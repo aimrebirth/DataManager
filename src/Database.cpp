@@ -23,6 +23,9 @@
 #include <Polygon4/Storage.h>
 #include <Polygon4/StorageImpl.h>
 
+#include "Logger.h"
+DECLARE_STATIC_LOGGER(logger, "db");
+
 namespace polygon4
 {
 
@@ -42,7 +45,11 @@ void Database::loadDatabase(std::string dbname)
     if (db)
         return;
     if (sqlite3_open(dbname.c_str(), &db))
-        throw std::exception(std::string("Can't open database file: " + dbname + " error: " + sqlite3_errmsg(db)).c_str());
+    {
+        std::string error = "Can't open database file: " + dbname + " error: " + sqlite3_errmsg(db);
+        LOG_ERROR(logger, error);
+        throw std::exception(error.c_str());
+    }
 }
 
 bool Database::isLoaded() const
@@ -52,20 +59,22 @@ bool Database::isLoaded() const
 
 void Database::execute(const std::string &sql, void *object, DatabaseCallback callback)
 {
+    LOG_TRACE(logger, "Executing sql statement: " << sql);
     char *errmsg;
     sqlite3_exec(db, sql.c_str(), callback, object, &errmsg);
     if (errmsg)
     {
-        std::string err = "Error executing sql statement: " + sql + " error: " + errmsg;
+        std::string error = "Error executing sql statement: " + sql + " error: " + errmsg;
         sqlite3_free(errmsg);
-        throw std::exception(err.c_str());
+        LOG_ERROR(logger, error);
+        throw std::exception(error.c_str());
     }
 }
 
-std::shared_ptr<detail::Storage> initStorage(std::string filename)
+std::shared_ptr<Storage> initStorage(std::string filename)
 {
     std::shared_ptr<Database> db = std::make_shared<Database>(filename);
-    std::shared_ptr<detail::Storage> storage = std::make_shared<detail::StorageImpl>(db);
+    std::shared_ptr<Storage> storage = std::make_shared<detail::StorageImpl>(db);
     return storage;
 }
 

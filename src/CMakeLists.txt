@@ -2,7 +2,7 @@
 # Polygon-4 Data Manager
 #
 
-file(GLOB_RECURSE db_inc "${CMAKE_SOURCE_DIR}/include/Polygon4/*")
+file(GLOB_RECURSE db_inc "${CMAKE_CURRENT_SOURCE_DIR}/../include/Polygon4/*")
 file(GLOB db_src "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
 set(db_src

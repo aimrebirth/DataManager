@@ -37,7 +37,7 @@ private:
         if (buildings.empty())
             return;
         std::string query;
-        query += "insert or replace into Buildings values";
+        query += "insert or replace into Buildings values\n";
         for (auto &building : buildings)
         {
             query += "(";
@@ -46,9 +46,9 @@ private:
             query += "'" + building.second->resource.string() + "',";
             query += "'" + std::to_string(building.second->name.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -84,7 +84,7 @@ private:
         if (clanReputations.empty())
             return;
         std::string query;
-        query += "insert or replace into ClanReputations values";
+        query += "insert or replace into ClanReputations values\n";
         for (auto &clanReputation : clanReputations)
         {
             query += "(";
@@ -92,9 +92,9 @@ private:
             query += "'" + std::to_string(clanReputation->clan2.id) + "',";
             query += "'" + std::to_string(clanReputation->reputation) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -136,7 +136,7 @@ private:
         if (clans.empty())
             return;
         std::string query;
-        query += "insert or replace into Clans values";
+        query += "insert or replace into Clans values\n";
         for (auto &clan : clans)
         {
             query += "(";
@@ -145,9 +145,9 @@ private:
             query += "'" + clan.second->resource.string() + "',";
             query += "'" + std::to_string(clan.second->name.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -183,7 +183,7 @@ private:
         if (configurationEquipments.empty())
             return;
         std::string query;
-        query += "insert or replace into ConfigurationEquipments values";
+        query += "insert or replace into ConfigurationEquipments values\n";
         for (auto &configurationEquipment : configurationEquipments)
         {
             query += "(";
@@ -191,9 +191,9 @@ private:
             query += "'" + std::to_string(configurationEquipment->equipment.id) + "',";
             query += "'" + std::to_string(configurationEquipment->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -229,7 +229,7 @@ private:
         if (configurationGoods.empty())
             return;
         std::string query;
-        query += "insert or replace into ConfigurationGoods values";
+        query += "insert or replace into ConfigurationGoods values\n";
         for (auto &configurationGood : configurationGoods)
         {
             query += "(";
@@ -237,9 +237,9 @@ private:
             query += "'" + std::to_string(configurationGood->goods.id) + "',";
             query += "'" + std::to_string(configurationGood->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -275,7 +275,7 @@ private:
         if (configurationProjectiles.empty())
             return;
         std::string query;
-        query += "insert or replace into ConfigurationProjectiles values";
+        query += "insert or replace into ConfigurationProjectiles values\n";
         for (auto &configurationProjectile : configurationProjectiles)
         {
             query += "(";
@@ -283,9 +283,9 @@ private:
             query += "'" + std::to_string(configurationProjectile->projectile.id) + "',";
             query += "'" + std::to_string(configurationProjectile->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -321,7 +321,7 @@ private:
         if (configurationWeapons.empty())
             return;
         std::string query;
-        query += "insert or replace into ConfigurationWeapons values";
+        query += "insert or replace into ConfigurationWeapons values\n";
         for (auto &configurationWeapon : configurationWeapons)
         {
             query += "(";
@@ -329,9 +329,9 @@ private:
             query += "'" + std::to_string(configurationWeapon->weapon.id) + "',";
             query += "'" + std::to_string(configurationWeapon->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -383,7 +383,7 @@ private:
         if (configurations.empty())
             return;
         std::string query;
-        query += "insert or replace into Configurations values";
+        query += "insert or replace into Configurations values\n";
         for (auto &configuration : configurations)
         {
             query += "(";
@@ -392,9 +392,9 @@ private:
             query += "'" + std::to_string(configuration.second->name.id) + "',";
             query += "'" + std::to_string(configuration.second->glider.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -429,7 +429,7 @@ private:
         if (coordinates.empty())
             return;
         std::string query;
-        query += "insert or replace into Coordinates values";
+        query += "insert or replace into Coordinates values\n";
         for (auto &coordinate : coordinates)
         {
             query += "(";
@@ -441,9 +441,9 @@ private:
             query += "'" + std::to_string(coordinate.second->pitch) + "',";
             query += "'" + std::to_string(coordinate.second->roll) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -490,7 +490,7 @@ private:
         if (equipments.empty())
             return;
         std::string query;
-        query += "insert or replace into Equipments values";
+        query += "insert or replace into Equipments values\n";
         for (auto &equipment : equipments)
         {
             query += "(";
@@ -510,9 +510,9 @@ private:
             query += "'" + std::to_string(equipment.second->price) + "',";
             query += "'" + std::to_string(equipment.second->notrade) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -557,7 +557,7 @@ private:
         if (gliders.empty())
             return;
         std::string query;
-        query += "insert or replace into Gliders values";
+        query += "insert or replace into Gliders values\n";
         for (auto &glider : gliders)
         {
             query += "(";
@@ -575,9 +575,9 @@ private:
             query += "'" + std::to_string(glider.second->power) + "',";
             query += "'" + std::to_string(glider.second->special) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -616,7 +616,7 @@ private:
         if (goods.empty())
             return;
         std::string query;
-        query += "insert or replace into Goods values";
+        query += "insert or replace into Goods values\n";
         for (auto &good : goods)
         {
             query += "(";
@@ -628,9 +628,9 @@ private:
             query += "'" + std::to_string(good.second->notrade) + "',";
             query += "'" + std::to_string(good.second->weight) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -666,7 +666,7 @@ private:
         if (mapBuildingEquipments.empty())
             return;
         std::string query;
-        query += "insert or replace into MapBuildingEquipments values";
+        query += "insert or replace into MapBuildingEquipments values\n";
         for (auto &mapBuildingEquipment : mapBuildingEquipments)
         {
             query += "(";
@@ -674,9 +674,9 @@ private:
             query += "'" + std::to_string(mapBuildingEquipment->equipment.id) + "',";
             query += "'" + std::to_string(mapBuildingEquipment->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -712,7 +712,7 @@ private:
         if (mapBuildingGliders.empty())
             return;
         std::string query;
-        query += "insert or replace into MapBuildingGliders values";
+        query += "insert or replace into MapBuildingGliders values\n";
         for (auto &mapBuildingGlider : mapBuildingGliders)
         {
             query += "(";
@@ -720,9 +720,9 @@ private:
             query += "'" + std::to_string(mapBuildingGlider->glider.id) + "',";
             query += "'" + std::to_string(mapBuildingGlider->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -758,7 +758,7 @@ private:
         if (mapBuildingGoods.empty())
             return;
         std::string query;
-        query += "insert or replace into MapBuildingGoods values";
+        query += "insert or replace into MapBuildingGoods values\n";
         for (auto &mapBuildingGood : mapBuildingGoods)
         {
             query += "(";
@@ -766,9 +766,9 @@ private:
             query += "'" + std::to_string(mapBuildingGood->goods.id) + "',";
             query += "'" + std::to_string(mapBuildingGood->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -804,7 +804,7 @@ private:
         if (mapBuildingModificators.empty())
             return;
         std::string query;
-        query += "insert or replace into MapBuildingModificators values";
+        query += "insert or replace into MapBuildingModificators values\n";
         for (auto &mapBuildingModificator : mapBuildingModificators)
         {
             query += "(";
@@ -812,9 +812,9 @@ private:
             query += "'" + std::to_string(mapBuildingModificator->modificator.id) + "',";
             query += "'" + std::to_string(mapBuildingModificator->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -850,7 +850,7 @@ private:
         if (mapBuildingProjectiles.empty())
             return;
         std::string query;
-        query += "insert or replace into MapBuildingProjectiles values";
+        query += "insert or replace into MapBuildingProjectiles values\n";
         for (auto &mapBuildingProjectile : mapBuildingProjectiles)
         {
             query += "(";
@@ -858,9 +858,9 @@ private:
             query += "'" + std::to_string(mapBuildingProjectile->projectile.id) + "',";
             query += "'" + std::to_string(mapBuildingProjectile->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -896,7 +896,7 @@ private:
         if (mapBuildingWeapons.empty())
             return;
         std::string query;
-        query += "insert or replace into MapBuildingWeapons values";
+        query += "insert or replace into MapBuildingWeapons values\n";
         for (auto &mapBuildingWeapon : mapBuildingWeapons)
         {
             query += "(";
@@ -904,9 +904,9 @@ private:
             query += "'" + std::to_string(mapBuildingWeapon->weapon.id) + "',";
             query += "'" + std::to_string(mapBuildingWeapon->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -966,7 +966,7 @@ private:
         if (mapBuildings.empty())
             return;
         std::string query;
-        query += "insert or replace into MapBuildings values";
+        query += "insert or replace into MapBuildings values\n";
         for (auto &mapBuilding : mapBuildings)
         {
             query += "(";
@@ -976,9 +976,9 @@ private:
             query += "'" + std::to_string(mapBuilding.second->building.id) + "',";
             query += "'" + std::to_string(mapBuilding.second->coordinate.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1016,7 +1016,7 @@ private:
         if (mapObjects.empty())
             return;
         std::string query;
-        query += "insert or replace into MapObjects values";
+        query += "insert or replace into MapObjects values\n";
         for (auto &mapObject : mapObjects)
         {
             query += "(";
@@ -1025,9 +1025,9 @@ private:
             query += "'" + std::to_string(mapObject.second->object.id) + "',";
             query += "'" + std::to_string(mapObject.second->coordinate.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1063,7 +1063,7 @@ private:
         if (maps.empty())
             return;
         std::string query;
-        query += "insert or replace into Maps values";
+        query += "insert or replace into Maps values\n";
         for (auto &map : maps)
         {
             query += "(";
@@ -1072,9 +1072,9 @@ private:
             query += "'" + map.second->resource.string() + "',";
             query += "'" + std::to_string(map.second->name.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1109,7 +1109,7 @@ private:
         if (mechanoidGroups.empty())
             return;
         std::string query;
-        query += "insert or replace into MechanoidGroups values";
+        query += "insert or replace into MechanoidGroups values\n";
         for (auto &mechanoidGroup : mechanoidGroups)
         {
             query += "(";
@@ -1117,9 +1117,9 @@ private:
             query += "'" + mechanoidGroup.second->text_id.string() + "',";
             query += "'" + std::to_string(mechanoidGroup.second->name.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1171,7 +1171,7 @@ private:
         if (mechanoids.empty())
             return;
         std::string query;
-        query += "insert or replace into Mechanoids values";
+        query += "insert or replace into Mechanoids values\n";
         for (auto &mechanoid : mechanoids)
         {
             query += "(";
@@ -1191,9 +1191,9 @@ private:
             query += "'" + std::to_string(mechanoid.second->map_building.id) + "',";
             query += "'" + std::to_string(mechanoid.second->coordinate.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1228,16 +1228,16 @@ private:
         if (modificationClans.empty())
             return;
         std::string query;
-        query += "insert or replace into ModificationClans values";
+        query += "insert or replace into ModificationClans values\n";
         for (auto &modificationClan : modificationClans)
         {
             query += "(";
             query += "'" + std::to_string(modificationClan->modification.id) + "',";
             query += "'" + std::to_string(modificationClan->clan.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1272,16 +1272,16 @@ private:
         if (modificationMaps.empty())
             return;
         std::string query;
-        query += "insert or replace into ModificationMaps values";
+        query += "insert or replace into ModificationMaps values\n";
         for (auto &modificationMap : modificationMaps)
         {
             query += "(";
             query += "'" + std::to_string(modificationMap->modification.id) + "',";
             query += "'" + std::to_string(modificationMap->map.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1316,16 +1316,16 @@ private:
         if (modificationMechanoids.empty())
             return;
         std::string query;
-        query += "insert or replace into ModificationMechanoids values";
+        query += "insert or replace into ModificationMechanoids values\n";
         for (auto &modificationMechanoid : modificationMechanoids)
         {
             query += "(";
             query += "'" + std::to_string(modificationMechanoid->modification.id) + "',";
             query += "'" + std::to_string(modificationMechanoid->mechanoid.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1336,8 +1336,8 @@ private:
         {
             Ptr<Modification> modification = std::make_shared<Modification>();
             modification->id = std::stoi(cols[0]);
-            modification->text_id = cols[1];
-            modification->name = cols[2];
+            modification->name = cols[1];
+            modification->directory = cols[2];
             modification->author = cols[3];
             modification->date_created = std::stoi(cols[4]);
             modification->date_modified = std::stoi(cols[5]);
@@ -1375,13 +1375,13 @@ private:
         if (modifications.empty())
             return;
         std::string query;
-        query += "insert or replace into Modifications values";
+        query += "insert or replace into Modifications values\n";
         for (auto &modification : modifications)
         {
             query += "(";
             query += "'" + std::to_string(modification.second->id) + "',";
-            query += "'" + modification.second->text_id.string() + "',";
             query += "'" + modification.second->name.string() + "',";
+            query += "'" + modification.second->directory.string() + "',";
             query += "'" + modification.second->author.string() + "',";
             query += "'" + std::to_string(modification.second->date_created) + "',";
             query += "'" + std::to_string(modification.second->date_modified) + "',";
@@ -1390,9 +1390,9 @@ private:
             query += "'" + modification.second->script_language.string() + "',";
             query += "'" + modification.second->script_main.string() + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1429,7 +1429,7 @@ private:
         if (modificators.empty())
             return;
         std::string query;
-        query += "insert or replace into Modificators values";
+        query += "insert or replace into Modificators values\n";
         for (auto &modificator : modificators)
         {
             query += "(";
@@ -1443,9 +1443,9 @@ private:
             query += "'" + std::to_string(modificator.second->k_param1) + "',";
             query += "'" + std::to_string(modificator.second->k_param2) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1478,7 +1478,7 @@ private:
         if (objects.empty())
             return;
         std::string query;
-        query += "insert or replace into Objects values";
+        query += "insert or replace into Objects values\n";
         for (auto &object : objects)
         {
             query += "(";
@@ -1488,9 +1488,9 @@ private:
             query += "'" + object.second->name.string() + "',";
             query += "'" + std::to_string(object.second->type) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1524,16 +1524,16 @@ private:
         if (players.empty())
             return;
         std::string query;
-        query += "insert or replace into Players values";
+        query += "insert or replace into Players values\n";
         for (auto &player : players)
         {
             query += "(";
             query += "'" + std::to_string(player.second->id) + "',";
             query += "'" + std::to_string(player.second->mechaniod.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1575,7 +1575,7 @@ private:
         if (projectiles.empty())
             return;
         std::string query;
-        query += "insert or replace into Projectiles values";
+        query += "insert or replace into Projectiles values\n";
         for (auto &projectile : projectiles)
         {
             query += "(";
@@ -1590,9 +1590,9 @@ private:
             query += "'" + std::to_string(projectile.second->scale) + "',";
             query += "'" + std::to_string(projectile.second->notrade) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1628,7 +1628,7 @@ private:
         if (questRewardEquipments.empty())
             return;
         std::string query;
-        query += "insert or replace into QuestRewardEquipments values";
+        query += "insert or replace into QuestRewardEquipments values\n";
         for (auto &questRewardEquipment : questRewardEquipments)
         {
             query += "(";
@@ -1636,9 +1636,9 @@ private:
             query += "'" + std::to_string(questRewardEquipment->equipment.id) + "',";
             query += "'" + std::to_string(questRewardEquipment->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1674,7 +1674,7 @@ private:
         if (questRewardGliders.empty())
             return;
         std::string query;
-        query += "insert or replace into QuestRewardGliders values";
+        query += "insert or replace into QuestRewardGliders values\n";
         for (auto &questRewardGlider : questRewardGliders)
         {
             query += "(";
@@ -1682,9 +1682,9 @@ private:
             query += "'" + std::to_string(questRewardGlider->glider.id) + "',";
             query += "'" + std::to_string(questRewardGlider->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1720,7 +1720,7 @@ private:
         if (questRewardGoods.empty())
             return;
         std::string query;
-        query += "insert or replace into QuestRewardGoods values";
+        query += "insert or replace into QuestRewardGoods values\n";
         for (auto &questRewardGood : questRewardGoods)
         {
             query += "(";
@@ -1728,9 +1728,9 @@ private:
             query += "'" + std::to_string(questRewardGood->good.id) + "',";
             query += "'" + std::to_string(questRewardGood->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1766,7 +1766,7 @@ private:
         if (questRewardModificators.empty())
             return;
         std::string query;
-        query += "insert or replace into QuestRewardModificators values";
+        query += "insert or replace into QuestRewardModificators values\n";
         for (auto &questRewardModificator : questRewardModificators)
         {
             query += "(";
@@ -1774,9 +1774,9 @@ private:
             query += "'" + std::to_string(questRewardModificator->modificator.id) + "',";
             query += "'" + std::to_string(questRewardModificator->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1812,7 +1812,7 @@ private:
         if (questRewardProjectiles.empty())
             return;
         std::string query;
-        query += "insert or replace into QuestRewardProjectiles values";
+        query += "insert or replace into QuestRewardProjectiles values\n";
         for (auto &questRewardProjectile : questRewardProjectiles)
         {
             query += "(";
@@ -1820,9 +1820,9 @@ private:
             query += "'" + std::to_string(questRewardProjectile->projectile.id) + "',";
             query += "'" + std::to_string(questRewardProjectile->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1858,7 +1858,7 @@ private:
         if (questRewardReputations.empty())
             return;
         std::string query;
-        query += "insert or replace into QuestRewardReputations values";
+        query += "insert or replace into QuestRewardReputations values\n";
         for (auto &questRewardReputation : questRewardReputations)
         {
             query += "(";
@@ -1866,9 +1866,9 @@ private:
             query += "'" + std::to_string(questRewardReputation->clan.id) + "',";
             query += "'" + std::to_string(questRewardReputation->reputation) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1904,7 +1904,7 @@ private:
         if (questRewardWeapons.empty())
             return;
         std::string query;
-        query += "insert or replace into QuestRewardWeapons values";
+        query += "insert or replace into QuestRewardWeapons values\n";
         for (auto &questRewardWeapon : questRewardWeapons)
         {
             query += "(";
@@ -1912,9 +1912,9 @@ private:
             query += "'" + std::to_string(questRewardWeapon->weapon.id) + "',";
             query += "'" + std::to_string(questRewardWeapon->quantity) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -1969,7 +1969,7 @@ private:
         if (questRewards.empty())
             return;
         std::string query;
-        query += "insert or replace into QuestRewards values";
+        query += "insert or replace into QuestRewards values\n";
         for (auto &questReward : questRewards)
         {
             query += "(";
@@ -1977,9 +1977,9 @@ private:
             query += "'" + std::to_string(questReward.second->money) + "',";
             query += "'" + std::to_string(questReward.second->rating) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -2021,7 +2021,7 @@ private:
         if (quests.empty())
             return;
         std::string query;
-        query += "insert or replace into Quests values";
+        query += "insert or replace into Quests values\n";
         for (auto &quest : quests)
         {
             query += "(";
@@ -2033,9 +2033,9 @@ private:
             query += "'" + std::to_string(quest.second->reward.id) + "',";
             query += "'" + std::to_string(quest.second->time) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -2074,7 +2074,7 @@ private:
         if (saveObjects.empty())
             return;
         std::string query;
-        query += "insert or replace into SaveObjects values";
+        query += "insert or replace into SaveObjects values\n";
         for (auto &saveObject : saveObjects)
         {
             query += "(";
@@ -2083,9 +2083,9 @@ private:
             query += "'" + std::to_string(saveObject->map.id) + "',";
             query += "'" + std::to_string(saveObject->coordinate.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -2120,16 +2120,16 @@ private:
         if (savePlayers.empty())
             return;
         std::string query;
-        query += "insert or replace into SavePlayers values";
+        query += "insert or replace into SavePlayers values\n";
         for (auto &savePlayer : savePlayers)
         {
             query += "(";
             query += "'" + std::to_string(savePlayer->save.id) + "',";
             query += "'" + std::to_string(savePlayer->player.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -2165,7 +2165,7 @@ private:
         if (saveQuests.empty())
             return;
         std::string query;
-        query += "insert or replace into SaveQuests values";
+        query += "insert or replace into SaveQuests values\n";
         for (auto &saveQuest : saveQuests)
         {
             query += "(";
@@ -2173,9 +2173,9 @@ private:
             query += "'" + std::to_string(saveQuest->quest.id) + "',";
             query += "'" + std::to_string(saveQuest->state) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -2226,7 +2226,7 @@ private:
         if (saves.empty())
             return;
         std::string query;
-        query += "insert or replace into Saves values";
+        query += "insert or replace into Saves values\n";
         for (auto &save : saves)
         {
             query += "(";
@@ -2235,9 +2235,9 @@ private:
             query += "'" + save.second->name.string() + "',";
             query += "'" + std::to_string(save.second->date) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -2272,7 +2272,7 @@ private:
         if (scriptVariables.empty())
             return;
         std::string query;
-        query += "insert or replace into ScriptVariables values";
+        query += "insert or replace into ScriptVariables values\n";
         for (auto &scriptVariable : scriptVariables)
         {
             query += "(";
@@ -2280,9 +2280,9 @@ private:
             query += "'" + scriptVariable->variable.string() + "',";
             query += "'" + scriptVariable->value.string() + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -2313,7 +2313,7 @@ private:
         if (strings.empty())
             return;
         std::string query;
-        query += "insert or replace into Strings values";
+        query += "insert or replace into Strings values\n";
         for (auto &string : strings)
         {
             query += "(";
@@ -2321,9 +2321,9 @@ private:
             query += "'" + string.second->ru.string() + "',";
             query += "'" + string.second->en.string() + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }
@@ -2368,7 +2368,7 @@ private:
         if (weapons.empty())
             return;
         std::string query;
-        query += "insert or replace into Weapons values";
+        query += "insert or replace into Weapons values\n";
         for (auto &weapon : weapons)
         {
             query += "(";
@@ -2385,9 +2385,9 @@ private:
             query += "'" + std::to_string(weapon.second->price) + "',";
             query += "'" + std::to_string(weapon.second->projectile.id) + "',";
             query.resize(query.size() - 1);
-            query += "),";
+            query += "),\n";
         }
-        query.resize(query.size() - 1);
+        query.resize(query.size() - 2);
         query += ";";
         db->execute(query.c_str(), 0, 0);
     }

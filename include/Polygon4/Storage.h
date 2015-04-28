@@ -33,6 +33,8 @@ namespace detail
 
 } // namespace detail
 
-std::shared_ptr<detail::Storage> initStorage(std::string filename);
+using detail::Storage;
+
+std::shared_ptr<Storage> initStorage(std::string filename);
 
 } // namespace polygon4

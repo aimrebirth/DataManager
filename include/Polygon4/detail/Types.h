@@ -293,8 +293,8 @@ struct ModificationMechanoid
 struct Modification
 {
     int id = 0;
-    Text text_id;
     Text name;
+    Text directory;
     Text author;
     int date_created = 0;
     int date_modified = 0;
