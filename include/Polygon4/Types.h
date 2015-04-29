@@ -22,6 +22,7 @@
 #include <memory>
 #include <set>
 #include <stdint.h>
+#include <sstream>
 #include <vector>
 
 #include "String.h"
@@ -31,6 +32,8 @@ namespace polygon4
 
 namespace detail
 {
+
+using std::to_string;
 
 typedef String Text;
 typedef uint8_t EnumType;
@@ -54,8 +57,16 @@ struct IdPtr
     std::shared_ptr<T> ptr;
 };
 
+template<class T>
+inline std::string to_string(IdPtr<T> ptr)
+{
+    return to_string(ptr.id);
+}
+
 #include "detail/Types.h"
 
 } // namespace detail
+
+using detail::Ptr;
 
 } // namespace polygon4

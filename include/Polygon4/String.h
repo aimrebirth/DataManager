@@ -159,4 +159,14 @@ private:
     }
 };
 
+inline std::string to_string(const String &s)
+{
+    return s.string();
+}
+
+inline std::wstring to_wstring(const String &s)
+{
+    return s.wstring();
+}
+
 }

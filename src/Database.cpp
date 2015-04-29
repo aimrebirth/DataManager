@@ -18,8 +18,11 @@
 
 #include <Polygon4/Database.h>
 
+#include <algorithm>
+
 #include <sqlite3/sqlite3.h>
 
+#include <Polygon4/DatabaseSchema.h>
 #include <Polygon4/Storage.h>
 #include <Polygon4/StorageImpl.h>
 
@@ -29,9 +32,21 @@ DECLARE_STATIC_LOGGER(logger, "db");
 namespace polygon4
 {
 
+std::shared_ptr<Storage> initStorage(std::string filename)
+{
+    std::shared_ptr<Database> db = std::make_shared<Database>(filename);
+    return initStorage(db);
+}
+
+std::shared_ptr<Storage> initStorage(std::shared_ptr<Database> db)
+{
+    return std::make_shared<detail::StorageImpl>(db);
+}
+
 Database::Database(std::string dbname)
 {
     loadDatabase(dbname);
+    name = dbname.substr(std::max((int)dbname.rfind("/"), (int)dbname.rfind("\\")) + 1);
 }
 
 Database::~Database()
@@ -71,11 +86,68 @@ void Database::execute(const std::string &sql, void *object, DatabaseCallback ca
     }
 }
 
-std::shared_ptr<Storage> initStorage(std::string filename)
+std::string Database::getName() const
 {
-    std::shared_ptr<Database> db = std::make_shared<Database>(filename);
-    std::shared_ptr<Storage> storage = std::make_shared<detail::StorageImpl>(db);
-    return storage;
+    return name;
+}
+
+void Database::getSchema(DatabaseSchema *schema)
+{
+    if (schema == 0)
+        return;
+
+    auto callback = [](void *o, int ncols, char **cols, char **names)
+    {
+        DatabaseSchema *schema = (DatabaseSchema *)o;
+        Table table;
+        table.id = schema->tables.size();
+        table.name = cols[1];
+        schema->tables[table.name] = table;
+        return 0;
+    };
+    execute("SELECT * FROM sqlite_master WHERE type='table';", schema, callback);
+    
+    auto callback2 = [](void *o, int ncols, char **cols, char **names)
+    {
+        Table *table = (Table *)o;
+        Column column;
+        column.id = table->columns.size();
+        column.name = cols[1];
+        column.type = getColumnType(cols[2]);
+        table->columns[column.name] = column;
+        return 0;
+    };
+    for (auto &tbl : schema->tables)
+        execute("PRAGMA table_info(" + tbl.first + ");", &tbl.second, callback2);
+}
+
+std::string getColumnTypeString(ColumnType type)
+{
+    switch (type)
+    {
+    case ColumnType::Integer:
+        return "INTEGER";
+    case ColumnType::Real:
+        return "REAL";
+    case ColumnType::Text:
+        return "TEXT";
+    case ColumnType::Blob:
+        return "BLOB";
+    }
+    return "";
+}
+
+ColumnType getColumnType(const std::string &s)
+{
+    if (s == "INTEGER")
+        return ColumnType::Integer;
+    else if (s == "REAL")
+        return ColumnType::Real;
+    else if (s == "TEXT")
+        return ColumnType::Text;
+    else if (s == "BLOB")
+        return ColumnType::Blob;
+    return ColumnType::Integer;
 }
 
 }

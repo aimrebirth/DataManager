@@ -18,8 +18,11 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
-#include <string>
+#include <set>
+#include <stdint.h>
+#include <vector>
 
 #include "Types.h"
 
@@ -28,15 +31,9 @@ namespace polygon4
 
 namespace detail
 {
-    
-#include "detail/Storage.h"
+
+#include "detail/Helpers.h"
 
 } // namespace detail
-
-using detail::Storage;
-class Database;
-
-std::shared_ptr<Storage> initStorage(std::string filename);
-std::shared_ptr<Storage> initStorage(std::shared_ptr<Database> db);
 
 } // namespace polygon4

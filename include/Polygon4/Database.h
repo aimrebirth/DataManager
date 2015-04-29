@@ -25,6 +25,8 @@ struct sqlite3;
 namespace polygon4
 {
 
+struct DatabaseSchema;
+
 class Database
 {    
     typedef int(*DatabaseCallback)(void*, int, char**, char**);
@@ -35,11 +37,14 @@ public:
 
     void loadDatabase(std::string dbname);
     bool isLoaded() const;
+    void getSchema(DatabaseSchema *schema);
+    std::string getName() const;
 
     void execute(const std::string &sql, void *object, DatabaseCallback callback);
 
 private:
     sqlite3 *db = 0;
+    std::string name;
 };
 
 }

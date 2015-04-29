@@ -18,25 +18,42 @@
 
 #pragma once
 
-#include <memory>
+#include <map>
 #include <string>
-
-#include "Types.h"
 
 namespace polygon4
 {
 
-namespace detail
+enum class ColumnType
 {
-    
-#include "detail/Storage.h"
+    Integer,
+    Real,
+    Text,
+    Blob
+};
+std::string getColumnTypeString(ColumnType type);
+ColumnType getColumnType(const std::string &s);
 
-} // namespace detail
+struct Column
+{
+    int id;
+    std::string name;
+    ColumnType type;
+};
+typedef std::map<std::string, Column> Columns;
 
-using detail::Storage;
-class Database;
+struct Table
+{
+    int id;
+    std::string name;
+    Columns columns;
+};
+typedef std::map<std::string, Table> Tables;
 
-std::shared_ptr<Storage> initStorage(std::string filename);
-std::shared_ptr<Storage> initStorage(std::shared_ptr<Database> db);
+struct DatabaseSchema
+{
+    std::string name;
+    Tables tables;
+};
 
-} // namespace polygon4
+}

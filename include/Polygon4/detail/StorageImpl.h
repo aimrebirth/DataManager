@@ -11,10 +11,10 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Building> building = std::make_shared<Building>();
-            building->id = std::stoi(cols[0]);
-            building->text_id = cols[1];
-            building->resource = cols[2];
-            building->name.id = std::stoi(cols[3]);
+            if (cols[0]) building->id = std::stoi(cols[0]);
+            if (cols[1]) building->text_id = cols[1];
+            if (cols[2]) building->resource = cols[2];
+            if (cols[3]) building->name.id = std::stoi(cols[3]);
 
             Storage *storage = (Storage *)o;
             storage->buildings[building->id] = building;
@@ -58,9 +58,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<ClanReputation> clanReputation = std::make_shared<ClanReputation>();
-            clanReputation->clan.id = std::stoi(cols[0]);
-            clanReputation->clan2.id = std::stoi(cols[1]);
-            clanReputation->reputation = std::stof(cols[2]);
+            if (cols[0]) clanReputation->clan.id = std::stoi(cols[0]);
+            if (cols[1]) clanReputation->clan2.id = std::stoi(cols[1]);
+            if (cols[2]) clanReputation->reputation = std::stof(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->clanReputations.push_back(clanReputation);
@@ -104,10 +104,10 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Clan> clan = std::make_shared<Clan>();
-            clan->id = std::stoi(cols[0]);
-            clan->text_id = cols[1];
-            clan->resource = cols[2];
-            clan->name.id = std::stoi(cols[3]);
+            if (cols[0]) clan->id = std::stoi(cols[0]);
+            if (cols[1]) clan->text_id = cols[1];
+            if (cols[2]) clan->resource = cols[2];
+            if (cols[3]) clan->name.id = std::stoi(cols[3]);
 
             Storage *storage = (Storage *)o;
             storage->clans[clan->id] = clan;
@@ -157,9 +157,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<ConfigurationEquipment> configurationEquipment = std::make_shared<ConfigurationEquipment>();
-            configurationEquipment->configuration.id = std::stoi(cols[0]);
-            configurationEquipment->equipment.id = std::stoi(cols[1]);
-            configurationEquipment->quantity = std::stoi(cols[2]);
+            if (cols[0]) configurationEquipment->configuration.id = std::stoi(cols[0]);
+            if (cols[1]) configurationEquipment->equipment.id = std::stoi(cols[1]);
+            if (cols[2]) configurationEquipment->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->configurationEquipments.push_back(configurationEquipment);
@@ -203,9 +203,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<ConfigurationGood> configurationGood = std::make_shared<ConfigurationGood>();
-            configurationGood->configuration.id = std::stoi(cols[0]);
-            configurationGood->goods.id = std::stoi(cols[1]);
-            configurationGood->quantity = std::stoi(cols[2]);
+            if (cols[0]) configurationGood->configuration.id = std::stoi(cols[0]);
+            if (cols[1]) configurationGood->goods.id = std::stoi(cols[1]);
+            if (cols[2]) configurationGood->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->configurationGoods.push_back(configurationGood);
@@ -249,9 +249,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<ConfigurationProjectile> configurationProjectile = std::make_shared<ConfigurationProjectile>();
-            configurationProjectile->configuration.id = std::stoi(cols[0]);
-            configurationProjectile->projectile.id = std::stoi(cols[1]);
-            configurationProjectile->quantity = std::stoi(cols[2]);
+            if (cols[0]) configurationProjectile->configuration.id = std::stoi(cols[0]);
+            if (cols[1]) configurationProjectile->projectile.id = std::stoi(cols[1]);
+            if (cols[2]) configurationProjectile->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->configurationProjectiles.push_back(configurationProjectile);
@@ -295,9 +295,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<ConfigurationWeapon> configurationWeapon = std::make_shared<ConfigurationWeapon>();
-            configurationWeapon->configuration.id = std::stoi(cols[0]);
-            configurationWeapon->weapon.id = std::stoi(cols[1]);
-            configurationWeapon->quantity = std::stoi(cols[2]);
+            if (cols[0]) configurationWeapon->configuration.id = std::stoi(cols[0]);
+            if (cols[1]) configurationWeapon->weapon.id = std::stoi(cols[1]);
+            if (cols[2]) configurationWeapon->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->configurationWeapons.push_back(configurationWeapon);
@@ -341,10 +341,10 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Configuration> configuration = std::make_shared<Configuration>();
-            configuration->id = std::stoi(cols[0]);
-            configuration->text_id = cols[1];
-            configuration->name.id = std::stoi(cols[2]);
-            configuration->glider.id = std::stoi(cols[3]);
+            if (cols[0]) configuration->id = std::stoi(cols[0]);
+            if (cols[1]) configuration->text_id = cols[1];
+            if (cols[2]) configuration->name.id = std::stoi(cols[2]);
+            if (cols[3]) configuration->glider.id = std::stoi(cols[3]);
 
             Storage *storage = (Storage *)o;
             storage->configurations[configuration->id] = configuration;
@@ -404,13 +404,13 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Coordinate> coordinate = std::make_shared<Coordinate>();
-            coordinate->id = std::stoi(cols[0]);
-            coordinate->x = std::stof(cols[1]);
-            coordinate->y = std::stof(cols[2]);
-            coordinate->z = std::stof(cols[3]);
-            coordinate->yaw = std::stof(cols[4]);
-            coordinate->pitch = std::stof(cols[5]);
-            coordinate->roll = std::stof(cols[6]);
+            if (cols[0]) coordinate->id = std::stoi(cols[0]);
+            if (cols[1]) coordinate->x = std::stof(cols[1]);
+            if (cols[2]) coordinate->y = std::stof(cols[2]);
+            if (cols[3]) coordinate->z = std::stof(cols[3]);
+            if (cols[4]) coordinate->yaw = std::stof(cols[4]);
+            if (cols[5]) coordinate->pitch = std::stof(cols[5]);
+            if (cols[6]) coordinate->roll = std::stof(cols[6]);
 
             Storage *storage = (Storage *)o;
             storage->coordinates[coordinate->id] = coordinate;
@@ -453,21 +453,21 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Equipment> equipment = std::make_shared<Equipment>();
-            equipment->id = std::stoi(cols[0]);
-            equipment->text_id = cols[1];
-            equipment->resource = cols[2];
-            equipment->name.id = std::stoi(cols[3]);
-            equipment->type = std::stoi(cols[4]);
-            equipment->standard = std::stoi(cols[5]);
-            equipment->weight = std::stof(cols[6]);
-            equipment->durability = std::stof(cols[7]);
-            equipment->power = std::stof(cols[8]);
-            equipment->value1 = std::stof(cols[9]);
-            equipment->value2 = std::stof(cols[10]);
-            equipment->value3 = std::stof(cols[11]);
-            equipment->manual = std::stoi(cols[12]);
-            equipment->price = std::stof(cols[13]);
-            equipment->notrade = std::stoi(cols[14]);
+            if (cols[0]) equipment->id = std::stoi(cols[0]);
+            if (cols[1]) equipment->text_id = cols[1];
+            if (cols[2]) equipment->resource = cols[2];
+            if (cols[3]) equipment->name.id = std::stoi(cols[3]);
+            if (cols[4]) equipment->type = std::stoi(cols[4]);
+            if (cols[5]) equipment->standard = std::stoi(cols[5]);
+            if (cols[6]) equipment->weight = std::stof(cols[6]);
+            if (cols[7]) equipment->durability = std::stof(cols[7]);
+            if (cols[8]) equipment->power = std::stof(cols[8]);
+            if (cols[9]) equipment->value1 = std::stof(cols[9]);
+            if (cols[10]) equipment->value2 = std::stof(cols[10]);
+            if (cols[11]) equipment->value3 = std::stof(cols[11]);
+            if (cols[12]) equipment->manual = std::stoi(cols[12]);
+            if (cols[13]) equipment->price = std::stof(cols[13]);
+            if (cols[14]) equipment->notrade = std::stoi(cols[14]);
 
             Storage *storage = (Storage *)o;
             storage->equipments[equipment->id] = equipment;
@@ -522,19 +522,19 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Glider> glider = std::make_shared<Glider>();
-            glider->id = std::stoi(cols[0]);
-            glider->text_id = cols[1];
-            glider->resource = cols[2];
-            glider->name.id = std::stoi(cols[3]);
-            glider->standard = std::stoi(cols[4]);
-            glider->weight = std::stof(cols[5]);
-            glider->maxweight = std::stof(cols[6]);
-            glider->rotatespeed = std::stof(cols[7]);
-            glider->armor = std::stof(cols[8]);
-            glider->price = std::stoi(cols[9]);
-            glider->restore = std::stof(cols[10]);
-            glider->power = std::stof(cols[11]);
-            glider->special = std::stoi(cols[12]);
+            if (cols[0]) glider->id = std::stoi(cols[0]);
+            if (cols[1]) glider->text_id = cols[1];
+            if (cols[2]) glider->resource = cols[2];
+            if (cols[3]) glider->name.id = std::stoi(cols[3]);
+            if (cols[4]) glider->standard = std::stoi(cols[4]);
+            if (cols[5]) glider->weight = std::stof(cols[5]);
+            if (cols[6]) glider->maxweight = std::stof(cols[6]);
+            if (cols[7]) glider->rotatespeed = std::stof(cols[7]);
+            if (cols[8]) glider->armor = std::stof(cols[8]);
+            if (cols[9]) glider->price = std::stoi(cols[9]);
+            if (cols[10]) glider->restore = std::stof(cols[10]);
+            if (cols[11]) glider->power = std::stof(cols[11]);
+            if (cols[12]) glider->special = std::stoi(cols[12]);
 
             Storage *storage = (Storage *)o;
             storage->gliders[glider->id] = glider;
@@ -587,13 +587,13 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Good> good = std::make_shared<Good>();
-            good->id = std::stoi(cols[0]);
-            good->text_id = cols[1];
-            good->resource = cols[2];
-            good->name.id = std::stoi(cols[3]);
-            good->price = std::stoi(cols[4]);
-            good->notrade = std::stoi(cols[5]);
-            good->weight = std::stof(cols[6]);
+            if (cols[0]) good->id = std::stoi(cols[0]);
+            if (cols[1]) good->text_id = cols[1];
+            if (cols[2]) good->resource = cols[2];
+            if (cols[3]) good->name.id = std::stoi(cols[3]);
+            if (cols[4]) good->price = std::stoi(cols[4]);
+            if (cols[5]) good->notrade = std::stoi(cols[5]);
+            if (cols[6]) good->weight = std::stof(cols[6]);
 
             Storage *storage = (Storage *)o;
             storage->goods[good->id] = good;
@@ -640,9 +640,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<MapBuildingEquipment> mapBuildingEquipment = std::make_shared<MapBuildingEquipment>();
-            mapBuildingEquipment->mapBuilding.id = std::stoi(cols[0]);
-            mapBuildingEquipment->equipment.id = std::stoi(cols[1]);
-            mapBuildingEquipment->quantity = std::stoi(cols[2]);
+            if (cols[0]) mapBuildingEquipment->mapBuilding.id = std::stoi(cols[0]);
+            if (cols[1]) mapBuildingEquipment->equipment.id = std::stoi(cols[1]);
+            if (cols[2]) mapBuildingEquipment->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->mapBuildingEquipments.push_back(mapBuildingEquipment);
@@ -686,9 +686,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<MapBuildingGlider> mapBuildingGlider = std::make_shared<MapBuildingGlider>();
-            mapBuildingGlider->mapBuilding.id = std::stoi(cols[0]);
-            mapBuildingGlider->glider.id = std::stoi(cols[1]);
-            mapBuildingGlider->quantity = std::stoi(cols[2]);
+            if (cols[0]) mapBuildingGlider->mapBuilding.id = std::stoi(cols[0]);
+            if (cols[1]) mapBuildingGlider->glider.id = std::stoi(cols[1]);
+            if (cols[2]) mapBuildingGlider->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->mapBuildingGliders.push_back(mapBuildingGlider);
@@ -732,9 +732,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<MapBuildingGood> mapBuildingGood = std::make_shared<MapBuildingGood>();
-            mapBuildingGood->mapBuilding.id = std::stoi(cols[0]);
-            mapBuildingGood->goods.id = std::stoi(cols[1]);
-            mapBuildingGood->quantity = std::stoi(cols[2]);
+            if (cols[0]) mapBuildingGood->mapBuilding.id = std::stoi(cols[0]);
+            if (cols[1]) mapBuildingGood->goods.id = std::stoi(cols[1]);
+            if (cols[2]) mapBuildingGood->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->mapBuildingGoods.push_back(mapBuildingGood);
@@ -778,9 +778,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<MapBuildingModificator> mapBuildingModificator = std::make_shared<MapBuildingModificator>();
-            mapBuildingModificator->mapBuilding.id = std::stoi(cols[0]);
-            mapBuildingModificator->modificator.id = std::stoi(cols[1]);
-            mapBuildingModificator->quantity = std::stoi(cols[2]);
+            if (cols[0]) mapBuildingModificator->mapBuilding.id = std::stoi(cols[0]);
+            if (cols[1]) mapBuildingModificator->modificator.id = std::stoi(cols[1]);
+            if (cols[2]) mapBuildingModificator->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->mapBuildingModificators.push_back(mapBuildingModificator);
@@ -824,9 +824,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<MapBuildingProjectile> mapBuildingProjectile = std::make_shared<MapBuildingProjectile>();
-            mapBuildingProjectile->mapBuilding.id = std::stoi(cols[0]);
-            mapBuildingProjectile->projectile.id = std::stoi(cols[1]);
-            mapBuildingProjectile->quantity = std::stoi(cols[2]);
+            if (cols[0]) mapBuildingProjectile->mapBuilding.id = std::stoi(cols[0]);
+            if (cols[1]) mapBuildingProjectile->projectile.id = std::stoi(cols[1]);
+            if (cols[2]) mapBuildingProjectile->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->mapBuildingProjectiles.push_back(mapBuildingProjectile);
@@ -870,9 +870,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<MapBuildingWeapon> mapBuildingWeapon = std::make_shared<MapBuildingWeapon>();
-            mapBuildingWeapon->mapBuilding.id = std::stoi(cols[0]);
-            mapBuildingWeapon->weapon.id = std::stoi(cols[1]);
-            mapBuildingWeapon->quantity = std::stoi(cols[2]);
+            if (cols[0]) mapBuildingWeapon->mapBuilding.id = std::stoi(cols[0]);
+            if (cols[1]) mapBuildingWeapon->weapon.id = std::stoi(cols[1]);
+            if (cols[2]) mapBuildingWeapon->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->mapBuildingWeapons.push_back(mapBuildingWeapon);
@@ -916,11 +916,11 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<MapBuilding> mapBuilding = std::make_shared<MapBuilding>();
-            mapBuilding->id = std::stoi(cols[0]);
-            mapBuilding->text_id = cols[1];
-            mapBuilding->map.id = std::stoi(cols[2]);
-            mapBuilding->building.id = std::stoi(cols[3]);
-            mapBuilding->coordinate.id = std::stoi(cols[4]);
+            if (cols[0]) mapBuilding->id = std::stoi(cols[0]);
+            if (cols[1]) mapBuilding->text_id = cols[1];
+            if (cols[2]) mapBuilding->map.id = std::stoi(cols[2]);
+            if (cols[3]) mapBuilding->building.id = std::stoi(cols[3]);
+            if (cols[4]) mapBuilding->coordinate.id = std::stoi(cols[4]);
 
             Storage *storage = (Storage *)o;
             storage->mapBuildings[mapBuilding->id] = mapBuilding;
@@ -988,10 +988,10 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<MapObject> mapObject = std::make_shared<MapObject>();
-            mapObject->id = std::stoi(cols[0]);
-            mapObject->map.id = std::stoi(cols[1]);
-            mapObject->object.id = std::stoi(cols[2]);
-            mapObject->coordinate.id = std::stoi(cols[3]);
+            if (cols[0]) mapObject->id = std::stoi(cols[0]);
+            if (cols[1]) mapObject->map.id = std::stoi(cols[1]);
+            if (cols[2]) mapObject->object.id = std::stoi(cols[2]);
+            if (cols[3]) mapObject->coordinate.id = std::stoi(cols[3]);
 
             Storage *storage = (Storage *)o;
             storage->mapObjects[mapObject->id] = mapObject;
@@ -1037,10 +1037,10 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Map> map = std::make_shared<Map>();
-            map->id = std::stoi(cols[0]);
-            map->text_id = cols[1];
-            map->resource = cols[2];
-            map->name.id = std::stoi(cols[3]);
+            if (cols[0]) map->id = std::stoi(cols[0]);
+            if (cols[1]) map->text_id = cols[1];
+            if (cols[2]) map->resource = cols[2];
+            if (cols[3]) map->name.id = std::stoi(cols[3]);
 
             Storage *storage = (Storage *)o;
             storage->maps[map->id] = map;
@@ -1084,9 +1084,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<MechanoidGroup> mechanoidGroup = std::make_shared<MechanoidGroup>();
-            mechanoidGroup->id = std::stoi(cols[0]);
-            mechanoidGroup->text_id = cols[1];
-            mechanoidGroup->name.id = std::stoi(cols[2]);
+            if (cols[0]) mechanoidGroup->id = std::stoi(cols[0]);
+            if (cols[1]) mechanoidGroup->text_id = cols[1];
+            if (cols[2]) mechanoidGroup->name.id = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->mechanoidGroups[mechanoidGroup->id] = mechanoidGroup;
@@ -1129,21 +1129,21 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Mechanoid> mechanoid = std::make_shared<Mechanoid>();
-            mechanoid->id = std::stoi(cols[0]);
-            mechanoid->text_id = cols[1];
-            mechanoid->name = cols[2];
-            mechanoid->generation = std::stoi(cols[3]);
-            mechanoid->rating = std::stof(cols[4]);
-            mechanoid->money = std::stof(cols[5]);
-            mechanoid->configuration.id = std::stoi(cols[6]);
-            mechanoid->clan.id = std::stoi(cols[7]);
-            mechanoid->group.id = std::stoi(cols[8]);
-            mechanoid->rating_fight = std::stof(cols[9]);
-            mechanoid->rating_courier = std::stof(cols[10]);
-            mechanoid->rating_trade = std::stof(cols[11]);
-            mechanoid->map.id = std::stoi(cols[12]);
-            mechanoid->map_building.id = std::stoi(cols[13]);
-            mechanoid->coordinate.id = std::stoi(cols[14]);
+            if (cols[0]) mechanoid->id = std::stoi(cols[0]);
+            if (cols[1]) mechanoid->text_id = cols[1];
+            if (cols[2]) mechanoid->name = cols[2];
+            if (cols[3]) mechanoid->generation = std::stoi(cols[3]);
+            if (cols[4]) mechanoid->rating = std::stof(cols[4]);
+            if (cols[5]) mechanoid->money = std::stof(cols[5]);
+            if (cols[6]) mechanoid->configuration.id = std::stoi(cols[6]);
+            if (cols[7]) mechanoid->clan.id = std::stoi(cols[7]);
+            if (cols[8]) mechanoid->group.id = std::stoi(cols[8]);
+            if (cols[9]) mechanoid->rating_fight = std::stof(cols[9]);
+            if (cols[10]) mechanoid->rating_courier = std::stof(cols[10]);
+            if (cols[11]) mechanoid->rating_trade = std::stof(cols[11]);
+            if (cols[12]) mechanoid->map.id = std::stoi(cols[12]);
+            if (cols[13]) mechanoid->map_building.id = std::stoi(cols[13]);
+            if (cols[14]) mechanoid->coordinate.id = std::stoi(cols[14]);
 
             Storage *storage = (Storage *)o;
             storage->mechanoids[mechanoid->id] = mechanoid;
@@ -1203,8 +1203,8 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<ModificationClan> modificationClan = std::make_shared<ModificationClan>();
-            modificationClan->modification.id = std::stoi(cols[0]);
-            modificationClan->clan.id = std::stoi(cols[1]);
+            if (cols[0]) modificationClan->modification.id = std::stoi(cols[0]);
+            if (cols[1]) modificationClan->clan.id = std::stoi(cols[1]);
 
             Storage *storage = (Storage *)o;
             storage->modificationClans.push_back(modificationClan);
@@ -1247,8 +1247,8 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<ModificationMap> modificationMap = std::make_shared<ModificationMap>();
-            modificationMap->modification.id = std::stoi(cols[0]);
-            modificationMap->map.id = std::stoi(cols[1]);
+            if (cols[0]) modificationMap->modification.id = std::stoi(cols[0]);
+            if (cols[1]) modificationMap->map.id = std::stoi(cols[1]);
 
             Storage *storage = (Storage *)o;
             storage->modificationMaps.push_back(modificationMap);
@@ -1291,8 +1291,8 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<ModificationMechanoid> modificationMechanoid = std::make_shared<ModificationMechanoid>();
-            modificationMechanoid->modification.id = std::stoi(cols[0]);
-            modificationMechanoid->mechanoid.id = std::stoi(cols[1]);
+            if (cols[0]) modificationMechanoid->modification.id = std::stoi(cols[0]);
+            if (cols[1]) modificationMechanoid->mechanoid.id = std::stoi(cols[1]);
 
             Storage *storage = (Storage *)o;
             storage->modificationMechanoids.push_back(modificationMechanoid);
@@ -1335,16 +1335,16 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Modification> modification = std::make_shared<Modification>();
-            modification->id = std::stoi(cols[0]);
-            modification->name = cols[1];
-            modification->directory = cols[2];
-            modification->author = cols[3];
-            modification->date_created = std::stoi(cols[4]);
-            modification->date_modified = std::stoi(cols[5]);
-            modification->comment = cols[6];
-            modification->version = std::stof(cols[7]);
-            modification->script_language = cols[8];
-            modification->script_main = cols[9];
+            if (cols[0]) modification->id = std::stoi(cols[0]);
+            if (cols[1]) modification->name = cols[1];
+            if (cols[2]) modification->directory = cols[2];
+            if (cols[3]) modification->author = cols[3];
+            if (cols[4]) modification->date_created = cols[4];
+            if (cols[5]) modification->date_modified = cols[5];
+            if (cols[6]) modification->comment = cols[6];
+            if (cols[7]) modification->version = std::stof(cols[7]);
+            if (cols[8]) modification->script_language = cols[8];
+            if (cols[9]) modification->script_main = cols[9];
 
             Storage *storage = (Storage *)o;
             storage->modifications[modification->id] = modification;
@@ -1383,8 +1383,8 @@ private:
             query += "'" + modification.second->name.string() + "',";
             query += "'" + modification.second->directory.string() + "',";
             query += "'" + modification.second->author.string() + "',";
-            query += "'" + std::to_string(modification.second->date_created) + "',";
-            query += "'" + std::to_string(modification.second->date_modified) + "',";
+            query += "'" + modification.second->date_created.string() + "',";
+            query += "'" + modification.second->date_modified.string() + "',";
             query += "'" + modification.second->comment.string() + "',";
             query += "'" + std::to_string(modification.second->version) + "',";
             query += "'" + modification.second->script_language.string() + "',";
@@ -1402,15 +1402,15 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Modificator> modificator = std::make_shared<Modificator>();
-            modificator->id = std::stoi(cols[0]);
-            modificator->text_id = cols[1];
-            modificator->resource = cols[2];
-            modificator->name = cols[3];
-            modificator->probability = std::stof(cols[4]);
-            modificator->price = std::stof(cols[5]);
-            modificator->k_price = std::stof(cols[6]);
-            modificator->k_param1 = std::stof(cols[7]);
-            modificator->k_param2 = std::stof(cols[8]);
+            if (cols[0]) modificator->id = std::stoi(cols[0]);
+            if (cols[1]) modificator->text_id = cols[1];
+            if (cols[2]) modificator->resource = cols[2];
+            if (cols[3]) modificator->name = cols[3];
+            if (cols[4]) modificator->probability = std::stof(cols[4]);
+            if (cols[5]) modificator->price = std::stof(cols[5]);
+            if (cols[6]) modificator->k_price = std::stof(cols[6]);
+            if (cols[7]) modificator->k_param1 = std::stof(cols[7]);
+            if (cols[8]) modificator->k_param2 = std::stof(cols[8]);
 
             Storage *storage = (Storage *)o;
             storage->modificators[modificator->id] = modificator;
@@ -1455,11 +1455,11 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Object> object = std::make_shared<Object>();
-            object->id = std::stoi(cols[0]);
-            object->text_id = cols[1];
-            object->resource = cols[2];
-            object->name = cols[3];
-            object->type = std::stoi(cols[4]);
+            if (cols[0]) object->id = std::stoi(cols[0]);
+            if (cols[1]) object->text_id = cols[1];
+            if (cols[2]) object->resource = cols[2];
+            if (cols[3]) object->name = cols[3];
+            if (cols[4]) object->type = std::stoi(cols[4]);
 
             Storage *storage = (Storage *)o;
             storage->objects[object->id] = object;
@@ -1500,8 +1500,8 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Player> player = std::make_shared<Player>();
-            player->id = std::stoi(cols[0]);
-            player->mechaniod.id = std::stoi(cols[1]);
+            if (cols[0]) player->id = std::stoi(cols[0]);
+            if (cols[1]) player->mechanoid.id = std::stoi(cols[1]);
 
             Storage *storage = (Storage *)o;
             storage->players[player->id] = player;
@@ -1513,7 +1513,7 @@ private:
     {
         for (auto &player : players)
         {
-            player.second->mechaniod.ptr = mechanoids[player.second->mechaniod.id];
+            player.second->mechanoid.ptr = mechanoids[player.second->mechanoid.id];
         }
     }
     void _loadPlayersArrays()
@@ -1529,7 +1529,7 @@ private:
         {
             query += "(";
             query += "'" + std::to_string(player.second->id) + "',";
-            query += "'" + std::to_string(player.second->mechaniod.id) + "',";
+            query += "'" + std::to_string(player.second->mechanoid.id) + "',";
             query.resize(query.size() - 1);
             query += "),\n";
         }
@@ -1543,16 +1543,16 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Projectile> projectile = std::make_shared<Projectile>();
-            projectile->id = std::stoi(cols[0]);
-            projectile->text_id = cols[1];
-            projectile->resource = cols[2];
-            projectile->name.id = std::stoi(cols[3]);
-            projectile->type = std::stoi(cols[4]);
-            projectile->weight = std::stof(cols[5]);
-            projectile->damage = std::stof(cols[6]);
-            projectile->speed = std::stof(cols[7]);
-            projectile->scale = std::stof(cols[8]);
-            projectile->notrade = std::stoi(cols[9]);
+            if (cols[0]) projectile->id = std::stoi(cols[0]);
+            if (cols[1]) projectile->text_id = cols[1];
+            if (cols[2]) projectile->resource = cols[2];
+            if (cols[3]) projectile->name.id = std::stoi(cols[3]);
+            if (cols[4]) projectile->type = std::stoi(cols[4]);
+            if (cols[5]) projectile->weight = std::stof(cols[5]);
+            if (cols[6]) projectile->damage = std::stof(cols[6]);
+            if (cols[7]) projectile->speed = std::stof(cols[7]);
+            if (cols[8]) projectile->scale = std::stof(cols[8]);
+            if (cols[9]) projectile->notrade = std::stoi(cols[9]);
 
             Storage *storage = (Storage *)o;
             storage->projectiles[projectile->id] = projectile;
@@ -1602,9 +1602,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<QuestRewardEquipment> questRewardEquipment = std::make_shared<QuestRewardEquipment>();
-            questRewardEquipment->questReward.id = std::stoi(cols[0]);
-            questRewardEquipment->equipment.id = std::stoi(cols[1]);
-            questRewardEquipment->quantity = std::stoi(cols[2]);
+            if (cols[0]) questRewardEquipment->questReward.id = std::stoi(cols[0]);
+            if (cols[1]) questRewardEquipment->equipment.id = std::stoi(cols[1]);
+            if (cols[2]) questRewardEquipment->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->questRewardEquipments.push_back(questRewardEquipment);
@@ -1648,9 +1648,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<QuestRewardGlider> questRewardGlider = std::make_shared<QuestRewardGlider>();
-            questRewardGlider->questReward.id = std::stoi(cols[0]);
-            questRewardGlider->glider.id = std::stoi(cols[1]);
-            questRewardGlider->quantity = std::stoi(cols[2]);
+            if (cols[0]) questRewardGlider->questReward.id = std::stoi(cols[0]);
+            if (cols[1]) questRewardGlider->glider.id = std::stoi(cols[1]);
+            if (cols[2]) questRewardGlider->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->questRewardGliders.push_back(questRewardGlider);
@@ -1694,9 +1694,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<QuestRewardGood> questRewardGood = std::make_shared<QuestRewardGood>();
-            questRewardGood->questReward.id = std::stoi(cols[0]);
-            questRewardGood->good.id = std::stoi(cols[1]);
-            questRewardGood->quantity = std::stoi(cols[2]);
+            if (cols[0]) questRewardGood->questReward.id = std::stoi(cols[0]);
+            if (cols[1]) questRewardGood->good.id = std::stoi(cols[1]);
+            if (cols[2]) questRewardGood->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->questRewardGoods.push_back(questRewardGood);
@@ -1740,9 +1740,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<QuestRewardModificator> questRewardModificator = std::make_shared<QuestRewardModificator>();
-            questRewardModificator->questReward.id = std::stoi(cols[0]);
-            questRewardModificator->modificator.id = std::stoi(cols[1]);
-            questRewardModificator->quantity = std::stoi(cols[2]);
+            if (cols[0]) questRewardModificator->questReward.id = std::stoi(cols[0]);
+            if (cols[1]) questRewardModificator->modificator.id = std::stoi(cols[1]);
+            if (cols[2]) questRewardModificator->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->questRewardModificators.push_back(questRewardModificator);
@@ -1786,9 +1786,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<QuestRewardProjectile> questRewardProjectile = std::make_shared<QuestRewardProjectile>();
-            questRewardProjectile->questReward.id = std::stoi(cols[0]);
-            questRewardProjectile->projectile.id = std::stoi(cols[1]);
-            questRewardProjectile->quantity = std::stoi(cols[2]);
+            if (cols[0]) questRewardProjectile->questReward.id = std::stoi(cols[0]);
+            if (cols[1]) questRewardProjectile->projectile.id = std::stoi(cols[1]);
+            if (cols[2]) questRewardProjectile->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->questRewardProjectiles.push_back(questRewardProjectile);
@@ -1832,9 +1832,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<QuestRewardReputation> questRewardReputation = std::make_shared<QuestRewardReputation>();
-            questRewardReputation->questReward.id = std::stoi(cols[0]);
-            questRewardReputation->clan.id = std::stoi(cols[1]);
-            questRewardReputation->reputation = std::stof(cols[2]);
+            if (cols[0]) questRewardReputation->questReward.id = std::stoi(cols[0]);
+            if (cols[1]) questRewardReputation->clan.id = std::stoi(cols[1]);
+            if (cols[2]) questRewardReputation->reputation = std::stof(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->questRewardReputations.push_back(questRewardReputation);
@@ -1878,9 +1878,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<QuestRewardWeapon> questRewardWeapon = std::make_shared<QuestRewardWeapon>();
-            questRewardWeapon->questReward.id = std::stoi(cols[0]);
-            questRewardWeapon->weapon.id = std::stoi(cols[1]);
-            questRewardWeapon->quantity = std::stoi(cols[2]);
+            if (cols[0]) questRewardWeapon->questReward.id = std::stoi(cols[0]);
+            if (cols[1]) questRewardWeapon->weapon.id = std::stoi(cols[1]);
+            if (cols[2]) questRewardWeapon->quantity = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->questRewardWeapons.push_back(questRewardWeapon);
@@ -1924,9 +1924,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<QuestReward> questReward = std::make_shared<QuestReward>();
-            questReward->id = std::stoi(cols[0]);
-            questReward->money = std::stoi(cols[1]);
-            questReward->rating = std::stof(cols[2]);
+            if (cols[0]) questReward->id = std::stoi(cols[0]);
+            if (cols[1]) questReward->money = std::stoi(cols[1]);
+            if (cols[2]) questReward->rating = std::stof(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->questRewards[questReward->id] = questReward;
@@ -1989,13 +1989,13 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Quest> quest = std::make_shared<Quest>();
-            quest->id = std::stoi(cols[0]);
-            quest->text_id = cols[1];
-            quest->name.id = std::stoi(cols[2]);
-            quest->title.id = std::stoi(cols[3]);
-            quest->description.id = std::stoi(cols[4]);
-            quest->reward.id = std::stoi(cols[5]);
-            quest->time = std::stoi(cols[6]);
+            if (cols[0]) quest->id = std::stoi(cols[0]);
+            if (cols[1]) quest->text_id = cols[1];
+            if (cols[2]) quest->name.id = std::stoi(cols[2]);
+            if (cols[3]) quest->title.id = std::stoi(cols[3]);
+            if (cols[4]) quest->description.id = std::stoi(cols[4]);
+            if (cols[5]) quest->reward.id = std::stoi(cols[5]);
+            if (cols[6]) quest->time = std::stoi(cols[6]);
 
             Storage *storage = (Storage *)o;
             storage->quests[quest->id] = quest;
@@ -2045,10 +2045,10 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<SaveObject> saveObject = std::make_shared<SaveObject>();
-            saveObject->save.id = std::stoi(cols[0]);
-            saveObject->object.id = std::stoi(cols[1]);
-            saveObject->map.id = std::stoi(cols[2]);
-            saveObject->coordinate.id = std::stoi(cols[3]);
+            if (cols[0]) saveObject->save.id = std::stoi(cols[0]);
+            if (cols[1]) saveObject->object.id = std::stoi(cols[1]);
+            if (cols[2]) saveObject->map.id = std::stoi(cols[2]);
+            if (cols[3]) saveObject->coordinate.id = std::stoi(cols[3]);
 
             Storage *storage = (Storage *)o;
             storage->saveObjects.push_back(saveObject);
@@ -2095,8 +2095,8 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<SavePlayer> savePlayer = std::make_shared<SavePlayer>();
-            savePlayer->save.id = std::stoi(cols[0]);
-            savePlayer->player.id = std::stoi(cols[1]);
+            if (cols[0]) savePlayer->save.id = std::stoi(cols[0]);
+            if (cols[1]) savePlayer->player.id = std::stoi(cols[1]);
 
             Storage *storage = (Storage *)o;
             storage->savePlayers.push_back(savePlayer);
@@ -2139,9 +2139,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<SaveQuest> saveQuest = std::make_shared<SaveQuest>();
-            saveQuest->save.id = std::stoi(cols[0]);
-            saveQuest->quest.id = std::stoi(cols[1]);
-            saveQuest->state = std::stoi(cols[2]);
+            if (cols[0]) saveQuest->save.id = std::stoi(cols[0]);
+            if (cols[1]) saveQuest->quest.id = std::stoi(cols[1]);
+            if (cols[2]) saveQuest->state = std::stoi(cols[2]);
 
             Storage *storage = (Storage *)o;
             storage->saveQuests.push_back(saveQuest);
@@ -2185,10 +2185,10 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Save> save = std::make_shared<Save>();
-            save->id = std::stoi(cols[0]);
-            save->modification.id = std::stoi(cols[1]);
-            save->name = cols[2];
-            save->date = std::stoi(cols[3]);
+            if (cols[0]) save->id = std::stoi(cols[0]);
+            if (cols[1]) save->modification.id = std::stoi(cols[1]);
+            if (cols[2]) save->name = cols[2];
+            if (cols[3]) save->date = std::stoi(cols[3]);
 
             Storage *storage = (Storage *)o;
             storage->saves[save->id] = save;
@@ -2247,9 +2247,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<ScriptVariable> scriptVariable = std::make_shared<ScriptVariable>();
-            scriptVariable->save.id = std::stoi(cols[0]);
-            scriptVariable->variable = cols[1];
-            scriptVariable->value = cols[2];
+            if (cols[0]) scriptVariable->save.id = std::stoi(cols[0]);
+            if (cols[1]) scriptVariable->variable = cols[1];
+            if (cols[2]) scriptVariable->value = cols[2];
 
             Storage *storage = (Storage *)o;
             storage->scriptVariables.push_back(scriptVariable);
@@ -2292,9 +2292,9 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<String> string = std::make_shared<String>();
-            string->id = std::stoi(cols[0]);
-            string->ru = cols[1];
-            string->en = cols[2];
+            if (cols[0]) string->id = std::stoi(cols[0]);
+            if (cols[1]) string->ru = cols[1];
+            if (cols[2]) string->en = cols[2];
 
             Storage *storage = (Storage *)o;
             storage->strings[string->id] = string;
@@ -2333,18 +2333,18 @@ private:
         auto callback = [](void *o, int ncols, char **cols, char **names)
         {
             Ptr<Weapon> weapon = std::make_shared<Weapon>();
-            weapon->id = std::stoi(cols[0]);
-            weapon->text_id = cols[1];
-            weapon->resource = cols[2];
-            weapon->name.id = std::stoi(cols[3]);
-            weapon->type = std::stoi(cols[4]);
-            weapon->standard = std::stoi(cols[5]);
-            weapon->weight = std::stof(cols[6]);
-            weapon->power = std::stof(cols[7]);
-            weapon->firerate = std::stof(cols[8]);
-            weapon->damage = std::stof(cols[9]);
-            weapon->price = std::stof(cols[10]);
-            weapon->projectile.id = std::stoi(cols[11]);
+            if (cols[0]) weapon->id = std::stoi(cols[0]);
+            if (cols[1]) weapon->text_id = cols[1];
+            if (cols[2]) weapon->resource = cols[2];
+            if (cols[3]) weapon->name.id = std::stoi(cols[3]);
+            if (cols[4]) weapon->type = std::stoi(cols[4]);
+            if (cols[5]) weapon->standard = std::stoi(cols[5]);
+            if (cols[6]) weapon->weight = std::stof(cols[6]);
+            if (cols[7]) weapon->power = std::stof(cols[7]);
+            if (cols[8]) weapon->firerate = std::stof(cols[8]);
+            if (cols[9]) weapon->damage = std::stof(cols[9]);
+            if (cols[10]) weapon->price = std::stof(cols[10]);
+            if (cols[11]) weapon->projectile.id = std::stoi(cols[11]);
 
             Storage *storage = (Storage *)o;
             storage->weapons[weapon->id] = weapon;
