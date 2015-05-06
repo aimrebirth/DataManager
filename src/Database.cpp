@@ -74,6 +74,9 @@ bool Database::isLoaded() const
 
 void Database::execute(const std::string &sql, void *object, DatabaseCallback callback)
 {
+    if (!isLoaded())
+        throw std::exception("Database is not loaded!");
+
     LOG_TRACE(logger, "Executing sql statement: " << sql);
     char *errmsg;
     sqlite3_exec(db, sql.c_str(), callback, object, &errmsg);
@@ -119,6 +122,18 @@ void Database::getSchema(DatabaseSchema *schema)
     };
     for (auto &tbl : schema->tables)
         execute("PRAGMA table_info(" + tbl.first + ");", &tbl.second, callback2);
+    
+    auto callback3 = [](void *o, int ncols, char **cols, char **names)
+    {
+        Table *table = (Table *)o;
+        Column &column = table->columns[cols[3]];
+        column.fk = new ForeignKey;
+        column.fk->table_name = cols[2];
+        column.fk->column_name = cols[4];
+        return 0;
+    };
+    for (auto &tbl : schema->tables)
+        execute("PRAGMA foreign_key_list(" + tbl.first + ");", &tbl.second, callback3);
 }
 
 std::string getColumnTypeString(ColumnType type)

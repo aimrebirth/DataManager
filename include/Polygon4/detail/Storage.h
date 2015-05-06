@@ -24,6 +24,7 @@ public:
     CMap<Ptr<MapBuilding>> mapBuildings;
     CMap<Ptr<MapObject>> mapObjects;
     CMap<Ptr<Map>> maps;
+    CVector<Ptr<MechanoidGroupMechanoid>> mechanoidGroupMechanoids;
     CMap<Ptr<MechanoidGroup>> mechanoidGroups;
     CMap<Ptr<Mechanoid>> mechanoids;
     CVector<Ptr<ModificationClan>> modificationClans;
@@ -54,5 +55,13 @@ public:
     virtual void clear() = 0;
     virtual void load() = 0;
     virtual void save() = 0;
+
+#ifdef USE_QT
+    virtual void printQtTreeView(QTreeWidgetItem *root) const = 0;
+    virtual QTreeWidgetItem *addRecord(QTreeWidgetItem *item) = 0;
+    virtual void deleteRecord(QTreeWidgetItem *item) = 0;
+#endif
+
+    virtual OrderedObjectMap getOrderedMap(EObjectType type) const = 0;
 };
 

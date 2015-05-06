@@ -27,8 +27,18 @@
 
 #include "String.h"
 
+#ifdef USE_QT
+#include <qobject.h>
+
+class QTreeWidgetItem;
+#endif
+
+#define POLYGON4_NONAME "NONAME"
+
 namespace polygon4
 {
+
+extern int gCurrentLocalizationId;
 
 namespace detail
 {
@@ -53,20 +63,31 @@ using CMap = std::map<int, T>;
 template <typename T>
 struct IdPtr
 {
-    int id = 0;
-    std::shared_ptr<T> ptr;
+    int id = 1;
+    Ptr<T> ptr;
+
+    IdPtr &operator=(const Ptr<T> &item)
+    {
+        if (!item)
+            return *this = IdPtr<T>();
+        id = item->id;
+        ptr = item;
+        return *this;
+    }
 };
 
 template<class T>
-inline std::string to_string(IdPtr<T> ptr)
+inline Text to_string(IdPtr<T> ptr)
 {
-    return to_string(ptr.id);
+    if (ptr.ptr)
+        return to_string(ptr.ptr->getName());
+    return POLYGON4_NONAME;
 }
-
-#include "detail/Types.h"
 
 } // namespace detail
 
 using detail::Ptr;
 
 } // namespace polygon4
+
+#include "detail/Types.h"

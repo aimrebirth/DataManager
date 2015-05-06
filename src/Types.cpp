@@ -16,21 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <Polygon4/Types.h>
 
 #ifdef USE_QT
 #include <qcoreapplication.h>
+#include <qtreewidget.h>
 #endif
-
-#include "Storage.h"
 
 namespace polygon4
 {
 
+int gCurrentLocalizationId = 0;
+
 namespace detail
 {
 
-#include "detail/StorageImpl.h"
+#include "detail/Types.cpp"
 
 } // namespace detail
 

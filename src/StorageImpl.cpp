@@ -16,13 +16,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <Polygon4/StorageImpl.h>
 
 #ifdef USE_QT
-#include <qcoreapplication.h>
+#include <qtreewidget.h>
 #endif
 
-#include "Storage.h"
+#include <Polygon4/Database.h>
+
+using polygon4::detail::CMap;
+using polygon4::detail::CVector;
+using polygon4::detail::OrderedObjectMap;
+
+template <class T>
+OrderedObjectMap getOrderedMap(const CMap<T> &array)
+{
+    OrderedObjectMap map;
+    for (auto &v : array)
+        map[v.second->getName()] = v.second;
+    return map;
+}
+
+template <class T>
+OrderedObjectMap getOrderedMap(const CVector<T> &array)
+{
+    OrderedObjectMap map;
+    for (auto &v : array)
+        map[v->getName()] = v;
+    return map;
+}
 
 namespace polygon4
 {
@@ -30,7 +52,7 @@ namespace polygon4
 namespace detail
 {
 
-#include "detail/StorageImpl.h"
+#include "detail/StorageImpl.cpp"
 
 } // namespace detail
 

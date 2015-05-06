@@ -34,11 +34,19 @@ enum class ColumnType
 std::string getColumnTypeString(ColumnType type);
 ColumnType getColumnType(const std::string &s);
 
+struct ForeignKey
+{
+    std::string table_name;
+    std::string column_name;
+};
+typedef std::map<std::string, ForeignKey> ForeignKeys;
+
 struct Column
 {
     int id;
     std::string name;
     ColumnType type;
+    ForeignKey *fk = 0;
 };
 typedef std::map<std::string, Column> Columns;
 

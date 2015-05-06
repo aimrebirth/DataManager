@@ -54,13 +54,19 @@ public:
     String()
     {
     }
-    explicit String(const char *s)
+    String(const char *s)
     {
-        copy(s, strlen(s) + 1);
+        if (s)
+            copy(s, strlen(s) + 1);
+        else
+            clear();
     }
-    explicit String(const wchar_t *s)
+    String(const wchar_t *s)
     {
-        copy(s, wcslen(s) + 1, 2);
+        if (s)
+            copy(s, wcslen(s) + 1, 2);
+        else
+            clear();
     }
     String(const std::string &s)
     {
@@ -69,6 +75,22 @@ public:
     String(const std::wstring &s)
     {
         copy(s.c_str(), s.size() + 1, 2);
+    }
+    String &String::operator=(const char *s)
+    {
+        if (s)
+            copy(s, strlen(s) + 1);
+        else
+            clear();
+        return *this;
+    }
+    String &String::operator=(const wchar_t *s)
+    {
+        if (s)
+            copy(s, wcslen(s) + 1, 2);
+        else
+            clear();
+        return *this;
     }
     String &String::operator=(const std::string &s)
     {
@@ -124,7 +146,7 @@ public:
 
     bool empty() const
     {
-        return length == 0;
+        return length == 0 || length == multiplier;
     }
 
     bool operator<(const String &rhs) const
@@ -137,12 +159,26 @@ public:
     }
     bool operator==(const String &rhs) const
     {
-        return data == rhs.data;
+        if (data == rhs.data)
+            return true;
+        if (!data || !rhs.data)
+            return false;
+        if (multiplier == 1 && rhs.multiplier == 1)
+            return strcmp(data.get(), rhs.data.get()) == 0;
+        return wcscmp((wchar_t *)data.get(), (wchar_t *)rhs.data.get()) == 0;
     }
     bool operator!=(const String &rhs) const
     {
         return !operator==(rhs);
     }
+
+    void clear()
+    {
+        data.reset();
+        length = 0;
+        multiplier = 1;
+    }
+
 private:
     std::shared_ptr<char> data;
     size_t length = 0;
