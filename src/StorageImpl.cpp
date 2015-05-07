@@ -24,6 +24,8 @@
 
 #include <Polygon4/Database.h>
 
+#define PROGRESS_CALLBACK(p) if (callback) callback(p)
+
 using polygon4::detail::CMap;
 using polygon4::detail::CVector;
 using polygon4::detail::OrderedObjectMap;

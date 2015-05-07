@@ -24,7 +24,6 @@ public:
     CMap<Ptr<MapBuilding>> mapBuildings;
     CMap<Ptr<MapObject>> mapObjects;
     CMap<Ptr<Map>> maps;
-    CVector<Ptr<MechanoidGroupMechanoid>> mechanoidGroupMechanoids;
     CMap<Ptr<MechanoidGroup>> mechanoidGroups;
     CMap<Ptr<Mechanoid>> mechanoids;
     CVector<Ptr<ModificationClan>> modificationClans;
@@ -53,8 +52,8 @@ public:
     CMap<Ptr<Weapon>> weapons;
 
     virtual void clear() = 0;
-    virtual void load() = 0;
-    virtual void save() = 0;
+    virtual void load(ProgressCallback callback = ProgressCallback()) = 0;
+    virtual void save(ProgressCallback callback = ProgressCallback()) = 0;
 
 #ifdef USE_QT
     virtual void printQtTreeView(QTreeWidgetItem *root) const = 0;

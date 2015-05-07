@@ -226,7 +226,7 @@ void StorageImpl::_loadConfigurationGoods()
     {
         Ptr<ConfigurationGood> configurationGood = std::make_shared<ConfigurationGood>();
         if (cols[0]) configurationGood->configuration.id = std::stoi(cols[0]);
-        if (cols[1]) configurationGood->goods.id = std::stoi(cols[1]);
+        if (cols[1]) configurationGood->good.id = std::stoi(cols[1]);
         if (cols[2]) configurationGood->quantity = std::stoi(cols[2]);
 
         Storage *storage = (Storage *)o;
@@ -242,8 +242,8 @@ void StorageImpl::_loadConfigurationGoodsPtrs()
     {
         if (configurations.find(configurationGood->configuration.id) != configurations.end())
             configurationGood->configuration.ptr = configurations[configurationGood->configuration.id];
-        if (goods.find(configurationGood->goods.id) != goods.end())
-            configurationGood->goods.ptr = goods[configurationGood->goods.id];
+        if (goods.find(configurationGood->good.id) != goods.end())
+            configurationGood->good.ptr = goods[configurationGood->good.id];
     }
 }
 
@@ -264,7 +264,7 @@ void StorageImpl::_saveConfigurationGoods()
     {
         query += "(";
         query += "'" + std::to_string(configurationGood->configuration.id) + "',";
-        query += "'" + std::to_string(configurationGood->goods.id) + "',";
+        query += "'" + std::to_string(configurationGood->good.id) + "',";
         query += "'" + std::to_string(configurationGood->quantity) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
@@ -462,8 +462,8 @@ void StorageImpl::_loadCoordinates()
         if (cols[1]) coordinate->x = std::stof(cols[1]);
         if (cols[2]) coordinate->y = std::stof(cols[2]);
         if (cols[3]) coordinate->z = std::stof(cols[3]);
-        if (cols[4]) coordinate->yaw = std::stof(cols[4]);
-        if (cols[5]) coordinate->pitch = std::stof(cols[5]);
+        if (cols[4]) coordinate->pitch = std::stof(cols[4]);
+        if (cols[5]) coordinate->yaw = std::stof(cols[5]);
         if (cols[6]) coordinate->roll = std::stof(cols[6]);
 
         Storage *storage = (Storage *)o;
@@ -497,8 +497,8 @@ void StorageImpl::_saveCoordinates()
         query += "'" + std::to_string(coordinate.second->x) + "',";
         query += "'" + std::to_string(coordinate.second->y) + "',";
         query += "'" + std::to_string(coordinate.second->z) + "',";
-        query += "'" + std::to_string(coordinate.second->yaw) + "',";
         query += "'" + std::to_string(coordinate.second->pitch) + "',";
+        query += "'" + std::to_string(coordinate.second->yaw) + "',";
         query += "'" + std::to_string(coordinate.second->roll) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
@@ -830,7 +830,7 @@ void StorageImpl::_loadMapBuildingGoods()
     {
         Ptr<MapBuildingGood> mapBuildingGood = std::make_shared<MapBuildingGood>();
         if (cols[0]) mapBuildingGood->mapBuilding.id = std::stoi(cols[0]);
-        if (cols[1]) mapBuildingGood->goods.id = std::stoi(cols[1]);
+        if (cols[1]) mapBuildingGood->good.id = std::stoi(cols[1]);
         if (cols[2]) mapBuildingGood->quantity = std::stoi(cols[2]);
 
         Storage *storage = (Storage *)o;
@@ -846,8 +846,8 @@ void StorageImpl::_loadMapBuildingGoodsPtrs()
     {
         if (mapBuildings.find(mapBuildingGood->mapBuilding.id) != mapBuildings.end())
             mapBuildingGood->mapBuilding.ptr = mapBuildings[mapBuildingGood->mapBuilding.id];
-        if (goods.find(mapBuildingGood->goods.id) != goods.end())
-            mapBuildingGood->goods.ptr = goods[mapBuildingGood->goods.id];
+        if (goods.find(mapBuildingGood->good.id) != goods.end())
+            mapBuildingGood->good.ptr = goods[mapBuildingGood->good.id];
     }
 }
 
@@ -868,7 +868,7 @@ void StorageImpl::_saveMapBuildingGoods()
     {
         query += "(";
         query += "'" + std::to_string(mapBuildingGood->mapBuilding.id) + "',";
-        query += "'" + std::to_string(mapBuildingGood->goods.id) + "',";
+        query += "'" + std::to_string(mapBuildingGood->good.id) + "',";
         query += "'" + std::to_string(mapBuildingGood->quantity) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
@@ -1211,7 +1211,10 @@ void StorageImpl::_loadMapsArrays()
     {
         for (auto &mapBuilding : mapBuildings)
             if (map.first == mapBuilding.second->map.id)
-                map.second->mapBuildings.push_back(mapBuilding.second);
+                map.second->buildings.push_back(mapBuilding.second);
+        for (auto &mapObject : mapObjects)
+            if (map.first == mapObject.second->map.id)
+                map.second->objects.push_back(mapObject.second);
     }
 }
 
@@ -1231,58 +1234,6 @@ void StorageImpl::_saveMaps()
         query += "'" + map.second->text_id.string() + "',";
         query += "'" + map.second->resource.string() + "',";
         query += "'" + std::to_string(map.second->name.id) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
-    }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str(), 0, 0);
-}
-
-void StorageImpl::_loadMechanoidGroupMechanoids()
-{
-    auto callback = [](void *o, int ncols, char **cols, char **names)
-    {
-        Ptr<MechanoidGroupMechanoid> mechanoidGroupMechanoid = std::make_shared<MechanoidGroupMechanoid>();
-        if (cols[0]) mechanoidGroupMechanoid->mechanoidGroup.id = std::stoi(cols[0]);
-        if (cols[1]) mechanoidGroupMechanoid->mechanoid.id = std::stoi(cols[1]);
-
-        Storage *storage = (Storage *)o;
-        storage->mechanoidGroupMechanoids.push_back(mechanoidGroupMechanoid);
-        return 0;
-    };
-    db->execute("select * from MechanoidGroupMechanoids;", this, callback);
-}
-
-void StorageImpl::_loadMechanoidGroupMechanoidsPtrs()
-{
-    for (auto &mechanoidGroupMechanoid : mechanoidGroupMechanoids)
-    {
-        if (mechanoidGroups.find(mechanoidGroupMechanoid->mechanoidGroup.id) != mechanoidGroups.end())
-            mechanoidGroupMechanoid->mechanoidGroup.ptr = mechanoidGroups[mechanoidGroupMechanoid->mechanoidGroup.id];
-        if (mechanoids.find(mechanoidGroupMechanoid->mechanoid.id) != mechanoids.end())
-            mechanoidGroupMechanoid->mechanoid.ptr = mechanoids[mechanoidGroupMechanoid->mechanoid.id];
-    }
-}
-
-void StorageImpl::_loadMechanoidGroupMechanoidsArrays()
-{
-}
-
-void StorageImpl::_saveMechanoidGroupMechanoids()
-{
-    std::string query;
-    query += "delete from MechanoidGroupMechanoids;";
-    db->execute(query.c_str(), 0, 0);
-    query.clear();
-    if (mechanoidGroupMechanoids.empty())
-        return;
-    query += "insert or replace into MechanoidGroupMechanoids values\n";
-    for (auto &mechanoidGroupMechanoid : mechanoidGroupMechanoids)
-    {
-        query += "(";
-        query += "'" + std::to_string(mechanoidGroupMechanoid->mechanoidGroup.id) + "',";
-        query += "'" + std::to_string(mechanoidGroupMechanoid->mechanoid.id) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
     }
@@ -1318,12 +1269,6 @@ void StorageImpl::_loadMechanoidGroupsPtrs()
 
 void StorageImpl::_loadMechanoidGroupsArrays()
 {
-    for (auto &mechanoidGroup : mechanoidGroups)
-    {
-        for (auto &mechanoidGroupMechanoid : mechanoidGroupMechanoids)
-            if (mechanoidGroup.first == mechanoidGroupMechanoid->mechanoidGroup.id)
-                mechanoidGroup.second->mechanoids.push_back(mechanoidGroupMechanoid);
-    }
 }
 
 void StorageImpl::_saveMechanoidGroups()
@@ -1361,13 +1306,14 @@ void StorageImpl::_loadMechanoids()
         if (cols[4]) mechanoid->rating = std::stof(cols[4]);
         if (cols[5]) mechanoid->money = std::stof(cols[5]);
         if (cols[6]) mechanoid->configuration.id = std::stoi(cols[6]);
-        if (cols[7]) mechanoid->clan.id = std::stoi(cols[7]);
-        if (cols[8]) mechanoid->rating_fight = std::stof(cols[8]);
-        if (cols[9]) mechanoid->rating_courier = std::stof(cols[9]);
-        if (cols[10]) mechanoid->rating_trade = std::stof(cols[10]);
-        if (cols[11]) mechanoid->map.id = std::stoi(cols[11]);
-        if (cols[12]) mechanoid->map_building.id = std::stoi(cols[12]);
-        if (cols[13]) mechanoid->coordinate.id = std::stoi(cols[13]);
+        if (cols[7]) mechanoid->mechanoidGroup.id = std::stoi(cols[7]);
+        if (cols[8]) mechanoid->clan.id = std::stoi(cols[8]);
+        if (cols[9]) mechanoid->rating_fight = std::stof(cols[9]);
+        if (cols[10]) mechanoid->rating_courier = std::stof(cols[10]);
+        if (cols[11]) mechanoid->rating_trade = std::stof(cols[11]);
+        if (cols[12]) mechanoid->map.id = std::stoi(cols[12]);
+        if (cols[13]) mechanoid->mapBuilding.id = std::stoi(cols[13]);
+        if (cols[14]) mechanoid->coordinate.id = std::stoi(cols[14]);
 
         Storage *storage = (Storage *)o;
         storage->mechanoids[mechanoid->id] = mechanoid;
@@ -1384,12 +1330,14 @@ void StorageImpl::_loadMechanoidsPtrs()
             mechanoid.second->name.ptr = strings[mechanoid.second->name.id];
         if (configurations.find(mechanoid.second->configuration.id) != configurations.end())
             mechanoid.second->configuration.ptr = configurations[mechanoid.second->configuration.id];
+        if (mechanoidGroups.find(mechanoid.second->mechanoidGroup.id) != mechanoidGroups.end())
+            mechanoid.second->mechanoidGroup.ptr = mechanoidGroups[mechanoid.second->mechanoidGroup.id];
         if (clans.find(mechanoid.second->clan.id) != clans.end())
             mechanoid.second->clan.ptr = clans[mechanoid.second->clan.id];
         if (maps.find(mechanoid.second->map.id) != maps.end())
             mechanoid.second->map.ptr = maps[mechanoid.second->map.id];
-        if (mapBuildings.find(mechanoid.second->map_building.id) != mapBuildings.end())
-            mechanoid.second->map_building.ptr = mapBuildings[mechanoid.second->map_building.id];
+        if (mapBuildings.find(mechanoid.second->mapBuilding.id) != mapBuildings.end())
+            mechanoid.second->mapBuilding.ptr = mapBuildings[mechanoid.second->mapBuilding.id];
         if (coordinates.find(mechanoid.second->coordinate.id) != coordinates.end())
             mechanoid.second->coordinate.ptr = coordinates[mechanoid.second->coordinate.id];
     }
@@ -1418,12 +1366,13 @@ void StorageImpl::_saveMechanoids()
         query += "'" + std::to_string(mechanoid.second->rating) + "',";
         query += "'" + std::to_string(mechanoid.second->money) + "',";
         query += "'" + std::to_string(mechanoid.second->configuration.id) + "',";
+        query += "'" + std::to_string(mechanoid.second->mechanoidGroup.id) + "',";
         query += "'" + std::to_string(mechanoid.second->clan.id) + "',";
         query += "'" + std::to_string(mechanoid.second->rating_fight) + "',";
         query += "'" + std::to_string(mechanoid.second->rating_courier) + "',";
         query += "'" + std::to_string(mechanoid.second->rating_trade) + "',";
         query += "'" + std::to_string(mechanoid.second->map.id) + "',";
-        query += "'" + std::to_string(mechanoid.second->map_building.id) + "',";
+        query += "'" + std::to_string(mechanoid.second->mapBuilding.id) + "',";
         query += "'" + std::to_string(mechanoid.second->coordinate.id) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
@@ -2399,7 +2348,7 @@ void StorageImpl::_loadQuestsArrays()
     {
         for (auto &questReward : questRewards)
             if (quest.first == questReward.second->quest.id)
-                quest.second->questRewards.push_back(questReward.second);
+                quest.second->rewards.push_back(questReward.second);
     }
 }
 
@@ -2636,7 +2585,7 @@ void StorageImpl::_loadSavesArrays()
                 save.second->quests.push_back(saveQuest);
         for (auto &scriptVariable : scriptVariables)
             if (save.first == scriptVariable->save.id)
-                save.second->scriptVariables.push_back(scriptVariable);
+                save.second->ptVariables.push_back(scriptVariable);
     }
 }
 
@@ -2858,7 +2807,6 @@ void StorageImpl::clear()
     mapBuildings.clear();
     mapObjects.clear();
     maps.clear();
-    mechanoidGroupMechanoids.clear();
     mechanoidGroups.clear();
     mechanoids.clear();
     modificationClans.clear();
@@ -2887,206 +2835,390 @@ void StorageImpl::clear()
     weapons.clear();
 }
 
-void StorageImpl::load()
+void StorageImpl::load(ProgressCallback callback)
 {
     _loadBuildings();
+    PROGRESS_CALLBACK(0.709220);
     _loadClanReputations();
+    PROGRESS_CALLBACK(1.418440);
     _loadClans();
+    PROGRESS_CALLBACK(2.127660);
     _loadConfigurationEquipments();
+    PROGRESS_CALLBACK(2.836879);
     _loadConfigurationGoods();
+    PROGRESS_CALLBACK(3.546099);
     _loadConfigurationProjectiles();
+    PROGRESS_CALLBACK(4.255319);
     _loadConfigurationWeapons();
+    PROGRESS_CALLBACK(4.964539);
     _loadConfigurations();
+    PROGRESS_CALLBACK(5.673759);
     _loadCoordinates();
+    PROGRESS_CALLBACK(6.382979);
     _loadEquipments();
+    PROGRESS_CALLBACK(7.092199);
     _loadGliders();
+    PROGRESS_CALLBACK(7.801418);
     _loadGoods();
+    PROGRESS_CALLBACK(8.510638);
     _loadMapBuildingEquipments();
+    PROGRESS_CALLBACK(9.219858);
     _loadMapBuildingGliders();
+    PROGRESS_CALLBACK(9.929078);
     _loadMapBuildingGoods();
+    PROGRESS_CALLBACK(10.638298);
     _loadMapBuildingModificators();
+    PROGRESS_CALLBACK(11.347518);
     _loadMapBuildingProjectiles();
+    PROGRESS_CALLBACK(12.056738);
     _loadMapBuildingWeapons();
+    PROGRESS_CALLBACK(12.765957);
     _loadMapBuildings();
+    PROGRESS_CALLBACK(13.475177);
     _loadMapObjects();
+    PROGRESS_CALLBACK(14.184397);
     _loadMaps();
-    _loadMechanoidGroupMechanoids();
+    PROGRESS_CALLBACK(14.893617);
     _loadMechanoidGroups();
+    PROGRESS_CALLBACK(15.602837);
     _loadMechanoids();
+    PROGRESS_CALLBACK(16.312057);
     _loadModificationClans();
+    PROGRESS_CALLBACK(17.021277);
     _loadModificationMaps();
+    PROGRESS_CALLBACK(17.730496);
     _loadModificationMechanoids();
+    PROGRESS_CALLBACK(18.439716);
     _loadModifications();
+    PROGRESS_CALLBACK(19.148936);
     _loadModificators();
+    PROGRESS_CALLBACK(19.858156);
     _loadObjects();
+    PROGRESS_CALLBACK(20.567376);
     _loadPlayers();
+    PROGRESS_CALLBACK(21.276596);
     _loadProjectiles();
+    PROGRESS_CALLBACK(21.985816);
     _loadQuestRewardEquipments();
+    PROGRESS_CALLBACK(22.695035);
     _loadQuestRewardGliders();
+    PROGRESS_CALLBACK(23.404255);
     _loadQuestRewardGoods();
+    PROGRESS_CALLBACK(24.113475);
     _loadQuestRewardModificators();
+    PROGRESS_CALLBACK(24.822695);
     _loadQuestRewardProjectiles();
+    PROGRESS_CALLBACK(25.531915);
     _loadQuestRewardReputations();
+    PROGRESS_CALLBACK(26.241135);
     _loadQuestRewardWeapons();
+    PROGRESS_CALLBACK(26.950355);
     _loadQuestRewards();
+    PROGRESS_CALLBACK(27.659574);
     _loadQuests();
+    PROGRESS_CALLBACK(28.368794);
     _loadSaveObjects();
+    PROGRESS_CALLBACK(29.078014);
     _loadSavePlayers();
+    PROGRESS_CALLBACK(29.787234);
     _loadSaveQuests();
+    PROGRESS_CALLBACK(30.496454);
     _loadSaves();
+    PROGRESS_CALLBACK(31.205674);
     _loadScriptVariables();
+    PROGRESS_CALLBACK(31.914894);
     _loadStrings();
+    PROGRESS_CALLBACK(32.624113);
     _loadWeapons();
+    PROGRESS_CALLBACK(33.333333);
 
     _loadBuildingsPtrs();
+    PROGRESS_CALLBACK(34.042553);
     _loadClanReputationsPtrs();
+    PROGRESS_CALLBACK(34.751773);
     _loadClansPtrs();
+    PROGRESS_CALLBACK(35.460993);
     _loadConfigurationEquipmentsPtrs();
+    PROGRESS_CALLBACK(36.170213);
     _loadConfigurationGoodsPtrs();
+    PROGRESS_CALLBACK(36.879433);
     _loadConfigurationProjectilesPtrs();
+    PROGRESS_CALLBACK(37.588652);
     _loadConfigurationWeaponsPtrs();
+    PROGRESS_CALLBACK(38.297872);
     _loadConfigurationsPtrs();
+    PROGRESS_CALLBACK(39.007092);
     _loadCoordinatesPtrs();
+    PROGRESS_CALLBACK(39.716312);
     _loadEquipmentsPtrs();
+    PROGRESS_CALLBACK(40.425532);
     _loadGlidersPtrs();
+    PROGRESS_CALLBACK(41.134752);
     _loadGoodsPtrs();
+    PROGRESS_CALLBACK(41.843972);
     _loadMapBuildingEquipmentsPtrs();
+    PROGRESS_CALLBACK(42.553191);
     _loadMapBuildingGlidersPtrs();
+    PROGRESS_CALLBACK(43.262411);
     _loadMapBuildingGoodsPtrs();
+    PROGRESS_CALLBACK(43.971631);
     _loadMapBuildingModificatorsPtrs();
+    PROGRESS_CALLBACK(44.680851);
     _loadMapBuildingProjectilesPtrs();
+    PROGRESS_CALLBACK(45.390071);
     _loadMapBuildingWeaponsPtrs();
+    PROGRESS_CALLBACK(46.099291);
     _loadMapBuildingsPtrs();
+    PROGRESS_CALLBACK(46.808511);
     _loadMapObjectsPtrs();
+    PROGRESS_CALLBACK(47.517730);
     _loadMapsPtrs();
-    _loadMechanoidGroupMechanoidsPtrs();
+    PROGRESS_CALLBACK(48.226950);
     _loadMechanoidGroupsPtrs();
+    PROGRESS_CALLBACK(48.936170);
     _loadMechanoidsPtrs();
+    PROGRESS_CALLBACK(49.645390);
     _loadModificationClansPtrs();
+    PROGRESS_CALLBACK(50.354610);
     _loadModificationMapsPtrs();
+    PROGRESS_CALLBACK(51.063830);
     _loadModificationMechanoidsPtrs();
+    PROGRESS_CALLBACK(51.773050);
     _loadModificationsPtrs();
+    PROGRESS_CALLBACK(52.482270);
     _loadModificatorsPtrs();
+    PROGRESS_CALLBACK(53.191489);
     _loadObjectsPtrs();
+    PROGRESS_CALLBACK(53.900709);
     _loadPlayersPtrs();
+    PROGRESS_CALLBACK(54.609929);
     _loadProjectilesPtrs();
+    PROGRESS_CALLBACK(55.319149);
     _loadQuestRewardEquipmentsPtrs();
+    PROGRESS_CALLBACK(56.028369);
     _loadQuestRewardGlidersPtrs();
+    PROGRESS_CALLBACK(56.737589);
     _loadQuestRewardGoodsPtrs();
+    PROGRESS_CALLBACK(57.446809);
     _loadQuestRewardModificatorsPtrs();
+    PROGRESS_CALLBACK(58.156028);
     _loadQuestRewardProjectilesPtrs();
+    PROGRESS_CALLBACK(58.865248);
     _loadQuestRewardReputationsPtrs();
+    PROGRESS_CALLBACK(59.574468);
     _loadQuestRewardWeaponsPtrs();
+    PROGRESS_CALLBACK(60.283688);
     _loadQuestRewardsPtrs();
+    PROGRESS_CALLBACK(60.992908);
     _loadQuestsPtrs();
+    PROGRESS_CALLBACK(61.702128);
     _loadSaveObjectsPtrs();
+    PROGRESS_CALLBACK(62.411348);
     _loadSavePlayersPtrs();
+    PROGRESS_CALLBACK(63.120567);
     _loadSaveQuestsPtrs();
+    PROGRESS_CALLBACK(63.829787);
     _loadSavesPtrs();
+    PROGRESS_CALLBACK(64.539007);
     _loadScriptVariablesPtrs();
+    PROGRESS_CALLBACK(65.248227);
     _loadStringsPtrs();
+    PROGRESS_CALLBACK(65.957447);
     _loadWeaponsPtrs();
+    PROGRESS_CALLBACK(66.666667);
 
     _loadBuildingsArrays();
+    PROGRESS_CALLBACK(67.375887);
     _loadClanReputationsArrays();
+    PROGRESS_CALLBACK(68.085106);
     _loadClansArrays();
+    PROGRESS_CALLBACK(68.794326);
     _loadConfigurationEquipmentsArrays();
+    PROGRESS_CALLBACK(69.503546);
     _loadConfigurationGoodsArrays();
+    PROGRESS_CALLBACK(70.212766);
     _loadConfigurationProjectilesArrays();
+    PROGRESS_CALLBACK(70.921986);
     _loadConfigurationWeaponsArrays();
+    PROGRESS_CALLBACK(71.631206);
     _loadConfigurationsArrays();
+    PROGRESS_CALLBACK(72.340426);
     _loadCoordinatesArrays();
+    PROGRESS_CALLBACK(73.049645);
     _loadEquipmentsArrays();
+    PROGRESS_CALLBACK(73.758865);
     _loadGlidersArrays();
+    PROGRESS_CALLBACK(74.468085);
     _loadGoodsArrays();
+    PROGRESS_CALLBACK(75.177305);
     _loadMapBuildingEquipmentsArrays();
+    PROGRESS_CALLBACK(75.886525);
     _loadMapBuildingGlidersArrays();
+    PROGRESS_CALLBACK(76.595745);
     _loadMapBuildingGoodsArrays();
+    PROGRESS_CALLBACK(77.304965);
     _loadMapBuildingModificatorsArrays();
+    PROGRESS_CALLBACK(78.014184);
     _loadMapBuildingProjectilesArrays();
+    PROGRESS_CALLBACK(78.723404);
     _loadMapBuildingWeaponsArrays();
+    PROGRESS_CALLBACK(79.432624);
     _loadMapBuildingsArrays();
+    PROGRESS_CALLBACK(80.141844);
     _loadMapObjectsArrays();
+    PROGRESS_CALLBACK(80.851064);
     _loadMapsArrays();
-    _loadMechanoidGroupMechanoidsArrays();
+    PROGRESS_CALLBACK(81.560284);
     _loadMechanoidGroupsArrays();
+    PROGRESS_CALLBACK(82.269504);
     _loadMechanoidsArrays();
+    PROGRESS_CALLBACK(82.978723);
     _loadModificationClansArrays();
+    PROGRESS_CALLBACK(83.687943);
     _loadModificationMapsArrays();
+    PROGRESS_CALLBACK(84.397163);
     _loadModificationMechanoidsArrays();
+    PROGRESS_CALLBACK(85.106383);
     _loadModificationsArrays();
+    PROGRESS_CALLBACK(85.815603);
     _loadModificatorsArrays();
+    PROGRESS_CALLBACK(86.524823);
     _loadObjectsArrays();
+    PROGRESS_CALLBACK(87.234043);
     _loadPlayersArrays();
+    PROGRESS_CALLBACK(87.943262);
     _loadProjectilesArrays();
+    PROGRESS_CALLBACK(88.652482);
     _loadQuestRewardEquipmentsArrays();
+    PROGRESS_CALLBACK(89.361702);
     _loadQuestRewardGlidersArrays();
+    PROGRESS_CALLBACK(90.070922);
     _loadQuestRewardGoodsArrays();
+    PROGRESS_CALLBACK(90.780142);
     _loadQuestRewardModificatorsArrays();
+    PROGRESS_CALLBACK(91.489362);
     _loadQuestRewardProjectilesArrays();
+    PROGRESS_CALLBACK(92.198582);
     _loadQuestRewardReputationsArrays();
+    PROGRESS_CALLBACK(92.907801);
     _loadQuestRewardWeaponsArrays();
+    PROGRESS_CALLBACK(93.617021);
     _loadQuestRewardsArrays();
+    PROGRESS_CALLBACK(94.326241);
     _loadQuestsArrays();
+    PROGRESS_CALLBACK(95.035461);
     _loadSaveObjectsArrays();
+    PROGRESS_CALLBACK(95.744681);
     _loadSavePlayersArrays();
+    PROGRESS_CALLBACK(96.453901);
     _loadSaveQuestsArrays();
+    PROGRESS_CALLBACK(97.163121);
     _loadSavesArrays();
+    PROGRESS_CALLBACK(97.872340);
     _loadScriptVariablesArrays();
+    PROGRESS_CALLBACK(98.581560);
     _loadStringsArrays();
+    PROGRESS_CALLBACK(99.290780);
     _loadWeaponsArrays();
+    PROGRESS_CALLBACK(100.000000);
 }
 
-void StorageImpl::save()
+void StorageImpl::save(ProgressCallback callback)
 {
     _saveStrings();
+    PROGRESS_CALLBACK(2.127660);
     _saveQuestRewards();
+    PROGRESS_CALLBACK(4.255319);
     _saveConfigurations();
+    PROGRESS_CALLBACK(6.382979);
     _saveMaps();
+    PROGRESS_CALLBACK(8.510638);
     _saveClans();
+    PROGRESS_CALLBACK(10.638298);
     _saveCoordinates();
+    PROGRESS_CALLBACK(12.765957);
     _saveModifications();
+    PROGRESS_CALLBACK(14.893617);
     _saveProjectiles();
+    PROGRESS_CALLBACK(17.021277);
     _saveSaves();
+    PROGRESS_CALLBACK(19.148936);
     _saveEquipments();
+    PROGRESS_CALLBACK(21.276596);
     _saveGliders();
+    PROGRESS_CALLBACK(23.404255);
     _saveGoods();
-    _saveMechanoids();
+    PROGRESS_CALLBACK(25.531915);
     _saveWeapons();
+    PROGRESS_CALLBACK(27.659574);
+    _saveMechanoids();
+    PROGRESS_CALLBACK(29.787234);
     _saveModificators();
+    PROGRESS_CALLBACK(31.914894);
     _saveObjects();
+    PROGRESS_CALLBACK(34.042553);
     _saveQuests();
+    PROGRESS_CALLBACK(36.170213);
     _saveBuildings();
+    PROGRESS_CALLBACK(38.297872);
     _saveMapBuildings();
+    PROGRESS_CALLBACK(40.425532);
     _saveMechanoidGroups();
+    PROGRESS_CALLBACK(42.553191);
     _savePlayers();
+    PROGRESS_CALLBACK(44.680851);
     _saveClanReputations();
+    PROGRESS_CALLBACK(46.808511);
     _saveConfigurationEquipments();
+    PROGRESS_CALLBACK(48.936170);
     _saveConfigurationGoods();
+    PROGRESS_CALLBACK(51.063830);
     _saveConfigurationProjectiles();
+    PROGRESS_CALLBACK(53.191489);
     _saveConfigurationWeapons();
+    PROGRESS_CALLBACK(55.319149);
     _saveMapBuildingEquipments();
+    PROGRESS_CALLBACK(57.446809);
     _saveMapBuildingGliders();
+    PROGRESS_CALLBACK(59.574468);
     _saveMapBuildingGoods();
+    PROGRESS_CALLBACK(61.702128);
     _saveMapBuildingModificators();
+    PROGRESS_CALLBACK(63.829787);
     _saveMapBuildingProjectiles();
+    PROGRESS_CALLBACK(65.957447);
     _saveMapBuildingWeapons();
+    PROGRESS_CALLBACK(68.085106);
     _saveMapObjects();
-    _saveMechanoidGroupMechanoids();
+    PROGRESS_CALLBACK(70.212766);
     _saveModificationClans();
+    PROGRESS_CALLBACK(72.340426);
     _saveModificationMaps();
+    PROGRESS_CALLBACK(74.468085);
     _saveModificationMechanoids();
+    PROGRESS_CALLBACK(76.595745);
     _saveQuestRewardEquipments();
+    PROGRESS_CALLBACK(78.723404);
     _saveQuestRewardGliders();
+    PROGRESS_CALLBACK(80.851064);
     _saveQuestRewardGoods();
+    PROGRESS_CALLBACK(82.978723);
     _saveQuestRewardModificators();
+    PROGRESS_CALLBACK(85.106383);
     _saveQuestRewardProjectiles();
+    PROGRESS_CALLBACK(87.234043);
     _saveQuestRewardReputations();
+    PROGRESS_CALLBACK(89.361702);
     _saveQuestRewardWeapons();
+    PROGRESS_CALLBACK(91.489362);
     _saveSaveObjects();
+    PROGRESS_CALLBACK(93.617021);
     _saveSavePlayers();
+    PROGRESS_CALLBACK(95.744681);
     _saveSaveQuests();
+    PROGRESS_CALLBACK(97.872340);
     _saveScriptVariables();
+    PROGRESS_CALLBACK(100.000000);
 }
 
 #ifdef USE_QT
@@ -3111,6 +3243,12 @@ void StorageImpl::printQtTreeView(QTreeWidgetItem *root) const
     auto configurations = getOrderedMap(EObjectType::Configuration);
     for (auto &configuration : configurations)
         configuration.second->printQtTreeView(item);
+
+    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Coordinates")));
+    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Coordinate));
+    auto coordinates = getOrderedMap(EObjectType::Coordinate);
+    for (auto &coordinate : coordinates)
+        coordinate.second->printQtTreeView(item);
 
     item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Equipments")));
     item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Equipment));
@@ -3172,12 +3310,6 @@ void StorageImpl::printQtTreeView(QTreeWidgetItem *root) const
     for (auto &projectile : projectiles)
         projectile.second->printQtTreeView(item);
 
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Quest Rewards")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
-    auto questRewards = getOrderedMap(EObjectType::QuestReward);
-    for (auto &questReward : questRewards)
-        questReward.second->printQtTreeView(item);
-
     item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Quests")));
     item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Quest));
     auto quests = getOrderedMap(EObjectType::Quest);
@@ -3206,186 +3338,416 @@ void StorageImpl::printQtTreeView(QTreeWidgetItem *root) const
 QTreeWidgetItem *StorageImpl::addRecord(QTreeWidgetItem *item)
 {
     EObjectType type = static_cast<EObjectType>(item->data(0, Qt::UserRole).toInt());
+    int id = 1;
+    IObject *parent = 0;
+    auto parentItem = item->parent();
+    if (parentItem)
+        parent = (IObject *)parentItem->data(0, Qt::UserRole).toULongLong();
     switch (type)
     {
     case EObjectType::Building:
     {
-        int id = 1;
         if (!buildings.empty())
             id = buildings.rbegin()->first + 1;
         auto v = std::make_shared<Building>();
         v->id = id;
-        buildings[id] = v;
+        buildings[v->id] = v;
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::ClanReputation:
+    {
+        auto v = std::make_shared<ClanReputation>();
+        Clan *clan = (Clan *)parent;
+        clan->reputations.push_back(v);
+        clanReputations.push_back(v);
+        v->clan = clans[clan->id];
         return v->printQtTreeView(item);
     }
     case EObjectType::Clan:
     {
-        int id = 1;
         if (!clans.empty())
             id = clans.rbegin()->first + 1;
         auto v = std::make_shared<Clan>();
         v->id = id;
-        clans[id] = v;
+        clans[v->id] = v;
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::ConfigurationEquipment:
+    {
+        auto v = std::make_shared<ConfigurationEquipment>();
+        Configuration *configuration = (Configuration *)parent;
+        configuration->equipments.push_back(v);
+        configurationEquipments.push_back(v);
+        v->configuration = configurations[configuration->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::ConfigurationGood:
+    {
+        auto v = std::make_shared<ConfigurationGood>();
+        Configuration *configuration = (Configuration *)parent;
+        configuration->goods.push_back(v);
+        configurationGoods.push_back(v);
+        v->configuration = configurations[configuration->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::ConfigurationProjectile:
+    {
+        auto v = std::make_shared<ConfigurationProjectile>();
+        Configuration *configuration = (Configuration *)parent;
+        configuration->projectiles.push_back(v);
+        configurationProjectiles.push_back(v);
+        v->configuration = configurations[configuration->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::ConfigurationWeapon:
+    {
+        auto v = std::make_shared<ConfigurationWeapon>();
+        Configuration *configuration = (Configuration *)parent;
+        configuration->weapons.push_back(v);
+        configurationWeapons.push_back(v);
+        v->configuration = configurations[configuration->id];
         return v->printQtTreeView(item);
     }
     case EObjectType::Configuration:
     {
-        int id = 1;
         if (!configurations.empty())
             id = configurations.rbegin()->first + 1;
         auto v = std::make_shared<Configuration>();
         v->id = id;
-        configurations[id] = v;
+        configurations[v->id] = v;
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::Coordinate:
+    {
+        if (!coordinates.empty())
+            id = coordinates.rbegin()->first + 1;
+        auto v = std::make_shared<Coordinate>();
+        v->id = id;
+        coordinates[v->id] = v;
         return v->printQtTreeView(item);
     }
     case EObjectType::Equipment:
     {
-        int id = 1;
         if (!equipments.empty())
             id = equipments.rbegin()->first + 1;
         auto v = std::make_shared<Equipment>();
         v->id = id;
-        equipments[id] = v;
+        equipments[v->id] = v;
         return v->printQtTreeView(item);
     }
     case EObjectType::Glider:
     {
-        int id = 1;
         if (!gliders.empty())
             id = gliders.rbegin()->first + 1;
         auto v = std::make_shared<Glider>();
         v->id = id;
-        gliders[id] = v;
+        gliders[v->id] = v;
         return v->printQtTreeView(item);
     }
     case EObjectType::Good:
     {
-        int id = 1;
         if (!goods.empty())
             id = goods.rbegin()->first + 1;
         auto v = std::make_shared<Good>();
         v->id = id;
-        goods[id] = v;
+        goods[v->id] = v;
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::MapBuildingEquipment:
+    {
+        auto v = std::make_shared<MapBuildingEquipment>();
+        MapBuilding *mapBuilding = (MapBuilding *)parent;
+        mapBuilding->equipments.push_back(v);
+        mapBuildingEquipments.push_back(v);
+        v->mapBuilding = mapBuildings[mapBuilding->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::MapBuildingGlider:
+    {
+        auto v = std::make_shared<MapBuildingGlider>();
+        MapBuilding *mapBuilding = (MapBuilding *)parent;
+        mapBuilding->gliders.push_back(v);
+        mapBuildingGliders.push_back(v);
+        v->mapBuilding = mapBuildings[mapBuilding->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::MapBuildingGood:
+    {
+        auto v = std::make_shared<MapBuildingGood>();
+        MapBuilding *mapBuilding = (MapBuilding *)parent;
+        mapBuilding->goods.push_back(v);
+        mapBuildingGoods.push_back(v);
+        v->mapBuilding = mapBuildings[mapBuilding->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::MapBuildingModificator:
+    {
+        auto v = std::make_shared<MapBuildingModificator>();
+        MapBuilding *mapBuilding = (MapBuilding *)parent;
+        mapBuilding->modificators.push_back(v);
+        mapBuildingModificators.push_back(v);
+        v->mapBuilding = mapBuildings[mapBuilding->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::MapBuildingProjectile:
+    {
+        auto v = std::make_shared<MapBuildingProjectile>();
+        MapBuilding *mapBuilding = (MapBuilding *)parent;
+        mapBuilding->projectiles.push_back(v);
+        mapBuildingProjectiles.push_back(v);
+        v->mapBuilding = mapBuildings[mapBuilding->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::MapBuildingWeapon:
+    {
+        auto v = std::make_shared<MapBuildingWeapon>();
+        MapBuilding *mapBuilding = (MapBuilding *)parent;
+        mapBuilding->weapons.push_back(v);
+        mapBuildingWeapons.push_back(v);
+        v->mapBuilding = mapBuildings[mapBuilding->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::MapBuilding:
+    {
+        auto v = std::make_shared<MapBuilding>();
+        Map *map = (Map *)parent;
+        map->buildings.push_back(v);
+        mapBuildings[v->id] = v;
+        v->map = maps[map->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::MapObject:
+    {
+        auto v = std::make_shared<MapObject>();
+        Map *map = (Map *)parent;
+        map->objects.push_back(v);
+        mapObjects[v->id] = v;
+        v->map = maps[map->id];
         return v->printQtTreeView(item);
     }
     case EObjectType::Map:
     {
-        int id = 1;
         if (!maps.empty())
             id = maps.rbegin()->first + 1;
         auto v = std::make_shared<Map>();
         v->id = id;
-        maps[id] = v;
+        maps[v->id] = v;
         return v->printQtTreeView(item);
     }
     case EObjectType::Mechanoid:
     {
-        int id = 1;
         if (!mechanoids.empty())
             id = mechanoids.rbegin()->first + 1;
         auto v = std::make_shared<Mechanoid>();
         v->id = id;
-        mechanoids[id] = v;
+        mechanoids[v->id] = v;
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::ModificationClan:
+    {
+        auto v = std::make_shared<ModificationClan>();
+        Modification *modification = (Modification *)parent;
+        modification->clans.push_back(v);
+        modificationClans.push_back(v);
+        v->modification = modifications[modification->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::ModificationMap:
+    {
+        auto v = std::make_shared<ModificationMap>();
+        Modification *modification = (Modification *)parent;
+        modification->maps.push_back(v);
+        modificationMaps.push_back(v);
+        v->modification = modifications[modification->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::ModificationMechanoid:
+    {
+        auto v = std::make_shared<ModificationMechanoid>();
+        Modification *modification = (Modification *)parent;
+        modification->mechanoids.push_back(v);
+        modificationMechanoids.push_back(v);
+        v->modification = modifications[modification->id];
         return v->printQtTreeView(item);
     }
     case EObjectType::Modification:
     {
-        int id = 1;
         if (!modifications.empty())
             id = modifications.rbegin()->first + 1;
         auto v = std::make_shared<Modification>();
         v->id = id;
-        modifications[id] = v;
+        modifications[v->id] = v;
         return v->printQtTreeView(item);
     }
     case EObjectType::Modificator:
     {
-        int id = 1;
         if (!modificators.empty())
             id = modificators.rbegin()->first + 1;
         auto v = std::make_shared<Modificator>();
         v->id = id;
-        modificators[id] = v;
+        modificators[v->id] = v;
         return v->printQtTreeView(item);
     }
     case EObjectType::Object:
     {
-        int id = 1;
         if (!objects.empty())
             id = objects.rbegin()->first + 1;
         auto v = std::make_shared<Object>();
         v->id = id;
-        objects[id] = v;
+        objects[v->id] = v;
         return v->printQtTreeView(item);
     }
     case EObjectType::Player:
     {
-        int id = 1;
         if (!players.empty())
             id = players.rbegin()->first + 1;
         auto v = std::make_shared<Player>();
         v->id = id;
-        players[id] = v;
+        players[v->id] = v;
         return v->printQtTreeView(item);
     }
     case EObjectType::Projectile:
     {
-        int id = 1;
         if (!projectiles.empty())
             id = projectiles.rbegin()->first + 1;
         auto v = std::make_shared<Projectile>();
         v->id = id;
-        projectiles[id] = v;
+        projectiles[v->id] = v;
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::QuestRewardEquipment:
+    {
+        auto v = std::make_shared<QuestRewardEquipment>();
+        QuestReward *questReward = (QuestReward *)parent;
+        questReward->equipments.push_back(v);
+        questRewardEquipments.push_back(v);
+        v->questReward = questRewards[questReward->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::QuestRewardGlider:
+    {
+        auto v = std::make_shared<QuestRewardGlider>();
+        QuestReward *questReward = (QuestReward *)parent;
+        questReward->gliders.push_back(v);
+        questRewardGliders.push_back(v);
+        v->questReward = questRewards[questReward->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::QuestRewardGood:
+    {
+        auto v = std::make_shared<QuestRewardGood>();
+        QuestReward *questReward = (QuestReward *)parent;
+        questReward->goods.push_back(v);
+        questRewardGoods.push_back(v);
+        v->questReward = questRewards[questReward->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::QuestRewardModificator:
+    {
+        auto v = std::make_shared<QuestRewardModificator>();
+        QuestReward *questReward = (QuestReward *)parent;
+        questReward->modificators.push_back(v);
+        questRewardModificators.push_back(v);
+        v->questReward = questRewards[questReward->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::QuestRewardProjectile:
+    {
+        auto v = std::make_shared<QuestRewardProjectile>();
+        QuestReward *questReward = (QuestReward *)parent;
+        questReward->projectiles.push_back(v);
+        questRewardProjectiles.push_back(v);
+        v->questReward = questRewards[questReward->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::QuestRewardReputation:
+    {
+        auto v = std::make_shared<QuestRewardReputation>();
+        QuestReward *questReward = (QuestReward *)parent;
+        questReward->reputations.push_back(v);
+        questRewardReputations.push_back(v);
+        v->questReward = questRewards[questReward->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::QuestRewardWeapon:
+    {
+        auto v = std::make_shared<QuestRewardWeapon>();
+        QuestReward *questReward = (QuestReward *)parent;
+        questReward->weapons.push_back(v);
+        questRewardWeapons.push_back(v);
+        v->questReward = questRewards[questReward->id];
         return v->printQtTreeView(item);
     }
     case EObjectType::QuestReward:
     {
-        int id = 1;
-        if (!questRewards.empty())
-            id = questRewards.rbegin()->first + 1;
         auto v = std::make_shared<QuestReward>();
-        v->id = id;
-        questRewards[id] = v;
+        Quest *quest = (Quest *)parent;
+        quest->rewards.push_back(v);
+        questRewards[v->id] = v;
+        v->quest = quests[quest->id];
         return v->printQtTreeView(item);
     }
     case EObjectType::Quest:
     {
-        int id = 1;
         if (!quests.empty())
             id = quests.rbegin()->first + 1;
         auto v = std::make_shared<Quest>();
         v->id = id;
-        quests[id] = v;
+        quests[v->id] = v;
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::SaveObject:
+    {
+        auto v = std::make_shared<SaveObject>();
+        Save *save = (Save *)parent;
+        save->objects.push_back(v);
+        saveObjects.push_back(v);
+        v->save = saves[save->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::SavePlayer:
+    {
+        auto v = std::make_shared<SavePlayer>();
+        Save *save = (Save *)parent;
+        save->players.push_back(v);
+        savePlayers.push_back(v);
+        v->save = saves[save->id];
+        return v->printQtTreeView(item);
+    }
+    case EObjectType::SaveQuest:
+    {
+        auto v = std::make_shared<SaveQuest>();
+        Save *save = (Save *)parent;
+        save->quests.push_back(v);
+        saveQuests.push_back(v);
+        v->save = saves[save->id];
         return v->printQtTreeView(item);
     }
     case EObjectType::Save:
     {
-        int id = 1;
         if (!saves.empty())
             id = saves.rbegin()->first + 1;
         auto v = std::make_shared<Save>();
         v->id = id;
-        saves[id] = v;
+        saves[v->id] = v;
         return v->printQtTreeView(item);
     }
     case EObjectType::String:
     {
-        int id = 1;
         if (!strings.empty())
             id = strings.rbegin()->first + 1;
         auto v = std::make_shared<String>();
         v->id = id;
-        strings[id] = v;
+        strings[v->id] = v;
         return v->printQtTreeView(item);
     }
     case EObjectType::Weapon:
     {
-        int id = 1;
         if (!weapons.empty())
             id = weapons.rbegin()->first + 1;
         auto v = std::make_shared<Weapon>();
         v->id = id;
-        weapons[id] = v;
+        weapons[v->id] = v;
         return v->printQtTreeView(item);
     }
     default:
@@ -3406,6 +3768,19 @@ void StorageImpl::deleteRecord(QTreeWidgetItem *item)
         item->parent()->removeChild(item);
         break;
     }
+    case EObjectType::ClanReputation:
+    {
+        ClanReputation *v = (ClanReputation *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(clanReputations.begin(), clanReputations.end(), [v](const Ptr<ClanReputation> &p){ return p.get() == v; });
+            if (i == clanReputations.end())
+                break;
+            clanReputations.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
     case EObjectType::Clan:
     {
         Clan *v = (Clan *)item->data(0, Qt::UserRole).toULongLong();
@@ -3413,10 +3788,69 @@ void StorageImpl::deleteRecord(QTreeWidgetItem *item)
         item->parent()->removeChild(item);
         break;
     }
+    case EObjectType::ConfigurationEquipment:
+    {
+        ConfigurationEquipment *v = (ConfigurationEquipment *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(configurationEquipments.begin(), configurationEquipments.end(), [v](const Ptr<ConfigurationEquipment> &p){ return p.get() == v; });
+            if (i == configurationEquipments.end())
+                break;
+            configurationEquipments.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::ConfigurationGood:
+    {
+        ConfigurationGood *v = (ConfigurationGood *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(configurationGoods.begin(), configurationGoods.end(), [v](const Ptr<ConfigurationGood> &p){ return p.get() == v; });
+            if (i == configurationGoods.end())
+                break;
+            configurationGoods.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::ConfigurationProjectile:
+    {
+        ConfigurationProjectile *v = (ConfigurationProjectile *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(configurationProjectiles.begin(), configurationProjectiles.end(), [v](const Ptr<ConfigurationProjectile> &p){ return p.get() == v; });
+            if (i == configurationProjectiles.end())
+                break;
+            configurationProjectiles.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::ConfigurationWeapon:
+    {
+        ConfigurationWeapon *v = (ConfigurationWeapon *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(configurationWeapons.begin(), configurationWeapons.end(), [v](const Ptr<ConfigurationWeapon> &p){ return p.get() == v; });
+            if (i == configurationWeapons.end())
+                break;
+            configurationWeapons.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
     case EObjectType::Configuration:
     {
         Configuration *v = (Configuration *)item->data(0, Qt::UserRole).toULongLong();
         configurations.erase(v->id);
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::Coordinate:
+    {
+        Coordinate *v = (Coordinate *)item->data(0, Qt::UserRole).toULongLong();
+        coordinates.erase(v->id);
         item->parent()->removeChild(item);
         break;
     }
@@ -3441,6 +3875,98 @@ void StorageImpl::deleteRecord(QTreeWidgetItem *item)
         item->parent()->removeChild(item);
         break;
     }
+    case EObjectType::MapBuildingEquipment:
+    {
+        MapBuildingEquipment *v = (MapBuildingEquipment *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(mapBuildingEquipments.begin(), mapBuildingEquipments.end(), [v](const Ptr<MapBuildingEquipment> &p){ return p.get() == v; });
+            if (i == mapBuildingEquipments.end())
+                break;
+            mapBuildingEquipments.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::MapBuildingGlider:
+    {
+        MapBuildingGlider *v = (MapBuildingGlider *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(mapBuildingGliders.begin(), mapBuildingGliders.end(), [v](const Ptr<MapBuildingGlider> &p){ return p.get() == v; });
+            if (i == mapBuildingGliders.end())
+                break;
+            mapBuildingGliders.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::MapBuildingGood:
+    {
+        MapBuildingGood *v = (MapBuildingGood *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(mapBuildingGoods.begin(), mapBuildingGoods.end(), [v](const Ptr<MapBuildingGood> &p){ return p.get() == v; });
+            if (i == mapBuildingGoods.end())
+                break;
+            mapBuildingGoods.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::MapBuildingModificator:
+    {
+        MapBuildingModificator *v = (MapBuildingModificator *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(mapBuildingModificators.begin(), mapBuildingModificators.end(), [v](const Ptr<MapBuildingModificator> &p){ return p.get() == v; });
+            if (i == mapBuildingModificators.end())
+                break;
+            mapBuildingModificators.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::MapBuildingProjectile:
+    {
+        MapBuildingProjectile *v = (MapBuildingProjectile *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(mapBuildingProjectiles.begin(), mapBuildingProjectiles.end(), [v](const Ptr<MapBuildingProjectile> &p){ return p.get() == v; });
+            if (i == mapBuildingProjectiles.end())
+                break;
+            mapBuildingProjectiles.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::MapBuildingWeapon:
+    {
+        MapBuildingWeapon *v = (MapBuildingWeapon *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(mapBuildingWeapons.begin(), mapBuildingWeapons.end(), [v](const Ptr<MapBuildingWeapon> &p){ return p.get() == v; });
+            if (i == mapBuildingWeapons.end())
+                break;
+            mapBuildingWeapons.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::MapBuilding:
+    {
+        MapBuilding *v = (MapBuilding *)item->data(0, Qt::UserRole).toULongLong();
+        mapBuildings.erase(v->id);
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::MapObject:
+    {
+        MapObject *v = (MapObject *)item->data(0, Qt::UserRole).toULongLong();
+        mapObjects.erase(v->id);
+        item->parent()->removeChild(item);
+        break;
+    }
     case EObjectType::Map:
     {
         Map *v = (Map *)item->data(0, Qt::UserRole).toULongLong();
@@ -3452,6 +3978,45 @@ void StorageImpl::deleteRecord(QTreeWidgetItem *item)
     {
         Mechanoid *v = (Mechanoid *)item->data(0, Qt::UserRole).toULongLong();
         mechanoids.erase(v->id);
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::ModificationClan:
+    {
+        ModificationClan *v = (ModificationClan *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(modificationClans.begin(), modificationClans.end(), [v](const Ptr<ModificationClan> &p){ return p.get() == v; });
+            if (i == modificationClans.end())
+                break;
+            modificationClans.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::ModificationMap:
+    {
+        ModificationMap *v = (ModificationMap *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(modificationMaps.begin(), modificationMaps.end(), [v](const Ptr<ModificationMap> &p){ return p.get() == v; });
+            if (i == modificationMaps.end())
+                break;
+            modificationMaps.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::ModificationMechanoid:
+    {
+        ModificationMechanoid *v = (ModificationMechanoid *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(modificationMechanoids.begin(), modificationMechanoids.end(), [v](const Ptr<ModificationMechanoid> &p){ return p.get() == v; });
+            if (i == modificationMechanoids.end())
+                break;
+            modificationMechanoids.erase(i);
+        }
         item->parent()->removeChild(item);
         break;
     }
@@ -3490,6 +4055,97 @@ void StorageImpl::deleteRecord(QTreeWidgetItem *item)
         item->parent()->removeChild(item);
         break;
     }
+    case EObjectType::QuestRewardEquipment:
+    {
+        QuestRewardEquipment *v = (QuestRewardEquipment *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(questRewardEquipments.begin(), questRewardEquipments.end(), [v](const Ptr<QuestRewardEquipment> &p){ return p.get() == v; });
+            if (i == questRewardEquipments.end())
+                break;
+            questRewardEquipments.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::QuestRewardGlider:
+    {
+        QuestRewardGlider *v = (QuestRewardGlider *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(questRewardGliders.begin(), questRewardGliders.end(), [v](const Ptr<QuestRewardGlider> &p){ return p.get() == v; });
+            if (i == questRewardGliders.end())
+                break;
+            questRewardGliders.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::QuestRewardGood:
+    {
+        QuestRewardGood *v = (QuestRewardGood *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(questRewardGoods.begin(), questRewardGoods.end(), [v](const Ptr<QuestRewardGood> &p){ return p.get() == v; });
+            if (i == questRewardGoods.end())
+                break;
+            questRewardGoods.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::QuestRewardModificator:
+    {
+        QuestRewardModificator *v = (QuestRewardModificator *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(questRewardModificators.begin(), questRewardModificators.end(), [v](const Ptr<QuestRewardModificator> &p){ return p.get() == v; });
+            if (i == questRewardModificators.end())
+                break;
+            questRewardModificators.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::QuestRewardProjectile:
+    {
+        QuestRewardProjectile *v = (QuestRewardProjectile *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(questRewardProjectiles.begin(), questRewardProjectiles.end(), [v](const Ptr<QuestRewardProjectile> &p){ return p.get() == v; });
+            if (i == questRewardProjectiles.end())
+                break;
+            questRewardProjectiles.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::QuestRewardReputation:
+    {
+        QuestRewardReputation *v = (QuestRewardReputation *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(questRewardReputations.begin(), questRewardReputations.end(), [v](const Ptr<QuestRewardReputation> &p){ return p.get() == v; });
+            if (i == questRewardReputations.end())
+                break;
+            questRewardReputations.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::QuestRewardWeapon:
+    {
+        QuestRewardWeapon *v = (QuestRewardWeapon *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(questRewardWeapons.begin(), questRewardWeapons.end(), [v](const Ptr<QuestRewardWeapon> &p){ return p.get() == v; });
+            if (i == questRewardWeapons.end())
+                break;
+            questRewardWeapons.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
     case EObjectType::QuestReward:
     {
         QuestReward *v = (QuestReward *)item->data(0, Qt::UserRole).toULongLong();
@@ -3501,6 +4157,45 @@ void StorageImpl::deleteRecord(QTreeWidgetItem *item)
     {
         Quest *v = (Quest *)item->data(0, Qt::UserRole).toULongLong();
         quests.erase(v->id);
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::SaveObject:
+    {
+        SaveObject *v = (SaveObject *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(saveObjects.begin(), saveObjects.end(), [v](const Ptr<SaveObject> &p){ return p.get() == v; });
+            if (i == saveObjects.end())
+                break;
+            saveObjects.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::SavePlayer:
+    {
+        SavePlayer *v = (SavePlayer *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(savePlayers.begin(), savePlayers.end(), [v](const Ptr<SavePlayer> &p){ return p.get() == v; });
+            if (i == savePlayers.end())
+                break;
+            savePlayers.erase(i);
+        }
+        item->parent()->removeChild(item);
+        break;
+    }
+    case EObjectType::SaveQuest:
+    {
+        SaveQuest *v = (SaveQuest *)item->data(0, Qt::UserRole).toULongLong();
+        while (1)
+        {
+            auto i = find_if(saveQuests.begin(), saveQuests.end(), [v](const Ptr<SaveQuest> &p){ return p.get() == v; });
+            if (i == saveQuests.end())
+                break;
+            saveQuests.erase(i);
+        }
         item->parent()->removeChild(item);
         break;
     }
@@ -3577,8 +4272,6 @@ OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type) const
         return ::getOrderedMap(mapObjects);
     case EObjectType::Map:
         return ::getOrderedMap(maps);
-    case EObjectType::MechanoidGroupMechanoid:
-        return ::getOrderedMap(mechanoidGroupMechanoids);
     case EObjectType::MechanoidGroup:
         return ::getOrderedMap(mechanoidGroups);
     case EObjectType::Mechanoid:

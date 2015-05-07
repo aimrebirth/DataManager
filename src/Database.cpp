@@ -65,6 +65,7 @@ void Database::loadDatabase(std::string dbname)
         LOG_ERROR(logger, error);
         throw std::exception(error.c_str());
     }
+    execute("PRAGMA foreign_keys = OFF;", 0, 0); // this can be turned on in the future
 }
 
 bool Database::isLoaded() const
@@ -72,20 +73,23 @@ bool Database::isLoaded() const
     return db != 0;
 }
 
-void Database::execute(const std::string &sql, void *object, DatabaseCallback callback)
+void Database::execute(const std::string &sql, void *object, DatabaseCallback callback, bool nothrow, std::string *err)
 {
-    if (!isLoaded())
-        throw std::exception("Database is not loaded!");
-
     LOG_TRACE(logger, "Executing sql statement: " << sql);
     char *errmsg;
     sqlite3_exec(db, sql.c_str(), callback, object, &errmsg);
     if (errmsg)
     {
-        std::string error = "Error executing sql statement: " + sql + " error: " + errmsg;
+        std::string error = "Error executing sql statement:\n" + sql + "\nError: " + errmsg;
         sqlite3_free(errmsg);
         LOG_ERROR(logger, error);
-        throw std::exception(error.c_str());
+        if (nothrow)
+        {
+            if (errmsg)
+                *err = error;
+        }
+        else
+            throw std::exception(error.c_str());
     }
 }
 
@@ -134,22 +138,6 @@ void Database::getSchema(DatabaseSchema *schema)
     };
     for (auto &tbl : schema->tables)
         execute("PRAGMA foreign_key_list(" + tbl.first + ");", &tbl.second, callback3);
-}
-
-std::string getColumnTypeString(ColumnType type)
-{
-    switch (type)
-    {
-    case ColumnType::Integer:
-        return "INTEGER";
-    case ColumnType::Real:
-        return "REAL";
-    case ColumnType::Text:
-        return "TEXT";
-    case ColumnType::Blob:
-        return "BLOB";
-    }
-    return "";
 }
 
 ColumnType getColumnType(const std::string &s)

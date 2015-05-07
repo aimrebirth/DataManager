@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <set>
@@ -63,7 +64,7 @@ using CMap = std::map<int, T>;
 template <typename T>
 struct IdPtr
 {
-    int id = 1;
+    int id = 0;
     Ptr<T> ptr;
 
     IdPtr &operator=(const Ptr<T> &item)
@@ -83,6 +84,11 @@ inline Text to_string(IdPtr<T> ptr)
         return to_string(ptr.ptr->getName());
     return POLYGON4_NONAME;
 }
+
+class Coordinate;
+inline Text to_string(const Coordinate &coordinate);
+
+typedef std::function<void(double)> ProgressCallback;
 
 } // namespace detail
 

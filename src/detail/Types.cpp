@@ -113,6 +113,11 @@ QTreeWidgetItem *ClanReputation::printQtTreeView(QTreeWidgetItem *parent) const
 }
 #endif
 
+Text ClanReputation::getName() const
+{
+    return clan.id < clan2.id ? (to_string(clan).wstring() + L" - " + to_string(clan2).wstring()) : (to_string(clan2).wstring() + L" - " + to_string(clan).wstring());
+}
+
 EObjectType Clan::getType() const
 {
     return EObjectType::Clan;
@@ -162,10 +167,10 @@ QTreeWidgetItem *Clan::printQtTreeView(QTreeWidgetItem *parent) const
 {
     auto item = new QTreeWidgetItem(parent, QStringList(QString::fromStdWString(getName())));
     item->setData(0, Qt::UserRole, (uint64_t)this);
-
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Reputations")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ClanReputation));
     for (auto &reputation : reputations)
         reputation->printQtTreeView(root);
 
@@ -229,6 +234,11 @@ QTreeWidgetItem *ConfigurationEquipment::printQtTreeView(QTreeWidgetItem *parent
 }
 #endif
 
+Text ConfigurationEquipment::getName() const
+{
+    return to_string(equipment);
+}
+
 EObjectType ConfigurationGood::getType() const
 {
     return EObjectType::ConfigurationGood;
@@ -241,7 +251,7 @@ Text ConfigurationGood::getVariableString(int columnId) const
     case 0:
         return to_string(configuration);
     case 1:
-        return to_string(goods);
+        return to_string(good);
     case 2:
         return to_string(quantity);
     default:
@@ -258,7 +268,7 @@ void ConfigurationGood::setVariableString(int columnId, Text text, Ptr<IObject> 
         configuration = std::static_pointer_cast<Configuration>(ptr);
         break;
     case 1:
-        goods = std::static_pointer_cast<Good>(ptr);
+        good = std::static_pointer_cast<Good>(ptr);
         break;
     case 2:
         quantity = std::stoi(text.string());
@@ -278,6 +288,11 @@ QTreeWidgetItem *ConfigurationGood::printQtTreeView(QTreeWidgetItem *parent) con
     return item;
 }
 #endif
+
+Text ConfigurationGood::getName() const
+{
+    return to_string(good);
+}
 
 EObjectType ConfigurationProjectile::getType() const
 {
@@ -329,6 +344,11 @@ QTreeWidgetItem *ConfigurationProjectile::printQtTreeView(QTreeWidgetItem *paren
 }
 #endif
 
+Text ConfigurationProjectile::getName() const
+{
+    return to_string(projectile);
+}
+
 EObjectType ConfigurationWeapon::getType() const
 {
     return EObjectType::ConfigurationWeapon;
@@ -379,6 +399,11 @@ QTreeWidgetItem *ConfigurationWeapon::printQtTreeView(QTreeWidgetItem *parent) c
 }
 #endif
 
+Text ConfigurationWeapon::getName() const
+{
+    return to_string(weapon);
+}
+
 EObjectType Configuration::getType() const
 {
     return EObjectType::Configuration;
@@ -428,19 +453,25 @@ QTreeWidgetItem *Configuration::printQtTreeView(QTreeWidgetItem *parent) const
 {
     auto item = new QTreeWidgetItem(parent, QStringList(QString::fromStdWString(getName())));
     item->setData(0, Qt::UserRole, (uint64_t)this);
-
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Equipments")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ConfigurationEquipment));
     for (auto &equipment : equipments)
         equipment->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ConfigurationGood));
     for (auto &good : goods)
         good->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Projectiles")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ConfigurationProjectile));
     for (auto &projectile : projectiles)
         projectile->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Weapons")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ConfigurationWeapon));
     for (auto &weapon : weapons)
         weapon->printQtTreeView(root);
 
@@ -472,9 +503,9 @@ Text Coordinate::getVariableString(int columnId) const
     case 3:
         { std::stringstream ss; ss << z; return ss.str(); }
     case 4:
-        { std::stringstream ss; ss << yaw; return ss.str(); }
-    case 5:
         { std::stringstream ss; ss << pitch; return ss.str(); }
+    case 5:
+        { std::stringstream ss; ss << yaw; return ss.str(); }
     case 6:
         { std::stringstream ss; ss << roll; return ss.str(); }
     default:
@@ -500,10 +531,10 @@ void Coordinate::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         z = std::stof(text.string());
         break;
     case 4:
-        yaw = std::stof(text.string());
+        pitch = std::stof(text.string());
         break;
     case 5:
-        pitch = std::stof(text.string());
+        yaw = std::stof(text.string());
         break;
     case 6:
         roll = std::stof(text.string());
@@ -523,6 +554,11 @@ QTreeWidgetItem *Coordinate::printQtTreeView(QTreeWidgetItem *parent) const
     return item;
 }
 #endif
+
+Text Coordinate::getName() const
+{
+    return to_string(*this);
+}
 
 EObjectType Equipment::getType() const
 {
@@ -869,6 +905,11 @@ QTreeWidgetItem *MapBuildingEquipment::printQtTreeView(QTreeWidgetItem *parent) 
 }
 #endif
 
+Text MapBuildingEquipment::getName() const
+{
+    return to_string(equipment);
+}
+
 EObjectType MapBuildingGlider::getType() const
 {
     return EObjectType::MapBuildingGlider;
@@ -919,6 +960,11 @@ QTreeWidgetItem *MapBuildingGlider::printQtTreeView(QTreeWidgetItem *parent) con
 }
 #endif
 
+Text MapBuildingGlider::getName() const
+{
+    return to_string(glider);
+}
+
 EObjectType MapBuildingGood::getType() const
 {
     return EObjectType::MapBuildingGood;
@@ -931,7 +977,7 @@ Text MapBuildingGood::getVariableString(int columnId) const
     case 0:
         return to_string(mapBuilding);
     case 1:
-        return to_string(goods);
+        return to_string(good);
     case 2:
         return to_string(quantity);
     default:
@@ -948,7 +994,7 @@ void MapBuildingGood::setVariableString(int columnId, Text text, Ptr<IObject> pt
         mapBuilding = std::static_pointer_cast<MapBuilding>(ptr);
         break;
     case 1:
-        goods = std::static_pointer_cast<Good>(ptr);
+        good = std::static_pointer_cast<Good>(ptr);
         break;
     case 2:
         quantity = std::stoi(text.string());
@@ -968,6 +1014,11 @@ QTreeWidgetItem *MapBuildingGood::printQtTreeView(QTreeWidgetItem *parent) const
     return item;
 }
 #endif
+
+Text MapBuildingGood::getName() const
+{
+    return to_string(good);
+}
 
 EObjectType MapBuildingModificator::getType() const
 {
@@ -1019,6 +1070,11 @@ QTreeWidgetItem *MapBuildingModificator::printQtTreeView(QTreeWidgetItem *parent
 }
 #endif
 
+Text MapBuildingModificator::getName() const
+{
+    return to_string(modificator);
+}
+
 EObjectType MapBuildingProjectile::getType() const
 {
     return EObjectType::MapBuildingProjectile;
@@ -1069,6 +1125,11 @@ QTreeWidgetItem *MapBuildingProjectile::printQtTreeView(QTreeWidgetItem *parent)
 }
 #endif
 
+Text MapBuildingProjectile::getName() const
+{
+    return to_string(projectile);
+}
+
 EObjectType MapBuildingWeapon::getType() const
 {
     return EObjectType::MapBuildingWeapon;
@@ -1118,6 +1179,11 @@ QTreeWidgetItem *MapBuildingWeapon::printQtTreeView(QTreeWidgetItem *parent) con
     return item;
 }
 #endif
+
+Text MapBuildingWeapon::getName() const
+{
+    return to_string(weapon);
+}
 
 EObjectType MapBuilding::getType() const
 {
@@ -1173,25 +1239,35 @@ QTreeWidgetItem *MapBuilding::printQtTreeView(QTreeWidgetItem *parent) const
 {
     auto item = new QTreeWidgetItem(parent, QStringList(QString::fromStdWString(getName())));
     item->setData(0, Qt::UserRole, (uint64_t)this);
-
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Equipments")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingEquipment));
     for (auto &equipment : equipments)
         equipment->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Gliders")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingGlider));
     for (auto &glider : gliders)
         glider->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingGood));
     for (auto &good : goods)
         good->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Modificators")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingModificator));
     for (auto &modificator : modificators)
         modificator->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Projectiles")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingProjectile));
     for (auto &projectile : projectiles)
         projectile->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Weapons")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingWeapon));
     for (auto &weapon : weapons)
         weapon->printQtTreeView(root);
 
@@ -1202,7 +1278,7 @@ QTreeWidgetItem *MapBuilding::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text MapBuilding::getName() const
 {
-    return text_id;
+    return to_string(building);
 }
 
 EObjectType MapObject::getType() const
@@ -1260,6 +1336,11 @@ QTreeWidgetItem *MapObject::printQtTreeView(QTreeWidgetItem *parent) const
 }
 #endif
 
+Text MapObject::getName() const
+{
+    return to_string(object);
+}
+
 EObjectType Map::getType() const
 {
     return EObjectType::Map;
@@ -1313,8 +1394,14 @@ QTreeWidgetItem *Map::printQtTreeView(QTreeWidgetItem *parent) const
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Map Buildings")));
-    for (auto &mapBuilding : mapBuildings)
-            mapBuilding->printQtTreeView(item);
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
+    for (auto &building : buildings)
+        building->printQtTreeView(root);
+
+    root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Map Objects")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapObject));
+    for (auto &object : objects)
+        object->printQtTreeView(root);
 
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
@@ -1325,51 +1412,6 @@ Text Map::getName() const
 {
     return to_string(name);
 }
-
-EObjectType MechanoidGroupMechanoid::getType() const
-{
-    return EObjectType::MechanoidGroupMechanoid;
-}
-
-Text MechanoidGroupMechanoid::getVariableString(int columnId) const
-{
-    switch (columnId)
-    {
-    case 0:
-        return to_string(mechanoidGroup);
-    case 1:
-        return to_string(mechanoid);
-    default:
-        return "";
-    }
-    return "";
-}
-
-void MechanoidGroupMechanoid::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
-{
-    switch (columnId)
-    {
-    case 0:
-        mechanoidGroup = std::static_pointer_cast<MechanoidGroup>(ptr);
-        break;
-    case 1:
-        mechanoid = std::static_pointer_cast<Mechanoid>(ptr);
-        break;
-    default:
-        break;
-    }
-}
-
-#ifdef USE_QT
-QTreeWidgetItem *MechanoidGroupMechanoid::printQtTreeView(QTreeWidgetItem *parent) const
-{
-    auto item = new QTreeWidgetItem(parent, QStringList(QString::fromStdWString(getName())));
-    item->setData(0, Qt::UserRole, (uint64_t)this);
-
-    item->sortChildren(0, Qt::AscendingOrder);
-    return item;
-}
-#endif
 
 EObjectType MechanoidGroup::getType() const
 {
@@ -1416,12 +1458,6 @@ QTreeWidgetItem *MechanoidGroup::printQtTreeView(QTreeWidgetItem *parent) const
     auto item = new QTreeWidgetItem(parent, QStringList(QString::fromStdWString(getName())));
     item->setData(0, Qt::UserRole, (uint64_t)this);
 
-    QTreeWidgetItem *root;
-
-    root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Mechanoids")));
-    for (auto &mechanoid : mechanoids)
-        mechanoid->printQtTreeView(root);
-
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
 }
@@ -1456,18 +1492,20 @@ Text Mechanoid::getVariableString(int columnId) const
     case 6:
         return to_string(configuration);
     case 7:
-        return to_string(clan);
+        return to_string(mechanoidGroup);
     case 8:
-        { std::stringstream ss; ss << rating_fight; return ss.str(); }
+        return to_string(clan);
     case 9:
-        { std::stringstream ss; ss << rating_courier; return ss.str(); }
+        { std::stringstream ss; ss << rating_fight; return ss.str(); }
     case 10:
-        { std::stringstream ss; ss << rating_trade; return ss.str(); }
+        { std::stringstream ss; ss << rating_courier; return ss.str(); }
     case 11:
-        return to_string(map);
+        { std::stringstream ss; ss << rating_trade; return ss.str(); }
     case 12:
-        return to_string(map_building);
+        return to_string(map);
     case 13:
+        return to_string(mapBuilding);
+    case 14:
         return to_string(coordinate);
     default:
         return "";
@@ -1501,24 +1539,27 @@ void Mechanoid::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         configuration = std::static_pointer_cast<Configuration>(ptr);
         break;
     case 7:
-        clan = std::static_pointer_cast<Clan>(ptr);
+        mechanoidGroup = std::static_pointer_cast<MechanoidGroup>(ptr);
         break;
     case 8:
-        rating_fight = std::stof(text.string());
+        clan = std::static_pointer_cast<Clan>(ptr);
         break;
     case 9:
-        rating_courier = std::stof(text.string());
+        rating_fight = std::stof(text.string());
         break;
     case 10:
-        rating_trade = std::stof(text.string());
+        rating_courier = std::stof(text.string());
         break;
     case 11:
-        map = std::static_pointer_cast<Map>(ptr);
+        rating_trade = std::stof(text.string());
         break;
     case 12:
-        map_building = std::static_pointer_cast<MapBuilding>(ptr);
+        map = std::static_pointer_cast<Map>(ptr);
         break;
     case 13:
+        mapBuilding = std::static_pointer_cast<MapBuilding>(ptr);
+        break;
+    case 14:
         coordinate = std::static_pointer_cast<Coordinate>(ptr);
         break;
     default:
@@ -1587,6 +1628,11 @@ QTreeWidgetItem *ModificationClan::printQtTreeView(QTreeWidgetItem *parent) cons
 }
 #endif
 
+Text ModificationClan::getName() const
+{
+    return to_string(clan);
+}
+
 EObjectType ModificationMap::getType() const
 {
     return EObjectType::ModificationMap;
@@ -1632,6 +1678,11 @@ QTreeWidgetItem *ModificationMap::printQtTreeView(QTreeWidgetItem *parent) const
 }
 #endif
 
+Text ModificationMap::getName() const
+{
+    return to_string(map);
+}
+
 EObjectType ModificationMechanoid::getType() const
 {
     return EObjectType::ModificationMechanoid;
@@ -1676,6 +1727,11 @@ QTreeWidgetItem *ModificationMechanoid::printQtTreeView(QTreeWidgetItem *parent)
     return item;
 }
 #endif
+
+Text ModificationMechanoid::getName() const
+{
+    return to_string(mechanoid);
+}
 
 EObjectType Modification::getType() const
 {
@@ -1756,16 +1812,20 @@ QTreeWidgetItem *Modification::printQtTreeView(QTreeWidgetItem *parent) const
 {
     auto item = new QTreeWidgetItem(parent, QStringList(QString::fromStdWString(getName())));
     item->setData(0, Qt::UserRole, (uint64_t)this);
-
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Clans")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ModificationClan));
     for (auto &clan : clans)
         clan->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Maps")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ModificationMap));
     for (auto &map : maps)
         map->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Mechanoids")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ModificationMechanoid));
     for (auto &mechanoid : mechanoids)
         mechanoid->printQtTreeView(root);
 
@@ -2119,6 +2179,11 @@ QTreeWidgetItem *QuestRewardEquipment::printQtTreeView(QTreeWidgetItem *parent) 
 }
 #endif
 
+Text QuestRewardEquipment::getName() const
+{
+    return to_string(equipment);
+}
+
 EObjectType QuestRewardGlider::getType() const
 {
     return EObjectType::QuestRewardGlider;
@@ -2168,6 +2233,11 @@ QTreeWidgetItem *QuestRewardGlider::printQtTreeView(QTreeWidgetItem *parent) con
     return item;
 }
 #endif
+
+Text QuestRewardGlider::getName() const
+{
+    return to_string(glider);
+}
 
 EObjectType QuestRewardGood::getType() const
 {
@@ -2219,6 +2289,11 @@ QTreeWidgetItem *QuestRewardGood::printQtTreeView(QTreeWidgetItem *parent) const
 }
 #endif
 
+Text QuestRewardGood::getName() const
+{
+    return to_string(good);
+}
+
 EObjectType QuestRewardModificator::getType() const
 {
     return EObjectType::QuestRewardModificator;
@@ -2268,6 +2343,11 @@ QTreeWidgetItem *QuestRewardModificator::printQtTreeView(QTreeWidgetItem *parent
     return item;
 }
 #endif
+
+Text QuestRewardModificator::getName() const
+{
+    return to_string(modificator);
+}
 
 EObjectType QuestRewardProjectile::getType() const
 {
@@ -2319,6 +2399,11 @@ QTreeWidgetItem *QuestRewardProjectile::printQtTreeView(QTreeWidgetItem *parent)
 }
 #endif
 
+Text QuestRewardProjectile::getName() const
+{
+    return to_string(projectile);
+}
+
 EObjectType QuestRewardReputation::getType() const
 {
     return EObjectType::QuestRewardReputation;
@@ -2369,6 +2454,11 @@ QTreeWidgetItem *QuestRewardReputation::printQtTreeView(QTreeWidgetItem *parent)
 }
 #endif
 
+Text QuestRewardReputation::getName() const
+{
+    return to_string(reputation);
+}
+
 EObjectType QuestRewardWeapon::getType() const
 {
     return EObjectType::QuestRewardWeapon;
@@ -2418,6 +2508,11 @@ QTreeWidgetItem *QuestRewardWeapon::printQtTreeView(QTreeWidgetItem *parent) con
     return item;
 }
 #endif
+
+Text QuestRewardWeapon::getName() const
+{
+    return to_string(weapon);
+}
 
 EObjectType QuestReward::getType() const
 {
@@ -2473,28 +2568,40 @@ QTreeWidgetItem *QuestReward::printQtTreeView(QTreeWidgetItem *parent) const
 {
     auto item = new QTreeWidgetItem(parent, QStringList(QString::fromStdWString(getName())));
     item->setData(0, Qt::UserRole, (uint64_t)this);
-
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Equipments")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardEquipment));
     for (auto &equipment : equipments)
         equipment->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Gliders")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardGlider));
     for (auto &glider : gliders)
         glider->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardGood));
     for (auto &good : goods)
         good->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Modificators")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardModificator));
     for (auto &modificator : modificators)
         modificator->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Projectiles")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardProjectile));
     for (auto &projectile : projectiles)
         projectile->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Reputations")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardReputation));
     for (auto &reputation : reputations)
         reputation->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Weapons")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardWeapon));
     for (auto &weapon : weapons)
         weapon->printQtTreeView(root);
 
@@ -2505,7 +2612,7 @@ QTreeWidgetItem *QuestReward::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text QuestReward::getName() const
 {
-    return text_id;
+    return to_string(quest);
 }
 
 EObjectType Quest::getType() const
@@ -2571,8 +2678,9 @@ QTreeWidgetItem *Quest::printQtTreeView(QTreeWidgetItem *parent) const
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Quest Rewards")));
-    for (auto &questReward : questRewards)
-            questReward->printQtTreeView(item);
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
+    for (auto &reward : rewards)
+        reward->printQtTreeView(root);
 
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
@@ -2639,6 +2747,11 @@ QTreeWidgetItem *SaveObject::printQtTreeView(QTreeWidgetItem *parent) const
 }
 #endif
 
+Text SaveObject::getName() const
+{
+    return to_string(object);
+}
+
 EObjectType SavePlayer::getType() const
 {
     return EObjectType::SavePlayer;
@@ -2683,6 +2796,11 @@ QTreeWidgetItem *SavePlayer::printQtTreeView(QTreeWidgetItem *parent) const
     return item;
 }
 #endif
+
+Text SavePlayer::getName() const
+{
+    return to_string(player);
+}
 
 EObjectType SaveQuest::getType() const
 {
@@ -2734,6 +2852,11 @@ QTreeWidgetItem *SaveQuest::printQtTreeView(QTreeWidgetItem *parent) const
 }
 #endif
 
+Text SaveQuest::getName() const
+{
+    return to_string(quest);
+}
+
 EObjectType Save::getType() const
 {
     return EObjectType::Save;
@@ -2783,22 +2906,27 @@ QTreeWidgetItem *Save::printQtTreeView(QTreeWidgetItem *parent) const
 {
     auto item = new QTreeWidgetItem(parent, QStringList(QString::fromStdWString(getName())));
     item->setData(0, Qt::UserRole, (uint64_t)this);
-
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Objects")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::SaveObject));
     for (auto &object : objects)
         object->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Players")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::SavePlayer));
     for (auto &player : players)
         player->printQtTreeView(root);
+
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Quests")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::SaveQuest));
     for (auto &quest : quests)
         quest->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Script Variables")));
-    for (auto &scriptVariable : scriptVariables)
-            scriptVariable->printQtTreeView(item);
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ScriptVariable));
+    for (auto &ptVariable : ptVariables)
+        ptVariable->printQtTreeView(root);
 
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
@@ -2859,6 +2987,11 @@ QTreeWidgetItem *ScriptVariable::printQtTreeView(QTreeWidgetItem *parent) const
     return item;
 }
 #endif
+
+Text ScriptVariable::getName() const
+{
+    return variable;
+}
 
 EObjectType String::getType() const
 {

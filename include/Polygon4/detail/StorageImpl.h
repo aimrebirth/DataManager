@@ -115,11 +115,6 @@ private:
     void _loadMapsArrays();
     void _saveMaps();
 
-    void _loadMechanoidGroupMechanoids();
-    void _loadMechanoidGroupMechanoidsPtrs();
-    void _loadMechanoidGroupMechanoidsArrays();
-    void _saveMechanoidGroupMechanoids();
-
     void _loadMechanoidGroups();
     void _loadMechanoidGroupsPtrs();
     void _loadMechanoidGroupsArrays();
@@ -254,8 +249,8 @@ public:
     StorageImpl(Ptr<Database> db) : db(db) {}
 
     virtual void clear();
-    virtual void load();
-    virtual void save();
+    virtual void load(ProgressCallback callback = ProgressCallback());
+    virtual void save(ProgressCallback callback = ProgressCallback());
 #ifdef USE_QT
     virtual void printQtTreeView(QTreeWidgetItem *root) const;
     virtual QTreeWidgetItem *addRecord(QTreeWidgetItem *item);

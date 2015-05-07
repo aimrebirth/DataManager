@@ -33,7 +33,6 @@ enum class EObjectType : int
     MapBuilding,
     MapObject,
     Map,
-    MechanoidGroupMechanoid,
     MechanoidGroup,
     Mechanoid,
     ModificationClan,
@@ -83,7 +82,6 @@ class MapBuildingWeapon;
 class MapBuilding;
 class MapObject;
 class Map;
-class MechanoidGroupMechanoid;
 class MechanoidGroup;
 class Mechanoid;
 class ModificationClan;
@@ -112,14 +110,7 @@ class String;
 class Weapon;
 
 class IObject
-#ifdef USE_QT
-    : public QObject
-#endif
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     virtual ~IObject(){}
 
@@ -139,10 +130,6 @@ public:
 
 class Building : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
@@ -160,10 +147,6 @@ public:
 
 class ClanReputation : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<Clan> clan;
     IdPtr<Clan> clan2;
@@ -175,14 +158,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class Clan : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
@@ -202,10 +182,6 @@ public:
 
 class ConfigurationEquipment : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<Configuration> configuration;
     IdPtr<Equipment> equipment;
@@ -217,17 +193,14 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class ConfigurationGood : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<Configuration> configuration;
-    IdPtr<Good> goods;
+    IdPtr<Good> good;
     int quantity = 0;
 
     virtual EObjectType getType() const;
@@ -236,14 +209,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class ConfigurationProjectile : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<Configuration> configuration;
     IdPtr<Projectile> projectile;
@@ -255,14 +225,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class ConfigurationWeapon : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<Configuration> configuration;
     IdPtr<Weapon> weapon;
@@ -274,14 +241,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class Configuration : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
@@ -304,17 +268,13 @@ public:
 
 class Coordinate : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
-    float yaw = 0.0f;
     float pitch = 0.0f;
+    float yaw = 0.0f;
     float roll = 0.0f;
 
     virtual EObjectType getType() const;
@@ -323,14 +283,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class Equipment : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
@@ -359,10 +316,6 @@ public:
 
 class Glider : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
@@ -389,10 +342,6 @@ public:
 
 class Good : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
@@ -413,10 +362,6 @@ public:
 
 class MapBuildingEquipment : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<MapBuilding> mapBuilding;
     IdPtr<Equipment> equipment;
@@ -428,14 +373,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class MapBuildingGlider : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<MapBuilding> mapBuilding;
     IdPtr<Glider> glider;
@@ -447,17 +389,14 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class MapBuildingGood : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<MapBuilding> mapBuilding;
-    IdPtr<Good> goods;
+    IdPtr<Good> good;
     int quantity = 0;
 
     virtual EObjectType getType() const;
@@ -466,14 +405,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class MapBuildingModificator : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<MapBuilding> mapBuilding;
     IdPtr<Modificator> modificator;
@@ -485,14 +421,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class MapBuildingProjectile : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<MapBuilding> mapBuilding;
     IdPtr<Projectile> projectile;
@@ -504,14 +437,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class MapBuildingWeapon : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<MapBuilding> mapBuilding;
     IdPtr<Weapon> weapon;
@@ -523,14 +453,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class MapBuilding : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
@@ -556,10 +483,6 @@ public:
 
 class MapObject : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     IdPtr<Map> map;
@@ -572,21 +495,19 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class Map : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
     Text resource;
     IdPtr<String> name;
 
-    CVector<Ptr<MapBuilding>> mapBuildings;
+    CVector<Ptr<MapBuilding>> buildings;
+    CVector<Ptr<MapObject>> objects;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -597,36 +518,13 @@ public:
     virtual Text getName() const;
 };
 
-class MechanoidGroupMechanoid : public IObject
-{
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
-public:
-    IdPtr<MechanoidGroup> mechanoidGroup;
-    IdPtr<Mechanoid> mechanoid;
-
-    virtual EObjectType getType() const;
-    virtual Text getVariableString(int columnId) const;
-    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
-#ifdef USE_QT
-    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
-#endif
-};
-
 class MechanoidGroup : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
     IdPtr<String> name;
 
-    CVector<Ptr<MechanoidGroupMechanoid>> mechanoids;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -639,10 +537,6 @@ public:
 
 class Mechanoid : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
@@ -651,12 +545,13 @@ public:
     float rating = 0.0f;
     float money = 0.0f;
     IdPtr<Configuration> configuration;
+    IdPtr<MechanoidGroup> mechanoidGroup;
     IdPtr<Clan> clan;
     float rating_fight = 0.0f;
     float rating_courier = 0.0f;
     float rating_trade = 0.0f;
     IdPtr<Map> map;
-    IdPtr<MapBuilding> map_building;
+    IdPtr<MapBuilding> mapBuilding;
     IdPtr<Coordinate> coordinate;
 
     virtual EObjectType getType() const;
@@ -670,10 +565,6 @@ public:
 
 class ModificationClan : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<Modification> modification;
     IdPtr<Clan> clan;
@@ -684,14 +575,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class ModificationMap : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<Modification> modification;
     IdPtr<Map> map;
@@ -702,14 +590,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class ModificationMechanoid : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<Modification> modification;
     IdPtr<Mechanoid> mechanoid;
@@ -720,14 +605,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class Modification : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     IdPtr<String> name;
@@ -755,10 +637,6 @@ public:
 
 class Modificator : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
@@ -781,10 +659,6 @@ public:
 
 class Object : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
@@ -803,10 +677,6 @@ public:
 
 class Player : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     IdPtr<Mechanoid> mechanoid;
@@ -822,10 +692,6 @@ public:
 
 class Projectile : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
@@ -849,10 +715,6 @@ public:
 
 class QuestRewardEquipment : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Equipment> equipment;
@@ -864,14 +726,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class QuestRewardGlider : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Glider> glider;
@@ -883,14 +742,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class QuestRewardGood : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Good> good;
@@ -902,14 +758,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class QuestRewardModificator : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Modificator> modificator;
@@ -921,14 +774,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class QuestRewardProjectile : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Projectile> projectile;
@@ -940,14 +790,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class QuestRewardReputation : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Clan> clan;
@@ -959,14 +806,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class QuestRewardWeapon : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Weapon> weapon;
@@ -978,14 +822,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class QuestReward : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     IdPtr<Quest> quest;
@@ -1012,10 +853,6 @@ public:
 
 class Quest : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;
@@ -1024,7 +861,7 @@ public:
     IdPtr<String> description;
     int time = 0;
 
-    CVector<Ptr<QuestReward>> questRewards;
+    CVector<Ptr<QuestReward>> rewards;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1037,10 +874,6 @@ public:
 
 class SaveObject : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<Save> save;
     IdPtr<Object> object;
@@ -1053,14 +886,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class SavePlayer : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<Save> save;
     IdPtr<Player> player;
@@ -1071,14 +901,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class SaveQuest : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<Save> save;
     IdPtr<Quest> quest;
@@ -1090,14 +917,11 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 class Save : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     IdPtr<Modification> modification;
@@ -1108,7 +932,7 @@ public:
     CVector<Ptr<SavePlayer>> players;
     CVector<Ptr<SaveQuest>> quests;
 
-    CVector<Ptr<ScriptVariable>> scriptVariables;
+    CVector<Ptr<ScriptVariable>> ptVariables;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1121,10 +945,6 @@ public:
 
 class ScriptVariable : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     IdPtr<Save> save;
     Text variable;
@@ -1136,6 +956,7 @@ public:
 #ifdef USE_QT
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
+    virtual Text getName() const;
 };
 
 enum class LocalizationType : EnumType
@@ -1148,10 +969,6 @@ enum class LocalizationType : EnumType
 
 class String : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text ru;
@@ -1168,10 +985,6 @@ public:
 
 class Weapon : public IObject
 {
-#ifdef USE_QT
-    Q_OBJECT
-#endif
-
 public:
     int id = 0;
     Text text_id;

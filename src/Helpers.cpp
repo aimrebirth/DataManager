@@ -16,51 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <Polygon4/Helpers.h>
 
-#include <map>
-#include <string>
+#ifdef USE_QT
+#include <qcoreapplication.h>
+#endif
 
 namespace polygon4
 {
 
-enum class ColumnType
+namespace detail
 {
-    Integer,
-    Real,
-    Text,
-    Blob
-};
-ColumnType getColumnType(const std::string &s);
 
-struct ForeignKey
-{
-    std::string table_name;
-    std::string column_name;
-};
-typedef std::map<std::string, ForeignKey> ForeignKeys;
+#include "detail/Helpers.cpp"
 
-struct Column
-{
-    int id;
-    std::string name;
-    ColumnType type;
-    ForeignKey *fk = 0;
-};
-typedef std::map<std::string, Column> Columns;
+} // namespace detail
 
-struct Table
-{
-    int id;
-    std::string name;
-    Columns columns;
-};
-typedef std::map<std::string, Table> Tables;
-
-struct DatabaseSchema
-{
-    std::string name;
-    Tables tables;
-};
-
-}
+} // namespace polygon4

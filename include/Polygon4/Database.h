@@ -40,7 +40,7 @@ public:
     void getSchema(DatabaseSchema *schema);
     std::string getName() const;
 
-    void execute(const std::string &sql, void *object, DatabaseCallback callback);
+    void execute(const std::string &sql, void *object, DatabaseCallback callback, bool nothrow = false, std::string *errmsg = 0);
 
 private:
     sqlite3 *db = 0;
