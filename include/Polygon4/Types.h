@@ -67,6 +67,15 @@ struct IdPtr
     int id = 0;
     Ptr<T> ptr;
 
+    bool operator==(const IdPtr<T> &rhs) const
+    {
+        if (ptr == rhs.ptr)
+            return true;
+        if (!ptr || !rhs.ptr)
+            return false;
+        return *ptr.get() == *rhs.ptr.get();
+    }
+
     IdPtr &operator=(const Ptr<T> &item)
     {
         if (!item)
@@ -74,6 +83,21 @@ struct IdPtr
         id = item->id;
         ptr = item;
         return *this;
+    }
+
+    Ptr<T> operator->() const
+    {
+        return ptr;
+    }
+
+    operator bool() const
+    {
+        return !!ptr;
+    }
+
+    operator Ptr<T>() const
+    {
+        return ptr;
     }
 };
 

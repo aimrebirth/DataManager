@@ -18,6 +18,8 @@
 
 #include <Polygon4/StorageImpl.h>
 
+#include <algorithm>
+
 #ifdef USE_QT
 #include <qtreewidget.h>
 #endif
