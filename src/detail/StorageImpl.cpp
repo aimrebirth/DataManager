@@ -1188,6 +1188,12 @@ void StorageImpl::_loadMaps()
         if (cols[1]) map->text_id = cols[1];
         if (cols[2]) map->resource = cols[2];
         if (cols[3]) map->name.id = std::stoi(cols[3]);
+        if (cols[4]) map->x_k = std::stof(cols[4]);
+        if (cols[5]) map->x_b = std::stof(cols[5]);
+        if (cols[6]) map->y_k = std::stof(cols[6]);
+        if (cols[7]) map->y_b = std::stof(cols[7]);
+        if (cols[8]) map->z_k = std::stof(cols[8]);
+        if (cols[9]) map->z_b = std::stof(cols[9]);
 
         Storage *storage = (Storage *)o;
         storage->maps[map->id] = map;
@@ -1234,6 +1240,12 @@ void StorageImpl::_saveMaps()
         query += "'" + map.second->text_id.string() + "',";
         query += "'" + map.second->resource.string() + "',";
         query += "'" + std::to_string(map.second->name.id) + "',";
+        query += "'" + std::to_string(map.second->x_k) + "',";
+        query += "'" + std::to_string(map.second->x_b) + "',";
+        query += "'" + std::to_string(map.second->y_k) + "',";
+        query += "'" + std::to_string(map.second->y_b) + "',";
+        query += "'" + std::to_string(map.second->z_k) + "',";
+        query += "'" + std::to_string(map.second->z_b) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
     }
@@ -1553,6 +1565,8 @@ void StorageImpl::_loadModifications()
         if (cols[7]) modification->version = std::stof(cols[7]);
         if (cols[8]) modification->script_language = cols[8];
         if (cols[9]) modification->script_main = cols[9];
+        if (cols[10]) modification->player_mechanoid.id = std::stoi(cols[10]);
+        if (cols[11]) modification->cooperative_player_configuration.id = std::stoi(cols[11]);
 
         Storage *storage = (Storage *)o;
         storage->modifications[modification->id] = modification;
@@ -1567,6 +1581,10 @@ void StorageImpl::_loadModificationsPtrs()
     {
         if (strings.find(modification.second->name.id) != strings.end())
             modification.second->name.ptr = strings[modification.second->name.id];
+        if (mechanoids.find(modification.second->player_mechanoid.id) != mechanoids.end())
+            modification.second->player_mechanoid.ptr = mechanoids[modification.second->player_mechanoid.id];
+        if (configurations.find(modification.second->cooperative_player_configuration.id) != configurations.end())
+            modification.second->cooperative_player_configuration.ptr = configurations[modification.second->cooperative_player_configuration.id];
     }
 }
 
@@ -1608,6 +1626,8 @@ void StorageImpl::_saveModifications()
         query += "'" + std::to_string(modification.second->version) + "',";
         query += "'" + modification.second->script_language.string() + "',";
         query += "'" + modification.second->script_main.string() + "',";
+        query += "'" + std::to_string(modification.second->player_mechanoid.id) + "',";
+        query += "'" + std::to_string(modification.second->cooperative_player_configuration.id) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
     }
@@ -3149,9 +3169,9 @@ void StorageImpl::save(ProgressCallback callback)
     PROGRESS_CALLBACK(23.404255);
     _saveGoods();
     PROGRESS_CALLBACK(25.531915);
-    _saveWeapons();
-    PROGRESS_CALLBACK(27.659574);
     _saveMechanoids();
+    PROGRESS_CALLBACK(27.659574);
+    _saveWeapons();
     PROGRESS_CALLBACK(29.787234);
     _saveModificators();
     PROGRESS_CALLBACK(31.914894);
@@ -3219,6 +3239,1100 @@ void StorageImpl::save(ProgressCallback callback)
     PROGRESS_CALLBACK(97.872340);
     _saveScriptVariables();
     PROGRESS_CALLBACK(100.000000);
+}
+
+Ptr<Building> StorageImpl::addBuilding(IObject *parent)
+{
+    int id = 1;
+    if (!buildings.empty())
+        id = buildings.rbegin()->first + 1;
+    auto v = std::make_shared<Building>();
+    v->id = id;
+    buildings[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteBuilding(Building *v)
+{
+    buildings.erase(v->id);
+}
+
+Ptr<ClanReputation> StorageImpl::addClanReputation(IObject *parent)
+{
+    auto v = std::make_shared<ClanReputation>();
+    Clan *clan = (Clan *)parent;
+    clan->reputations.push_back(v);
+    clanReputations.push_back(v);
+    v->clan = clans[clan->id];
+    return v;
+}
+
+void StorageImpl::deleteClanReputation(ClanReputation *v)
+{
+    while (1)
+    {
+        auto i = find_if(clanReputations.begin(), clanReputations.end(), [v](const Ptr<ClanReputation> &p){ return p.get() == v; });
+        if (i == clanReputations.end())
+            break;
+        clanReputations.erase(i);
+    }
+}
+
+Ptr<Clan> StorageImpl::addClan(IObject *parent)
+{
+    int id = 1;
+    if (!clans.empty())
+        id = clans.rbegin()->first + 1;
+    auto v = std::make_shared<Clan>();
+    v->id = id;
+    clans[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteClan(Clan *v)
+{
+    clans.erase(v->id);
+}
+
+Ptr<ConfigurationEquipment> StorageImpl::addConfigurationEquipment(IObject *parent)
+{
+    auto v = std::make_shared<ConfigurationEquipment>();
+    Configuration *configuration = (Configuration *)parent;
+    configuration->equipments.push_back(v);
+    configurationEquipments.push_back(v);
+    v->configuration = configurations[configuration->id];
+    return v;
+}
+
+void StorageImpl::deleteConfigurationEquipment(ConfigurationEquipment *v)
+{
+    while (1)
+    {
+        auto i = find_if(configurationEquipments.begin(), configurationEquipments.end(), [v](const Ptr<ConfigurationEquipment> &p){ return p.get() == v; });
+        if (i == configurationEquipments.end())
+            break;
+        configurationEquipments.erase(i);
+    }
+}
+
+Ptr<ConfigurationGood> StorageImpl::addConfigurationGood(IObject *parent)
+{
+    auto v = std::make_shared<ConfigurationGood>();
+    Configuration *configuration = (Configuration *)parent;
+    configuration->goods.push_back(v);
+    configurationGoods.push_back(v);
+    v->configuration = configurations[configuration->id];
+    return v;
+}
+
+void StorageImpl::deleteConfigurationGood(ConfigurationGood *v)
+{
+    while (1)
+    {
+        auto i = find_if(configurationGoods.begin(), configurationGoods.end(), [v](const Ptr<ConfigurationGood> &p){ return p.get() == v; });
+        if (i == configurationGoods.end())
+            break;
+        configurationGoods.erase(i);
+    }
+}
+
+Ptr<ConfigurationProjectile> StorageImpl::addConfigurationProjectile(IObject *parent)
+{
+    auto v = std::make_shared<ConfigurationProjectile>();
+    Configuration *configuration = (Configuration *)parent;
+    configuration->projectiles.push_back(v);
+    configurationProjectiles.push_back(v);
+    v->configuration = configurations[configuration->id];
+    return v;
+}
+
+void StorageImpl::deleteConfigurationProjectile(ConfigurationProjectile *v)
+{
+    while (1)
+    {
+        auto i = find_if(configurationProjectiles.begin(), configurationProjectiles.end(), [v](const Ptr<ConfigurationProjectile> &p){ return p.get() == v; });
+        if (i == configurationProjectiles.end())
+            break;
+        configurationProjectiles.erase(i);
+    }
+}
+
+Ptr<ConfigurationWeapon> StorageImpl::addConfigurationWeapon(IObject *parent)
+{
+    auto v = std::make_shared<ConfigurationWeapon>();
+    Configuration *configuration = (Configuration *)parent;
+    configuration->weapons.push_back(v);
+    configurationWeapons.push_back(v);
+    v->configuration = configurations[configuration->id];
+    return v;
+}
+
+void StorageImpl::deleteConfigurationWeapon(ConfigurationWeapon *v)
+{
+    while (1)
+    {
+        auto i = find_if(configurationWeapons.begin(), configurationWeapons.end(), [v](const Ptr<ConfigurationWeapon> &p){ return p.get() == v; });
+        if (i == configurationWeapons.end())
+            break;
+        configurationWeapons.erase(i);
+    }
+}
+
+Ptr<Configuration> StorageImpl::addConfiguration(IObject *parent)
+{
+    int id = 1;
+    if (!configurations.empty())
+        id = configurations.rbegin()->first + 1;
+    auto v = std::make_shared<Configuration>();
+    v->id = id;
+    configurations[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteConfiguration(Configuration *v)
+{
+    configurations.erase(v->id);
+}
+
+Ptr<Coordinate> StorageImpl::addCoordinate(IObject *parent)
+{
+    int id = 1;
+    if (!coordinates.empty())
+        id = coordinates.rbegin()->first + 1;
+    auto v = std::make_shared<Coordinate>();
+    v->id = id;
+    coordinates[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteCoordinate(Coordinate *v)
+{
+    coordinates.erase(v->id);
+}
+
+Ptr<Equipment> StorageImpl::addEquipment(IObject *parent)
+{
+    int id = 1;
+    if (!equipments.empty())
+        id = equipments.rbegin()->first + 1;
+    auto v = std::make_shared<Equipment>();
+    v->id = id;
+    equipments[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteEquipment(Equipment *v)
+{
+    equipments.erase(v->id);
+}
+
+Ptr<Glider> StorageImpl::addGlider(IObject *parent)
+{
+    int id = 1;
+    if (!gliders.empty())
+        id = gliders.rbegin()->first + 1;
+    auto v = std::make_shared<Glider>();
+    v->id = id;
+    gliders[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteGlider(Glider *v)
+{
+    gliders.erase(v->id);
+}
+
+Ptr<Good> StorageImpl::addGood(IObject *parent)
+{
+    int id = 1;
+    if (!goods.empty())
+        id = goods.rbegin()->first + 1;
+    auto v = std::make_shared<Good>();
+    v->id = id;
+    goods[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteGood(Good *v)
+{
+    goods.erase(v->id);
+}
+
+Ptr<MapBuildingEquipment> StorageImpl::addMapBuildingEquipment(IObject *parent)
+{
+    auto v = std::make_shared<MapBuildingEquipment>();
+    MapBuilding *mapBuilding = (MapBuilding *)parent;
+    mapBuilding->equipments.push_back(v);
+    mapBuildingEquipments.push_back(v);
+    v->mapBuilding = mapBuildings[mapBuilding->id];
+    return v;
+}
+
+void StorageImpl::deleteMapBuildingEquipment(MapBuildingEquipment *v)
+{
+    while (1)
+    {
+        auto i = find_if(mapBuildingEquipments.begin(), mapBuildingEquipments.end(), [v](const Ptr<MapBuildingEquipment> &p){ return p.get() == v; });
+        if (i == mapBuildingEquipments.end())
+            break;
+        mapBuildingEquipments.erase(i);
+    }
+}
+
+Ptr<MapBuildingGlider> StorageImpl::addMapBuildingGlider(IObject *parent)
+{
+    auto v = std::make_shared<MapBuildingGlider>();
+    MapBuilding *mapBuilding = (MapBuilding *)parent;
+    mapBuilding->gliders.push_back(v);
+    mapBuildingGliders.push_back(v);
+    v->mapBuilding = mapBuildings[mapBuilding->id];
+    return v;
+}
+
+void StorageImpl::deleteMapBuildingGlider(MapBuildingGlider *v)
+{
+    while (1)
+    {
+        auto i = find_if(mapBuildingGliders.begin(), mapBuildingGliders.end(), [v](const Ptr<MapBuildingGlider> &p){ return p.get() == v; });
+        if (i == mapBuildingGliders.end())
+            break;
+        mapBuildingGliders.erase(i);
+    }
+}
+
+Ptr<MapBuildingGood> StorageImpl::addMapBuildingGood(IObject *parent)
+{
+    auto v = std::make_shared<MapBuildingGood>();
+    MapBuilding *mapBuilding = (MapBuilding *)parent;
+    mapBuilding->goods.push_back(v);
+    mapBuildingGoods.push_back(v);
+    v->mapBuilding = mapBuildings[mapBuilding->id];
+    return v;
+}
+
+void StorageImpl::deleteMapBuildingGood(MapBuildingGood *v)
+{
+    while (1)
+    {
+        auto i = find_if(mapBuildingGoods.begin(), mapBuildingGoods.end(), [v](const Ptr<MapBuildingGood> &p){ return p.get() == v; });
+        if (i == mapBuildingGoods.end())
+            break;
+        mapBuildingGoods.erase(i);
+    }
+}
+
+Ptr<MapBuildingModificator> StorageImpl::addMapBuildingModificator(IObject *parent)
+{
+    auto v = std::make_shared<MapBuildingModificator>();
+    MapBuilding *mapBuilding = (MapBuilding *)parent;
+    mapBuilding->modificators.push_back(v);
+    mapBuildingModificators.push_back(v);
+    v->mapBuilding = mapBuildings[mapBuilding->id];
+    return v;
+}
+
+void StorageImpl::deleteMapBuildingModificator(MapBuildingModificator *v)
+{
+    while (1)
+    {
+        auto i = find_if(mapBuildingModificators.begin(), mapBuildingModificators.end(), [v](const Ptr<MapBuildingModificator> &p){ return p.get() == v; });
+        if (i == mapBuildingModificators.end())
+            break;
+        mapBuildingModificators.erase(i);
+    }
+}
+
+Ptr<MapBuildingProjectile> StorageImpl::addMapBuildingProjectile(IObject *parent)
+{
+    auto v = std::make_shared<MapBuildingProjectile>();
+    MapBuilding *mapBuilding = (MapBuilding *)parent;
+    mapBuilding->projectiles.push_back(v);
+    mapBuildingProjectiles.push_back(v);
+    v->mapBuilding = mapBuildings[mapBuilding->id];
+    return v;
+}
+
+void StorageImpl::deleteMapBuildingProjectile(MapBuildingProjectile *v)
+{
+    while (1)
+    {
+        auto i = find_if(mapBuildingProjectiles.begin(), mapBuildingProjectiles.end(), [v](const Ptr<MapBuildingProjectile> &p){ return p.get() == v; });
+        if (i == mapBuildingProjectiles.end())
+            break;
+        mapBuildingProjectiles.erase(i);
+    }
+}
+
+Ptr<MapBuildingWeapon> StorageImpl::addMapBuildingWeapon(IObject *parent)
+{
+    auto v = std::make_shared<MapBuildingWeapon>();
+    MapBuilding *mapBuilding = (MapBuilding *)parent;
+    mapBuilding->weapons.push_back(v);
+    mapBuildingWeapons.push_back(v);
+    v->mapBuilding = mapBuildings[mapBuilding->id];
+    return v;
+}
+
+void StorageImpl::deleteMapBuildingWeapon(MapBuildingWeapon *v)
+{
+    while (1)
+    {
+        auto i = find_if(mapBuildingWeapons.begin(), mapBuildingWeapons.end(), [v](const Ptr<MapBuildingWeapon> &p){ return p.get() == v; });
+        if (i == mapBuildingWeapons.end())
+            break;
+        mapBuildingWeapons.erase(i);
+    }
+}
+
+Ptr<MapBuilding> StorageImpl::addMapBuilding(IObject *parent)
+{
+    int id = 1;
+    if (!mapBuildings.empty())
+        id = mapBuildings.rbegin()->first + 1;
+    auto v = std::make_shared<MapBuilding>();
+    v->id = id;
+    mapBuildings[v->id] = v;
+    Map *map = (Map *)parent;
+    map->buildings.push_back(v);
+    v->map = maps[map->id];
+    return v;
+}
+
+void StorageImpl::deleteMapBuilding(MapBuilding *v)
+{
+    mapBuildings.erase(v->id);
+}
+
+Ptr<MapObject> StorageImpl::addMapObject(IObject *parent)
+{
+    int id = 1;
+    if (!mapObjects.empty())
+        id = mapObjects.rbegin()->first + 1;
+    auto v = std::make_shared<MapObject>();
+    v->id = id;
+    mapObjects[v->id] = v;
+    Map *map = (Map *)parent;
+    map->objects.push_back(v);
+    v->map = maps[map->id];
+    return v;
+}
+
+void StorageImpl::deleteMapObject(MapObject *v)
+{
+    mapObjects.erase(v->id);
+}
+
+Ptr<Map> StorageImpl::addMap(IObject *parent)
+{
+    int id = 1;
+    if (!maps.empty())
+        id = maps.rbegin()->first + 1;
+    auto v = std::make_shared<Map>();
+    v->id = id;
+    maps[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteMap(Map *v)
+{
+    maps.erase(v->id);
+}
+
+Ptr<Mechanoid> StorageImpl::addMechanoid(IObject *parent)
+{
+    int id = 1;
+    if (!mechanoids.empty())
+        id = mechanoids.rbegin()->first + 1;
+    auto v = std::make_shared<Mechanoid>();
+    v->id = id;
+    mechanoids[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteMechanoid(Mechanoid *v)
+{
+    mechanoids.erase(v->id);
+}
+
+Ptr<ModificationClan> StorageImpl::addModificationClan(IObject *parent)
+{
+    auto v = std::make_shared<ModificationClan>();
+    Modification *modification = (Modification *)parent;
+    modification->clans.push_back(v);
+    modificationClans.push_back(v);
+    v->modification = modifications[modification->id];
+    return v;
+}
+
+void StorageImpl::deleteModificationClan(ModificationClan *v)
+{
+    while (1)
+    {
+        auto i = find_if(modificationClans.begin(), modificationClans.end(), [v](const Ptr<ModificationClan> &p){ return p.get() == v; });
+        if (i == modificationClans.end())
+            break;
+        modificationClans.erase(i);
+    }
+}
+
+Ptr<ModificationMap> StorageImpl::addModificationMap(IObject *parent)
+{
+    auto v = std::make_shared<ModificationMap>();
+    Modification *modification = (Modification *)parent;
+    modification->maps.push_back(v);
+    modificationMaps.push_back(v);
+    v->modification = modifications[modification->id];
+    return v;
+}
+
+void StorageImpl::deleteModificationMap(ModificationMap *v)
+{
+    while (1)
+    {
+        auto i = find_if(modificationMaps.begin(), modificationMaps.end(), [v](const Ptr<ModificationMap> &p){ return p.get() == v; });
+        if (i == modificationMaps.end())
+            break;
+        modificationMaps.erase(i);
+    }
+}
+
+Ptr<ModificationMechanoid> StorageImpl::addModificationMechanoid(IObject *parent)
+{
+    auto v = std::make_shared<ModificationMechanoid>();
+    Modification *modification = (Modification *)parent;
+    modification->mechanoids.push_back(v);
+    modificationMechanoids.push_back(v);
+    v->modification = modifications[modification->id];
+    return v;
+}
+
+void StorageImpl::deleteModificationMechanoid(ModificationMechanoid *v)
+{
+    while (1)
+    {
+        auto i = find_if(modificationMechanoids.begin(), modificationMechanoids.end(), [v](const Ptr<ModificationMechanoid> &p){ return p.get() == v; });
+        if (i == modificationMechanoids.end())
+            break;
+        modificationMechanoids.erase(i);
+    }
+}
+
+Ptr<Modification> StorageImpl::addModification(IObject *parent)
+{
+    int id = 1;
+    if (!modifications.empty())
+        id = modifications.rbegin()->first + 1;
+    auto v = std::make_shared<Modification>();
+    v->id = id;
+    modifications[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteModification(Modification *v)
+{
+    modifications.erase(v->id);
+}
+
+Ptr<Modificator> StorageImpl::addModificator(IObject *parent)
+{
+    int id = 1;
+    if (!modificators.empty())
+        id = modificators.rbegin()->first + 1;
+    auto v = std::make_shared<Modificator>();
+    v->id = id;
+    modificators[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteModificator(Modificator *v)
+{
+    modificators.erase(v->id);
+}
+
+Ptr<Object> StorageImpl::addObject(IObject *parent)
+{
+    int id = 1;
+    if (!objects.empty())
+        id = objects.rbegin()->first + 1;
+    auto v = std::make_shared<Object>();
+    v->id = id;
+    objects[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteObject(Object *v)
+{
+    objects.erase(v->id);
+}
+
+Ptr<Player> StorageImpl::addPlayer(IObject *parent)
+{
+    int id = 1;
+    if (!players.empty())
+        id = players.rbegin()->first + 1;
+    auto v = std::make_shared<Player>();
+    v->id = id;
+    players[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deletePlayer(Player *v)
+{
+    players.erase(v->id);
+}
+
+Ptr<Projectile> StorageImpl::addProjectile(IObject *parent)
+{
+    int id = 1;
+    if (!projectiles.empty())
+        id = projectiles.rbegin()->first + 1;
+    auto v = std::make_shared<Projectile>();
+    v->id = id;
+    projectiles[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteProjectile(Projectile *v)
+{
+    projectiles.erase(v->id);
+}
+
+Ptr<QuestRewardEquipment> StorageImpl::addQuestRewardEquipment(IObject *parent)
+{
+    auto v = std::make_shared<QuestRewardEquipment>();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->equipments.push_back(v);
+    questRewardEquipments.push_back(v);
+    v->questReward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardEquipment(QuestRewardEquipment *v)
+{
+    while (1)
+    {
+        auto i = find_if(questRewardEquipments.begin(), questRewardEquipments.end(), [v](const Ptr<QuestRewardEquipment> &p){ return p.get() == v; });
+        if (i == questRewardEquipments.end())
+            break;
+        questRewardEquipments.erase(i);
+    }
+}
+
+Ptr<QuestRewardGlider> StorageImpl::addQuestRewardGlider(IObject *parent)
+{
+    auto v = std::make_shared<QuestRewardGlider>();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->gliders.push_back(v);
+    questRewardGliders.push_back(v);
+    v->questReward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardGlider(QuestRewardGlider *v)
+{
+    while (1)
+    {
+        auto i = find_if(questRewardGliders.begin(), questRewardGliders.end(), [v](const Ptr<QuestRewardGlider> &p){ return p.get() == v; });
+        if (i == questRewardGliders.end())
+            break;
+        questRewardGliders.erase(i);
+    }
+}
+
+Ptr<QuestRewardGood> StorageImpl::addQuestRewardGood(IObject *parent)
+{
+    auto v = std::make_shared<QuestRewardGood>();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->goods.push_back(v);
+    questRewardGoods.push_back(v);
+    v->questReward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardGood(QuestRewardGood *v)
+{
+    while (1)
+    {
+        auto i = find_if(questRewardGoods.begin(), questRewardGoods.end(), [v](const Ptr<QuestRewardGood> &p){ return p.get() == v; });
+        if (i == questRewardGoods.end())
+            break;
+        questRewardGoods.erase(i);
+    }
+}
+
+Ptr<QuestRewardModificator> StorageImpl::addQuestRewardModificator(IObject *parent)
+{
+    auto v = std::make_shared<QuestRewardModificator>();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->modificators.push_back(v);
+    questRewardModificators.push_back(v);
+    v->questReward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardModificator(QuestRewardModificator *v)
+{
+    while (1)
+    {
+        auto i = find_if(questRewardModificators.begin(), questRewardModificators.end(), [v](const Ptr<QuestRewardModificator> &p){ return p.get() == v; });
+        if (i == questRewardModificators.end())
+            break;
+        questRewardModificators.erase(i);
+    }
+}
+
+Ptr<QuestRewardProjectile> StorageImpl::addQuestRewardProjectile(IObject *parent)
+{
+    auto v = std::make_shared<QuestRewardProjectile>();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->projectiles.push_back(v);
+    questRewardProjectiles.push_back(v);
+    v->questReward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardProjectile(QuestRewardProjectile *v)
+{
+    while (1)
+    {
+        auto i = find_if(questRewardProjectiles.begin(), questRewardProjectiles.end(), [v](const Ptr<QuestRewardProjectile> &p){ return p.get() == v; });
+        if (i == questRewardProjectiles.end())
+            break;
+        questRewardProjectiles.erase(i);
+    }
+}
+
+Ptr<QuestRewardReputation> StorageImpl::addQuestRewardReputation(IObject *parent)
+{
+    auto v = std::make_shared<QuestRewardReputation>();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->reputations.push_back(v);
+    questRewardReputations.push_back(v);
+    v->questReward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardReputation(QuestRewardReputation *v)
+{
+    while (1)
+    {
+        auto i = find_if(questRewardReputations.begin(), questRewardReputations.end(), [v](const Ptr<QuestRewardReputation> &p){ return p.get() == v; });
+        if (i == questRewardReputations.end())
+            break;
+        questRewardReputations.erase(i);
+    }
+}
+
+Ptr<QuestRewardWeapon> StorageImpl::addQuestRewardWeapon(IObject *parent)
+{
+    auto v = std::make_shared<QuestRewardWeapon>();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->weapons.push_back(v);
+    questRewardWeapons.push_back(v);
+    v->questReward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardWeapon(QuestRewardWeapon *v)
+{
+    while (1)
+    {
+        auto i = find_if(questRewardWeapons.begin(), questRewardWeapons.end(), [v](const Ptr<QuestRewardWeapon> &p){ return p.get() == v; });
+        if (i == questRewardWeapons.end())
+            break;
+        questRewardWeapons.erase(i);
+    }
+}
+
+Ptr<QuestReward> StorageImpl::addQuestReward(IObject *parent)
+{
+    int id = 1;
+    if (!questRewards.empty())
+        id = questRewards.rbegin()->first + 1;
+    auto v = std::make_shared<QuestReward>();
+    v->id = id;
+    questRewards[v->id] = v;
+    Quest *quest = (Quest *)parent;
+    quest->rewards.push_back(v);
+    v->quest = quests[quest->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestReward(QuestReward *v)
+{
+    questRewards.erase(v->id);
+}
+
+Ptr<Quest> StorageImpl::addQuest(IObject *parent)
+{
+    int id = 1;
+    if (!quests.empty())
+        id = quests.rbegin()->first + 1;
+    auto v = std::make_shared<Quest>();
+    v->id = id;
+    quests[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteQuest(Quest *v)
+{
+    quests.erase(v->id);
+}
+
+Ptr<SaveObject> StorageImpl::addSaveObject(IObject *parent)
+{
+    auto v = std::make_shared<SaveObject>();
+    Save *save = (Save *)parent;
+    save->objects.push_back(v);
+    saveObjects.push_back(v);
+    v->save = saves[save->id];
+    return v;
+}
+
+void StorageImpl::deleteSaveObject(SaveObject *v)
+{
+    while (1)
+    {
+        auto i = find_if(saveObjects.begin(), saveObjects.end(), [v](const Ptr<SaveObject> &p){ return p.get() == v; });
+        if (i == saveObjects.end())
+            break;
+        saveObjects.erase(i);
+    }
+}
+
+Ptr<SavePlayer> StorageImpl::addSavePlayer(IObject *parent)
+{
+    auto v = std::make_shared<SavePlayer>();
+    Save *save = (Save *)parent;
+    save->players.push_back(v);
+    savePlayers.push_back(v);
+    v->save = saves[save->id];
+    return v;
+}
+
+void StorageImpl::deleteSavePlayer(SavePlayer *v)
+{
+    while (1)
+    {
+        auto i = find_if(savePlayers.begin(), savePlayers.end(), [v](const Ptr<SavePlayer> &p){ return p.get() == v; });
+        if (i == savePlayers.end())
+            break;
+        savePlayers.erase(i);
+    }
+}
+
+Ptr<SaveQuest> StorageImpl::addSaveQuest(IObject *parent)
+{
+    auto v = std::make_shared<SaveQuest>();
+    Save *save = (Save *)parent;
+    save->quests.push_back(v);
+    saveQuests.push_back(v);
+    v->save = saves[save->id];
+    return v;
+}
+
+void StorageImpl::deleteSaveQuest(SaveQuest *v)
+{
+    while (1)
+    {
+        auto i = find_if(saveQuests.begin(), saveQuests.end(), [v](const Ptr<SaveQuest> &p){ return p.get() == v; });
+        if (i == saveQuests.end())
+            break;
+        saveQuests.erase(i);
+    }
+}
+
+Ptr<Save> StorageImpl::addSave(IObject *parent)
+{
+    int id = 1;
+    if (!saves.empty())
+        id = saves.rbegin()->first + 1;
+    auto v = std::make_shared<Save>();
+    v->id = id;
+    saves[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteSave(Save *v)
+{
+    saves.erase(v->id);
+}
+
+Ptr<String> StorageImpl::addString(IObject *parent)
+{
+    int id = 1;
+    if (!strings.empty())
+        id = strings.rbegin()->first + 1;
+    auto v = std::make_shared<String>();
+    v->id = id;
+    strings[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteString(String *v)
+{
+    strings.erase(v->id);
+}
+
+Ptr<Weapon> StorageImpl::addWeapon(IObject *parent)
+{
+    int id = 1;
+    if (!weapons.empty())
+        id = weapons.rbegin()->first + 1;
+    auto v = std::make_shared<Weapon>();
+    v->id = id;
+    weapons[v->id] = v;
+    return v;
+}
+
+void StorageImpl::deleteWeapon(Weapon *v)
+{
+    weapons.erase(v->id);
+}
+
+Ptr<IObject> StorageImpl::addRecord(IObject *parent)
+{
+    EObjectType type = parent->getType();
+    switch (type)
+    {
+    case EObjectType::Building:
+        return addBuilding(parent);
+    case EObjectType::ClanReputation:
+        return addClanReputation(parent);
+    case EObjectType::Clan:
+        return addClan(parent);
+    case EObjectType::ConfigurationEquipment:
+        return addConfigurationEquipment(parent);
+    case EObjectType::ConfigurationGood:
+        return addConfigurationGood(parent);
+    case EObjectType::ConfigurationProjectile:
+        return addConfigurationProjectile(parent);
+    case EObjectType::ConfigurationWeapon:
+        return addConfigurationWeapon(parent);
+    case EObjectType::Configuration:
+        return addConfiguration(parent);
+    case EObjectType::Coordinate:
+        return addCoordinate(parent);
+    case EObjectType::Equipment:
+        return addEquipment(parent);
+    case EObjectType::Glider:
+        return addGlider(parent);
+    case EObjectType::Good:
+        return addGood(parent);
+    case EObjectType::MapBuildingEquipment:
+        return addMapBuildingEquipment(parent);
+    case EObjectType::MapBuildingGlider:
+        return addMapBuildingGlider(parent);
+    case EObjectType::MapBuildingGood:
+        return addMapBuildingGood(parent);
+    case EObjectType::MapBuildingModificator:
+        return addMapBuildingModificator(parent);
+    case EObjectType::MapBuildingProjectile:
+        return addMapBuildingProjectile(parent);
+    case EObjectType::MapBuildingWeapon:
+        return addMapBuildingWeapon(parent);
+    case EObjectType::MapBuilding:
+        return addMapBuilding(parent);
+    case EObjectType::MapObject:
+        return addMapObject(parent);
+    case EObjectType::Map:
+        return addMap(parent);
+    case EObjectType::Mechanoid:
+        return addMechanoid(parent);
+    case EObjectType::ModificationClan:
+        return addModificationClan(parent);
+    case EObjectType::ModificationMap:
+        return addModificationMap(parent);
+    case EObjectType::ModificationMechanoid:
+        return addModificationMechanoid(parent);
+    case EObjectType::Modification:
+        return addModification(parent);
+    case EObjectType::Modificator:
+        return addModificator(parent);
+    case EObjectType::Object:
+        return addObject(parent);
+    case EObjectType::Player:
+        return addPlayer(parent);
+    case EObjectType::Projectile:
+        return addProjectile(parent);
+    case EObjectType::QuestRewardEquipment:
+        return addQuestRewardEquipment(parent);
+    case EObjectType::QuestRewardGlider:
+        return addQuestRewardGlider(parent);
+    case EObjectType::QuestRewardGood:
+        return addQuestRewardGood(parent);
+    case EObjectType::QuestRewardModificator:
+        return addQuestRewardModificator(parent);
+    case EObjectType::QuestRewardProjectile:
+        return addQuestRewardProjectile(parent);
+    case EObjectType::QuestRewardReputation:
+        return addQuestRewardReputation(parent);
+    case EObjectType::QuestRewardWeapon:
+        return addQuestRewardWeapon(parent);
+    case EObjectType::QuestReward:
+        return addQuestReward(parent);
+    case EObjectType::Quest:
+        return addQuest(parent);
+    case EObjectType::SaveObject:
+        return addSaveObject(parent);
+    case EObjectType::SavePlayer:
+        return addSavePlayer(parent);
+    case EObjectType::SaveQuest:
+        return addSaveQuest(parent);
+    case EObjectType::Save:
+        return addSave(parent);
+    case EObjectType::String:
+        return addString(parent);
+    case EObjectType::Weapon:
+        return addWeapon(parent);
+    default:
+        return Ptr<IObject>(0);
+    }
+}
+
+void StorageImpl::deleteRecord(IObject *data)
+{
+    EObjectType type = data->getType();
+    switch (type)
+    {
+    case EObjectType::Building:
+        deleteBuilding((Building *)data);
+        break;
+    case EObjectType::ClanReputation:
+        deleteClanReputation((ClanReputation *)data);
+        break;
+    case EObjectType::Clan:
+        deleteClan((Clan *)data);
+        break;
+    case EObjectType::ConfigurationEquipment:
+        deleteConfigurationEquipment((ConfigurationEquipment *)data);
+        break;
+    case EObjectType::ConfigurationGood:
+        deleteConfigurationGood((ConfigurationGood *)data);
+        break;
+    case EObjectType::ConfigurationProjectile:
+        deleteConfigurationProjectile((ConfigurationProjectile *)data);
+        break;
+    case EObjectType::ConfigurationWeapon:
+        deleteConfigurationWeapon((ConfigurationWeapon *)data);
+        break;
+    case EObjectType::Configuration:
+        deleteConfiguration((Configuration *)data);
+        break;
+    case EObjectType::Coordinate:
+        deleteCoordinate((Coordinate *)data);
+        break;
+    case EObjectType::Equipment:
+        deleteEquipment((Equipment *)data);
+        break;
+    case EObjectType::Glider:
+        deleteGlider((Glider *)data);
+        break;
+    case EObjectType::Good:
+        deleteGood((Good *)data);
+        break;
+    case EObjectType::MapBuildingEquipment:
+        deleteMapBuildingEquipment((MapBuildingEquipment *)data);
+        break;
+    case EObjectType::MapBuildingGlider:
+        deleteMapBuildingGlider((MapBuildingGlider *)data);
+        break;
+    case EObjectType::MapBuildingGood:
+        deleteMapBuildingGood((MapBuildingGood *)data);
+        break;
+    case EObjectType::MapBuildingModificator:
+        deleteMapBuildingModificator((MapBuildingModificator *)data);
+        break;
+    case EObjectType::MapBuildingProjectile:
+        deleteMapBuildingProjectile((MapBuildingProjectile *)data);
+        break;
+    case EObjectType::MapBuildingWeapon:
+        deleteMapBuildingWeapon((MapBuildingWeapon *)data);
+        break;
+    case EObjectType::MapBuilding:
+        deleteMapBuilding((MapBuilding *)data);
+        break;
+    case EObjectType::MapObject:
+        deleteMapObject((MapObject *)data);
+        break;
+    case EObjectType::Map:
+        deleteMap((Map *)data);
+        break;
+    case EObjectType::Mechanoid:
+        deleteMechanoid((Mechanoid *)data);
+        break;
+    case EObjectType::ModificationClan:
+        deleteModificationClan((ModificationClan *)data);
+        break;
+    case EObjectType::ModificationMap:
+        deleteModificationMap((ModificationMap *)data);
+        break;
+    case EObjectType::ModificationMechanoid:
+        deleteModificationMechanoid((ModificationMechanoid *)data);
+        break;
+    case EObjectType::Modification:
+        deleteModification((Modification *)data);
+        break;
+    case EObjectType::Modificator:
+        deleteModificator((Modificator *)data);
+        break;
+    case EObjectType::Object:
+        deleteObject((Object *)data);
+        break;
+    case EObjectType::Player:
+        deletePlayer((Player *)data);
+        break;
+    case EObjectType::Projectile:
+        deleteProjectile((Projectile *)data);
+        break;
+    case EObjectType::QuestRewardEquipment:
+        deleteQuestRewardEquipment((QuestRewardEquipment *)data);
+        break;
+    case EObjectType::QuestRewardGlider:
+        deleteQuestRewardGlider((QuestRewardGlider *)data);
+        break;
+    case EObjectType::QuestRewardGood:
+        deleteQuestRewardGood((QuestRewardGood *)data);
+        break;
+    case EObjectType::QuestRewardModificator:
+        deleteQuestRewardModificator((QuestRewardModificator *)data);
+        break;
+    case EObjectType::QuestRewardProjectile:
+        deleteQuestRewardProjectile((QuestRewardProjectile *)data);
+        break;
+    case EObjectType::QuestRewardReputation:
+        deleteQuestRewardReputation((QuestRewardReputation *)data);
+        break;
+    case EObjectType::QuestRewardWeapon:
+        deleteQuestRewardWeapon((QuestRewardWeapon *)data);
+        break;
+    case EObjectType::QuestReward:
+        deleteQuestReward((QuestReward *)data);
+        break;
+    case EObjectType::Quest:
+        deleteQuest((Quest *)data);
+        break;
+    case EObjectType::SaveObject:
+        deleteSaveObject((SaveObject *)data);
+        break;
+    case EObjectType::SavePlayer:
+        deleteSavePlayer((SavePlayer *)data);
+        break;
+    case EObjectType::SaveQuest:
+        deleteSaveQuest((SaveQuest *)data);
+        break;
+    case EObjectType::Save:
+        deleteSave((Save *)data);
+        break;
+    case EObjectType::String:
+        deleteString((String *)data);
+        break;
+    case EObjectType::Weapon:
+        deleteWeapon((Weapon *)data);
+        break;
+    default:
+        break;
+    }
 }
 
 #ifdef USE_QT
@@ -3338,7 +4452,6 @@ void StorageImpl::printQtTreeView(QTreeWidgetItem *root) const
 QTreeWidgetItem *StorageImpl::addRecord(QTreeWidgetItem *item)
 {
     EObjectType type = static_cast<EObjectType>(item->data(0, Qt::UserRole).toInt());
-    int id = 1;
     IObject *parent = 0;
     auto parentItem = item->parent();
     if (parentItem)
@@ -3346,410 +4459,95 @@ QTreeWidgetItem *StorageImpl::addRecord(QTreeWidgetItem *item)
     switch (type)
     {
     case EObjectType::Building:
-    {
-        if (!buildings.empty())
-            id = buildings.rbegin()->first + 1;
-        auto v = std::make_shared<Building>();
-        v->id = id;
-        buildings[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addBuilding(parent)->printQtTreeView(item);
     case EObjectType::ClanReputation:
-    {
-        auto v = std::make_shared<ClanReputation>();
-        Clan *clan = (Clan *)parent;
-        clan->reputations.push_back(v);
-        clanReputations.push_back(v);
-        v->clan = clans[clan->id];
-        return v->printQtTreeView(item);
-    }
+        return addClanReputation(parent)->printQtTreeView(item);
     case EObjectType::Clan:
-    {
-        if (!clans.empty())
-            id = clans.rbegin()->first + 1;
-        auto v = std::make_shared<Clan>();
-        v->id = id;
-        clans[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addClan(parent)->printQtTreeView(item);
     case EObjectType::ConfigurationEquipment:
-    {
-        auto v = std::make_shared<ConfigurationEquipment>();
-        Configuration *configuration = (Configuration *)parent;
-        configuration->equipments.push_back(v);
-        configurationEquipments.push_back(v);
-        v->configuration = configurations[configuration->id];
-        return v->printQtTreeView(item);
-    }
+        return addConfigurationEquipment(parent)->printQtTreeView(item);
     case EObjectType::ConfigurationGood:
-    {
-        auto v = std::make_shared<ConfigurationGood>();
-        Configuration *configuration = (Configuration *)parent;
-        configuration->goods.push_back(v);
-        configurationGoods.push_back(v);
-        v->configuration = configurations[configuration->id];
-        return v->printQtTreeView(item);
-    }
+        return addConfigurationGood(parent)->printQtTreeView(item);
     case EObjectType::ConfigurationProjectile:
-    {
-        auto v = std::make_shared<ConfigurationProjectile>();
-        Configuration *configuration = (Configuration *)parent;
-        configuration->projectiles.push_back(v);
-        configurationProjectiles.push_back(v);
-        v->configuration = configurations[configuration->id];
-        return v->printQtTreeView(item);
-    }
+        return addConfigurationProjectile(parent)->printQtTreeView(item);
     case EObjectType::ConfigurationWeapon:
-    {
-        auto v = std::make_shared<ConfigurationWeapon>();
-        Configuration *configuration = (Configuration *)parent;
-        configuration->weapons.push_back(v);
-        configurationWeapons.push_back(v);
-        v->configuration = configurations[configuration->id];
-        return v->printQtTreeView(item);
-    }
+        return addConfigurationWeapon(parent)->printQtTreeView(item);
     case EObjectType::Configuration:
-    {
-        if (!configurations.empty())
-            id = configurations.rbegin()->first + 1;
-        auto v = std::make_shared<Configuration>();
-        v->id = id;
-        configurations[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addConfiguration(parent)->printQtTreeView(item);
     case EObjectType::Coordinate:
-    {
-        if (!coordinates.empty())
-            id = coordinates.rbegin()->first + 1;
-        auto v = std::make_shared<Coordinate>();
-        v->id = id;
-        coordinates[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addCoordinate(parent)->printQtTreeView(item);
     case EObjectType::Equipment:
-    {
-        if (!equipments.empty())
-            id = equipments.rbegin()->first + 1;
-        auto v = std::make_shared<Equipment>();
-        v->id = id;
-        equipments[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addEquipment(parent)->printQtTreeView(item);
     case EObjectType::Glider:
-    {
-        if (!gliders.empty())
-            id = gliders.rbegin()->first + 1;
-        auto v = std::make_shared<Glider>();
-        v->id = id;
-        gliders[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addGlider(parent)->printQtTreeView(item);
     case EObjectType::Good:
-    {
-        if (!goods.empty())
-            id = goods.rbegin()->first + 1;
-        auto v = std::make_shared<Good>();
-        v->id = id;
-        goods[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addGood(parent)->printQtTreeView(item);
     case EObjectType::MapBuildingEquipment:
-    {
-        auto v = std::make_shared<MapBuildingEquipment>();
-        MapBuilding *mapBuilding = (MapBuilding *)parent;
-        mapBuilding->equipments.push_back(v);
-        mapBuildingEquipments.push_back(v);
-        v->mapBuilding = mapBuildings[mapBuilding->id];
-        return v->printQtTreeView(item);
-    }
+        return addMapBuildingEquipment(parent)->printQtTreeView(item);
     case EObjectType::MapBuildingGlider:
-    {
-        auto v = std::make_shared<MapBuildingGlider>();
-        MapBuilding *mapBuilding = (MapBuilding *)parent;
-        mapBuilding->gliders.push_back(v);
-        mapBuildingGliders.push_back(v);
-        v->mapBuilding = mapBuildings[mapBuilding->id];
-        return v->printQtTreeView(item);
-    }
+        return addMapBuildingGlider(parent)->printQtTreeView(item);
     case EObjectType::MapBuildingGood:
-    {
-        auto v = std::make_shared<MapBuildingGood>();
-        MapBuilding *mapBuilding = (MapBuilding *)parent;
-        mapBuilding->goods.push_back(v);
-        mapBuildingGoods.push_back(v);
-        v->mapBuilding = mapBuildings[mapBuilding->id];
-        return v->printQtTreeView(item);
-    }
+        return addMapBuildingGood(parent)->printQtTreeView(item);
     case EObjectType::MapBuildingModificator:
-    {
-        auto v = std::make_shared<MapBuildingModificator>();
-        MapBuilding *mapBuilding = (MapBuilding *)parent;
-        mapBuilding->modificators.push_back(v);
-        mapBuildingModificators.push_back(v);
-        v->mapBuilding = mapBuildings[mapBuilding->id];
-        return v->printQtTreeView(item);
-    }
+        return addMapBuildingModificator(parent)->printQtTreeView(item);
     case EObjectType::MapBuildingProjectile:
-    {
-        auto v = std::make_shared<MapBuildingProjectile>();
-        MapBuilding *mapBuilding = (MapBuilding *)parent;
-        mapBuilding->projectiles.push_back(v);
-        mapBuildingProjectiles.push_back(v);
-        v->mapBuilding = mapBuildings[mapBuilding->id];
-        return v->printQtTreeView(item);
-    }
+        return addMapBuildingProjectile(parent)->printQtTreeView(item);
     case EObjectType::MapBuildingWeapon:
-    {
-        auto v = std::make_shared<MapBuildingWeapon>();
-        MapBuilding *mapBuilding = (MapBuilding *)parent;
-        mapBuilding->weapons.push_back(v);
-        mapBuildingWeapons.push_back(v);
-        v->mapBuilding = mapBuildings[mapBuilding->id];
-        return v->printQtTreeView(item);
-    }
+        return addMapBuildingWeapon(parent)->printQtTreeView(item);
     case EObjectType::MapBuilding:
-    {
-        auto v = std::make_shared<MapBuilding>();
-        Map *map = (Map *)parent;
-        map->buildings.push_back(v);
-        mapBuildings[v->id] = v;
-        v->map = maps[map->id];
-        return v->printQtTreeView(item);
-    }
+        return addMapBuilding(parent)->printQtTreeView(item);
     case EObjectType::MapObject:
-    {
-        auto v = std::make_shared<MapObject>();
-        Map *map = (Map *)parent;
-        map->objects.push_back(v);
-        mapObjects[v->id] = v;
-        v->map = maps[map->id];
-        return v->printQtTreeView(item);
-    }
+        return addMapObject(parent)->printQtTreeView(item);
     case EObjectType::Map:
-    {
-        if (!maps.empty())
-            id = maps.rbegin()->first + 1;
-        auto v = std::make_shared<Map>();
-        v->id = id;
-        maps[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addMap(parent)->printQtTreeView(item);
     case EObjectType::Mechanoid:
-    {
-        if (!mechanoids.empty())
-            id = mechanoids.rbegin()->first + 1;
-        auto v = std::make_shared<Mechanoid>();
-        v->id = id;
-        mechanoids[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addMechanoid(parent)->printQtTreeView(item);
     case EObjectType::ModificationClan:
-    {
-        auto v = std::make_shared<ModificationClan>();
-        Modification *modification = (Modification *)parent;
-        modification->clans.push_back(v);
-        modificationClans.push_back(v);
-        v->modification = modifications[modification->id];
-        return v->printQtTreeView(item);
-    }
+        return addModificationClan(parent)->printQtTreeView(item);
     case EObjectType::ModificationMap:
-    {
-        auto v = std::make_shared<ModificationMap>();
-        Modification *modification = (Modification *)parent;
-        modification->maps.push_back(v);
-        modificationMaps.push_back(v);
-        v->modification = modifications[modification->id];
-        return v->printQtTreeView(item);
-    }
+        return addModificationMap(parent)->printQtTreeView(item);
     case EObjectType::ModificationMechanoid:
-    {
-        auto v = std::make_shared<ModificationMechanoid>();
-        Modification *modification = (Modification *)parent;
-        modification->mechanoids.push_back(v);
-        modificationMechanoids.push_back(v);
-        v->modification = modifications[modification->id];
-        return v->printQtTreeView(item);
-    }
+        return addModificationMechanoid(parent)->printQtTreeView(item);
     case EObjectType::Modification:
-    {
-        if (!modifications.empty())
-            id = modifications.rbegin()->first + 1;
-        auto v = std::make_shared<Modification>();
-        v->id = id;
-        modifications[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addModification(parent)->printQtTreeView(item);
     case EObjectType::Modificator:
-    {
-        if (!modificators.empty())
-            id = modificators.rbegin()->first + 1;
-        auto v = std::make_shared<Modificator>();
-        v->id = id;
-        modificators[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addModificator(parent)->printQtTreeView(item);
     case EObjectType::Object:
-    {
-        if (!objects.empty())
-            id = objects.rbegin()->first + 1;
-        auto v = std::make_shared<Object>();
-        v->id = id;
-        objects[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addObject(parent)->printQtTreeView(item);
     case EObjectType::Player:
-    {
-        if (!players.empty())
-            id = players.rbegin()->first + 1;
-        auto v = std::make_shared<Player>();
-        v->id = id;
-        players[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addPlayer(parent)->printQtTreeView(item);
     case EObjectType::Projectile:
-    {
-        if (!projectiles.empty())
-            id = projectiles.rbegin()->first + 1;
-        auto v = std::make_shared<Projectile>();
-        v->id = id;
-        projectiles[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addProjectile(parent)->printQtTreeView(item);
     case EObjectType::QuestRewardEquipment:
-    {
-        auto v = std::make_shared<QuestRewardEquipment>();
-        QuestReward *questReward = (QuestReward *)parent;
-        questReward->equipments.push_back(v);
-        questRewardEquipments.push_back(v);
-        v->questReward = questRewards[questReward->id];
-        return v->printQtTreeView(item);
-    }
+        return addQuestRewardEquipment(parent)->printQtTreeView(item);
     case EObjectType::QuestRewardGlider:
-    {
-        auto v = std::make_shared<QuestRewardGlider>();
-        QuestReward *questReward = (QuestReward *)parent;
-        questReward->gliders.push_back(v);
-        questRewardGliders.push_back(v);
-        v->questReward = questRewards[questReward->id];
-        return v->printQtTreeView(item);
-    }
+        return addQuestRewardGlider(parent)->printQtTreeView(item);
     case EObjectType::QuestRewardGood:
-    {
-        auto v = std::make_shared<QuestRewardGood>();
-        QuestReward *questReward = (QuestReward *)parent;
-        questReward->goods.push_back(v);
-        questRewardGoods.push_back(v);
-        v->questReward = questRewards[questReward->id];
-        return v->printQtTreeView(item);
-    }
+        return addQuestRewardGood(parent)->printQtTreeView(item);
     case EObjectType::QuestRewardModificator:
-    {
-        auto v = std::make_shared<QuestRewardModificator>();
-        QuestReward *questReward = (QuestReward *)parent;
-        questReward->modificators.push_back(v);
-        questRewardModificators.push_back(v);
-        v->questReward = questRewards[questReward->id];
-        return v->printQtTreeView(item);
-    }
+        return addQuestRewardModificator(parent)->printQtTreeView(item);
     case EObjectType::QuestRewardProjectile:
-    {
-        auto v = std::make_shared<QuestRewardProjectile>();
-        QuestReward *questReward = (QuestReward *)parent;
-        questReward->projectiles.push_back(v);
-        questRewardProjectiles.push_back(v);
-        v->questReward = questRewards[questReward->id];
-        return v->printQtTreeView(item);
-    }
+        return addQuestRewardProjectile(parent)->printQtTreeView(item);
     case EObjectType::QuestRewardReputation:
-    {
-        auto v = std::make_shared<QuestRewardReputation>();
-        QuestReward *questReward = (QuestReward *)parent;
-        questReward->reputations.push_back(v);
-        questRewardReputations.push_back(v);
-        v->questReward = questRewards[questReward->id];
-        return v->printQtTreeView(item);
-    }
+        return addQuestRewardReputation(parent)->printQtTreeView(item);
     case EObjectType::QuestRewardWeapon:
-    {
-        auto v = std::make_shared<QuestRewardWeapon>();
-        QuestReward *questReward = (QuestReward *)parent;
-        questReward->weapons.push_back(v);
-        questRewardWeapons.push_back(v);
-        v->questReward = questRewards[questReward->id];
-        return v->printQtTreeView(item);
-    }
+        return addQuestRewardWeapon(parent)->printQtTreeView(item);
     case EObjectType::QuestReward:
-    {
-        auto v = std::make_shared<QuestReward>();
-        Quest *quest = (Quest *)parent;
-        quest->rewards.push_back(v);
-        questRewards[v->id] = v;
-        v->quest = quests[quest->id];
-        return v->printQtTreeView(item);
-    }
+        return addQuestReward(parent)->printQtTreeView(item);
     case EObjectType::Quest:
-    {
-        if (!quests.empty())
-            id = quests.rbegin()->first + 1;
-        auto v = std::make_shared<Quest>();
-        v->id = id;
-        quests[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addQuest(parent)->printQtTreeView(item);
     case EObjectType::SaveObject:
-    {
-        auto v = std::make_shared<SaveObject>();
-        Save *save = (Save *)parent;
-        save->objects.push_back(v);
-        saveObjects.push_back(v);
-        v->save = saves[save->id];
-        return v->printQtTreeView(item);
-    }
+        return addSaveObject(parent)->printQtTreeView(item);
     case EObjectType::SavePlayer:
-    {
-        auto v = std::make_shared<SavePlayer>();
-        Save *save = (Save *)parent;
-        save->players.push_back(v);
-        savePlayers.push_back(v);
-        v->save = saves[save->id];
-        return v->printQtTreeView(item);
-    }
+        return addSavePlayer(parent)->printQtTreeView(item);
     case EObjectType::SaveQuest:
-    {
-        auto v = std::make_shared<SaveQuest>();
-        Save *save = (Save *)parent;
-        save->quests.push_back(v);
-        saveQuests.push_back(v);
-        v->save = saves[save->id];
-        return v->printQtTreeView(item);
-    }
+        return addSaveQuest(parent)->printQtTreeView(item);
     case EObjectType::Save:
-    {
-        if (!saves.empty())
-            id = saves.rbegin()->first + 1;
-        auto v = std::make_shared<Save>();
-        v->id = id;
-        saves[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addSave(parent)->printQtTreeView(item);
     case EObjectType::String:
-    {
-        if (!strings.empty())
-            id = strings.rbegin()->first + 1;
-        auto v = std::make_shared<String>();
-        v->id = id;
-        strings[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addString(parent)->printQtTreeView(item);
     case EObjectType::Weapon:
-    {
-        if (!weapons.empty())
-            id = weapons.rbegin()->first + 1;
-        auto v = std::make_shared<Weapon>();
-        v->id = id;
-        weapons[v->id] = v;
-        return v->printQtTreeView(item);
-    }
+        return addWeapon(parent)->printQtTreeView(item);
     default:
         return 0;
     }
@@ -3762,467 +4560,144 @@ void StorageImpl::deleteRecord(QTreeWidgetItem *item)
     switch (type)
     {
     case EObjectType::Building:
-    {
-        Building *v = (Building *)item->data(0, Qt::UserRole).toULongLong();
-        buildings.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteBuilding((Building *)data);
         break;
-    }
     case EObjectType::ClanReputation:
-    {
-        ClanReputation *v = (ClanReputation *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(clanReputations.begin(), clanReputations.end(), [v](const Ptr<ClanReputation> &p){ return p.get() == v; });
-            if (i == clanReputations.end())
-                break;
-            clanReputations.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteClanReputation((ClanReputation *)data);
         break;
-    }
     case EObjectType::Clan:
-    {
-        Clan *v = (Clan *)item->data(0, Qt::UserRole).toULongLong();
-        clans.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteClan((Clan *)data);
         break;
-    }
     case EObjectType::ConfigurationEquipment:
-    {
-        ConfigurationEquipment *v = (ConfigurationEquipment *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(configurationEquipments.begin(), configurationEquipments.end(), [v](const Ptr<ConfigurationEquipment> &p){ return p.get() == v; });
-            if (i == configurationEquipments.end())
-                break;
-            configurationEquipments.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteConfigurationEquipment((ConfigurationEquipment *)data);
         break;
-    }
     case EObjectType::ConfigurationGood:
-    {
-        ConfigurationGood *v = (ConfigurationGood *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(configurationGoods.begin(), configurationGoods.end(), [v](const Ptr<ConfigurationGood> &p){ return p.get() == v; });
-            if (i == configurationGoods.end())
-                break;
-            configurationGoods.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteConfigurationGood((ConfigurationGood *)data);
         break;
-    }
     case EObjectType::ConfigurationProjectile:
-    {
-        ConfigurationProjectile *v = (ConfigurationProjectile *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(configurationProjectiles.begin(), configurationProjectiles.end(), [v](const Ptr<ConfigurationProjectile> &p){ return p.get() == v; });
-            if (i == configurationProjectiles.end())
-                break;
-            configurationProjectiles.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteConfigurationProjectile((ConfigurationProjectile *)data);
         break;
-    }
     case EObjectType::ConfigurationWeapon:
-    {
-        ConfigurationWeapon *v = (ConfigurationWeapon *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(configurationWeapons.begin(), configurationWeapons.end(), [v](const Ptr<ConfigurationWeapon> &p){ return p.get() == v; });
-            if (i == configurationWeapons.end())
-                break;
-            configurationWeapons.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteConfigurationWeapon((ConfigurationWeapon *)data);
         break;
-    }
     case EObjectType::Configuration:
-    {
-        Configuration *v = (Configuration *)item->data(0, Qt::UserRole).toULongLong();
-        configurations.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteConfiguration((Configuration *)data);
         break;
-    }
     case EObjectType::Coordinate:
-    {
-        Coordinate *v = (Coordinate *)item->data(0, Qt::UserRole).toULongLong();
-        coordinates.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteCoordinate((Coordinate *)data);
         break;
-    }
     case EObjectType::Equipment:
-    {
-        Equipment *v = (Equipment *)item->data(0, Qt::UserRole).toULongLong();
-        equipments.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteEquipment((Equipment *)data);
         break;
-    }
     case EObjectType::Glider:
-    {
-        Glider *v = (Glider *)item->data(0, Qt::UserRole).toULongLong();
-        gliders.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteGlider((Glider *)data);
         break;
-    }
     case EObjectType::Good:
-    {
-        Good *v = (Good *)item->data(0, Qt::UserRole).toULongLong();
-        goods.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteGood((Good *)data);
         break;
-    }
     case EObjectType::MapBuildingEquipment:
-    {
-        MapBuildingEquipment *v = (MapBuildingEquipment *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(mapBuildingEquipments.begin(), mapBuildingEquipments.end(), [v](const Ptr<MapBuildingEquipment> &p){ return p.get() == v; });
-            if (i == mapBuildingEquipments.end())
-                break;
-            mapBuildingEquipments.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteMapBuildingEquipment((MapBuildingEquipment *)data);
         break;
-    }
     case EObjectType::MapBuildingGlider:
-    {
-        MapBuildingGlider *v = (MapBuildingGlider *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(mapBuildingGliders.begin(), mapBuildingGliders.end(), [v](const Ptr<MapBuildingGlider> &p){ return p.get() == v; });
-            if (i == mapBuildingGliders.end())
-                break;
-            mapBuildingGliders.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteMapBuildingGlider((MapBuildingGlider *)data);
         break;
-    }
     case EObjectType::MapBuildingGood:
-    {
-        MapBuildingGood *v = (MapBuildingGood *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(mapBuildingGoods.begin(), mapBuildingGoods.end(), [v](const Ptr<MapBuildingGood> &p){ return p.get() == v; });
-            if (i == mapBuildingGoods.end())
-                break;
-            mapBuildingGoods.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteMapBuildingGood((MapBuildingGood *)data);
         break;
-    }
     case EObjectType::MapBuildingModificator:
-    {
-        MapBuildingModificator *v = (MapBuildingModificator *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(mapBuildingModificators.begin(), mapBuildingModificators.end(), [v](const Ptr<MapBuildingModificator> &p){ return p.get() == v; });
-            if (i == mapBuildingModificators.end())
-                break;
-            mapBuildingModificators.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteMapBuildingModificator((MapBuildingModificator *)data);
         break;
-    }
     case EObjectType::MapBuildingProjectile:
-    {
-        MapBuildingProjectile *v = (MapBuildingProjectile *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(mapBuildingProjectiles.begin(), mapBuildingProjectiles.end(), [v](const Ptr<MapBuildingProjectile> &p){ return p.get() == v; });
-            if (i == mapBuildingProjectiles.end())
-                break;
-            mapBuildingProjectiles.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteMapBuildingProjectile((MapBuildingProjectile *)data);
         break;
-    }
     case EObjectType::MapBuildingWeapon:
-    {
-        MapBuildingWeapon *v = (MapBuildingWeapon *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(mapBuildingWeapons.begin(), mapBuildingWeapons.end(), [v](const Ptr<MapBuildingWeapon> &p){ return p.get() == v; });
-            if (i == mapBuildingWeapons.end())
-                break;
-            mapBuildingWeapons.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteMapBuildingWeapon((MapBuildingWeapon *)data);
         break;
-    }
     case EObjectType::MapBuilding:
-    {
-        MapBuilding *v = (MapBuilding *)item->data(0, Qt::UserRole).toULongLong();
-        mapBuildings.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteMapBuilding((MapBuilding *)data);
         break;
-    }
     case EObjectType::MapObject:
-    {
-        MapObject *v = (MapObject *)item->data(0, Qt::UserRole).toULongLong();
-        mapObjects.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteMapObject((MapObject *)data);
         break;
-    }
     case EObjectType::Map:
-    {
-        Map *v = (Map *)item->data(0, Qt::UserRole).toULongLong();
-        maps.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteMap((Map *)data);
         break;
-    }
     case EObjectType::Mechanoid:
-    {
-        Mechanoid *v = (Mechanoid *)item->data(0, Qt::UserRole).toULongLong();
-        mechanoids.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteMechanoid((Mechanoid *)data);
         break;
-    }
     case EObjectType::ModificationClan:
-    {
-        ModificationClan *v = (ModificationClan *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(modificationClans.begin(), modificationClans.end(), [v](const Ptr<ModificationClan> &p){ return p.get() == v; });
-            if (i == modificationClans.end())
-                break;
-            modificationClans.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteModificationClan((ModificationClan *)data);
         break;
-    }
     case EObjectType::ModificationMap:
-    {
-        ModificationMap *v = (ModificationMap *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(modificationMaps.begin(), modificationMaps.end(), [v](const Ptr<ModificationMap> &p){ return p.get() == v; });
-            if (i == modificationMaps.end())
-                break;
-            modificationMaps.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteModificationMap((ModificationMap *)data);
         break;
-    }
     case EObjectType::ModificationMechanoid:
-    {
-        ModificationMechanoid *v = (ModificationMechanoid *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(modificationMechanoids.begin(), modificationMechanoids.end(), [v](const Ptr<ModificationMechanoid> &p){ return p.get() == v; });
-            if (i == modificationMechanoids.end())
-                break;
-            modificationMechanoids.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteModificationMechanoid((ModificationMechanoid *)data);
         break;
-    }
     case EObjectType::Modification:
-    {
-        Modification *v = (Modification *)item->data(0, Qt::UserRole).toULongLong();
-        modifications.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteModification((Modification *)data);
         break;
-    }
     case EObjectType::Modificator:
-    {
-        Modificator *v = (Modificator *)item->data(0, Qt::UserRole).toULongLong();
-        modificators.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteModificator((Modificator *)data);
         break;
-    }
     case EObjectType::Object:
-    {
-        Object *v = (Object *)item->data(0, Qt::UserRole).toULongLong();
-        objects.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteObject((Object *)data);
         break;
-    }
     case EObjectType::Player:
-    {
-        Player *v = (Player *)item->data(0, Qt::UserRole).toULongLong();
-        players.erase(v->id);
-        item->parent()->removeChild(item);
+        deletePlayer((Player *)data);
         break;
-    }
     case EObjectType::Projectile:
-    {
-        Projectile *v = (Projectile *)item->data(0, Qt::UserRole).toULongLong();
-        projectiles.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteProjectile((Projectile *)data);
         break;
-    }
     case EObjectType::QuestRewardEquipment:
-    {
-        QuestRewardEquipment *v = (QuestRewardEquipment *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(questRewardEquipments.begin(), questRewardEquipments.end(), [v](const Ptr<QuestRewardEquipment> &p){ return p.get() == v; });
-            if (i == questRewardEquipments.end())
-                break;
-            questRewardEquipments.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteQuestRewardEquipment((QuestRewardEquipment *)data);
         break;
-    }
     case EObjectType::QuestRewardGlider:
-    {
-        QuestRewardGlider *v = (QuestRewardGlider *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(questRewardGliders.begin(), questRewardGliders.end(), [v](const Ptr<QuestRewardGlider> &p){ return p.get() == v; });
-            if (i == questRewardGliders.end())
-                break;
-            questRewardGliders.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteQuestRewardGlider((QuestRewardGlider *)data);
         break;
-    }
     case EObjectType::QuestRewardGood:
-    {
-        QuestRewardGood *v = (QuestRewardGood *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(questRewardGoods.begin(), questRewardGoods.end(), [v](const Ptr<QuestRewardGood> &p){ return p.get() == v; });
-            if (i == questRewardGoods.end())
-                break;
-            questRewardGoods.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteQuestRewardGood((QuestRewardGood *)data);
         break;
-    }
     case EObjectType::QuestRewardModificator:
-    {
-        QuestRewardModificator *v = (QuestRewardModificator *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(questRewardModificators.begin(), questRewardModificators.end(), [v](const Ptr<QuestRewardModificator> &p){ return p.get() == v; });
-            if (i == questRewardModificators.end())
-                break;
-            questRewardModificators.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteQuestRewardModificator((QuestRewardModificator *)data);
         break;
-    }
     case EObjectType::QuestRewardProjectile:
-    {
-        QuestRewardProjectile *v = (QuestRewardProjectile *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(questRewardProjectiles.begin(), questRewardProjectiles.end(), [v](const Ptr<QuestRewardProjectile> &p){ return p.get() == v; });
-            if (i == questRewardProjectiles.end())
-                break;
-            questRewardProjectiles.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteQuestRewardProjectile((QuestRewardProjectile *)data);
         break;
-    }
     case EObjectType::QuestRewardReputation:
-    {
-        QuestRewardReputation *v = (QuestRewardReputation *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(questRewardReputations.begin(), questRewardReputations.end(), [v](const Ptr<QuestRewardReputation> &p){ return p.get() == v; });
-            if (i == questRewardReputations.end())
-                break;
-            questRewardReputations.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteQuestRewardReputation((QuestRewardReputation *)data);
         break;
-    }
     case EObjectType::QuestRewardWeapon:
-    {
-        QuestRewardWeapon *v = (QuestRewardWeapon *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(questRewardWeapons.begin(), questRewardWeapons.end(), [v](const Ptr<QuestRewardWeapon> &p){ return p.get() == v; });
-            if (i == questRewardWeapons.end())
-                break;
-            questRewardWeapons.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteQuestRewardWeapon((QuestRewardWeapon *)data);
         break;
-    }
     case EObjectType::QuestReward:
-    {
-        QuestReward *v = (QuestReward *)item->data(0, Qt::UserRole).toULongLong();
-        questRewards.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteQuestReward((QuestReward *)data);
         break;
-    }
     case EObjectType::Quest:
-    {
-        Quest *v = (Quest *)item->data(0, Qt::UserRole).toULongLong();
-        quests.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteQuest((Quest *)data);
         break;
-    }
     case EObjectType::SaveObject:
-    {
-        SaveObject *v = (SaveObject *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(saveObjects.begin(), saveObjects.end(), [v](const Ptr<SaveObject> &p){ return p.get() == v; });
-            if (i == saveObjects.end())
-                break;
-            saveObjects.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteSaveObject((SaveObject *)data);
         break;
-    }
     case EObjectType::SavePlayer:
-    {
-        SavePlayer *v = (SavePlayer *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(savePlayers.begin(), savePlayers.end(), [v](const Ptr<SavePlayer> &p){ return p.get() == v; });
-            if (i == savePlayers.end())
-                break;
-            savePlayers.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteSavePlayer((SavePlayer *)data);
         break;
-    }
     case EObjectType::SaveQuest:
-    {
-        SaveQuest *v = (SaveQuest *)item->data(0, Qt::UserRole).toULongLong();
-        while (1)
-        {
-            auto i = find_if(saveQuests.begin(), saveQuests.end(), [v](const Ptr<SaveQuest> &p){ return p.get() == v; });
-            if (i == saveQuests.end())
-                break;
-            saveQuests.erase(i);
-        }
-        item->parent()->removeChild(item);
+        deleteSaveQuest((SaveQuest *)data);
         break;
-    }
     case EObjectType::Save:
-    {
-        Save *v = (Save *)item->data(0, Qt::UserRole).toULongLong();
-        saves.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteSave((Save *)data);
         break;
-    }
     case EObjectType::String:
-    {
-        String *v = (String *)item->data(0, Qt::UserRole).toULongLong();
-        strings.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteString((String *)data);
         break;
-    }
     case EObjectType::Weapon:
-    {
-        Weapon *v = (Weapon *)item->data(0, Qt::UserRole).toULongLong();
-        weapons.erase(v->id);
-        item->parent()->removeChild(item);
+        deleteWeapon((Weapon *)data);
         break;
-    }
     default:
         break;
     }
+    item->parent()->removeChild(item);
 }
 #endif
 

@@ -143,6 +143,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Building &rhs) const;
 };
 
 class ClanReputation : public IObject
@@ -159,6 +161,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const ClanReputation &rhs) const;
 };
 
 class Clan : public IObject
@@ -178,6 +182,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Clan &rhs) const;
 };
 
 class ConfigurationEquipment : public IObject
@@ -194,6 +200,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const ConfigurationEquipment &rhs) const;
 };
 
 class ConfigurationGood : public IObject
@@ -210,6 +218,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const ConfigurationGood &rhs) const;
 };
 
 class ConfigurationProjectile : public IObject
@@ -226,6 +236,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const ConfigurationProjectile &rhs) const;
 };
 
 class ConfigurationWeapon : public IObject
@@ -242,6 +254,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const ConfigurationWeapon &rhs) const;
 };
 
 class Configuration : public IObject
@@ -264,6 +278,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Configuration &rhs) const;
 };
 
 class Coordinate : public IObject
@@ -284,6 +300,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Coordinate &rhs) const;
 };
 
 class Equipment : public IObject
@@ -312,6 +330,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Equipment &rhs) const;
 };
 
 class Glider : public IObject
@@ -338,6 +358,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Glider &rhs) const;
 };
 
 class Good : public IObject
@@ -358,6 +380,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Good &rhs) const;
 };
 
 class MapBuildingEquipment : public IObject
@@ -374,6 +398,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const MapBuildingEquipment &rhs) const;
 };
 
 class MapBuildingGlider : public IObject
@@ -390,6 +416,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const MapBuildingGlider &rhs) const;
 };
 
 class MapBuildingGood : public IObject
@@ -406,6 +434,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const MapBuildingGood &rhs) const;
 };
 
 class MapBuildingModificator : public IObject
@@ -422,6 +452,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const MapBuildingModificator &rhs) const;
 };
 
 class MapBuildingProjectile : public IObject
@@ -438,6 +470,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const MapBuildingProjectile &rhs) const;
 };
 
 class MapBuildingWeapon : public IObject
@@ -454,6 +488,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const MapBuildingWeapon &rhs) const;
 };
 
 class MapBuilding : public IObject
@@ -479,6 +515,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const MapBuilding &rhs) const;
 };
 
 class MapObject : public IObject
@@ -496,6 +534,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const MapObject &rhs) const;
 };
 
 class Map : public IObject
@@ -505,6 +545,12 @@ public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
+    float x_k = 0.0f;
+    float x_b = 0.0f;
+    float y_k = 0.0f;
+    float y_b = 0.0f;
+    float z_k = 0.0f;
+    float z_b = 0.0f;
 
     CVector<Ptr<MapBuilding>> buildings;
     CVector<Ptr<MapObject>> objects;
@@ -516,6 +562,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Map &rhs) const;
 };
 
 class MechanoidGroup : public IObject
@@ -533,6 +581,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const MechanoidGroup &rhs) const;
 };
 
 class Mechanoid : public IObject
@@ -561,6 +611,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Mechanoid &rhs) const;
 };
 
 class ModificationClan : public IObject
@@ -576,6 +628,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const ModificationClan &rhs) const;
 };
 
 class ModificationMap : public IObject
@@ -591,6 +645,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const ModificationMap &rhs) const;
 };
 
 class ModificationMechanoid : public IObject
@@ -606,6 +662,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const ModificationMechanoid &rhs) const;
 };
 
 class Modification : public IObject
@@ -621,6 +679,8 @@ public:
     float version = 0.0f;
     Text script_language;
     Text script_main;
+    IdPtr<Mechanoid> player_mechanoid;
+    IdPtr<Configuration> cooperative_player_configuration;
 
     CVector<Ptr<ModificationClan>> clans;
     CVector<Ptr<ModificationMap>> maps;
@@ -633,6 +693,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Modification &rhs) const;
 };
 
 class Modificator : public IObject
@@ -655,6 +717,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Modificator &rhs) const;
 };
 
 class Object : public IObject
@@ -673,6 +737,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Object &rhs) const;
 };
 
 class Player : public IObject
@@ -688,6 +754,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Player &rhs) const;
 };
 
 class Projectile : public IObject
@@ -711,6 +779,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Projectile &rhs) const;
 };
 
 class QuestRewardEquipment : public IObject
@@ -727,6 +797,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const QuestRewardEquipment &rhs) const;
 };
 
 class QuestRewardGlider : public IObject
@@ -743,6 +815,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const QuestRewardGlider &rhs) const;
 };
 
 class QuestRewardGood : public IObject
@@ -759,6 +833,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const QuestRewardGood &rhs) const;
 };
 
 class QuestRewardModificator : public IObject
@@ -775,6 +851,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const QuestRewardModificator &rhs) const;
 };
 
 class QuestRewardProjectile : public IObject
@@ -791,6 +869,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const QuestRewardProjectile &rhs) const;
 };
 
 class QuestRewardReputation : public IObject
@@ -807,6 +887,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const QuestRewardReputation &rhs) const;
 };
 
 class QuestRewardWeapon : public IObject
@@ -823,6 +905,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const QuestRewardWeapon &rhs) const;
 };
 
 class QuestReward : public IObject
@@ -849,6 +933,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const QuestReward &rhs) const;
 };
 
 class Quest : public IObject
@@ -870,6 +956,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Quest &rhs) const;
 };
 
 class SaveObject : public IObject
@@ -887,6 +975,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const SaveObject &rhs) const;
 };
 
 class SavePlayer : public IObject
@@ -902,6 +992,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const SavePlayer &rhs) const;
 };
 
 class SaveQuest : public IObject
@@ -918,6 +1010,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const SaveQuest &rhs) const;
 };
 
 class Save : public IObject
@@ -941,6 +1035,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Save &rhs) const;
 };
 
 class ScriptVariable : public IObject
@@ -957,6 +1053,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const ScriptVariable &rhs) const;
 };
 
 enum class LocalizationType : EnumType
@@ -981,6 +1079,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const String &rhs) const;
 };
 
 class Weapon : public IObject
@@ -1006,6 +1106,8 @@ public:
     virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
 #endif
     virtual Text getName() const;
+
+    bool operator==(const Weapon &rhs) const;
 };
 
 }

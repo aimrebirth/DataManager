@@ -63,6 +63,15 @@ Text Building::getName() const
     return to_string(name);
 }
 
+bool Building::operator==(const Building &rhs) const
+{
+    return
+        name == rhs.name &&
+        resource == rhs.resource &&
+        text_id == rhs.text_id &&
+        1;
+}
+
 EObjectType ClanReputation::getType() const
 {
     return EObjectType::ClanReputation;
@@ -116,6 +125,15 @@ QTreeWidgetItem *ClanReputation::printQtTreeView(QTreeWidgetItem *parent) const
 Text ClanReputation::getName() const
 {
     return clan.id < clan2.id ? (to_string(clan).wstring() + L" - " + to_string(clan2).wstring()) : (to_string(clan2).wstring() + L" - " + to_string(clan).wstring());
+}
+
+bool ClanReputation::operator==(const ClanReputation &rhs) const
+{
+    return
+        clan == rhs.clan &&
+        clan2 == rhs.clan2 &&
+        reputation == rhs.reputation &&
+        1;
 }
 
 EObjectType Clan::getType() const
@@ -184,6 +202,15 @@ Text Clan::getName() const
     return to_string(name);
 }
 
+bool Clan::operator==(const Clan &rhs) const
+{
+    return
+        name == rhs.name &&
+        resource == rhs.resource &&
+        text_id == rhs.text_id &&
+        1;
+}
+
 EObjectType ConfigurationEquipment::getType() const
 {
     return EObjectType::ConfigurationEquipment;
@@ -237,6 +264,15 @@ QTreeWidgetItem *ConfigurationEquipment::printQtTreeView(QTreeWidgetItem *parent
 Text ConfigurationEquipment::getName() const
 {
     return to_string(equipment);
+}
+
+bool ConfigurationEquipment::operator==(const ConfigurationEquipment &rhs) const
+{
+    return
+        configuration == rhs.configuration &&
+        equipment == rhs.equipment &&
+        quantity == rhs.quantity &&
+        1;
 }
 
 EObjectType ConfigurationGood::getType() const
@@ -294,6 +330,15 @@ Text ConfigurationGood::getName() const
     return to_string(good);
 }
 
+bool ConfigurationGood::operator==(const ConfigurationGood &rhs) const
+{
+    return
+        configuration == rhs.configuration &&
+        good == rhs.good &&
+        quantity == rhs.quantity &&
+        1;
+}
+
 EObjectType ConfigurationProjectile::getType() const
 {
     return EObjectType::ConfigurationProjectile;
@@ -349,6 +394,15 @@ Text ConfigurationProjectile::getName() const
     return to_string(projectile);
 }
 
+bool ConfigurationProjectile::operator==(const ConfigurationProjectile &rhs) const
+{
+    return
+        configuration == rhs.configuration &&
+        projectile == rhs.projectile &&
+        quantity == rhs.quantity &&
+        1;
+}
+
 EObjectType ConfigurationWeapon::getType() const
 {
     return EObjectType::ConfigurationWeapon;
@@ -402,6 +456,15 @@ QTreeWidgetItem *ConfigurationWeapon::printQtTreeView(QTreeWidgetItem *parent) c
 Text ConfigurationWeapon::getName() const
 {
     return to_string(weapon);
+}
+
+bool ConfigurationWeapon::operator==(const ConfigurationWeapon &rhs) const
+{
+    return
+        configuration == rhs.configuration &&
+        quantity == rhs.quantity &&
+        weapon == rhs.weapon &&
+        1;
 }
 
 EObjectType Configuration::getType() const
@@ -485,6 +548,15 @@ Text Configuration::getName() const
     return to_string(name);
 }
 
+bool Configuration::operator==(const Configuration &rhs) const
+{
+    return
+        glider == rhs.glider &&
+        name == rhs.name &&
+        text_id == rhs.text_id &&
+        1;
+}
+
 EObjectType Coordinate::getType() const
 {
     return EObjectType::Coordinate;
@@ -558,6 +630,18 @@ QTreeWidgetItem *Coordinate::printQtTreeView(QTreeWidgetItem *parent) const
 Text Coordinate::getName() const
 {
     return to_string(*this);
+}
+
+bool Coordinate::operator==(const Coordinate &rhs) const
+{
+    return
+        pitch == rhs.pitch &&
+        roll == rhs.roll &&
+        x == rhs.x &&
+        y == rhs.y &&
+        yaw == rhs.yaw &&
+        z == rhs.z &&
+        1;
 }
 
 EObjectType Equipment::getType() const
@@ -675,6 +759,26 @@ Text Equipment::getName() const
     return to_string(name);
 }
 
+bool Equipment::operator==(const Equipment &rhs) const
+{
+    return
+        durability == rhs.durability &&
+        manual == rhs.manual &&
+        name == rhs.name &&
+        notrade == rhs.notrade &&
+        power == rhs.power &&
+        price == rhs.price &&
+        resource == rhs.resource &&
+        standard == rhs.standard &&
+        text_id == rhs.text_id &&
+        type == rhs.type &&
+        value1 == rhs.value1 &&
+        value2 == rhs.value2 &&
+        value3 == rhs.value3 &&
+        weight == rhs.weight &&
+        1;
+}
+
 EObjectType Glider::getType() const
 {
     return EObjectType::Glider;
@@ -780,6 +884,24 @@ Text Glider::getName() const
     return to_string(name);
 }
 
+bool Glider::operator==(const Glider &rhs) const
+{
+    return
+        armor == rhs.armor &&
+        maxweight == rhs.maxweight &&
+        name == rhs.name &&
+        power == rhs.power &&
+        price == rhs.price &&
+        resource == rhs.resource &&
+        restore == rhs.restore &&
+        rotatespeed == rhs.rotatespeed &&
+        special == rhs.special &&
+        standard == rhs.standard &&
+        text_id == rhs.text_id &&
+        weight == rhs.weight &&
+        1;
+}
+
 EObjectType Good::getType() const
 {
     return EObjectType::Good;
@@ -855,6 +977,18 @@ Text Good::getName() const
     return to_string(name);
 }
 
+bool Good::operator==(const Good &rhs) const
+{
+    return
+        name == rhs.name &&
+        notrade == rhs.notrade &&
+        price == rhs.price &&
+        resource == rhs.resource &&
+        text_id == rhs.text_id &&
+        weight == rhs.weight &&
+        1;
+}
+
 EObjectType MapBuildingEquipment::getType() const
 {
     return EObjectType::MapBuildingEquipment;
@@ -908,6 +1042,15 @@ QTreeWidgetItem *MapBuildingEquipment::printQtTreeView(QTreeWidgetItem *parent) 
 Text MapBuildingEquipment::getName() const
 {
     return to_string(equipment);
+}
+
+bool MapBuildingEquipment::operator==(const MapBuildingEquipment &rhs) const
+{
+    return
+        equipment == rhs.equipment &&
+        mapBuilding == rhs.mapBuilding &&
+        quantity == rhs.quantity &&
+        1;
 }
 
 EObjectType MapBuildingGlider::getType() const
@@ -965,6 +1108,15 @@ Text MapBuildingGlider::getName() const
     return to_string(glider);
 }
 
+bool MapBuildingGlider::operator==(const MapBuildingGlider &rhs) const
+{
+    return
+        glider == rhs.glider &&
+        mapBuilding == rhs.mapBuilding &&
+        quantity == rhs.quantity &&
+        1;
+}
+
 EObjectType MapBuildingGood::getType() const
 {
     return EObjectType::MapBuildingGood;
@@ -1018,6 +1170,15 @@ QTreeWidgetItem *MapBuildingGood::printQtTreeView(QTreeWidgetItem *parent) const
 Text MapBuildingGood::getName() const
 {
     return to_string(good);
+}
+
+bool MapBuildingGood::operator==(const MapBuildingGood &rhs) const
+{
+    return
+        good == rhs.good &&
+        mapBuilding == rhs.mapBuilding &&
+        quantity == rhs.quantity &&
+        1;
 }
 
 EObjectType MapBuildingModificator::getType() const
@@ -1075,6 +1236,15 @@ Text MapBuildingModificator::getName() const
     return to_string(modificator);
 }
 
+bool MapBuildingModificator::operator==(const MapBuildingModificator &rhs) const
+{
+    return
+        mapBuilding == rhs.mapBuilding &&
+        modificator == rhs.modificator &&
+        quantity == rhs.quantity &&
+        1;
+}
+
 EObjectType MapBuildingProjectile::getType() const
 {
     return EObjectType::MapBuildingProjectile;
@@ -1130,6 +1300,15 @@ Text MapBuildingProjectile::getName() const
     return to_string(projectile);
 }
 
+bool MapBuildingProjectile::operator==(const MapBuildingProjectile &rhs) const
+{
+    return
+        mapBuilding == rhs.mapBuilding &&
+        projectile == rhs.projectile &&
+        quantity == rhs.quantity &&
+        1;
+}
+
 EObjectType MapBuildingWeapon::getType() const
 {
     return EObjectType::MapBuildingWeapon;
@@ -1183,6 +1362,15 @@ QTreeWidgetItem *MapBuildingWeapon::printQtTreeView(QTreeWidgetItem *parent) con
 Text MapBuildingWeapon::getName() const
 {
     return to_string(weapon);
+}
+
+bool MapBuildingWeapon::operator==(const MapBuildingWeapon &rhs) const
+{
+    return
+        mapBuilding == rhs.mapBuilding &&
+        quantity == rhs.quantity &&
+        weapon == rhs.weapon &&
+        1;
 }
 
 EObjectType MapBuilding::getType() const
@@ -1281,6 +1469,16 @@ Text MapBuilding::getName() const
     return to_string(building);
 }
 
+bool MapBuilding::operator==(const MapBuilding &rhs) const
+{
+    return
+        building == rhs.building &&
+        coordinate == rhs.coordinate &&
+        map == rhs.map &&
+        text_id == rhs.text_id &&
+        1;
+}
+
 EObjectType MapObject::getType() const
 {
     return EObjectType::MapObject;
@@ -1341,6 +1539,15 @@ Text MapObject::getName() const
     return to_string(object);
 }
 
+bool MapObject::operator==(const MapObject &rhs) const
+{
+    return
+        coordinate == rhs.coordinate &&
+        map == rhs.map &&
+        object == rhs.object &&
+        1;
+}
+
 EObjectType Map::getType() const
 {
     return EObjectType::Map;
@@ -1358,6 +1565,18 @@ Text Map::getVariableString(int columnId) const
         return to_string(resource);
     case 3:
         return to_string(name);
+    case 4:
+        { std::stringstream ss; ss << x_k; return ss.str(); }
+    case 5:
+        { std::stringstream ss; ss << x_b; return ss.str(); }
+    case 6:
+        { std::stringstream ss; ss << y_k; return ss.str(); }
+    case 7:
+        { std::stringstream ss; ss << y_b; return ss.str(); }
+    case 8:
+        { std::stringstream ss; ss << z_k; return ss.str(); }
+    case 9:
+        { std::stringstream ss; ss << z_b; return ss.str(); }
     default:
         return "";
     }
@@ -1379,6 +1598,24 @@ void Map::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         break;
     case 3:
         name = std::static_pointer_cast<String>(ptr);
+        break;
+    case 4:
+        x_k = std::stof(text.string());
+        break;
+    case 5:
+        x_b = std::stof(text.string());
+        break;
+    case 6:
+        y_k = std::stof(text.string());
+        break;
+    case 7:
+        y_b = std::stof(text.string());
+        break;
+    case 8:
+        z_k = std::stof(text.string());
+        break;
+    case 9:
+        z_b = std::stof(text.string());
         break;
     default:
         break;
@@ -1411,6 +1648,21 @@ QTreeWidgetItem *Map::printQtTreeView(QTreeWidgetItem *parent) const
 Text Map::getName() const
 {
     return to_string(name);
+}
+
+bool Map::operator==(const Map &rhs) const
+{
+    return
+        name == rhs.name &&
+        resource == rhs.resource &&
+        text_id == rhs.text_id &&
+        x_b == rhs.x_b &&
+        x_k == rhs.x_k &&
+        y_b == rhs.y_b &&
+        y_k == rhs.y_k &&
+        z_b == rhs.z_b &&
+        z_k == rhs.z_k &&
+        1;
 }
 
 EObjectType MechanoidGroup::getType() const
@@ -1466,6 +1718,14 @@ QTreeWidgetItem *MechanoidGroup::printQtTreeView(QTreeWidgetItem *parent) const
 Text MechanoidGroup::getName() const
 {
     return to_string(name);
+}
+
+bool MechanoidGroup::operator==(const MechanoidGroup &rhs) const
+{
+    return
+        name == rhs.name &&
+        text_id == rhs.text_id &&
+        1;
 }
 
 EObjectType Mechanoid::getType() const
@@ -1583,6 +1843,26 @@ Text Mechanoid::getName() const
     return to_string(name);
 }
 
+bool Mechanoid::operator==(const Mechanoid &rhs) const
+{
+    return
+        clan == rhs.clan &&
+        configuration == rhs.configuration &&
+        coordinate == rhs.coordinate &&
+        generation == rhs.generation &&
+        mapBuilding == rhs.mapBuilding &&
+        map == rhs.map &&
+        mechanoidGroup == rhs.mechanoidGroup &&
+        money == rhs.money &&
+        name == rhs.name &&
+        rating == rhs.rating &&
+        rating_courier == rhs.rating_courier &&
+        rating_fight == rhs.rating_fight &&
+        rating_trade == rhs.rating_trade &&
+        text_id == rhs.text_id &&
+        1;
+}
+
 EObjectType ModificationClan::getType() const
 {
     return EObjectType::ModificationClan;
@@ -1631,6 +1911,14 @@ QTreeWidgetItem *ModificationClan::printQtTreeView(QTreeWidgetItem *parent) cons
 Text ModificationClan::getName() const
 {
     return to_string(clan);
+}
+
+bool ModificationClan::operator==(const ModificationClan &rhs) const
+{
+    return
+        clan == rhs.clan &&
+        modification == rhs.modification &&
+        1;
 }
 
 EObjectType ModificationMap::getType() const
@@ -1683,6 +1971,14 @@ Text ModificationMap::getName() const
     return to_string(map);
 }
 
+bool ModificationMap::operator==(const ModificationMap &rhs) const
+{
+    return
+        map == rhs.map &&
+        modification == rhs.modification &&
+        1;
+}
+
 EObjectType ModificationMechanoid::getType() const
 {
     return EObjectType::ModificationMechanoid;
@@ -1733,6 +2029,14 @@ Text ModificationMechanoid::getName() const
     return to_string(mechanoid);
 }
 
+bool ModificationMechanoid::operator==(const ModificationMechanoid &rhs) const
+{
+    return
+        mechanoid == rhs.mechanoid &&
+        modification == rhs.modification &&
+        1;
+}
+
 EObjectType Modification::getType() const
 {
     return EObjectType::Modification;
@@ -1762,6 +2066,10 @@ Text Modification::getVariableString(int columnId) const
         return to_string(script_language);
     case 9:
         return to_string(script_main);
+    case 10:
+        return to_string(player_mechanoid);
+    case 11:
+        return to_string(cooperative_player_configuration);
     default:
         return "";
     }
@@ -1802,6 +2110,12 @@ void Modification::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
     case 9:
         script_main = text.string();
         break;
+    case 10:
+        player_mechanoid = std::static_pointer_cast<Mechanoid>(ptr);
+        break;
+    case 11:
+        cooperative_player_configuration = std::static_pointer_cast<Configuration>(ptr);
+        break;
     default:
         break;
     }
@@ -1837,6 +2151,23 @@ QTreeWidgetItem *Modification::printQtTreeView(QTreeWidgetItem *parent) const
 Text Modification::getName() const
 {
     return to_string(name);
+}
+
+bool Modification::operator==(const Modification &rhs) const
+{
+    return
+        author == rhs.author &&
+        comment == rhs.comment &&
+        cooperative_player_configuration == rhs.cooperative_player_configuration &&
+        date_created == rhs.date_created &&
+        date_modified == rhs.date_modified &&
+        directory == rhs.directory &&
+        name == rhs.name &&
+        player_mechanoid == rhs.player_mechanoid &&
+        script_language == rhs.script_language &&
+        script_main == rhs.script_main &&
+        version == rhs.version &&
+        1;
 }
 
 EObjectType Modificator::getType() const
@@ -1924,6 +2255,20 @@ Text Modificator::getName() const
     return to_string(name);
 }
 
+bool Modificator::operator==(const Modificator &rhs) const
+{
+    return
+        k_param1 == rhs.k_param1 &&
+        k_param2 == rhs.k_param2 &&
+        k_price == rhs.k_price &&
+        name == rhs.name &&
+        price == rhs.price &&
+        probability == rhs.probability &&
+        resource == rhs.resource &&
+        text_id == rhs.text_id &&
+        1;
+}
+
 EObjectType Object::getType() const
 {
     return EObjectType::Object;
@@ -1989,6 +2334,16 @@ Text Object::getName() const
     return to_string(name);
 }
 
+bool Object::operator==(const Object &rhs) const
+{
+    return
+        name == rhs.name &&
+        resource == rhs.resource &&
+        text_id == rhs.text_id &&
+        type == rhs.type &&
+        1;
+}
+
 EObjectType Player::getType() const
 {
     return EObjectType::Player;
@@ -2037,6 +2392,13 @@ QTreeWidgetItem *Player::printQtTreeView(QTreeWidgetItem *parent) const
 Text Player::getName() const
 {
     return to_string(mechanoid);
+}
+
+bool Player::operator==(const Player &rhs) const
+{
+    return
+        mechanoid == rhs.mechanoid &&
+        1;
 }
 
 EObjectType Projectile::getType() const
@@ -2129,6 +2491,21 @@ Text Projectile::getName() const
     return to_string(name);
 }
 
+bool Projectile::operator==(const Projectile &rhs) const
+{
+    return
+        damage == rhs.damage &&
+        name == rhs.name &&
+        notrade == rhs.notrade &&
+        resource == rhs.resource &&
+        scale == rhs.scale &&
+        speed == rhs.speed &&
+        text_id == rhs.text_id &&
+        type == rhs.type &&
+        weight == rhs.weight &&
+        1;
+}
+
 EObjectType QuestRewardEquipment::getType() const
 {
     return EObjectType::QuestRewardEquipment;
@@ -2182,6 +2559,15 @@ QTreeWidgetItem *QuestRewardEquipment::printQtTreeView(QTreeWidgetItem *parent) 
 Text QuestRewardEquipment::getName() const
 {
     return to_string(equipment);
+}
+
+bool QuestRewardEquipment::operator==(const QuestRewardEquipment &rhs) const
+{
+    return
+        equipment == rhs.equipment &&
+        quantity == rhs.quantity &&
+        questReward == rhs.questReward &&
+        1;
 }
 
 EObjectType QuestRewardGlider::getType() const
@@ -2239,6 +2625,15 @@ Text QuestRewardGlider::getName() const
     return to_string(glider);
 }
 
+bool QuestRewardGlider::operator==(const QuestRewardGlider &rhs) const
+{
+    return
+        glider == rhs.glider &&
+        quantity == rhs.quantity &&
+        questReward == rhs.questReward &&
+        1;
+}
+
 EObjectType QuestRewardGood::getType() const
 {
     return EObjectType::QuestRewardGood;
@@ -2292,6 +2687,15 @@ QTreeWidgetItem *QuestRewardGood::printQtTreeView(QTreeWidgetItem *parent) const
 Text QuestRewardGood::getName() const
 {
     return to_string(good);
+}
+
+bool QuestRewardGood::operator==(const QuestRewardGood &rhs) const
+{
+    return
+        good == rhs.good &&
+        quantity == rhs.quantity &&
+        questReward == rhs.questReward &&
+        1;
 }
 
 EObjectType QuestRewardModificator::getType() const
@@ -2349,6 +2753,15 @@ Text QuestRewardModificator::getName() const
     return to_string(modificator);
 }
 
+bool QuestRewardModificator::operator==(const QuestRewardModificator &rhs) const
+{
+    return
+        modificator == rhs.modificator &&
+        quantity == rhs.quantity &&
+        questReward == rhs.questReward &&
+        1;
+}
+
 EObjectType QuestRewardProjectile::getType() const
 {
     return EObjectType::QuestRewardProjectile;
@@ -2402,6 +2815,15 @@ QTreeWidgetItem *QuestRewardProjectile::printQtTreeView(QTreeWidgetItem *parent)
 Text QuestRewardProjectile::getName() const
 {
     return to_string(projectile);
+}
+
+bool QuestRewardProjectile::operator==(const QuestRewardProjectile &rhs) const
+{
+    return
+        projectile == rhs.projectile &&
+        quantity == rhs.quantity &&
+        questReward == rhs.questReward &&
+        1;
 }
 
 EObjectType QuestRewardReputation::getType() const
@@ -2459,6 +2881,15 @@ Text QuestRewardReputation::getName() const
     return to_string(reputation);
 }
 
+bool QuestRewardReputation::operator==(const QuestRewardReputation &rhs) const
+{
+    return
+        clan == rhs.clan &&
+        questReward == rhs.questReward &&
+        reputation == rhs.reputation &&
+        1;
+}
+
 EObjectType QuestRewardWeapon::getType() const
 {
     return EObjectType::QuestRewardWeapon;
@@ -2512,6 +2943,15 @@ QTreeWidgetItem *QuestRewardWeapon::printQtTreeView(QTreeWidgetItem *parent) con
 Text QuestRewardWeapon::getName() const
 {
     return to_string(weapon);
+}
+
+bool QuestRewardWeapon::operator==(const QuestRewardWeapon &rhs) const
+{
+    return
+        quantity == rhs.quantity &&
+        questReward == rhs.questReward &&
+        weapon == rhs.weapon &&
+        1;
 }
 
 EObjectType QuestReward::getType() const
@@ -2615,6 +3055,16 @@ Text QuestReward::getName() const
     return to_string(quest);
 }
 
+bool QuestReward::operator==(const QuestReward &rhs) const
+{
+    return
+        money == rhs.money &&
+        quest == rhs.quest &&
+        rating == rhs.rating &&
+        text_id == rhs.text_id &&
+        1;
+}
+
 EObjectType Quest::getType() const
 {
     return EObjectType::Quest;
@@ -2692,6 +3142,17 @@ Text Quest::getName() const
     return to_string(name);
 }
 
+bool Quest::operator==(const Quest &rhs) const
+{
+    return
+        description == rhs.description &&
+        name == rhs.name &&
+        text_id == rhs.text_id &&
+        time == rhs.time &&
+        title == rhs.title &&
+        1;
+}
+
 EObjectType SaveObject::getType() const
 {
     return EObjectType::SaveObject;
@@ -2752,6 +3213,16 @@ Text SaveObject::getName() const
     return to_string(object);
 }
 
+bool SaveObject::operator==(const SaveObject &rhs) const
+{
+    return
+        coordinate == rhs.coordinate &&
+        map == rhs.map &&
+        object == rhs.object &&
+        save == rhs.save &&
+        1;
+}
+
 EObjectType SavePlayer::getType() const
 {
     return EObjectType::SavePlayer;
@@ -2800,6 +3271,14 @@ QTreeWidgetItem *SavePlayer::printQtTreeView(QTreeWidgetItem *parent) const
 Text SavePlayer::getName() const
 {
     return to_string(player);
+}
+
+bool SavePlayer::operator==(const SavePlayer &rhs) const
+{
+    return
+        player == rhs.player &&
+        save == rhs.save &&
+        1;
 }
 
 EObjectType SaveQuest::getType() const
@@ -2855,6 +3334,15 @@ QTreeWidgetItem *SaveQuest::printQtTreeView(QTreeWidgetItem *parent) const
 Text SaveQuest::getName() const
 {
     return to_string(quest);
+}
+
+bool SaveQuest::operator==(const SaveQuest &rhs) const
+{
+    return
+        quest == rhs.quest &&
+        save == rhs.save &&
+        state == rhs.state &&
+        1;
 }
 
 EObjectType Save::getType() const
@@ -2938,6 +3426,15 @@ Text Save::getName() const
     return name;
 }
 
+bool Save::operator==(const Save &rhs) const
+{
+    return
+        date == rhs.date &&
+        modification == rhs.modification &&
+        name == rhs.name &&
+        1;
+}
+
 EObjectType ScriptVariable::getType() const
 {
     return EObjectType::ScriptVariable;
@@ -2991,6 +3488,15 @@ QTreeWidgetItem *ScriptVariable::printQtTreeView(QTreeWidgetItem *parent) const
 Text ScriptVariable::getName() const
 {
     return variable;
+}
+
+bool ScriptVariable::operator==(const ScriptVariable &rhs) const
+{
+    return
+        save == rhs.save &&
+        value == rhs.value &&
+        variable == rhs.variable &&
+        1;
 }
 
 EObjectType String::getType() const
@@ -3055,6 +3561,14 @@ Text String::getName() const
             return s;
     }
     return s;
+}
+
+bool String::operator==(const String &rhs) const
+{
+    return
+        en == rhs.en &&
+        ru == rhs.ru &&
+        1;
 }
 
 EObjectType Weapon::getType() const
@@ -3155,5 +3669,22 @@ QTreeWidgetItem *Weapon::printQtTreeView(QTreeWidgetItem *parent) const
 Text Weapon::getName() const
 {
     return to_string(name);
+}
+
+bool Weapon::operator==(const Weapon &rhs) const
+{
+    return
+        damage == rhs.damage &&
+        firerate == rhs.firerate &&
+        name == rhs.name &&
+        power == rhs.power &&
+        price == rhs.price &&
+        projectile == rhs.projectile &&
+        resource == rhs.resource &&
+        standard == rhs.standard &&
+        text_id == rhs.text_id &&
+        type == rhs.type &&
+        weight == rhs.weight &&
+        1;
 }
 

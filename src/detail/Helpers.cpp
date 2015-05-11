@@ -126,6 +126,7 @@ void retranslateFieldNames()
         { "clan_id2", QCoreApplication::translate("DB", "clan_id2") },
         { "comment", QCoreApplication::translate("DB", "comment") },
         { "configuration_id", QCoreApplication::translate("DB", "configuration_id") },
+        { "cooperative_player_configuration_id", QCoreApplication::translate("DB", "cooperative_player_configuration_id") },
         { "coordinate_id", QCoreApplication::translate("DB", "coordinate_id") },
         { "damage", QCoreApplication::translate("DB", "damage") },
         { "date", QCoreApplication::translate("DB", "date") },
@@ -159,6 +160,7 @@ void retranslateFieldNames()
         { "object_id", QCoreApplication::translate("DB", "object_id") },
         { "pitch", QCoreApplication::translate("DB", "pitch") },
         { "player_id", QCoreApplication::translate("DB", "player_id") },
+        { "player_mechanoid_id", QCoreApplication::translate("DB", "player_mechanoid_id") },
         { "power", QCoreApplication::translate("DB", "power") },
         { "price", QCoreApplication::translate("DB", "price") },
         { "probability", QCoreApplication::translate("DB", "probability") },
@@ -197,9 +199,15 @@ void retranslateFieldNames()
         { "weapon_id", QCoreApplication::translate("DB", "weapon_id") },
         { "weight", QCoreApplication::translate("DB", "weight") },
         { "x", QCoreApplication::translate("DB", "x") },
+        { "x_b", QCoreApplication::translate("DB", "x_b") },
+        { "x_k", QCoreApplication::translate("DB", "x_k") },
         { "y", QCoreApplication::translate("DB", "y") },
+        { "y_b", QCoreApplication::translate("DB", "y_b") },
+        { "y_k", QCoreApplication::translate("DB", "y_k") },
         { "yaw", QCoreApplication::translate("DB", "yaw") },
         { "z", QCoreApplication::translate("DB", "z") },
+        { "z_b", QCoreApplication::translate("DB", "z_b") },
+        { "z_k", QCoreApplication::translate("DB", "z_k") },
     };
     fieldNames = names;
 };
