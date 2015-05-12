@@ -1049,7 +1049,12 @@ void StorageImpl::_loadMapBuildings()
         if (cols[1]) mapBuilding->text_id = cols[1];
         if (cols[2]) mapBuilding->map.id = std::stoi(cols[2]);
         if (cols[3]) mapBuilding->building.id = std::stoi(cols[3]);
-        if (cols[4]) mapBuilding->coordinate.id = std::stoi(cols[4]);
+        if (cols[4]) mapBuilding->x = std::stof(cols[4]);
+        if (cols[5]) mapBuilding->y = std::stof(cols[5]);
+        if (cols[6]) mapBuilding->z = std::stof(cols[6]);
+        if (cols[7]) mapBuilding->pitch = std::stof(cols[7]);
+        if (cols[8]) mapBuilding->yaw = std::stof(cols[8]);
+        if (cols[9]) mapBuilding->roll = std::stof(cols[9]);
 
         Storage *storage = (Storage *)o;
         storage->mapBuildings[mapBuilding->id] = mapBuilding;
@@ -1066,8 +1071,6 @@ void StorageImpl::_loadMapBuildingsPtrs()
             mapBuilding.second->map.ptr = maps[mapBuilding.second->map.id];
         if (buildings.find(mapBuilding.second->building.id) != buildings.end())
             mapBuilding.second->building.ptr = buildings[mapBuilding.second->building.id];
-        if (coordinates.find(mapBuilding.second->coordinate.id) != coordinates.end())
-            mapBuilding.second->coordinate.ptr = coordinates[mapBuilding.second->coordinate.id];
     }
 }
 
@@ -1112,7 +1115,12 @@ void StorageImpl::_saveMapBuildings()
         query += "'" + mapBuilding.second->text_id.string() + "',";
         query += "'" + std::to_string(mapBuilding.second->map.id) + "',";
         query += "'" + std::to_string(mapBuilding.second->building.id) + "',";
-        query += "'" + std::to_string(mapBuilding.second->coordinate.id) + "',";
+        query += "'" + std::to_string(mapBuilding.second->x) + "',";
+        query += "'" + std::to_string(mapBuilding.second->y) + "',";
+        query += "'" + std::to_string(mapBuilding.second->z) + "',";
+        query += "'" + std::to_string(mapBuilding.second->pitch) + "',";
+        query += "'" + std::to_string(mapBuilding.second->yaw) + "',";
+        query += "'" + std::to_string(mapBuilding.second->roll) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
     }
@@ -1127,9 +1135,15 @@ void StorageImpl::_loadMapObjects()
     {
         Ptr<MapObject> mapObject = std::make_shared<MapObject>();
         if (cols[0]) mapObject->id = std::stoi(cols[0]);
-        if (cols[1]) mapObject->map.id = std::stoi(cols[1]);
-        if (cols[2]) mapObject->object.id = std::stoi(cols[2]);
-        if (cols[3]) mapObject->coordinate.id = std::stoi(cols[3]);
+        if (cols[1]) mapObject->text_id = cols[1];
+        if (cols[2]) mapObject->map.id = std::stoi(cols[2]);
+        if (cols[3]) mapObject->object.id = std::stoi(cols[3]);
+        if (cols[4]) mapObject->x = std::stof(cols[4]);
+        if (cols[5]) mapObject->y = std::stof(cols[5]);
+        if (cols[6]) mapObject->z = std::stof(cols[6]);
+        if (cols[7]) mapObject->pitch = std::stof(cols[7]);
+        if (cols[8]) mapObject->yaw = std::stof(cols[8]);
+        if (cols[9]) mapObject->roll = std::stof(cols[9]);
 
         Storage *storage = (Storage *)o;
         storage->mapObjects[mapObject->id] = mapObject;
@@ -1146,8 +1160,6 @@ void StorageImpl::_loadMapObjectsPtrs()
             mapObject.second->map.ptr = maps[mapObject.second->map.id];
         if (objects.find(mapObject.second->object.id) != objects.end())
             mapObject.second->object.ptr = objects[mapObject.second->object.id];
-        if (coordinates.find(mapObject.second->coordinate.id) != coordinates.end())
-            mapObject.second->coordinate.ptr = coordinates[mapObject.second->coordinate.id];
     }
 }
 
@@ -1168,9 +1180,15 @@ void StorageImpl::_saveMapObjects()
     {
         query += "(";
         query += "'" + std::to_string(mapObject.second->id) + "',";
+        query += "'" + mapObject.second->text_id.string() + "',";
         query += "'" + std::to_string(mapObject.second->map.id) + "',";
         query += "'" + std::to_string(mapObject.second->object.id) + "',";
-        query += "'" + std::to_string(mapObject.second->coordinate.id) + "',";
+        query += "'" + std::to_string(mapObject.second->x) + "',";
+        query += "'" + std::to_string(mapObject.second->y) + "',";
+        query += "'" + std::to_string(mapObject.second->z) + "',";
+        query += "'" + std::to_string(mapObject.second->pitch) + "',";
+        query += "'" + std::to_string(mapObject.second->yaw) + "',";
+        query += "'" + std::to_string(mapObject.second->roll) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
     }
@@ -1325,7 +1343,12 @@ void StorageImpl::_loadMechanoids()
         if (cols[11]) mechanoid->rating_trade = std::stof(cols[11]);
         if (cols[12]) mechanoid->map.id = std::stoi(cols[12]);
         if (cols[13]) mechanoid->mapBuilding.id = std::stoi(cols[13]);
-        if (cols[14]) mechanoid->coordinate.id = std::stoi(cols[14]);
+        if (cols[14]) mechanoid->x = std::stof(cols[14]);
+        if (cols[15]) mechanoid->y = std::stof(cols[15]);
+        if (cols[16]) mechanoid->z = std::stof(cols[16]);
+        if (cols[17]) mechanoid->pitch = std::stof(cols[17]);
+        if (cols[18]) mechanoid->yaw = std::stof(cols[18]);
+        if (cols[19]) mechanoid->roll = std::stof(cols[19]);
 
         Storage *storage = (Storage *)o;
         storage->mechanoids[mechanoid->id] = mechanoid;
@@ -1350,8 +1373,6 @@ void StorageImpl::_loadMechanoidsPtrs()
             mechanoid.second->map.ptr = maps[mechanoid.second->map.id];
         if (mapBuildings.find(mechanoid.second->mapBuilding.id) != mapBuildings.end())
             mechanoid.second->mapBuilding.ptr = mapBuildings[mechanoid.second->mapBuilding.id];
-        if (coordinates.find(mechanoid.second->coordinate.id) != coordinates.end())
-            mechanoid.second->coordinate.ptr = coordinates[mechanoid.second->coordinate.id];
     }
 }
 
@@ -1385,7 +1406,12 @@ void StorageImpl::_saveMechanoids()
         query += "'" + std::to_string(mechanoid.second->rating_trade) + "',";
         query += "'" + std::to_string(mechanoid.second->map.id) + "',";
         query += "'" + std::to_string(mechanoid.second->mapBuilding.id) + "',";
-        query += "'" + std::to_string(mechanoid.second->coordinate.id) + "',";
+        query += "'" + std::to_string(mechanoid.second->x) + "',";
+        query += "'" + std::to_string(mechanoid.second->y) + "',";
+        query += "'" + std::to_string(mechanoid.second->z) + "',";
+        query += "'" + std::to_string(mechanoid.second->pitch) + "',";
+        query += "'" + std::to_string(mechanoid.second->yaw) + "',";
+        query += "'" + std::to_string(mechanoid.second->roll) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
     }
@@ -2406,7 +2432,12 @@ void StorageImpl::_loadSaveObjects()
         if (cols[0]) saveObject->save.id = std::stoi(cols[0]);
         if (cols[1]) saveObject->object.id = std::stoi(cols[1]);
         if (cols[2]) saveObject->map.id = std::stoi(cols[2]);
-        if (cols[3]) saveObject->coordinate.id = std::stoi(cols[3]);
+        if (cols[3]) saveObject->x = std::stof(cols[3]);
+        if (cols[4]) saveObject->y = std::stof(cols[4]);
+        if (cols[5]) saveObject->z = std::stof(cols[5]);
+        if (cols[6]) saveObject->pitch = std::stof(cols[6]);
+        if (cols[7]) saveObject->yaw = std::stof(cols[7]);
+        if (cols[8]) saveObject->roll = std::stof(cols[8]);
 
         Storage *storage = (Storage *)o;
         storage->saveObjects.push_back(saveObject);
@@ -2425,8 +2456,6 @@ void StorageImpl::_loadSaveObjectsPtrs()
             saveObject->object.ptr = objects[saveObject->object.id];
         if (maps.find(saveObject->map.id) != maps.end())
             saveObject->map.ptr = maps[saveObject->map.id];
-        if (coordinates.find(saveObject->coordinate.id) != coordinates.end())
-            saveObject->coordinate.ptr = coordinates[saveObject->coordinate.id];
     }
 }
 
@@ -2449,7 +2478,12 @@ void StorageImpl::_saveSaveObjects()
         query += "'" + std::to_string(saveObject->save.id) + "',";
         query += "'" + std::to_string(saveObject->object.id) + "',";
         query += "'" + std::to_string(saveObject->map.id) + "',";
-        query += "'" + std::to_string(saveObject->coordinate.id) + "',";
+        query += "'" + std::to_string(saveObject->x) + "',";
+        query += "'" + std::to_string(saveObject->y) + "',";
+        query += "'" + std::to_string(saveObject->z) + "',";
+        query += "'" + std::to_string(saveObject->pitch) + "',";
+        query += "'" + std::to_string(saveObject->yaw) + "',";
+        query += "'" + std::to_string(saveObject->roll) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
     }
@@ -3155,47 +3189,47 @@ void StorageImpl::save(ProgressCallback callback)
     PROGRESS_CALLBACK(8.510638);
     _saveClans();
     PROGRESS_CALLBACK(10.638298);
-    _saveCoordinates();
-    PROGRESS_CALLBACK(12.765957);
     _saveModifications();
-    PROGRESS_CALLBACK(14.893617);
+    PROGRESS_CALLBACK(12.765957);
     _saveProjectiles();
-    PROGRESS_CALLBACK(17.021277);
+    PROGRESS_CALLBACK(14.893617);
     _saveSaves();
-    PROGRESS_CALLBACK(19.148936);
+    PROGRESS_CALLBACK(17.021277);
     _saveEquipments();
-    PROGRESS_CALLBACK(21.276596);
+    PROGRESS_CALLBACK(19.148936);
     _saveGliders();
-    PROGRESS_CALLBACK(23.404255);
+    PROGRESS_CALLBACK(21.276596);
     _saveGoods();
-    PROGRESS_CALLBACK(25.531915);
+    PROGRESS_CALLBACK(23.404255);
     _saveMechanoids();
-    PROGRESS_CALLBACK(27.659574);
+    PROGRESS_CALLBACK(25.531915);
     _saveWeapons();
-    PROGRESS_CALLBACK(29.787234);
+    PROGRESS_CALLBACK(27.659574);
     _saveModificators();
-    PROGRESS_CALLBACK(31.914894);
+    PROGRESS_CALLBACK(29.787234);
     _saveObjects();
-    PROGRESS_CALLBACK(34.042553);
+    PROGRESS_CALLBACK(31.914894);
     _saveQuests();
-    PROGRESS_CALLBACK(36.170213);
+    PROGRESS_CALLBACK(34.042553);
     _saveBuildings();
-    PROGRESS_CALLBACK(38.297872);
+    PROGRESS_CALLBACK(36.170213);
     _saveMapBuildings();
-    PROGRESS_CALLBACK(40.425532);
+    PROGRESS_CALLBACK(38.297872);
     _saveMechanoidGroups();
-    PROGRESS_CALLBACK(42.553191);
+    PROGRESS_CALLBACK(40.425532);
     _savePlayers();
-    PROGRESS_CALLBACK(44.680851);
+    PROGRESS_CALLBACK(42.553191);
     _saveClanReputations();
-    PROGRESS_CALLBACK(46.808511);
+    PROGRESS_CALLBACK(44.680851);
     _saveConfigurationEquipments();
-    PROGRESS_CALLBACK(48.936170);
+    PROGRESS_CALLBACK(46.808511);
     _saveConfigurationGoods();
-    PROGRESS_CALLBACK(51.063830);
+    PROGRESS_CALLBACK(48.936170);
     _saveConfigurationProjectiles();
-    PROGRESS_CALLBACK(53.191489);
+    PROGRESS_CALLBACK(51.063830);
     _saveConfigurationWeapons();
+    PROGRESS_CALLBACK(53.191489);
+    _saveCoordinates();
     PROGRESS_CALLBACK(55.319149);
     _saveMapBuildingEquipments();
     PROGRESS_CALLBACK(57.446809);

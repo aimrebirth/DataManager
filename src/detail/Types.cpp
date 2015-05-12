@@ -60,7 +60,14 @@ QTreeWidgetItem *Building::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Building::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Building::operator==(const Building &rhs) const
@@ -124,7 +131,14 @@ QTreeWidgetItem *ClanReputation::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text ClanReputation::getName() const
 {
-    return clan.id < clan2.id ? (to_string(clan).wstring() + L" - " + to_string(clan2).wstring()) : (to_string(clan2).wstring() + L" - " + to_string(clan).wstring());
+    Text n;
+    n = clan.id < clan2.id ? (to_string(clan).wstring() + L" - " + to_string(clan2).wstring()) : (to_string(clan2).wstring() + L" - " + to_string(clan).wstring());
+    if (!n.empty())
+        return n;
+    n = to_string(reputation);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool ClanReputation::operator==(const ClanReputation &rhs) const
@@ -199,7 +213,14 @@ QTreeWidgetItem *Clan::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Clan::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Clan::operator==(const Clan &rhs) const
@@ -263,7 +284,11 @@ QTreeWidgetItem *ConfigurationEquipment::printQtTreeView(QTreeWidgetItem *parent
 
 Text ConfigurationEquipment::getName() const
 {
-    return to_string(equipment);
+    Text n;
+    n = to_string(equipment);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool ConfigurationEquipment::operator==(const ConfigurationEquipment &rhs) const
@@ -327,7 +352,11 @@ QTreeWidgetItem *ConfigurationGood::printQtTreeView(QTreeWidgetItem *parent) con
 
 Text ConfigurationGood::getName() const
 {
-    return to_string(good);
+    Text n;
+    n = to_string(good);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool ConfigurationGood::operator==(const ConfigurationGood &rhs) const
@@ -391,7 +420,11 @@ QTreeWidgetItem *ConfigurationProjectile::printQtTreeView(QTreeWidgetItem *paren
 
 Text ConfigurationProjectile::getName() const
 {
-    return to_string(projectile);
+    Text n;
+    n = to_string(projectile);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool ConfigurationProjectile::operator==(const ConfigurationProjectile &rhs) const
@@ -455,7 +488,11 @@ QTreeWidgetItem *ConfigurationWeapon::printQtTreeView(QTreeWidgetItem *parent) c
 
 Text ConfigurationWeapon::getName() const
 {
-    return to_string(weapon);
+    Text n;
+    n = to_string(weapon);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool ConfigurationWeapon::operator==(const ConfigurationWeapon &rhs) const
@@ -545,7 +582,14 @@ QTreeWidgetItem *Configuration::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Configuration::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Configuration::operator==(const Configuration &rhs) const
@@ -629,7 +673,11 @@ QTreeWidgetItem *Coordinate::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Coordinate::getName() const
 {
-    return to_string(*this);
+    Text n;
+    n = to_string(*this);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Coordinate::operator==(const Coordinate &rhs) const
@@ -756,7 +804,14 @@ QTreeWidgetItem *Equipment::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Equipment::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Equipment::operator==(const Equipment &rhs) const
@@ -881,7 +936,14 @@ QTreeWidgetItem *Glider::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Glider::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Glider::operator==(const Glider &rhs) const
@@ -974,7 +1036,14 @@ QTreeWidgetItem *Good::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Good::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Good::operator==(const Good &rhs) const
@@ -1041,7 +1110,11 @@ QTreeWidgetItem *MapBuildingEquipment::printQtTreeView(QTreeWidgetItem *parent) 
 
 Text MapBuildingEquipment::getName() const
 {
-    return to_string(equipment);
+    Text n;
+    n = to_string(equipment);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool MapBuildingEquipment::operator==(const MapBuildingEquipment &rhs) const
@@ -1105,7 +1178,11 @@ QTreeWidgetItem *MapBuildingGlider::printQtTreeView(QTreeWidgetItem *parent) con
 
 Text MapBuildingGlider::getName() const
 {
-    return to_string(glider);
+    Text n;
+    n = to_string(glider);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool MapBuildingGlider::operator==(const MapBuildingGlider &rhs) const
@@ -1169,7 +1246,11 @@ QTreeWidgetItem *MapBuildingGood::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text MapBuildingGood::getName() const
 {
-    return to_string(good);
+    Text n;
+    n = to_string(good);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool MapBuildingGood::operator==(const MapBuildingGood &rhs) const
@@ -1233,7 +1314,11 @@ QTreeWidgetItem *MapBuildingModificator::printQtTreeView(QTreeWidgetItem *parent
 
 Text MapBuildingModificator::getName() const
 {
-    return to_string(modificator);
+    Text n;
+    n = to_string(modificator);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool MapBuildingModificator::operator==(const MapBuildingModificator &rhs) const
@@ -1297,7 +1382,11 @@ QTreeWidgetItem *MapBuildingProjectile::printQtTreeView(QTreeWidgetItem *parent)
 
 Text MapBuildingProjectile::getName() const
 {
-    return to_string(projectile);
+    Text n;
+    n = to_string(projectile);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool MapBuildingProjectile::operator==(const MapBuildingProjectile &rhs) const
@@ -1361,7 +1450,11 @@ QTreeWidgetItem *MapBuildingWeapon::printQtTreeView(QTreeWidgetItem *parent) con
 
 Text MapBuildingWeapon::getName() const
 {
-    return to_string(weapon);
+    Text n;
+    n = to_string(weapon);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool MapBuildingWeapon::operator==(const MapBuildingWeapon &rhs) const
@@ -1391,7 +1484,17 @@ Text MapBuilding::getVariableString(int columnId) const
     case 3:
         return to_string(building);
     case 4:
-        return to_string(coordinate);
+        { std::stringstream ss; ss << x; return ss.str(); }
+    case 5:
+        { std::stringstream ss; ss << y; return ss.str(); }
+    case 6:
+        { std::stringstream ss; ss << z; return ss.str(); }
+    case 7:
+        { std::stringstream ss; ss << pitch; return ss.str(); }
+    case 8:
+        { std::stringstream ss; ss << yaw; return ss.str(); }
+    case 9:
+        { std::stringstream ss; ss << roll; return ss.str(); }
     default:
         return "";
     }
@@ -1415,7 +1518,22 @@ void MapBuilding::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         building = std::static_pointer_cast<Building>(ptr);
         break;
     case 4:
-        coordinate = std::static_pointer_cast<Coordinate>(ptr);
+        x = std::stof(text.string());
+        break;
+    case 5:
+        y = std::stof(text.string());
+        break;
+    case 6:
+        z = std::stof(text.string());
+        break;
+    case 7:
+        pitch = std::stof(text.string());
+        break;
+    case 8:
+        yaw = std::stof(text.string());
+        break;
+    case 9:
+        roll = std::stof(text.string());
         break;
     default:
         break;
@@ -1466,16 +1584,31 @@ QTreeWidgetItem *MapBuilding::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text MapBuilding::getName() const
 {
-    return to_string(building);
+    Text n;
+    n = to_string(building);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    n = to_string(building);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool MapBuilding::operator==(const MapBuilding &rhs) const
 {
     return
         building == rhs.building &&
-        coordinate == rhs.coordinate &&
         map == rhs.map &&
+        pitch == rhs.pitch &&
+        roll == rhs.roll &&
         text_id == rhs.text_id &&
+        x == rhs.x &&
+        y == rhs.y &&
+        yaw == rhs.yaw &&
+        z == rhs.z &&
         1;
 }
 
@@ -1491,11 +1624,23 @@ Text MapObject::getVariableString(int columnId) const
     case 0:
         return to_string(id);
     case 1:
-        return to_string(map);
+        return to_string(text_id);
     case 2:
-        return to_string(object);
+        return to_string(map);
     case 3:
-        return to_string(coordinate);
+        return to_string(object);
+    case 4:
+        { std::stringstream ss; ss << x; return ss.str(); }
+    case 5:
+        { std::stringstream ss; ss << y; return ss.str(); }
+    case 6:
+        { std::stringstream ss; ss << z; return ss.str(); }
+    case 7:
+        { std::stringstream ss; ss << pitch; return ss.str(); }
+    case 8:
+        { std::stringstream ss; ss << yaw; return ss.str(); }
+    case 9:
+        { std::stringstream ss; ss << roll; return ss.str(); }
     default:
         return "";
     }
@@ -1510,13 +1655,31 @@ void MapObject::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         id = std::stoi(text.string());
         break;
     case 1:
-        map = std::static_pointer_cast<Map>(ptr);
+        text_id = text.string();
         break;
     case 2:
-        object = std::static_pointer_cast<Object>(ptr);
+        map = std::static_pointer_cast<Map>(ptr);
         break;
     case 3:
-        coordinate = std::static_pointer_cast<Coordinate>(ptr);
+        object = std::static_pointer_cast<Object>(ptr);
+        break;
+    case 4:
+        x = std::stof(text.string());
+        break;
+    case 5:
+        y = std::stof(text.string());
+        break;
+    case 6:
+        z = std::stof(text.string());
+        break;
+    case 7:
+        pitch = std::stof(text.string());
+        break;
+    case 8:
+        yaw = std::stof(text.string());
+        break;
+    case 9:
+        roll = std::stof(text.string());
         break;
     default:
         break;
@@ -1536,15 +1699,28 @@ QTreeWidgetItem *MapObject::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text MapObject::getName() const
 {
-    return to_string(object);
+    Text n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    n = to_string(object);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool MapObject::operator==(const MapObject &rhs) const
 {
     return
-        coordinate == rhs.coordinate &&
         map == rhs.map &&
         object == rhs.object &&
+        pitch == rhs.pitch &&
+        roll == rhs.roll &&
+        text_id == rhs.text_id &&
+        x == rhs.x &&
+        y == rhs.y &&
+        yaw == rhs.yaw &&
+        z == rhs.z &&
         1;
 }
 
@@ -1647,7 +1823,14 @@ QTreeWidgetItem *Map::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Map::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Map::operator==(const Map &rhs) const
@@ -1717,7 +1900,14 @@ QTreeWidgetItem *MechanoidGroup::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text MechanoidGroup::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool MechanoidGroup::operator==(const MechanoidGroup &rhs) const
@@ -1766,7 +1956,17 @@ Text Mechanoid::getVariableString(int columnId) const
     case 13:
         return to_string(mapBuilding);
     case 14:
-        return to_string(coordinate);
+        { std::stringstream ss; ss << x; return ss.str(); }
+    case 15:
+        { std::stringstream ss; ss << y; return ss.str(); }
+    case 16:
+        { std::stringstream ss; ss << z; return ss.str(); }
+    case 17:
+        { std::stringstream ss; ss << pitch; return ss.str(); }
+    case 18:
+        { std::stringstream ss; ss << yaw; return ss.str(); }
+    case 19:
+        { std::stringstream ss; ss << roll; return ss.str(); }
     default:
         return "";
     }
@@ -1820,7 +2020,22 @@ void Mechanoid::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         mapBuilding = std::static_pointer_cast<MapBuilding>(ptr);
         break;
     case 14:
-        coordinate = std::static_pointer_cast<Coordinate>(ptr);
+        x = std::stof(text.string());
+        break;
+    case 15:
+        y = std::stof(text.string());
+        break;
+    case 16:
+        z = std::stof(text.string());
+        break;
+    case 17:
+        pitch = std::stof(text.string());
+        break;
+    case 18:
+        yaw = std::stof(text.string());
+        break;
+    case 19:
+        roll = std::stof(text.string());
         break;
     default:
         break;
@@ -1840,7 +2055,14 @@ QTreeWidgetItem *Mechanoid::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Mechanoid::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Mechanoid::operator==(const Mechanoid &rhs) const
@@ -1848,18 +2070,23 @@ bool Mechanoid::operator==(const Mechanoid &rhs) const
     return
         clan == rhs.clan &&
         configuration == rhs.configuration &&
-        coordinate == rhs.coordinate &&
         generation == rhs.generation &&
         mapBuilding == rhs.mapBuilding &&
         map == rhs.map &&
         mechanoidGroup == rhs.mechanoidGroup &&
         money == rhs.money &&
         name == rhs.name &&
+        pitch == rhs.pitch &&
         rating == rhs.rating &&
         rating_courier == rhs.rating_courier &&
         rating_fight == rhs.rating_fight &&
         rating_trade == rhs.rating_trade &&
+        roll == rhs.roll &&
         text_id == rhs.text_id &&
+        x == rhs.x &&
+        y == rhs.y &&
+        yaw == rhs.yaw &&
+        z == rhs.z &&
         1;
 }
 
@@ -1910,7 +2137,11 @@ QTreeWidgetItem *ModificationClan::printQtTreeView(QTreeWidgetItem *parent) cons
 
 Text ModificationClan::getName() const
 {
-    return to_string(clan);
+    Text n;
+    n = to_string(clan);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool ModificationClan::operator==(const ModificationClan &rhs) const
@@ -1968,7 +2199,11 @@ QTreeWidgetItem *ModificationMap::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text ModificationMap::getName() const
 {
-    return to_string(map);
+    Text n;
+    n = to_string(map);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool ModificationMap::operator==(const ModificationMap &rhs) const
@@ -2026,7 +2261,11 @@ QTreeWidgetItem *ModificationMechanoid::printQtTreeView(QTreeWidgetItem *parent)
 
 Text ModificationMechanoid::getName() const
 {
-    return to_string(mechanoid);
+    Text n;
+    n = to_string(mechanoid);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool ModificationMechanoid::operator==(const ModificationMechanoid &rhs) const
@@ -2150,7 +2389,11 @@ QTreeWidgetItem *Modification::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Modification::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Modification::operator==(const Modification &rhs) const
@@ -2252,7 +2495,14 @@ QTreeWidgetItem *Modificator::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Modificator::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Modificator::operator==(const Modificator &rhs) const
@@ -2331,7 +2581,14 @@ QTreeWidgetItem *Object::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Object::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Object::operator==(const Object &rhs) const
@@ -2391,7 +2648,11 @@ QTreeWidgetItem *Player::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Player::getName() const
 {
-    return to_string(mechanoid);
+    Text n;
+    n = to_string(mechanoid);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Player::operator==(const Player &rhs) const
@@ -2488,7 +2749,14 @@ QTreeWidgetItem *Projectile::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Projectile::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Projectile::operator==(const Projectile &rhs) const
@@ -2558,7 +2826,11 @@ QTreeWidgetItem *QuestRewardEquipment::printQtTreeView(QTreeWidgetItem *parent) 
 
 Text QuestRewardEquipment::getName() const
 {
-    return to_string(equipment);
+    Text n;
+    n = to_string(equipment);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool QuestRewardEquipment::operator==(const QuestRewardEquipment &rhs) const
@@ -2622,7 +2894,11 @@ QTreeWidgetItem *QuestRewardGlider::printQtTreeView(QTreeWidgetItem *parent) con
 
 Text QuestRewardGlider::getName() const
 {
-    return to_string(glider);
+    Text n;
+    n = to_string(glider);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool QuestRewardGlider::operator==(const QuestRewardGlider &rhs) const
@@ -2686,7 +2962,11 @@ QTreeWidgetItem *QuestRewardGood::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text QuestRewardGood::getName() const
 {
-    return to_string(good);
+    Text n;
+    n = to_string(good);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool QuestRewardGood::operator==(const QuestRewardGood &rhs) const
@@ -2750,7 +3030,11 @@ QTreeWidgetItem *QuestRewardModificator::printQtTreeView(QTreeWidgetItem *parent
 
 Text QuestRewardModificator::getName() const
 {
-    return to_string(modificator);
+    Text n;
+    n = to_string(modificator);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool QuestRewardModificator::operator==(const QuestRewardModificator &rhs) const
@@ -2814,7 +3098,11 @@ QTreeWidgetItem *QuestRewardProjectile::printQtTreeView(QTreeWidgetItem *parent)
 
 Text QuestRewardProjectile::getName() const
 {
-    return to_string(projectile);
+    Text n;
+    n = to_string(projectile);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool QuestRewardProjectile::operator==(const QuestRewardProjectile &rhs) const
@@ -2878,7 +3166,11 @@ QTreeWidgetItem *QuestRewardReputation::printQtTreeView(QTreeWidgetItem *parent)
 
 Text QuestRewardReputation::getName() const
 {
-    return to_string(reputation);
+    Text n;
+    n = to_string(reputation);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool QuestRewardReputation::operator==(const QuestRewardReputation &rhs) const
@@ -2942,7 +3234,11 @@ QTreeWidgetItem *QuestRewardWeapon::printQtTreeView(QTreeWidgetItem *parent) con
 
 Text QuestRewardWeapon::getName() const
 {
-    return to_string(weapon);
+    Text n;
+    n = to_string(weapon);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool QuestRewardWeapon::operator==(const QuestRewardWeapon &rhs) const
@@ -3052,7 +3348,14 @@ QTreeWidgetItem *QuestReward::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text QuestReward::getName() const
 {
-    return to_string(quest);
+    Text n;
+    n = to_string(quest);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool QuestReward::operator==(const QuestReward &rhs) const
@@ -3139,7 +3442,14 @@ QTreeWidgetItem *Quest::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Quest::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Quest::operator==(const Quest &rhs) const
@@ -3169,7 +3479,17 @@ Text SaveObject::getVariableString(int columnId) const
     case 2:
         return to_string(map);
     case 3:
-        return to_string(coordinate);
+        { std::stringstream ss; ss << x; return ss.str(); }
+    case 4:
+        { std::stringstream ss; ss << y; return ss.str(); }
+    case 5:
+        { std::stringstream ss; ss << z; return ss.str(); }
+    case 6:
+        { std::stringstream ss; ss << pitch; return ss.str(); }
+    case 7:
+        { std::stringstream ss; ss << yaw; return ss.str(); }
+    case 8:
+        { std::stringstream ss; ss << roll; return ss.str(); }
     default:
         return "";
     }
@@ -3190,7 +3510,22 @@ void SaveObject::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         map = std::static_pointer_cast<Map>(ptr);
         break;
     case 3:
-        coordinate = std::static_pointer_cast<Coordinate>(ptr);
+        x = std::stof(text.string());
+        break;
+    case 4:
+        y = std::stof(text.string());
+        break;
+    case 5:
+        z = std::stof(text.string());
+        break;
+    case 6:
+        pitch = std::stof(text.string());
+        break;
+    case 7:
+        yaw = std::stof(text.string());
+        break;
+    case 8:
+        roll = std::stof(text.string());
         break;
     default:
         break;
@@ -3210,16 +3545,25 @@ QTreeWidgetItem *SaveObject::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text SaveObject::getName() const
 {
-    return to_string(object);
+    Text n;
+    n = to_string(object);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool SaveObject::operator==(const SaveObject &rhs) const
 {
     return
-        coordinate == rhs.coordinate &&
         map == rhs.map &&
         object == rhs.object &&
+        pitch == rhs.pitch &&
+        roll == rhs.roll &&
         save == rhs.save &&
+        x == rhs.x &&
+        y == rhs.y &&
+        yaw == rhs.yaw &&
+        z == rhs.z &&
         1;
 }
 
@@ -3270,7 +3614,11 @@ QTreeWidgetItem *SavePlayer::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text SavePlayer::getName() const
 {
-    return to_string(player);
+    Text n;
+    n = to_string(player);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool SavePlayer::operator==(const SavePlayer &rhs) const
@@ -3333,7 +3681,11 @@ QTreeWidgetItem *SaveQuest::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text SaveQuest::getName() const
 {
-    return to_string(quest);
+    Text n;
+    n = to_string(quest);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool SaveQuest::operator==(const SaveQuest &rhs) const
@@ -3423,7 +3775,11 @@ QTreeWidgetItem *Save::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Save::getName() const
 {
-    return name;
+    Text n;
+    n = name;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Save::operator==(const Save &rhs) const
@@ -3487,7 +3843,14 @@ QTreeWidgetItem *ScriptVariable::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text ScriptVariable::getName() const
 {
-    return variable;
+    Text n;
+    n = variable;
+    if (!n.empty())
+        return n;
+    n = to_string(variable);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool ScriptVariable::operator==(const ScriptVariable &rhs) const
@@ -3668,7 +4031,14 @@ QTreeWidgetItem *Weapon::printQtTreeView(QTreeWidgetItem *parent) const
 
 Text Weapon::getName() const
 {
-    return to_string(name);
+    Text n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool Weapon::operator==(const Weapon &rhs) const

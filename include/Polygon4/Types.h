@@ -25,6 +25,8 @@
 #include <stdint.h>
 #include <sstream>
 #include <vector>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "String.h"
 
@@ -56,10 +58,10 @@ template <typename T>
 using CVector = std::vector<T>;
 
 template <typename T>
-using CSet = std::set<T>;
+using CSet = std::unordered_set<T>;
 
 template <typename T>
-using CMap = std::map<int, T>;
+using CMap = std::unordered_map<int, T>;
 
 template <typename T>
 struct IdPtr
@@ -106,7 +108,7 @@ inline Text to_string(IdPtr<T> ptr)
 {
     if (ptr.ptr)
         return to_string(ptr.ptr->getName());
-    return POLYGON4_NONAME;
+    return Text();
 }
 
 class Coordinate;

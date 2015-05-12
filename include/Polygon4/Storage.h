@@ -29,7 +29,7 @@ namespace polygon4
 namespace detail
 {
 
-typedef std::map<Text, Ptr<IObject>> OrderedObjectMap;
+typedef std::multimap<Text, Ptr<IObject>> OrderedObjectMap;
     
 #include "detail/Storage.h"
 

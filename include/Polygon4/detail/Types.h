@@ -499,7 +499,12 @@ public:
     Text text_id;
     IdPtr<Map> map;
     IdPtr<Building> building;
-    IdPtr<Coordinate> coordinate;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float pitch = 0.0f;
+    float yaw = 0.0f;
+    float roll = 0.0f;
 
     CVector<Ptr<MapBuildingEquipment>> equipments;
     CVector<Ptr<MapBuildingGlider>> gliders;
@@ -523,9 +528,15 @@ class MapObject : public IObject
 {
 public:
     int id = 0;
+    Text text_id;
     IdPtr<Map> map;
     IdPtr<Object> object;
-    IdPtr<Coordinate> coordinate;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float pitch = 0.0f;
+    float yaw = 0.0f;
+    float roll = 0.0f;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -602,7 +613,12 @@ public:
     float rating_trade = 0.0f;
     IdPtr<Map> map;
     IdPtr<MapBuilding> mapBuilding;
-    IdPtr<Coordinate> coordinate;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float pitch = 0.0f;
+    float yaw = 0.0f;
+    float roll = 0.0f;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -966,7 +982,12 @@ public:
     IdPtr<Save> save;
     IdPtr<Object> object;
     IdPtr<Map> map;
-    IdPtr<Coordinate> coordinate;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float pitch = 0.0f;
+    float yaw = 0.0f;
+    float roll = 0.0f;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;

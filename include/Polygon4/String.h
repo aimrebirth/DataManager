@@ -23,7 +23,11 @@
 
 #include <codecvt>
 #include <locale>
-#include <string> 
+#include <string>
+
+#ifdef USE_QT
+#include <qstring.h>
+#endif
 
 inline std::wstring to_wstring(std::string s)
 {
@@ -143,6 +147,12 @@ public:
     {
         return (wchar_t *)data.get();
     }
+#ifdef USE_QT
+    operator QString() const
+    {
+        return QString::fromStdWString(*this);
+    }
+#endif
 
     bool empty() const
     {

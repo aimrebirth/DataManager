@@ -127,7 +127,6 @@ void retranslateFieldNames()
         { "comment", QCoreApplication::translate("DB", "comment") },
         { "configuration_id", QCoreApplication::translate("DB", "configuration_id") },
         { "cooperative_player_configuration_id", QCoreApplication::translate("DB", "cooperative_player_configuration_id") },
-        { "coordinate_id", QCoreApplication::translate("DB", "coordinate_id") },
         { "damage", QCoreApplication::translate("DB", "damage") },
         { "date", QCoreApplication::translate("DB", "date") },
         { "date_created", QCoreApplication::translate("DB", "date_created") },
