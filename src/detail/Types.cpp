@@ -93,7 +93,7 @@ Text ClanReputation::getVariableString(int columnId) const
     case 1:
         return to_string(clan2);
     case 2:
-        { std::stringstream ss; ss << reputation; return ss.str(); }
+        return to_string(reputation);
     default:
         return "";
     }
@@ -613,17 +613,17 @@ Text Coordinate::getVariableString(int columnId) const
     case 0:
         return to_string(id);
     case 1:
-        { std::stringstream ss; ss << x; return ss.str(); }
+        return to_string(x);
     case 2:
-        { std::stringstream ss; ss << y; return ss.str(); }
+        return to_string(y);
     case 3:
-        { std::stringstream ss; ss << z; return ss.str(); }
+        return to_string(z);
     case 4:
-        { std::stringstream ss; ss << pitch; return ss.str(); }
+        return to_string(pitch);
     case 5:
-        { std::stringstream ss; ss << yaw; return ss.str(); }
+        return to_string(yaw);
     case 6:
-        { std::stringstream ss; ss << roll; return ss.str(); }
+        return to_string(roll);
     default:
         return "";
     }
@@ -714,21 +714,21 @@ Text Equipment::getVariableString(int columnId) const
     case 5:
         return to_string(standard);
     case 6:
-        { std::stringstream ss; ss << weight; return ss.str(); }
+        return to_string(weight);
     case 7:
-        { std::stringstream ss; ss << durability; return ss.str(); }
+        return to_string(durability);
     case 8:
-        { std::stringstream ss; ss << power; return ss.str(); }
+        return to_string(power);
     case 9:
-        { std::stringstream ss; ss << value1; return ss.str(); }
+        return to_string(value1);
     case 10:
-        { std::stringstream ss; ss << value2; return ss.str(); }
+        return to_string(value2);
     case 11:
-        { std::stringstream ss; ss << value3; return ss.str(); }
+        return to_string(value3);
     case 12:
         return to_string(manual);
     case 13:
-        { std::stringstream ss; ss << price; return ss.str(); }
+        return to_string(price);
     case 14:
         return to_string(notrade);
     default:
@@ -854,19 +854,19 @@ Text Glider::getVariableString(int columnId) const
     case 4:
         return to_string(standard);
     case 5:
-        { std::stringstream ss; ss << weight; return ss.str(); }
+        return to_string(weight);
     case 6:
-        { std::stringstream ss; ss << maxweight; return ss.str(); }
+        return to_string(maxweight);
     case 7:
-        { std::stringstream ss; ss << rotatespeed; return ss.str(); }
+        return to_string(rotatespeed);
     case 8:
-        { std::stringstream ss; ss << armor; return ss.str(); }
+        return to_string(armor);
     case 9:
         return to_string(price);
     case 10:
-        { std::stringstream ss; ss << restore; return ss.str(); }
+        return to_string(restore);
     case 11:
-        { std::stringstream ss; ss << power; return ss.str(); }
+        return to_string(power);
     case 12:
         return to_string(special);
     default:
@@ -986,7 +986,7 @@ Text Good::getVariableString(int columnId) const
     case 5:
         return to_string(notrade);
     case 6:
-        { std::stringstream ss; ss << weight; return ss.str(); }
+        return to_string(weight);
     default:
         return "";
     }
@@ -1484,17 +1484,17 @@ Text MapBuilding::getVariableString(int columnId) const
     case 3:
         return to_string(building);
     case 4:
-        { std::stringstream ss; ss << x; return ss.str(); }
+        return to_string(x);
     case 5:
-        { std::stringstream ss; ss << y; return ss.str(); }
+        return to_string(y);
     case 6:
-        { std::stringstream ss; ss << z; return ss.str(); }
+        return to_string(z);
     case 7:
-        { std::stringstream ss; ss << pitch; return ss.str(); }
+        return to_string(pitch);
     case 8:
-        { std::stringstream ss; ss << yaw; return ss.str(); }
+        return to_string(yaw);
     case 9:
-        { std::stringstream ss; ss << roll; return ss.str(); }
+        return to_string(roll);
     default:
         return "";
     }
@@ -1630,17 +1630,17 @@ Text MapObject::getVariableString(int columnId) const
     case 3:
         return to_string(object);
     case 4:
-        { std::stringstream ss; ss << x; return ss.str(); }
+        return to_string(x);
     case 5:
-        { std::stringstream ss; ss << y; return ss.str(); }
+        return to_string(y);
     case 6:
-        { std::stringstream ss; ss << z; return ss.str(); }
+        return to_string(z);
     case 7:
-        { std::stringstream ss; ss << pitch; return ss.str(); }
+        return to_string(pitch);
     case 8:
-        { std::stringstream ss; ss << yaw; return ss.str(); }
+        return to_string(yaw);
     case 9:
-        { std::stringstream ss; ss << roll; return ss.str(); }
+        return to_string(roll);
     default:
         return "";
     }
@@ -1742,17 +1742,17 @@ Text Map::getVariableString(int columnId) const
     case 3:
         return to_string(name);
     case 4:
-        { std::stringstream ss; ss << x_k; return ss.str(); }
+        return to_string(x_k);
     case 5:
-        { std::stringstream ss; ss << x_b; return ss.str(); }
+        return to_string(x_b);
     case 6:
-        { std::stringstream ss; ss << y_k; return ss.str(); }
+        return to_string(y_k);
     case 7:
-        { std::stringstream ss; ss << y_b; return ss.str(); }
+        return to_string(y_b);
     case 8:
-        { std::stringstream ss; ss << z_k; return ss.str(); }
+        return to_string(z_k);
     case 9:
-        { std::stringstream ss; ss << z_b; return ss.str(); }
+        return to_string(z_b);
     default:
         return "";
     }
@@ -1936,9 +1936,9 @@ Text Mechanoid::getVariableString(int columnId) const
     case 3:
         return to_string(generation);
     case 4:
-        { std::stringstream ss; ss << rating; return ss.str(); }
+        return to_string(rating);
     case 5:
-        { std::stringstream ss; ss << money; return ss.str(); }
+        return to_string(money);
     case 6:
         return to_string(configuration);
     case 7:
@@ -1946,27 +1946,27 @@ Text Mechanoid::getVariableString(int columnId) const
     case 8:
         return to_string(clan);
     case 9:
-        { std::stringstream ss; ss << rating_fight; return ss.str(); }
+        return to_string(rating_fight);
     case 10:
-        { std::stringstream ss; ss << rating_courier; return ss.str(); }
+        return to_string(rating_courier);
     case 11:
-        { std::stringstream ss; ss << rating_trade; return ss.str(); }
+        return to_string(rating_trade);
     case 12:
         return to_string(map);
     case 13:
         return to_string(mapBuilding);
     case 14:
-        { std::stringstream ss; ss << x; return ss.str(); }
+        return to_string(x);
     case 15:
-        { std::stringstream ss; ss << y; return ss.str(); }
+        return to_string(y);
     case 16:
-        { std::stringstream ss; ss << z; return ss.str(); }
+        return to_string(z);
     case 17:
-        { std::stringstream ss; ss << pitch; return ss.str(); }
+        return to_string(pitch);
     case 18:
-        { std::stringstream ss; ss << yaw; return ss.str(); }
+        return to_string(yaw);
     case 19:
-        { std::stringstream ss; ss << roll; return ss.str(); }
+        return to_string(roll);
     default:
         return "";
     }
@@ -2300,7 +2300,7 @@ Text Modification::getVariableString(int columnId) const
     case 6:
         return to_string(comment);
     case 7:
-        { std::stringstream ss; ss << version; return ss.str(); }
+        return to_string(version);
     case 8:
         return to_string(script_language);
     case 9:
@@ -2431,15 +2431,15 @@ Text Modificator::getVariableString(int columnId) const
     case 3:
         return to_string(name);
     case 4:
-        { std::stringstream ss; ss << probability; return ss.str(); }
+        return to_string(probability);
     case 5:
-        { std::stringstream ss; ss << price; return ss.str(); }
+        return to_string(price);
     case 6:
-        { std::stringstream ss; ss << k_price; return ss.str(); }
+        return to_string(k_price);
     case 7:
-        { std::stringstream ss; ss << k_param1; return ss.str(); }
+        return to_string(k_param1);
     case 8:
-        { std::stringstream ss; ss << k_param2; return ss.str(); }
+        return to_string(k_param2);
     default:
         return "";
     }
@@ -2682,13 +2682,13 @@ Text Projectile::getVariableString(int columnId) const
     case 4:
         return to_string(type);
     case 5:
-        { std::stringstream ss; ss << weight; return ss.str(); }
+        return to_string(weight);
     case 6:
-        { std::stringstream ss; ss << damage; return ss.str(); }
+        return to_string(damage);
     case 7:
-        { std::stringstream ss; ss << speed; return ss.str(); }
+        return to_string(speed);
     case 8:
-        { std::stringstream ss; ss << scale; return ss.str(); }
+        return to_string(scale);
     case 9:
         return to_string(notrade);
     default:
@@ -3128,7 +3128,7 @@ Text QuestRewardReputation::getVariableString(int columnId) const
     case 1:
         return to_string(clan);
     case 2:
-        { std::stringstream ss; ss << reputation; return ss.str(); }
+        return to_string(reputation);
     default:
         return "";
     }
@@ -3268,7 +3268,7 @@ Text QuestReward::getVariableString(int columnId) const
     case 3:
         return to_string(money);
     case 4:
-        { std::stringstream ss; ss << rating; return ss.str(); }
+        return to_string(rating);
     default:
         return "";
     }
@@ -3479,17 +3479,17 @@ Text SaveObject::getVariableString(int columnId) const
     case 2:
         return to_string(map);
     case 3:
-        { std::stringstream ss; ss << x; return ss.str(); }
+        return to_string(x);
     case 4:
-        { std::stringstream ss; ss << y; return ss.str(); }
+        return to_string(y);
     case 5:
-        { std::stringstream ss; ss << z; return ss.str(); }
+        return to_string(z);
     case 6:
-        { std::stringstream ss; ss << pitch; return ss.str(); }
+        return to_string(pitch);
     case 7:
-        { std::stringstream ss; ss << yaw; return ss.str(); }
+        return to_string(yaw);
     case 8:
-        { std::stringstream ss; ss << roll; return ss.str(); }
+        return to_string(roll);
     default:
         return "";
     }
@@ -3956,15 +3956,15 @@ Text Weapon::getVariableString(int columnId) const
     case 5:
         return to_string(standard);
     case 6:
-        { std::stringstream ss; ss << weight; return ss.str(); }
+        return to_string(weight);
     case 7:
-        { std::stringstream ss; ss << power; return ss.str(); }
+        return to_string(power);
     case 8:
-        { std::stringstream ss; ss << firerate; return ss.str(); }
+        return to_string(firerate);
     case 9:
-        { std::stringstream ss; ss << damage; return ss.str(); }
+        return to_string(damage);
     case 10:
-        { std::stringstream ss; ss << price; return ss.str(); }
+        return to_string(price);
     case 11:
         return to_string(projectile);
     default:

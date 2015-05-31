@@ -58,10 +58,10 @@ template <typename T>
 using CVector = std::vector<T>;
 
 template <typename T>
-using CSet = std::unordered_set<T>;
+using CSet = std::set<T>;
 
 template <typename T>
-using CMap = std::unordered_map<int, T>;
+using CMap = std::map<int, T>;
 
 template <typename T>
 struct IdPtr
