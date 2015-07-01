@@ -80,7 +80,7 @@ public:
     {
         copy(s.c_str(), s.size() + 1, 2);
     }
-    String &String::operator=(const char *s)
+    String &operator=(const char *s)
     {
         if (s)
             copy(s, strlen(s) + 1);
@@ -88,7 +88,7 @@ public:
             clear();
         return *this;
     }
-    String &String::operator=(const wchar_t *s)
+    String &operator=(const wchar_t *s)
     {
         if (s)
             copy(s, wcslen(s) + 1, 2);
@@ -96,12 +96,12 @@ public:
             clear();
         return *this;
     }
-    String &String::operator=(const std::string &s)
+    String &operator=(const std::string &s)
     {
         copy(s.c_str(), s.size() + 1);
         return *this;
     }
-    String &String::operator=(const std::wstring &s)
+    String &operator=(const std::wstring &s)
     {
         copy(s.c_str(), s.size() + 1, 2);
         return *this;
