@@ -47,6 +47,7 @@ Database::Database(std::string dbname)
 {
     loadDatabase(dbname);
     name = dbname.substr(std::max((int)dbname.rfind("/"), (int)dbname.rfind("\\")) + 1);
+    fullName = dbname;
 }
 
 Database::~Database()
@@ -96,6 +97,11 @@ void Database::execute(const std::string &sql, void *object, DatabaseCallback ca
 std::string Database::getName() const
 {
     return name;
+}
+
+std::string Database::getFullName() const
+{
+    return fullName;
 }
 
 void Database::getSchema(DatabaseSchema *schema)

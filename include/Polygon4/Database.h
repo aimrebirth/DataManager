@@ -38,13 +38,16 @@ public:
     void loadDatabase(std::string dbname);
     bool isLoaded() const;
     void getSchema(DatabaseSchema *schema);
+
     std::string getName() const;
+    std::string Database::getFullName() const;
 
     void execute(const std::string &sql, void *object, DatabaseCallback callback, bool nothrow = false, std::string *errmsg = 0);
 
 private:
     sqlite3 *db = 0;
     std::string name;
+    std::string fullName;
 };
 
 }
