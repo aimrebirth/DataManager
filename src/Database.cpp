@@ -128,6 +128,11 @@ std::string Database::getName() const
     return name;
 }
 
+std::string Database::getFullName() const
+{
+    return fullName;
+}
+
 void Database::getSchema(DatabaseSchema *schema) const
 {
     if (schema == 0)

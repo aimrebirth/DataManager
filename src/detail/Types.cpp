@@ -302,12 +302,12 @@ QTreeWidgetItem *Clan::printQtTreeView(QTreeWidgetItem *parent) const
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Mechanoids")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Clan));
-    for (auto &mechanoids : mechanoids)
+    for (auto &mechanoid : mechanoids)
         mechanoid->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Reputations")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Clan));
-    for (auto &reputations : reputations)
+    for (auto &reputation : reputations)
         reputation->printQtTreeView(root);
 
     item->sortChildren(0, Qt::AscendingOrder);
@@ -724,22 +724,22 @@ QTreeWidgetItem *Configuration::printQtTreeView(QTreeWidgetItem *parent) const
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Equipments")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Configuration));
-    for (auto &equipments : equipments)
+    for (auto &equipment : equipments)
         equipment->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Configuration));
-    for (auto &goods : goods)
+    for (auto &good : goods)
         good->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Projectiles")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Configuration));
-    for (auto &projectiles : projectiles)
+    for (auto &projectile : projectiles)
         projectile->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Weapons")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Configuration));
-    for (auto &weapons : weapons)
+    for (auto &weapon : weapons)
         weapon->printQtTreeView(root);
 
     item->sortChildren(0, Qt::AscendingOrder);
@@ -1317,7 +1317,7 @@ QTreeWidgetItem *Group::printQtTreeView(QTreeWidgetItem *parent) const
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Mechanoids")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Group));
-    for (auto &mechanoids : mechanoids)
+    for (auto &mechanoid : mechanoids)
         mechanoid->printQtTreeView(root);
 
     item->sortChildren(0, Qt::AscendingOrder);
@@ -1924,32 +1924,32 @@ QTreeWidgetItem *MapBuilding::printQtTreeView(QTreeWidgetItem *parent) const
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Equipments")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
-    for (auto &equipments : equipments)
+    for (auto &equipment : equipments)
         equipment->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Gliders")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
-    for (auto &gliders : gliders)
+    for (auto &glider : gliders)
         glider->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
-    for (auto &goods : goods)
+    for (auto &good : goods)
         good->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Modificators")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
-    for (auto &modificators : modificators)
+    for (auto &modificator : modificators)
         modificator->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Projectiles")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
-    for (auto &projectiles : projectiles)
+    for (auto &projectile : projectiles)
         projectile->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Weapons")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
-    for (auto &weapons : weapons)
+    for (auto &weapon : weapons)
         weapon->printQtTreeView(root);
 
     item->sortChildren(0, Qt::AscendingOrder);
@@ -2246,12 +2246,12 @@ QTreeWidgetItem *Map::printQtTreeView(QTreeWidgetItem *parent) const
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Buildings")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Map));
-    for (auto &buildings : buildings)
+    for (auto &building : buildings)
         building->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Objects")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Map));
-    for (auto &objects : objects)
+    for (auto &object : objects)
         object->printQtTreeView(root);
 
     item->sortChildren(0, Qt::AscendingOrder);
@@ -2521,7 +2521,7 @@ QTreeWidgetItem *Mechanoid::printQtTreeView(QTreeWidgetItem *parent) const
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Quests")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Mechanoid));
-    for (auto &quests : quests)
+    for (auto &quest : quests)
         quest->printQtTreeView(root);
 
     item->sortChildren(0, Qt::AscendingOrder);
@@ -2908,17 +2908,17 @@ QTreeWidgetItem *Modification::printQtTreeView(QTreeWidgetItem *parent) const
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Clans")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Modification));
-    for (auto &clans : clans)
+    for (auto &clan : clans)
         clan->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Maps")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Modification));
-    for (auto &maps : maps)
+    for (auto &map : maps)
         map->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Mechanoids")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Modification));
-    for (auto &mechanoids : mechanoids)
+    for (auto &mechanoid : mechanoids)
         mechanoid->printQtTreeView(root);
 
     item->sortChildren(0, Qt::AscendingOrder);
@@ -4003,37 +4003,37 @@ QTreeWidgetItem *QuestReward::printQtTreeView(QTreeWidgetItem *parent) const
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Equipments")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
-    for (auto &equipments : equipments)
+    for (auto &equipment : equipments)
         equipment->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Gliders")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
-    for (auto &gliders : gliders)
+    for (auto &glider : gliders)
         glider->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
-    for (auto &goods : goods)
+    for (auto &good : goods)
         good->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Modificators")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
-    for (auto &modificators : modificators)
+    for (auto &modificator : modificators)
         modificator->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Projectiles")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
-    for (auto &projectiles : projectiles)
+    for (auto &projectile : projectiles)
         projectile->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Reputations")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
-    for (auto &reputations : reputations)
+    for (auto &reputation : reputations)
         reputation->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Weapons")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
-    for (auto &weapons : weapons)
+    for (auto &weapon : weapons)
         weapon->printQtTreeView(root);
 
     item->sortChildren(0, Qt::AscendingOrder);
@@ -4138,7 +4138,7 @@ QTreeWidgetItem *Quest::printQtTreeView(QTreeWidgetItem *parent) const
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Rewards")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Quest));
-    for (auto &rewards : rewards)
+    for (auto &reward : rewards)
         reward->printQtTreeView(root);
 
     item->sortChildren(0, Qt::AscendingOrder);
