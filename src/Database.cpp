@@ -29,6 +29,8 @@
 #include "Logger.h"
 DECLARE_STATIC_LOGGER(logger, "db");
 
+#define MAX_ERROR_SQL_LENGTH 200
+
 namespace polygon4
 {
 
@@ -82,7 +84,10 @@ bool Database::execute(const std::string &sql, void *object, Sqlite3Callback cal
     sqlite3_exec(db, sql.c_str(), callback, object, &errmsg);
     if (errmsg)
     {
-        error = "Error executing sql statement:\n" + sql + "\nError: " + errmsg;
+        auto s = sql.substr(0, MAX_ERROR_SQL_LENGTH);
+        if (sql.size() > MAX_ERROR_SQL_LENGTH)
+            s += "...";
+        error = "Error executing sql statement:\n" + s + "\nError: " + errmsg;
         sqlite3_free(errmsg);
         LOG_ERROR(logger, error);
         if (nothrow)
@@ -109,7 +114,10 @@ bool Database::execute(const std::string &sql, DatabaseCallback callback, bool n
     sqlite3_exec(db, sql.c_str(), cb, &callback, &errmsg);
     if (errmsg)
     {
-        error = "Error executing sql statement:\n" + sql + "\nError: " + errmsg;
+        auto s = sql.substr(0, MAX_ERROR_SQL_LENGTH);
+        if (sql.size() > MAX_ERROR_SQL_LENGTH)
+            s += "...";
+        error = "Error executing sql statement:\n" + s + "\nError: " + errmsg;
         sqlite3_free(errmsg);
         LOG_ERROR(logger, error);
         if (nothrow)
