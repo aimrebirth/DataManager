@@ -37,7 +37,7 @@ OrderedObjectMap getOrderedMap(const CMap<T> &array)
 {
     OrderedObjectMap map;
     for (auto &v : array)
-        map[v.second->getName()] = v.second;
+        map.insert(std::make_pair(v.second->getName(), v.second));
     return map;
 }
 
@@ -46,7 +46,7 @@ OrderedObjectMap getOrderedMap(const CVector<T> &array)
 {
     OrderedObjectMap map;
     for (auto &v : array)
-        map[v->getName()] = v;
+        map.insert(std::make_pair(v->getName(), v));
     return map;
 }
 

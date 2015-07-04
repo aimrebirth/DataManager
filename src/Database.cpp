@@ -47,6 +47,7 @@ Database::Database(std::string dbname)
 {
     loadDatabase(dbname);
     name = dbname.substr(std::max((int)dbname.rfind("/"), (int)dbname.rfind("\\")) + 1);
+    fullName = dbname;
 }
 
 Database::~Database()
@@ -63,7 +64,7 @@ void Database::loadDatabase(std::string dbname)
     {
         std::string error = "Can't open database file: " + dbname + " error: " + sqlite3_errmsg(db);
         LOG_ERROR(logger, error);
-        throw std::exception(error.c_str());
+        throw std::runtime_error(error.c_str());
     }
     execute("PRAGMA foreign_keys = OFF;", 0, 0); // this can be turned on in the future
 }
@@ -90,7 +91,7 @@ bool Database::execute(const std::string &sql, void *object, Sqlite3Callback cal
                 *err = error;
         }
         else
-            throw std::exception(error.c_str());
+            throw std::runtime_error(error.c_str());
     }
     return error.empty();
 }
@@ -127,7 +128,16 @@ std::string Database::getName() const
     return name;
 }
 
+<<<<<<< HEAD
 void Database::getSchema(DatabaseSchema *schema) const
+=======
+std::string Database::getFullName() const
+{
+    return fullName;
+}
+
+void Database::getSchema(DatabaseSchema *schema)
+>>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
 {
     if (schema == 0)
         return;

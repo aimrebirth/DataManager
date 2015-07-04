@@ -41,6 +41,7 @@ public:
     bool isLoaded() const;
     void getSchema(DatabaseSchema *schema) const;
     std::string getName() const;
+    std::string Database::getFullName() const;
 
     bool execute(const std::string &sql, void *object, Sqlite3Callback callback, bool nothrow = false, std::string *errmsg = 0) const;
     bool execute(const std::string &sql, DatabaseCallback callback, bool nothrow = false, std::string *errmsg = 0) const;
@@ -48,6 +49,7 @@ public:
 private:
     sqlite3 *db = 0;
     std::string name;
+    std::string fullName;
 };
 
 }

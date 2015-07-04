@@ -25,6 +25,8 @@
 #include <stdint.h>
 #include <sstream>
 #include <vector>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "String.h"
 
@@ -106,7 +108,7 @@ inline Text to_string(IdPtr<T> ptr)
 {
     if (ptr.ptr)
         return to_string(ptr.ptr->getName());
-    return POLYGON4_NONAME;
+    return Text();
 }
 
 class Coordinate;

@@ -1048,9 +1048,26 @@ void StorageImpl::_loadMapBuildings()
     auto callback = [this](int ncols, char **cols, char **names)
     {
         Ptr<MapBuilding> mapBuilding = std::make_shared<MapBuilding>();
+<<<<<<< HEAD
         int ret = mapBuilding->loadFromSqlite3(ncols, cols, names);
         mapBuildings[mapBuilding->id] = mapBuilding;
         return ret;
+=======
+        if (cols[0]) mapBuilding->id = std::stoi(cols[0]);
+        if (cols[1]) mapBuilding->text_id = cols[1];
+        if (cols[2]) mapBuilding->map.id = std::stoi(cols[2]);
+        if (cols[3]) mapBuilding->building.id = std::stoi(cols[3]);
+        if (cols[4]) mapBuilding->x = std::stof(cols[4]);
+        if (cols[5]) mapBuilding->y = std::stof(cols[5]);
+        if (cols[6]) mapBuilding->z = std::stof(cols[6]);
+        if (cols[7]) mapBuilding->pitch = std::stof(cols[7]);
+        if (cols[8]) mapBuilding->yaw = std::stof(cols[8]);
+        if (cols[9]) mapBuilding->roll = std::stof(cols[9]);
+
+        Storage *storage = (Storage *)o;
+        storage->mapBuildings[mapBuilding->id] = mapBuilding;
+        return 0;
+>>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     };
     db->execute("select * from MapBuildings;", callback);
 }
@@ -1126,9 +1143,26 @@ void StorageImpl::_loadMapObjects()
     auto callback = [this](int ncols, char **cols, char **names)
     {
         Ptr<MapObject> mapObject = std::make_shared<MapObject>();
+<<<<<<< HEAD
         int ret = mapObject->loadFromSqlite3(ncols, cols, names);
         mapObjects[mapObject->id] = mapObject;
         return ret;
+=======
+        if (cols[0]) mapObject->id = std::stoi(cols[0]);
+        if (cols[1]) mapObject->text_id = cols[1];
+        if (cols[2]) mapObject->map.id = std::stoi(cols[2]);
+        if (cols[3]) mapObject->object.id = std::stoi(cols[3]);
+        if (cols[4]) mapObject->x = std::stof(cols[4]);
+        if (cols[5]) mapObject->y = std::stof(cols[5]);
+        if (cols[6]) mapObject->z = std::stof(cols[6]);
+        if (cols[7]) mapObject->pitch = std::stof(cols[7]);
+        if (cols[8]) mapObject->yaw = std::stof(cols[8]);
+        if (cols[9]) mapObject->roll = std::stof(cols[9]);
+
+        Storage *storage = (Storage *)o;
+        storage->mapObjects[mapObject->id] = mapObject;
+        return 0;
+>>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     };
     db->execute("select * from MapObjects;", callback);
 }
@@ -1170,10 +1204,13 @@ void StorageImpl::_saveMapObjects() const
         query += "'" + std::to_string(mapObject.second->pitch) + "',";
         query += "'" + std::to_string(mapObject.second->yaw) + "',";
         query += "'" + std::to_string(mapObject.second->roll) + "',";
+<<<<<<< HEAD
         query += "'" + std::to_string(mapObject.second->scale) + "',";
         query += "'" + std::to_string(mapObject.second->scale_x) + "',";
         query += "'" + std::to_string(mapObject.second->scale_y) + "',";
         query += "'" + std::to_string(mapObject.second->scale_z) + "',";
+=======
+>>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
         query.resize(query.size() - 1);
         query += "),\n";
     }
@@ -1303,9 +1340,36 @@ void StorageImpl::_loadMechanoids()
     auto callback = [this](int ncols, char **cols, char **names)
     {
         Ptr<Mechanoid> mechanoid = std::make_shared<Mechanoid>();
+<<<<<<< HEAD
         int ret = mechanoid->loadFromSqlite3(ncols, cols, names);
         mechanoids[mechanoid->id] = mechanoid;
         return ret;
+=======
+        if (cols[0]) mechanoid->id = std::stoi(cols[0]);
+        if (cols[1]) mechanoid->text_id = cols[1];
+        if (cols[2]) mechanoid->name.id = std::stoi(cols[2]);
+        if (cols[3]) mechanoid->generation = std::stoi(cols[3]);
+        if (cols[4]) mechanoid->rating = std::stof(cols[4]);
+        if (cols[5]) mechanoid->money = std::stof(cols[5]);
+        if (cols[6]) mechanoid->configuration.id = std::stoi(cols[6]);
+        if (cols[7]) mechanoid->mechanoidGroup.id = std::stoi(cols[7]);
+        if (cols[8]) mechanoid->clan.id = std::stoi(cols[8]);
+        if (cols[9]) mechanoid->rating_fight = std::stof(cols[9]);
+        if (cols[10]) mechanoid->rating_courier = std::stof(cols[10]);
+        if (cols[11]) mechanoid->rating_trade = std::stof(cols[11]);
+        if (cols[12]) mechanoid->map.id = std::stoi(cols[12]);
+        if (cols[13]) mechanoid->mapBuilding.id = std::stoi(cols[13]);
+        if (cols[14]) mechanoid->x = std::stof(cols[14]);
+        if (cols[15]) mechanoid->y = std::stof(cols[15]);
+        if (cols[16]) mechanoid->z = std::stof(cols[16]);
+        if (cols[17]) mechanoid->pitch = std::stof(cols[17]);
+        if (cols[18]) mechanoid->yaw = std::stof(cols[18]);
+        if (cols[19]) mechanoid->roll = std::stof(cols[19]);
+
+        Storage *storage = (Storage *)o;
+        storage->mechanoids[mechanoid->id] = mechanoid;
+        return 0;
+>>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     };
     db->execute("select * from Mechanoids;", callback);
 }
@@ -2290,7 +2354,185 @@ void StorageImpl::_saveQuests() const
     db->execute(query.c_str(), 0, 0);
 }
 
+<<<<<<< HEAD
 void StorageImpl::_loadScriptVariables()
+=======
+void StorageImpl::_loadSaveObjects()
+{
+    auto callback = [](void *o, int ncols, char **cols, char **names)
+    {
+        Ptr<SaveObject> saveObject = std::make_shared<SaveObject>();
+        if (cols[0]) saveObject->save.id = std::stoi(cols[0]);
+        if (cols[1]) saveObject->object.id = std::stoi(cols[1]);
+        if (cols[2]) saveObject->map.id = std::stoi(cols[2]);
+        if (cols[3]) saveObject->x = std::stof(cols[3]);
+        if (cols[4]) saveObject->y = std::stof(cols[4]);
+        if (cols[5]) saveObject->z = std::stof(cols[5]);
+        if (cols[6]) saveObject->pitch = std::stof(cols[6]);
+        if (cols[7]) saveObject->yaw = std::stof(cols[7]);
+        if (cols[8]) saveObject->roll = std::stof(cols[8]);
+
+        Storage *storage = (Storage *)o;
+        storage->saveObjects.push_back(saveObject);
+        return 0;
+    };
+    db->execute("select * from SaveObjects;", this, callback);
+}
+
+void StorageImpl::_loadSaveObjectsPtrs()
+{
+    for (auto &saveObject : saveObjects)
+    {
+        if (saves.find(saveObject->save.id) != saves.end())
+            saveObject->save.ptr = saves[saveObject->save.id];
+        if (objects.find(saveObject->object.id) != objects.end())
+            saveObject->object.ptr = objects[saveObject->object.id];
+        if (maps.find(saveObject->map.id) != maps.end())
+            saveObject->map.ptr = maps[saveObject->map.id];
+    }
+}
+
+void StorageImpl::_loadSaveObjectsArrays()
+{
+}
+
+void StorageImpl::_saveSaveObjects()
+{
+    std::string query;
+    query += "delete from SaveObjects;";
+    db->execute(query.c_str(), 0, 0);
+    query.clear();
+    if (saveObjects.empty())
+        return;
+    query += "insert or replace into SaveObjects values\n";
+    for (auto &saveObject : saveObjects)
+    {
+        query += "(";
+        query += "'" + std::to_string(saveObject->save.id) + "',";
+        query += "'" + std::to_string(saveObject->object.id) + "',";
+        query += "'" + std::to_string(saveObject->map.id) + "',";
+        query += "'" + std::to_string(saveObject->x) + "',";
+        query += "'" + std::to_string(saveObject->y) + "',";
+        query += "'" + std::to_string(saveObject->z) + "',";
+        query += "'" + std::to_string(saveObject->pitch) + "',";
+        query += "'" + std::to_string(saveObject->yaw) + "',";
+        query += "'" + std::to_string(saveObject->roll) + "',";
+        query.resize(query.size() - 1);
+        query += "),\n";
+    }
+    query.resize(query.size() - 2);
+    query += ";";
+    db->execute(query.c_str(), 0, 0);
+}
+
+void StorageImpl::_loadSavePlayers()
+{
+    auto callback = [](void *o, int ncols, char **cols, char **names)
+    {
+        Ptr<SavePlayer> savePlayer = std::make_shared<SavePlayer>();
+        if (cols[0]) savePlayer->save.id = std::stoi(cols[0]);
+        if (cols[1]) savePlayer->player.id = std::stoi(cols[1]);
+
+        Storage *storage = (Storage *)o;
+        storage->savePlayers.push_back(savePlayer);
+        return 0;
+    };
+    db->execute("select * from SavePlayers;", this, callback);
+}
+
+void StorageImpl::_loadSavePlayersPtrs()
+{
+    for (auto &savePlayer : savePlayers)
+    {
+        if (saves.find(savePlayer->save.id) != saves.end())
+            savePlayer->save.ptr = saves[savePlayer->save.id];
+        if (players.find(savePlayer->player.id) != players.end())
+            savePlayer->player.ptr = players[savePlayer->player.id];
+    }
+}
+
+void StorageImpl::_loadSavePlayersArrays()
+{
+}
+
+void StorageImpl::_saveSavePlayers()
+{
+    std::string query;
+    query += "delete from SavePlayers;";
+    db->execute(query.c_str(), 0, 0);
+    query.clear();
+    if (savePlayers.empty())
+        return;
+    query += "insert or replace into SavePlayers values\n";
+    for (auto &savePlayer : savePlayers)
+    {
+        query += "(";
+        query += "'" + std::to_string(savePlayer->save.id) + "',";
+        query += "'" + std::to_string(savePlayer->player.id) + "',";
+        query.resize(query.size() - 1);
+        query += "),\n";
+    }
+    query.resize(query.size() - 2);
+    query += ";";
+    db->execute(query.c_str(), 0, 0);
+}
+
+void StorageImpl::_loadSaveQuests()
+{
+    auto callback = [](void *o, int ncols, char **cols, char **names)
+    {
+        Ptr<SaveQuest> saveQuest = std::make_shared<SaveQuest>();
+        if (cols[0]) saveQuest->save.id = std::stoi(cols[0]);
+        if (cols[1]) saveQuest->quest.id = std::stoi(cols[1]);
+        if (cols[2]) saveQuest->state = std::stoi(cols[2]);
+
+        Storage *storage = (Storage *)o;
+        storage->saveQuests.push_back(saveQuest);
+        return 0;
+    };
+    db->execute("select * from SaveQuests;", this, callback);
+}
+
+void StorageImpl::_loadSaveQuestsPtrs()
+{
+    for (auto &saveQuest : saveQuests)
+    {
+        if (saves.find(saveQuest->save.id) != saves.end())
+            saveQuest->save.ptr = saves[saveQuest->save.id];
+        if (quests.find(saveQuest->quest.id) != quests.end())
+            saveQuest->quest.ptr = quests[saveQuest->quest.id];
+    }
+}
+
+void StorageImpl::_loadSaveQuestsArrays()
+{
+}
+
+void StorageImpl::_saveSaveQuests()
+{
+    std::string query;
+    query += "delete from SaveQuests;";
+    db->execute(query.c_str(), 0, 0);
+    query.clear();
+    if (saveQuests.empty())
+        return;
+    query += "insert or replace into SaveQuests values\n";
+    for (auto &saveQuest : saveQuests)
+    {
+        query += "(";
+        query += "'" + std::to_string(saveQuest->save.id) + "',";
+        query += "'" + std::to_string(saveQuest->quest.id) + "',";
+        query += "'" + std::to_string(saveQuest->state) + "',";
+        query.resize(query.size() - 1);
+        query += "),\n";
+    }
+    query.resize(query.size() - 2);
+    query += ";";
+    db->execute(query.c_str(), 0, 0);
+}
+
+void StorageImpl::_loadSaves()
+>>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
 {
     auto callback = [this](int ncols, char **cols, char **names)
     {
@@ -2820,6 +3062,7 @@ void StorageImpl::load(ProgressCallback callback)
 
 void StorageImpl::save(ProgressCallback callback) const
 {
+<<<<<<< HEAD
     _saveBuildings();
     PROGRESS_CALLBACK(2.173913);
     _saveClanMechanoids();
@@ -2848,6 +3091,60 @@ void StorageImpl::save(ProgressCallback callback) const
     PROGRESS_CALLBACK(28.260870);
     _saveGroups();
     PROGRESS_CALLBACK(30.434783);
+=======
+    _saveStrings();
+    PROGRESS_CALLBACK(2.127660);
+    _saveQuestRewards();
+    PROGRESS_CALLBACK(4.255319);
+    _saveConfigurations();
+    PROGRESS_CALLBACK(6.382979);
+    _saveMaps();
+    PROGRESS_CALLBACK(8.510638);
+    _saveClans();
+    PROGRESS_CALLBACK(10.638298);
+    _saveModifications();
+    PROGRESS_CALLBACK(12.765957);
+    _saveProjectiles();
+    PROGRESS_CALLBACK(14.893617);
+    _saveSaves();
+    PROGRESS_CALLBACK(17.021277);
+    _saveEquipments();
+    PROGRESS_CALLBACK(19.148936);
+    _saveGliders();
+    PROGRESS_CALLBACK(21.276596);
+    _saveGoods();
+    PROGRESS_CALLBACK(23.404255);
+    _saveMechanoids();
+    PROGRESS_CALLBACK(25.531915);
+    _saveWeapons();
+    PROGRESS_CALLBACK(27.659574);
+    _saveModificators();
+    PROGRESS_CALLBACK(29.787234);
+    _saveObjects();
+    PROGRESS_CALLBACK(31.914894);
+    _saveQuests();
+    PROGRESS_CALLBACK(34.042553);
+    _saveBuildings();
+    PROGRESS_CALLBACK(36.170213);
+    _saveMapBuildings();
+    PROGRESS_CALLBACK(38.297872);
+    _saveMechanoidGroups();
+    PROGRESS_CALLBACK(40.425532);
+    _savePlayers();
+    PROGRESS_CALLBACK(42.553191);
+    _saveClanReputations();
+    PROGRESS_CALLBACK(44.680851);
+    _saveConfigurationEquipments();
+    PROGRESS_CALLBACK(46.808511);
+    _saveConfigurationGoods();
+    PROGRESS_CALLBACK(48.936170);
+    _saveConfigurationProjectiles();
+    PROGRESS_CALLBACK(51.063830);
+    _saveConfigurationWeapons();
+    PROGRESS_CALLBACK(53.191489);
+    _saveCoordinates();
+    PROGRESS_CALLBACK(55.319149);
+>>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     _saveMapBuildingEquipments();
     PROGRESS_CALLBACK(32.608696);
     _saveMapBuildingGliders();
