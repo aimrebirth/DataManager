@@ -32,31 +32,6 @@ int gCurrentLocalizationId = 0;
 
 namespace detail
 {
-    
-inline Text to_string(const Coordinate &c)
-{
-    std::wstringstream ss;
-    ss <<
-#ifdef USE_QT
-        QCoreApplication::translate("DB", "Point").toStdWString()
-#else
-        "Point"
-#endif
-        << " (" <<
-        c.x << ", " <<
-        c.y << ", " <<
-        c.z << "), " <<
-#ifdef USE_QT
-        QCoreApplication::translate("DB", "Rotation").toStdWString()
-#else
-        "Rotation"
-#endif
-        << " (" <<
-        c.pitch << ", " <<
-        c.yaw << ", " <<
-        c.roll << ")";
-    return ss.str();
-}
 
 #include "detail/Types.cpp"
 

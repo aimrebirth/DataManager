@@ -13,6 +13,7 @@ namespace detail
 enum class EObjectType : int
 {
     Building,
+    ClanMechanoid,
     ClanReputation,
     Clan,
     ConfigurationEquipment,
@@ -20,10 +21,11 @@ enum class EObjectType : int
     ConfigurationProjectile,
     ConfigurationWeapon,
     Configuration,
-    Coordinate,
     Equipment,
     Glider,
     Good,
+    GroupMechanoid,
+    Group,
     MapBuildingEquipment,
     MapBuildingGlider,
     MapBuildingGood,
@@ -33,7 +35,7 @@ enum class EObjectType : int
     MapBuilding,
     MapObject,
     Map,
-    MechanoidGroup,
+    MechanoidQuest,
     Mechanoid,
     ModificationClan,
     ModificationMap,
@@ -52,16 +54,14 @@ enum class EObjectType : int
     QuestRewardWeapon,
     QuestReward,
     Quest,
-    SaveObject,
-    SavePlayer,
-    SaveQuest,
-    Save,
     ScriptVariable,
+    Setting,
     String,
     Weapon,
 };
 
 class Building;
+class ClanMechanoid;
 class ClanReputation;
 class Clan;
 class ConfigurationEquipment;
@@ -69,10 +69,11 @@ class ConfigurationGood;
 class ConfigurationProjectile;
 class ConfigurationWeapon;
 class Configuration;
-class Coordinate;
 class Equipment;
 class Glider;
 class Good;
+class GroupMechanoid;
+class Group;
 class MapBuildingEquipment;
 class MapBuildingGlider;
 class MapBuildingGood;
@@ -82,7 +83,7 @@ class MapBuildingWeapon;
 class MapBuilding;
 class MapObject;
 class Map;
-class MechanoidGroup;
+class MechanoidQuest;
 class Mechanoid;
 class ModificationClan;
 class ModificationMap;
@@ -101,16 +102,16 @@ class QuestRewardReputation;
 class QuestRewardWeapon;
 class QuestReward;
 class Quest;
-class SaveObject;
-class SavePlayer;
-class SaveQuest;
-class Save;
 class ScriptVariable;
+class Setting;
 class String;
 class Weapon;
 
 class IObject
 {
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
+
 public:
     virtual ~IObject(){}
 
@@ -130,8 +131,9 @@ public:
 
 class Building : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
@@ -145,6 +147,36 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Building &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
+};
+
+class ClanMechanoid : public IObject
+{
+public:
+    IdPtr<Clan> clan;
+    IdPtr<Mechanoid> mechanoid;
+
+    virtual EObjectType getType() const;
+    virtual Text getVariableString(int columnId) const;
+    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
+#ifdef USE_QT
+    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
+#endif
+    virtual Text getName() const;
+
+    bool operator==(const ClanMechanoid &rhs) const;
+    IdPtr<Clan> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class ClanReputation : public IObject
@@ -163,16 +195,25 @@ public:
     virtual Text getName() const;
 
     bool operator==(const ClanReputation &rhs) const;
+    IdPtr<Clan> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Clan : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
 
+    CVector<Ptr<ClanMechanoid>> mechanoids;
     CVector<Ptr<ClanReputation>> reputations;
 
     virtual EObjectType getType() const;
@@ -184,6 +225,12 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Clan &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class ConfigurationEquipment : public IObject
@@ -202,6 +249,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const ConfigurationEquipment &rhs) const;
+    IdPtr<Configuration> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class ConfigurationGood : public IObject
@@ -220,6 +274,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const ConfigurationGood &rhs) const;
+    IdPtr<Configuration> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class ConfigurationProjectile : public IObject
@@ -238,6 +299,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const ConfigurationProjectile &rhs) const;
+    IdPtr<Configuration> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class ConfigurationWeapon : public IObject
@@ -256,12 +324,20 @@ public:
     virtual Text getName() const;
 
     bool operator==(const ConfigurationWeapon &rhs) const;
+    IdPtr<Configuration> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Configuration : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     IdPtr<String> name;
     IdPtr<Glider> glider;
@@ -280,34 +356,19 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Configuration &rhs) const;
-};
 
-class Coordinate : public IObject
-{
-public:
-    int id = 0;
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
-    float pitch = 0.0f;
-    float yaw = 0.0f;
-    float roll = 0.0f;
+private:
+    int loadFromSqlite3(int, char**, char**);
 
-    virtual EObjectType getType() const;
-    virtual Text getVariableString(int columnId) const;
-    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
-#ifdef USE_QT
-    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
-#endif
-    virtual Text getName() const;
-
-    bool operator==(const Coordinate &rhs) const;
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Equipment : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
@@ -332,12 +393,19 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Equipment &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Glider : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
@@ -360,12 +428,19 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Glider &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Good : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
@@ -382,6 +457,63 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Good &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
+};
+
+class GroupMechanoid : public IObject
+{
+public:
+    IdPtr<Group> group;
+    IdPtr<Mechanoid> mechanoid;
+
+    virtual EObjectType getType() const;
+    virtual Text getVariableString(int columnId) const;
+    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
+#ifdef USE_QT
+    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
+#endif
+    virtual Text getName() const;
+
+    bool operator==(const GroupMechanoid &rhs) const;
+    IdPtr<Group> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
+};
+
+class Group : public IObject
+{
+private:
+    int id = 0;
+public:
+    Text text_id;
+    IdPtr<String> name;
+
+    CVector<Ptr<GroupMechanoid>> mechanoids;
+
+    virtual EObjectType getType() const;
+    virtual Text getVariableString(int columnId) const;
+    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
+#ifdef USE_QT
+    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
+#endif
+    virtual Text getName() const;
+
+    bool operator==(const Group &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class MapBuildingEquipment : public IObject
@@ -400,6 +532,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const MapBuildingEquipment &rhs) const;
+    IdPtr<MapBuilding> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class MapBuildingGlider : public IObject
@@ -418,6 +557,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const MapBuildingGlider &rhs) const;
+    IdPtr<MapBuilding> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class MapBuildingGood : public IObject
@@ -436,6 +582,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const MapBuildingGood &rhs) const;
+    IdPtr<MapBuilding> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class MapBuildingModificator : public IObject
@@ -454,6 +607,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const MapBuildingModificator &rhs) const;
+    IdPtr<MapBuilding> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class MapBuildingProjectile : public IObject
@@ -472,6 +632,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const MapBuildingProjectile &rhs) const;
+    IdPtr<MapBuilding> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class MapBuildingWeapon : public IObject
@@ -490,16 +657,29 @@ public:
     virtual Text getName() const;
 
     bool operator==(const MapBuildingWeapon &rhs) const;
+    IdPtr<MapBuilding> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class MapBuilding : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     IdPtr<Map> map;
     IdPtr<Building> building;
-    IdPtr<Coordinate> coordinate;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float pitch = 0.0f;
+    float yaw = 0.0f;
+    float roll = 0.0f;
 
     CVector<Ptr<MapBuildingEquipment>> equipments;
     CVector<Ptr<MapBuildingGlider>> gliders;
@@ -517,15 +697,32 @@ public:
     virtual Text getName() const;
 
     bool operator==(const MapBuilding &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class MapObject : public IObject
 {
-public:
+private:
     int id = 0;
+public:
+    Text text_id;
     IdPtr<Map> map;
     IdPtr<Object> object;
-    IdPtr<Coordinate> coordinate;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float pitch = 0.0f;
+    float yaw = 0.0f;
+    float roll = 0.0f;
+    float scale = 1;
+    float scale_x = 1;
+    float scale_y = 1;
+    float scale_z = 1;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -536,12 +733,19 @@ public:
     virtual Text getName() const;
 
     bool operator==(const MapObject &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Map : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
@@ -551,6 +755,8 @@ public:
     float y_b = 0.0f;
     float z_k = 0.0f;
     float z_b = 0.0f;
+    float h_min = 0.0f;
+    float h_max = 0.0f;
 
     CVector<Ptr<MapBuilding>> buildings;
     CVector<Ptr<MapObject>> objects;
@@ -564,15 +770,20 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Map &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
-class MechanoidGroup : public IObject
+class MechanoidQuest : public IObject
 {
 public:
-    int id = 0;
-    Text text_id;
-    IdPtr<String> name;
-
+    IdPtr<Mechanoid> mechanoid;
+    IdPtr<Quest> quest;
+    int state = 0;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -582,27 +793,42 @@ public:
 #endif
     virtual Text getName() const;
 
-    bool operator==(const MechanoidGroup &rhs) const;
+    bool operator==(const MechanoidQuest &rhs) const;
+    IdPtr<Mechanoid> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Mechanoid : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     IdPtr<String> name;
     int generation = 0;
     float rating = 0.0f;
     float money = 0.0f;
     IdPtr<Configuration> configuration;
-    IdPtr<MechanoidGroup> mechanoidGroup;
+    IdPtr<Group> group;
     IdPtr<Clan> clan;
     float rating_fight = 0.0f;
     float rating_courier = 0.0f;
     float rating_trade = 0.0f;
     IdPtr<Map> map;
     IdPtr<MapBuilding> mapBuilding;
-    IdPtr<Coordinate> coordinate;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float pitch = 0.0f;
+    float yaw = 0.0f;
+    float roll = 0.0f;
+
+    CVector<Ptr<MechanoidQuest>> quests;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -613,6 +839,12 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Mechanoid &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class ModificationClan : public IObject
@@ -630,6 +862,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const ModificationClan &rhs) const;
+    IdPtr<Modification> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class ModificationMap : public IObject
@@ -647,6 +886,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const ModificationMap &rhs) const;
+    IdPtr<Modification> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class ModificationMechanoid : public IObject
@@ -664,12 +910,20 @@ public:
     virtual Text getName() const;
 
     bool operator==(const ModificationMechanoid &rhs) const;
+    IdPtr<Modification> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Modification : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     IdPtr<String> name;
     Text directory;
     Text author;
@@ -695,12 +949,19 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Modification &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Modificator : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
@@ -719,12 +980,19 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Modificator &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Object : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
@@ -739,12 +1007,19 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Object &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Player : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     IdPtr<Mechanoid> mechanoid;
 
     virtual EObjectType getType() const;
@@ -756,12 +1031,19 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Player &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Projectile : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
@@ -781,6 +1063,12 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Projectile &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class QuestRewardEquipment : public IObject
@@ -799,6 +1087,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const QuestRewardEquipment &rhs) const;
+    IdPtr<QuestReward> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class QuestRewardGlider : public IObject
@@ -817,6 +1112,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const QuestRewardGlider &rhs) const;
+    IdPtr<QuestReward> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class QuestRewardGood : public IObject
@@ -835,6 +1137,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const QuestRewardGood &rhs) const;
+    IdPtr<QuestReward> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class QuestRewardModificator : public IObject
@@ -853,6 +1162,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const QuestRewardModificator &rhs) const;
+    IdPtr<QuestReward> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class QuestRewardProjectile : public IObject
@@ -871,6 +1187,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const QuestRewardProjectile &rhs) const;
+    IdPtr<QuestReward> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class QuestRewardReputation : public IObject
@@ -889,6 +1212,13 @@ public:
     virtual Text getName() const;
 
     bool operator==(const QuestRewardReputation &rhs) const;
+    IdPtr<QuestReward> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class QuestRewardWeapon : public IObject
@@ -907,12 +1237,20 @@ public:
     virtual Text getName() const;
 
     bool operator==(const QuestRewardWeapon &rhs) const;
+    IdPtr<QuestReward> operator->() const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class QuestReward : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     IdPtr<Quest> quest;
     Text text_id;
     int money = 0;
@@ -935,12 +1273,19 @@ public:
     virtual Text getName() const;
 
     bool operator==(const QuestReward &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Quest : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     IdPtr<String> name;
     IdPtr<String> title;
@@ -958,91 +1303,17 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Quest &rhs) const;
-};
 
-class SaveObject : public IObject
-{
-public:
-    IdPtr<Save> save;
-    IdPtr<Object> object;
-    IdPtr<Map> map;
-    IdPtr<Coordinate> coordinate;
+private:
+    int loadFromSqlite3(int, char**, char**);
 
-    virtual EObjectType getType() const;
-    virtual Text getVariableString(int columnId) const;
-    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
-#ifdef USE_QT
-    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
-#endif
-    virtual Text getName() const;
-
-    bool operator==(const SaveObject &rhs) const;
-};
-
-class SavePlayer : public IObject
-{
-public:
-    IdPtr<Save> save;
-    IdPtr<Player> player;
-
-    virtual EObjectType getType() const;
-    virtual Text getVariableString(int columnId) const;
-    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
-#ifdef USE_QT
-    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
-#endif
-    virtual Text getName() const;
-
-    bool operator==(const SavePlayer &rhs) const;
-};
-
-class SaveQuest : public IObject
-{
-public:
-    IdPtr<Save> save;
-    IdPtr<Quest> quest;
-    int state = 0;
-
-    virtual EObjectType getType() const;
-    virtual Text getVariableString(int columnId) const;
-    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
-#ifdef USE_QT
-    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
-#endif
-    virtual Text getName() const;
-
-    bool operator==(const SaveQuest &rhs) const;
-};
-
-class Save : public IObject
-{
-public:
-    int id = 0;
-    IdPtr<Modification> modification;
-    Text name;
-    Text date;
-
-    CVector<Ptr<SaveObject>> objects;
-    CVector<Ptr<SavePlayer>> players;
-    CVector<Ptr<SaveQuest>> quests;
-
-    CVector<Ptr<ScriptVariable>> ptVariables;
-
-    virtual EObjectType getType() const;
-    virtual Text getVariableString(int columnId) const;
-    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
-#ifdef USE_QT
-    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
-#endif
-    virtual Text getName() const;
-
-    bool operator==(const Save &rhs) const;
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class ScriptVariable : public IObject
 {
 public:
-    IdPtr<Save> save;
     Text variable;
     Text value;
 
@@ -1055,6 +1326,34 @@ public:
     virtual Text getName() const;
 
     bool operator==(const ScriptVariable &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
+};
+
+class Setting : public IObject
+{
+public:
+    IdPtr<Player> player;
+
+    virtual EObjectType getType() const;
+    virtual Text getVariableString(int columnId) const;
+    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
+#ifdef USE_QT
+    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
+#endif
+    virtual Text getName() const;
+
+    bool operator==(const Setting &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 enum class LocalizationType : EnumType
@@ -1067,8 +1366,9 @@ enum class LocalizationType : EnumType
 
 class String : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text ru;
     Text en;
 
@@ -1081,12 +1381,19 @@ public:
     virtual Text getName() const;
 
     bool operator==(const String &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 class Weapon : public IObject
 {
-public:
+private:
     int id = 0;
+public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
@@ -1108,6 +1415,12 @@ public:
     virtual Text getName() const;
 
     bool operator==(const Weapon &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
 };
 
 }

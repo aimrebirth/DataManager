@@ -73,14 +73,15 @@ bool Database::isLoaded() const
     return db != 0;
 }
 
-void Database::execute(const std::string &sql, void *object, DatabaseCallback callback, bool nothrow, std::string *err)
+bool Database::execute(const std::string &sql, void *object, Sqlite3Callback callback, bool nothrow, std::string *err) const
 {
     LOG_TRACE(logger, "Executing sql statement: " << sql);
     char *errmsg;
+    std::string error;
     sqlite3_exec(db, sql.c_str(), callback, object, &errmsg);
     if (errmsg)
     {
-        std::string error = "Error executing sql statement:\n" + sql + "\nError: " + errmsg;
+        error = "Error executing sql statement:\n" + sql + "\nError: " + errmsg;
         sqlite3_free(errmsg);
         LOG_ERROR(logger, error);
         if (nothrow)
@@ -91,6 +92,34 @@ void Database::execute(const std::string &sql, void *object, DatabaseCallback ca
         else
             throw std::exception(error.c_str());
     }
+    return error.empty();
+}
+
+bool Database::execute(const std::string &sql, DatabaseCallback callback, bool nothrow, std::string *err) const
+{
+    LOG_TRACE(logger, "Executing sql statement: " << sql);
+    char *errmsg;
+    std::string error;
+    auto cb = [](void *o, int ncols, char **cols, char **names)
+    {
+        DatabaseCallback *f = (DatabaseCallback *)o;
+        return (*f)(ncols, cols, names);
+    };
+    sqlite3_exec(db, sql.c_str(), cb, &callback, &errmsg);
+    if (errmsg)
+    {
+        error = "Error executing sql statement:\n" + sql + "\nError: " + errmsg;
+        sqlite3_free(errmsg);
+        LOG_ERROR(logger, error);
+        if (nothrow)
+        {
+            if (errmsg)
+                *err = error;
+        }
+        else
+            throw std::exception(error.c_str());
+    }
+    return error.empty();
 }
 
 std::string Database::getName() const
@@ -98,7 +127,7 @@ std::string Database::getName() const
     return name;
 }
 
-void Database::getSchema(DatabaseSchema *schema)
+void Database::getSchema(DatabaseSchema *schema) const
 {
     if (schema == 0)
         return;

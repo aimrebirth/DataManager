@@ -4,6 +4,7 @@ class Storage
 {
 public:
     CMap<Ptr<Building>> buildings;
+    CVector<Ptr<ClanMechanoid>> clanMechanoids;
     CVector<Ptr<ClanReputation>> clanReputations;
     CMap<Ptr<Clan>> clans;
     CVector<Ptr<ConfigurationEquipment>> configurationEquipments;
@@ -11,10 +12,11 @@ public:
     CVector<Ptr<ConfigurationProjectile>> configurationProjectiles;
     CVector<Ptr<ConfigurationWeapon>> configurationWeapons;
     CMap<Ptr<Configuration>> configurations;
-    CMap<Ptr<Coordinate>> coordinates;
     CMap<Ptr<Equipment>> equipments;
     CMap<Ptr<Glider>> gliders;
     CMap<Ptr<Good>> goods;
+    CVector<Ptr<GroupMechanoid>> groupMechanoids;
+    CMap<Ptr<Group>> groups;
     CVector<Ptr<MapBuildingEquipment>> mapBuildingEquipments;
     CVector<Ptr<MapBuildingGlider>> mapBuildingGliders;
     CVector<Ptr<MapBuildingGood>> mapBuildingGoods;
@@ -24,7 +26,7 @@ public:
     CMap<Ptr<MapBuilding>> mapBuildings;
     CMap<Ptr<MapObject>> mapObjects;
     CMap<Ptr<Map>> maps;
-    CMap<Ptr<MechanoidGroup>> mechanoidGroups;
+    CVector<Ptr<MechanoidQuest>> mechanoidQuests;
     CMap<Ptr<Mechanoid>> mechanoids;
     CVector<Ptr<ModificationClan>> modificationClans;
     CVector<Ptr<ModificationMap>> modificationMaps;
@@ -43,17 +45,15 @@ public:
     CVector<Ptr<QuestRewardWeapon>> questRewardWeapons;
     CMap<Ptr<QuestReward>> questRewards;
     CMap<Ptr<Quest>> quests;
-    CVector<Ptr<SaveObject>> saveObjects;
-    CVector<Ptr<SavePlayer>> savePlayers;
-    CVector<Ptr<SaveQuest>> saveQuests;
-    CMap<Ptr<Save>> saves;
     CVector<Ptr<ScriptVariable>> scriptVariables;
+    CVector<Ptr<Setting>> settings;
     CMap<Ptr<String>> strings;
     CMap<Ptr<Weapon>> weapons;
 
+public:
     virtual void clear() = 0;
     virtual void load(ProgressCallback callback = ProgressCallback()) = 0;
-    virtual void save(ProgressCallback callback = ProgressCallback()) = 0;
+    virtual void save(ProgressCallback callback = ProgressCallback()) const = 0;
 
 #ifdef USE_QT
     virtual void printQtTreeView(QTreeWidgetItem *root) const = 0;
@@ -65,6 +65,8 @@ public:
 
     virtual Ptr<Building> addBuilding(IObject *parent = 0) = 0;
     virtual void deleteBuilding(Building *object) = 0;
+    virtual Ptr<ClanMechanoid> addClanMechanoid(IObject *parent = 0) = 0;
+    virtual void deleteClanMechanoid(ClanMechanoid *object) = 0;
     virtual Ptr<ClanReputation> addClanReputation(IObject *parent = 0) = 0;
     virtual void deleteClanReputation(ClanReputation *object) = 0;
     virtual Ptr<Clan> addClan(IObject *parent = 0) = 0;
@@ -79,14 +81,16 @@ public:
     virtual void deleteConfigurationWeapon(ConfigurationWeapon *object) = 0;
     virtual Ptr<Configuration> addConfiguration(IObject *parent = 0) = 0;
     virtual void deleteConfiguration(Configuration *object) = 0;
-    virtual Ptr<Coordinate> addCoordinate(IObject *parent = 0) = 0;
-    virtual void deleteCoordinate(Coordinate *object) = 0;
     virtual Ptr<Equipment> addEquipment(IObject *parent = 0) = 0;
     virtual void deleteEquipment(Equipment *object) = 0;
     virtual Ptr<Glider> addGlider(IObject *parent = 0) = 0;
     virtual void deleteGlider(Glider *object) = 0;
     virtual Ptr<Good> addGood(IObject *parent = 0) = 0;
     virtual void deleteGood(Good *object) = 0;
+    virtual Ptr<GroupMechanoid> addGroupMechanoid(IObject *parent = 0) = 0;
+    virtual void deleteGroupMechanoid(GroupMechanoid *object) = 0;
+    virtual Ptr<Group> addGroup(IObject *parent = 0) = 0;
+    virtual void deleteGroup(Group *object) = 0;
     virtual Ptr<MapBuildingEquipment> addMapBuildingEquipment(IObject *parent = 0) = 0;
     virtual void deleteMapBuildingEquipment(MapBuildingEquipment *object) = 0;
     virtual Ptr<MapBuildingGlider> addMapBuildingGlider(IObject *parent = 0) = 0;
@@ -105,6 +109,8 @@ public:
     virtual void deleteMapObject(MapObject *object) = 0;
     virtual Ptr<Map> addMap(IObject *parent = 0) = 0;
     virtual void deleteMap(Map *object) = 0;
+    virtual Ptr<MechanoidQuest> addMechanoidQuest(IObject *parent = 0) = 0;
+    virtual void deleteMechanoidQuest(MechanoidQuest *object) = 0;
     virtual Ptr<Mechanoid> addMechanoid(IObject *parent = 0) = 0;
     virtual void deleteMechanoid(Mechanoid *object) = 0;
     virtual Ptr<ModificationClan> addModificationClan(IObject *parent = 0) = 0;
@@ -141,14 +147,10 @@ public:
     virtual void deleteQuestReward(QuestReward *object) = 0;
     virtual Ptr<Quest> addQuest(IObject *parent = 0) = 0;
     virtual void deleteQuest(Quest *object) = 0;
-    virtual Ptr<SaveObject> addSaveObject(IObject *parent = 0) = 0;
-    virtual void deleteSaveObject(SaveObject *object) = 0;
-    virtual Ptr<SavePlayer> addSavePlayer(IObject *parent = 0) = 0;
-    virtual void deleteSavePlayer(SavePlayer *object) = 0;
-    virtual Ptr<SaveQuest> addSaveQuest(IObject *parent = 0) = 0;
-    virtual void deleteSaveQuest(SaveQuest *object) = 0;
-    virtual Ptr<Save> addSave(IObject *parent = 0) = 0;
-    virtual void deleteSave(Save *object) = 0;
+    virtual Ptr<ScriptVariable> addScriptVariable(IObject *parent = 0) = 0;
+    virtual void deleteScriptVariable(ScriptVariable *object) = 0;
+    virtual Ptr<Setting> addSetting(IObject *parent = 0) = 0;
+    virtual void deleteSetting(Setting *object) = 0;
     virtual Ptr<String> addString(IObject *parent = 0) = 0;
     virtual void deleteString(String *object) = 0;
     virtual Ptr<Weapon> addWeapon(IObject *parent = 0) = 0;

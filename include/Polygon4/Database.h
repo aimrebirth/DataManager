@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <functional>
 #include <string>
 
 struct sqlite3;
@@ -29,7 +30,8 @@ struct DatabaseSchema;
 
 class Database
 {    
-    typedef int(*DatabaseCallback)(void*, int, char**, char**);
+    typedef int(*Sqlite3Callback)(void*, int, char**, char**);
+    typedef std::function<int(int, char**, char**)> DatabaseCallback;
 
 public:
     Database(std::string dbname);
@@ -37,10 +39,11 @@ public:
 
     void loadDatabase(std::string dbname);
     bool isLoaded() const;
-    void getSchema(DatabaseSchema *schema);
+    void getSchema(DatabaseSchema *schema) const;
     std::string getName() const;
 
-    void execute(const std::string &sql, void *object, DatabaseCallback callback, bool nothrow = false, std::string *errmsg = 0);
+    bool execute(const std::string &sql, void *object, Sqlite3Callback callback, bool nothrow = false, std::string *errmsg = 0) const;
+    bool execute(const std::string &sql, DatabaseCallback callback, bool nothrow = false, std::string *errmsg = 0) const;
 
 private:
     sqlite3 *db = 0;
