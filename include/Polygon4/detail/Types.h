@@ -138,6 +138,9 @@ public:
     Text resource;
     IdPtr<String> name;
 
+    int getId() const;
+    void setId(int id);
+
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -215,6 +218,9 @@ public:
 
     CVector<Ptr<ClanMechanoid>> mechanoids;
     CVector<Ptr<ClanReputation>> reputations;
+
+    int getId() const;
+    void setId(int id);
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -347,6 +353,9 @@ public:
     CVector<Ptr<ConfigurationProjectile>> projectiles;
     CVector<Ptr<ConfigurationWeapon>> weapons;
 
+    int getId() const;
+    void setId(int id);
+
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -384,6 +393,9 @@ public:
     float price = 0.0f;
     int notrade = 0;
 
+    int getId() const;
+    void setId(int id);
+
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -419,6 +431,9 @@ public:
     float power = 0.0f;
     int special = 0;
 
+    int getId() const;
+    void setId(int id);
+
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -447,6 +462,9 @@ public:
     int price = 0;
     int notrade = 0;
     float weight = 0.0f;
+
+    int getId() const;
+    void setId(int id);
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -498,6 +516,9 @@ public:
     IdPtr<String> name;
 
     CVector<Ptr<GroupMechanoid>> mechanoids;
+
+    int getId() const;
+    void setId(int id);
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -688,6 +709,9 @@ public:
     CVector<Ptr<MapBuildingProjectile>> projectiles;
     CVector<Ptr<MapBuildingWeapon>> weapons;
 
+    int getId() const;
+    void setId(int id);
+
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -724,6 +748,9 @@ public:
     float scale_y = 1;
     float scale_z = 1;
 
+    int getId() const;
+    void setId(int id);
+
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -754,6 +781,9 @@ public:
 
     CVector<Ptr<MapBuilding>> buildings;
     CVector<Ptr<MapObject>> objects;
+
+    int getId() const;
+    void setId(int id);
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -823,6 +853,9 @@ public:
     float roll = 0.0f;
 
     CVector<Ptr<MechanoidQuest>> quests;
+
+    int getId() const;
+    void setId(int id);
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -934,6 +967,9 @@ public:
     CVector<Ptr<ModificationMap>> maps;
     CVector<Ptr<ModificationMechanoid>> mechanoids;
 
+    int getId() const;
+    void setId(int id);
+
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -965,6 +1001,9 @@ public:
     float k_param1 = 0.0f;
     float k_param2 = 0.0f;
 
+    int getId() const;
+    void setId(int id);
+
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -992,6 +1031,9 @@ public:
     IdPtr<String> name;
     int type = 0;
 
+    int getId() const;
+    void setId(int id);
+
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1015,6 +1057,9 @@ private:
     int id = 0;
 public:
     IdPtr<Mechanoid> mechanoid;
+
+    int getId() const;
+    void setId(int id);
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1047,6 +1092,9 @@ public:
     float speed = 0.0f;
     float scale = 0.0f;
     int notrade = 0;
+
+    int getId() const;
+    void setId(int id);
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1258,6 +1306,9 @@ public:
     CVector<Ptr<QuestRewardReputation>> reputations;
     CVector<Ptr<QuestRewardWeapon>> weapons;
 
+    int getId() const;
+    void setId(int id);
+
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1287,6 +1338,9 @@ public:
     int time = 0;
 
     CVector<Ptr<QuestReward>> rewards;
+
+    int getId() const;
+    void setId(int id);
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1366,6 +1420,9 @@ public:
     Text ru;
     Text en;
 
+    int getId() const;
+    void setId(int id);
+
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1399,6 +1456,9 @@ public:
     float damage = 0.0f;
     float price = 0.0f;
     IdPtr<Projectile> projectile;
+
+    int getId() const;
+    void setId(int id);
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;

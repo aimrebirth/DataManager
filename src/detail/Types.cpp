@@ -5,6 +5,16 @@ Text IObject::getName() const
     return POLYGON4_NONAME;
 }
 
+int Building::getId() const
+{
+    return id;
+}
+
+void Building::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType Building::getType() const
 {
     return EObjectType::Building;
@@ -246,6 +256,16 @@ int ClanReputation::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[2]) reputation = std::stof(cols[2]);
 
     return 0;
+}
+
+int Clan::getId() const
+{
+    return id;
+}
+
+void Clan::setId(int id)
+{
+    this->id = id;
 }
 
 EObjectType Clan::getType() const
@@ -670,6 +690,16 @@ int ConfigurationWeapon::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+int Configuration::getId() const
+{
+    return id;
+}
+
+void Configuration::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType Configuration::getType() const
 {
     return EObjectType::Configuration;
@@ -776,6 +806,16 @@ int Configuration::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[3]) glider.id = std::stoi(cols[3]);
 
     return 0;
+}
+
+int Equipment::getId() const
+{
+    return id;
+}
+
+void Equipment::setId(int id)
+{
+    this->id = id;
 }
 
 EObjectType Equipment::getType() const
@@ -940,6 +980,16 @@ int Equipment::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+int Glider::getId() const
+{
+    return id;
+}
+
+void Glider::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType Glider::getType() const
 {
     return EObjectType::Glider;
@@ -1086,6 +1136,16 @@ int Glider::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[12]) special = std::stoi(cols[12]);
 
     return 0;
+}
+
+int Good::getId() const
+{
+    return id;
+}
+
+void Good::setId(int id)
+{
+    this->id = id;
 }
 
 EObjectType Good::getType() const
@@ -1266,6 +1326,16 @@ int GroupMechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[1]) mechanoid.id = std::stoi(cols[1]);
 
     return 0;
+}
+
+int Group::getId() const
+{
+    return id;
+}
+
+void Group::setId(int id)
+{
+    this->id = id;
 }
 
 EObjectType Group::getType() const
@@ -1840,6 +1910,16 @@ int MapBuildingWeapon::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+int MapBuilding::getId() const
+{
+    return id;
+}
+
+void MapBuilding::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType MapBuilding::getType() const
 {
     return EObjectType::MapBuilding;
@@ -2000,6 +2080,16 @@ int MapBuilding::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+int MapObject::getId() const
+{
+    return id;
+}
+
+void MapObject::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType MapObject::getType() const
 {
     return EObjectType::MapObject;
@@ -2150,6 +2240,16 @@ int MapObject::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[13]) scale_z = std::stof(cols[13]);
 
     return 0;
+}
+
+int Map::getId() const
+{
+    return id;
+}
+
+void Map::setId(int id)
+{
+    this->id = id;
 }
 
 EObjectType Map::getType() const
@@ -2343,6 +2443,16 @@ int MechanoidQuest::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[2]) state = std::stoi(cols[2]);
 
     return 0;
+}
+
+int Mechanoid::getId() const
+{
+    return id;
+}
+
+void Mechanoid::setId(int id)
+{
+    this->id = id;
 }
 
 EObjectType Mechanoid::getType() const
@@ -2772,6 +2882,16 @@ int ModificationMechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+int Modification::getId() const
+{
+    return id;
+}
+
+void Modification::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType Modification::getType() const
 {
     return EObjectType::Modification;
@@ -2928,6 +3048,16 @@ int Modification::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+int Modificator::getId() const
+{
+    return id;
+}
+
+void Modificator::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType Modificator::getType() const
 {
     return EObjectType::Modificator;
@@ -3048,6 +3178,16 @@ int Modificator::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+int Object::getId() const
+{
+    return id;
+}
+
+void Object::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType Object::getType() const
 {
     return EObjectType::Object;
@@ -3140,6 +3280,16 @@ int Object::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+int Player::getId() const
+{
+    return id;
+}
+
+void Player::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType Player::getType() const
 {
     return EObjectType::Player;
@@ -3206,6 +3356,16 @@ int Player::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[1]) mechanoid.id = std::stoi(cols[1]);
 
     return 0;
+}
+
+int Projectile::getId() const
+{
+    return id;
+}
+
+void Projectile::setId(int id)
+{
+    this->id = id;
 }
 
 EObjectType Projectile::getType() const
@@ -3902,6 +4062,16 @@ int QuestRewardWeapon::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+int QuestReward::getId() const
+{
+    return id;
+}
+
+void QuestReward::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType QuestReward::getType() const
 {
     return EObjectType::QuestReward;
@@ -4030,6 +4200,16 @@ int QuestReward::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[4]) rating = std::stof(cols[4]);
 
     return 0;
+}
+
+int Quest::getId() const
+{
+    return id;
+}
+
+void Quest::setId(int id)
+{
+    this->id = id;
 }
 
 EObjectType Quest::getType() const
@@ -4267,6 +4447,16 @@ int Setting::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+int String::getId() const
+{
+    return id;
+}
+
+void String::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType String::getType() const
 {
     return EObjectType::String;
@@ -4345,6 +4535,16 @@ int String::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[2]) en = cols[2];
 
     return 0;
+}
+
+int Weapon::getId() const
+{
+    return id;
+}
+
+void Weapon::setId(int id)
+{
+    this->id = id;
 }
 
 EObjectType Weapon::getType() const
