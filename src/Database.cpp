@@ -128,16 +128,7 @@ std::string Database::getName() const
     return name;
 }
 
-<<<<<<< HEAD
 void Database::getSchema(DatabaseSchema *schema) const
-=======
-std::string Database::getFullName() const
-{
-    return fullName;
-}
-
-void Database::getSchema(DatabaseSchema *schema)
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
 {
     if (schema == 0)
         return;

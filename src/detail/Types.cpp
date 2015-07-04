@@ -768,93 +768,12 @@ bool Configuration::operator==(const Configuration &rhs) const
         1;
 }
 
-<<<<<<< HEAD
 int Configuration::loadFromSqlite3(int ncols, char **cols, char **names)
 {
     if (cols[0]) id = std::stoi(cols[0]);
     if (cols[1]) text_id = cols[1];
     if (cols[2]) name.id = std::stoi(cols[2]);
     if (cols[3]) glider.id = std::stoi(cols[3]);
-=======
-EObjectType Coordinate::getType() const
-{
-    return EObjectType::Coordinate;
-}
-
-Text Coordinate::getVariableString(int columnId) const
-{
-    switch (columnId)
-    {
-    case 0:
-        return to_string(id);
-    case 1:
-        return to_string(x);
-    case 2:
-        return to_string(y);
-    case 3:
-        return to_string(z);
-    case 4:
-        return to_string(pitch);
-    case 5:
-        return to_string(yaw);
-    case 6:
-        return to_string(roll);
-    default:
-        return "";
-    }
-    return "";
-}
-
-void Coordinate::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
-{
-    switch (columnId)
-    {
-    case 0:
-        id = std::stoi(text.string());
-        break;
-    case 1:
-        x = std::stof(text.string());
-        break;
-    case 2:
-        y = std::stof(text.string());
-        break;
-    case 3:
-        z = std::stof(text.string());
-        break;
-    case 4:
-        pitch = std::stof(text.string());
-        break;
-    case 5:
-        yaw = std::stof(text.string());
-        break;
-    case 6:
-        roll = std::stof(text.string());
-        break;
-    default:
-        break;
-    }
-}
-
-#ifdef USE_QT
-QTreeWidgetItem *Coordinate::printQtTreeView(QTreeWidgetItem *parent) const
-{
-    auto item = new QTreeWidgetItem(parent, QStringList(QString::fromStdWString(getName())));
-    item->setData(0, Qt::UserRole, (uint64_t)this);
-
-    item->sortChildren(0, Qt::AscendingOrder);
-    return item;
-}
-#endif
-
-Text Coordinate::getName() const
-{
-    Text n;
-    n = to_string(*this);
-    if (!n.empty())
-        return n;
-    return IObject::getName();
-}
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
 
     return 0;
 }
@@ -1322,11 +1241,7 @@ QTreeWidgetItem *GroupMechanoid::printQtTreeView(QTreeWidgetItem *parent) const
 Text GroupMechanoid::getName() const
 {
     Text n;
-<<<<<<< HEAD
     n = to_string(mechanoid);
-=======
-    n = to_string(equipment);
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     if (!n.empty())
         return n;
     return IObject::getName();
@@ -1413,14 +1328,10 @@ QTreeWidgetItem *Group::printQtTreeView(QTreeWidgetItem *parent) const
 Text Group::getName() const
 {
     Text n;
-<<<<<<< HEAD
     n = to_string(name);
     if (!n.empty())
         return n;
     n = text_id;
-=======
-    n = to_string(glider);
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     if (!n.empty())
         return n;
     return IObject::getName();
@@ -2055,12 +1966,6 @@ Text MapBuilding::getName() const
     n = text_id;
     if (!n.empty())
         return n;
-<<<<<<< HEAD
-=======
-    n = to_string(building);
-    if (!n.empty())
-        return n;
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     return IObject::getName();
 }
 
@@ -2124,7 +2029,6 @@ Text MapObject::getVariableString(int columnId) const
         return to_string(yaw);
     case 9:
         return to_string(roll);
-<<<<<<< HEAD
     case 10:
         return to_string(scale);
     case 11:
@@ -2133,8 +2037,6 @@ Text MapObject::getVariableString(int columnId) const
         return to_string(scale_y);
     case 13:
         return to_string(scale_z);
-=======
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     default:
         return "";
     }
@@ -2174,7 +2076,6 @@ void MapObject::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         break;
     case 9:
         roll = std::stof(text.string());
-<<<<<<< HEAD
         break;
     case 10:
         scale = std::stof(text.string());
@@ -2187,8 +2088,6 @@ void MapObject::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         break;
     case 13:
         scale_z = std::stof(text.string());
-=======
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
         break;
     default:
         break;
@@ -2211,12 +2110,6 @@ Text MapObject::getName() const
     n = text_id;
     if (!n.empty())
         return n;
-<<<<<<< HEAD
-=======
-    n = to_string(object);
-    if (!n.empty())
-        return n;
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     return IObject::getName();
 }
 
@@ -2227,13 +2120,10 @@ bool MapObject::operator==(const MapObject &rhs) const
         object == rhs.object &&
         pitch == rhs.pitch &&
         roll == rhs.roll &&
-<<<<<<< HEAD
         scale == rhs.scale &&
         scale_x == rhs.scale_x &&
         scale_y == rhs.scale_y &&
         scale_z == rhs.scale_z &&
-=======
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
         text_id == rhs.text_id &&
         x == rhs.x &&
         y == rhs.y &&
@@ -2291,13 +2181,10 @@ Text Map::getVariableString(int columnId) const
         return to_string(z_k);
     case 9:
         return to_string(z_b);
-<<<<<<< HEAD
     case 10:
         return to_string(h_min);
     case 11:
         return to_string(h_max);
-=======
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     default:
         return "";
     }
@@ -2471,14 +2358,7 @@ QTreeWidgetItem *MechanoidQuest::printQtTreeView(QTreeWidgetItem *parent) const
 Text MechanoidQuest::getName() const
 {
     Text n;
-<<<<<<< HEAD
     n = to_string(quest);
-=======
-    n = to_string(name);
-    if (!n.empty())
-        return n;
-    n = text_id;
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     if (!n.empty())
         return n;
     return IObject::getName();
@@ -4289,7 +4169,6 @@ bool Quest::operator==(const Quest &rhs) const
         1;
 }
 
-<<<<<<< HEAD
 int Quest::loadFromSqlite3(int ncols, char **cols, char **names)
 {
     if (cols[0]) id = std::stoi(cols[0]);
@@ -4300,110 +4179,6 @@ int Quest::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[5]) time = std::stoi(cols[5]);
 
     return 0;
-=======
-EObjectType SaveObject::getType() const
-{
-    return EObjectType::SaveObject;
-}
-
-Text SaveObject::getVariableString(int columnId) const
-{
-    switch (columnId)
-    {
-    case 0:
-        return to_string(save);
-    case 1:
-        return to_string(object);
-    case 2:
-        return to_string(map);
-    case 3:
-        return to_string(x);
-    case 4:
-        return to_string(y);
-    case 5:
-        return to_string(z);
-    case 6:
-        return to_string(pitch);
-    case 7:
-        return to_string(yaw);
-    case 8:
-        return to_string(roll);
-    default:
-        return "";
-    }
-    return "";
-}
-
-void SaveObject::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
-{
-    switch (columnId)
-    {
-    case 0:
-        save = std::static_pointer_cast<Save>(ptr);
-        break;
-    case 1:
-        object = std::static_pointer_cast<Object>(ptr);
-        break;
-    case 2:
-        map = std::static_pointer_cast<Map>(ptr);
-        break;
-    case 3:
-        x = std::stof(text.string());
-        break;
-    case 4:
-        y = std::stof(text.string());
-        break;
-    case 5:
-        z = std::stof(text.string());
-        break;
-    case 6:
-        pitch = std::stof(text.string());
-        break;
-    case 7:
-        yaw = std::stof(text.string());
-        break;
-    case 8:
-        roll = std::stof(text.string());
-        break;
-    default:
-        break;
-    }
-}
-
-#ifdef USE_QT
-QTreeWidgetItem *SaveObject::printQtTreeView(QTreeWidgetItem *parent) const
-{
-    auto item = new QTreeWidgetItem(parent, QStringList(QString::fromStdWString(getName())));
-    item->setData(0, Qt::UserRole, (uint64_t)this);
-
-    item->sortChildren(0, Qt::AscendingOrder);
-    return item;
-}
-#endif
-
-Text SaveObject::getName() const
-{
-    Text n;
-    n = to_string(object);
-    if (!n.empty())
-        return n;
-    return IObject::getName();
-}
-
-bool SaveObject::operator==(const SaveObject &rhs) const
-{
-    return
-        map == rhs.map &&
-        object == rhs.object &&
-        pitch == rhs.pitch &&
-        roll == rhs.roll &&
-        save == rhs.save &&
-        x == rhs.x &&
-        y == rhs.y &&
-        yaw == rhs.yaw &&
-        z == rhs.z &&
-        1;
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
 }
 
 EObjectType ScriptVariable::getType() const
@@ -4453,11 +4228,7 @@ QTreeWidgetItem *ScriptVariable::printQtTreeView(QTreeWidgetItem *parent) const
 Text ScriptVariable::getName() const
 {
     Text n;
-<<<<<<< HEAD
     n = variable;
-=======
-    n = to_string(player);
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     if (!n.empty())
         return n;
     return IObject::getName();
@@ -4476,26 +4247,7 @@ int ScriptVariable::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[0]) variable = cols[0];
     if (cols[1]) value = cols[1];
 
-<<<<<<< HEAD
     return 0;
-=======
-Text SaveQuest::getName() const
-{
-    Text n;
-    n = to_string(quest);
-    if (!n.empty())
-        return n;
-    return IObject::getName();
-}
-
-bool SaveQuest::operator==(const SaveQuest &rhs) const
-{
-    return
-        quest == rhs.quest &&
-        save == rhs.save &&
-        state == rhs.state &&
-        1;
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
 }
 
 EObjectType Setting::getType() const
@@ -4540,12 +4292,6 @@ QTreeWidgetItem *Setting::printQtTreeView(QTreeWidgetItem *parent) const
 Text Setting::getName() const
 {
     Text n;
-<<<<<<< HEAD
-=======
-    n = name;
-    if (!n.empty())
-        return n;
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     return IObject::getName();
 }
 
@@ -4558,19 +4304,7 @@ bool Setting::operator==(const Setting &rhs) const
 
 int Setting::loadFromSqlite3(int ncols, char **cols, char **names)
 {
-<<<<<<< HEAD
     if (cols[0]) player.id = std::stoi(cols[0]);
-=======
-    Text n;
-    n = variable;
-    if (!n.empty())
-        return n;
-    n = to_string(variable);
-    if (!n.empty())
-        return n;
-    return IObject::getName();
-}
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
 
     return 0;
 }

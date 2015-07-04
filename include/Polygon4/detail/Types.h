@@ -709,10 +709,7 @@ class MapObject : public IObject
 {
 private:
     int id = 0;
-<<<<<<< HEAD
 public:
-=======
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
     Text text_id;
     IdPtr<Map> map;
     IdPtr<Object> object;
@@ -722,13 +719,10 @@ public:
     float pitch = 0.0f;
     float yaw = 0.0f;
     float roll = 0.0f;
-<<<<<<< HEAD
     float scale = 1;
     float scale_x = 1;
     float scale_y = 1;
     float scale_z = 1;
-=======
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -833,11 +827,8 @@ public:
     float pitch = 0.0f;
     float yaw = 0.0f;
     float roll = 0.0f;
-<<<<<<< HEAD
 
     CVector<Ptr<MechanoidQuest>> quests;
-=======
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1313,23 +1304,8 @@ public:
 
     bool operator==(const Quest &rhs) const;
 
-<<<<<<< HEAD
 private:
     int loadFromSqlite3(int, char**, char**);
-=======
-class SaveObject : public IObject
-{
-public:
-    IdPtr<Save> save;
-    IdPtr<Object> object;
-    IdPtr<Map> map;
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
-    float pitch = 0.0f;
-    float yaw = 0.0f;
-    float roll = 0.0f;
->>>>>>> 4c7b28b924e9b584a47044845270ad7b2029bcf8
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
