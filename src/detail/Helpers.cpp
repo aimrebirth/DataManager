@@ -198,15 +198,9 @@ void retranslateFieldNames()
         { "weapon_id", QCoreApplication::translate("DB", "weapon_id") },
         { "weight", QCoreApplication::translate("DB", "weight") },
         { "x", QCoreApplication::translate("DB", "x") },
-        { "x_b", QCoreApplication::translate("DB", "x_b") },
-        { "x_k", QCoreApplication::translate("DB", "x_k") },
         { "y", QCoreApplication::translate("DB", "y") },
-        { "y_b", QCoreApplication::translate("DB", "y_b") },
-        { "y_k", QCoreApplication::translate("DB", "y_k") },
         { "yaw", QCoreApplication::translate("DB", "yaw") },
         { "z", QCoreApplication::translate("DB", "z") },
-        { "z_b", QCoreApplication::translate("DB", "z_b") },
-        { "z_k", QCoreApplication::translate("DB", "z_k") },
     };
     fieldNames = names;
 };

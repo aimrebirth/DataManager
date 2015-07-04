@@ -749,12 +749,6 @@ public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
-    float x_k = 0.0f;
-    float x_b = 0.0f;
-    float y_k = 0.0f;
-    float y_b = 0.0f;
-    float z_k = 0.0f;
-    float z_b = 0.0f;
     float h_min = 0.0f;
     float h_max = 0.0f;
 
@@ -930,7 +924,7 @@ public:
     Text date_created;
     Text date_modified;
     Text comment;
-    float version = 0.0f;
+    Text version;
     Text script_language;
     Text script_main;
     IdPtr<Mechanoid> player_mechanoid;

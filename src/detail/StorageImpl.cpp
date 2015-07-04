@@ -1232,12 +1232,6 @@ void StorageImpl::_saveMaps() const
         query += "'" + map.second->text_id.string() + "',";
         query += "'" + map.second->resource.string() + "',";
         query += "'" + std::to_string(map.second->name.id) + "',";
-        query += "'" + std::to_string(map.second->x_k) + "',";
-        query += "'" + std::to_string(map.second->x_b) + "',";
-        query += "'" + std::to_string(map.second->y_k) + "',";
-        query += "'" + std::to_string(map.second->y_b) + "',";
-        query += "'" + std::to_string(map.second->z_k) + "',";
-        query += "'" + std::to_string(map.second->z_b) + "',";
         query += "'" + std::to_string(map.second->h_min) + "',";
         query += "'" + std::to_string(map.second->h_max) + "',";
         query.resize(query.size() - 1);
@@ -1586,7 +1580,7 @@ void StorageImpl::_saveModifications() const
         query += "'" + modification.second->date_created.string() + "',";
         query += "'" + modification.second->date_modified.string() + "',";
         query += "'" + modification.second->comment.string() + "',";
-        query += "'" + std::to_string(modification.second->version) + "',";
+        query += "'" + modification.second->version.string() + "',";
         query += "'" + modification.second->script_language.string() + "',";
         query += "'" + modification.second->script_main.string() + "',";
         query += "'" + std::to_string(modification.second->player_mechanoid.id) + "',";

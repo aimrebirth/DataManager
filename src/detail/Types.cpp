@@ -2170,20 +2170,8 @@ Text Map::getVariableString(int columnId) const
     case 3:
         return to_string(name);
     case 4:
-        return to_string(x_k);
-    case 5:
-        return to_string(x_b);
-    case 6:
-        return to_string(y_k);
-    case 7:
-        return to_string(y_b);
-    case 8:
-        return to_string(z_k);
-    case 9:
-        return to_string(z_b);
-    case 10:
         return to_string(h_min);
-    case 11:
+    case 5:
         return to_string(h_max);
     default:
         return "";
@@ -2208,27 +2196,9 @@ void Map::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         name = std::static_pointer_cast<String>(ptr);
         break;
     case 4:
-        x_k = std::stof(text.string());
-        break;
-    case 5:
-        x_b = std::stof(text.string());
-        break;
-    case 6:
-        y_k = std::stof(text.string());
-        break;
-    case 7:
-        y_b = std::stof(text.string());
-        break;
-    case 8:
-        z_k = std::stof(text.string());
-        break;
-    case 9:
-        z_b = std::stof(text.string());
-        break;
-    case 10:
         h_min = std::stof(text.string());
         break;
-    case 11:
+    case 5:
         h_max = std::stof(text.string());
         break;
     default:
@@ -2279,12 +2249,6 @@ bool Map::operator==(const Map &rhs) const
         name == rhs.name &&
         resource == rhs.resource &&
         text_id == rhs.text_id &&
-        x_b == rhs.x_b &&
-        x_k == rhs.x_k &&
-        y_b == rhs.y_b &&
-        y_k == rhs.y_k &&
-        z_b == rhs.z_b &&
-        z_k == rhs.z_k &&
         1;
 }
 
@@ -2294,14 +2258,8 @@ int Map::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[1]) text_id = cols[1];
     if (cols[2]) resource = cols[2];
     if (cols[3]) name.id = std::stoi(cols[3]);
-    if (cols[4]) x_k = std::stof(cols[4]);
-    if (cols[5]) x_b = std::stof(cols[5]);
-    if (cols[6]) y_k = std::stof(cols[6]);
-    if (cols[7]) y_b = std::stof(cols[7]);
-    if (cols[8]) z_k = std::stof(cols[8]);
-    if (cols[9]) z_b = std::stof(cols[9]);
-    if (cols[10]) h_min = std::stof(cols[10]);
-    if (cols[11]) h_max = std::stof(cols[11]);
+    if (cols[4]) h_min = std::stof(cols[4]);
+    if (cols[5]) h_max = std::stof(cols[5]);
 
     return 0;
 }
@@ -2879,7 +2837,7 @@ void Modification::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         comment = text.string();
         break;
     case 7:
-        version = std::stof(text.string());
+        version = text.string();
         break;
     case 8:
         script_language = text.string();
@@ -2961,7 +2919,7 @@ int Modification::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[4]) date_created = cols[4];
     if (cols[5]) date_modified = cols[5];
     if (cols[6]) comment = cols[6];
-    if (cols[7]) version = std::stof(cols[7]);
+    if (cols[7]) version = cols[7];
     if (cols[8]) script_language = cols[8];
     if (cols[9]) script_main = cols[9];
     if (cols[10]) player_mechanoid.id = std::stoi(cols[10]);
