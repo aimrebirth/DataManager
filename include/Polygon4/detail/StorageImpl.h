@@ -243,6 +243,9 @@ private:
 public:
     StorageImpl(Ptr<Database> db) : db(db) {}
 
+    void setDb(Ptr<Database> db) { this->db = db; }
+
+    virtual void create() const;
     virtual void clear();
     virtual void load(ProgressCallback callback = ProgressCallback());
     virtual void save(ProgressCallback callback = ProgressCallback()) const;

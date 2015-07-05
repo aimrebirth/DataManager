@@ -109,7 +109,9 @@ bool Database::execute(const std::string &sql, DatabaseCallback callback, bool n
     auto cb = [](void *o, int ncols, char **cols, char **names)
     {
         DatabaseCallback *f = (DatabaseCallback *)o;
-        return (*f)(ncols, cols, names);
+        if (*f)
+            return (*f)(ncols, cols, names);
+        return 0;
     };
     sqlite3_exec(db, sql.c_str(), cb, &callback, &errmsg);
     if (errmsg)

@@ -137,6 +137,7 @@ public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
+    int interactive = 0;
 
     int getId() const;
     void setId(int id);
@@ -156,6 +157,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class ClanMechanoid : public IObject
@@ -180,6 +184,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class ClanReputation : public IObject
@@ -198,13 +205,15 @@ public:
     virtual Text getName() const;
 
     bool operator==(const ClanReputation &rhs) const;
-    IdPtr<Clan> operator->() const;
 
 private:
     int loadFromSqlite3(int, char**, char**);
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Clan : public IObject
@@ -237,6 +246,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class ConfigurationEquipment : public IObject
@@ -262,6 +274,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class ConfigurationGood : public IObject
@@ -287,6 +302,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class ConfigurationProjectile : public IObject
@@ -312,6 +330,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class ConfigurationWeapon : public IObject
@@ -337,6 +358,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Configuration : public IObject
@@ -371,6 +395,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Equipment : public IObject
@@ -411,6 +438,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Glider : public IObject
@@ -449,6 +479,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Good : public IObject
@@ -481,6 +514,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class GroupMechanoid : public IObject
@@ -505,6 +541,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Group : public IObject
@@ -535,6 +574,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class MapBuildingEquipment : public IObject
@@ -560,6 +602,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class MapBuildingGlider : public IObject
@@ -585,6 +630,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class MapBuildingGood : public IObject
@@ -610,6 +658,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class MapBuildingModificator : public IObject
@@ -635,6 +686,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class MapBuildingProjectile : public IObject
@@ -660,6 +714,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class MapBuildingWeapon : public IObject
@@ -685,6 +742,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class MapBuilding : public IObject
@@ -701,6 +761,10 @@ public:
     float pitch = 0.0f;
     float yaw = 0.0f;
     float roll = 0.0f;
+    float scale = 1;
+    float scale_x = 1;
+    float scale_y = 1;
+    float scale_z = 1;
 
     CVector<Ptr<MapBuildingEquipment>> equipments;
     CVector<Ptr<MapBuildingGlider>> gliders;
@@ -727,6 +791,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class MapObject : public IObject
@@ -766,6 +833,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Map : public IObject
@@ -800,6 +870,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class MechanoidQuest : public IObject
@@ -825,6 +898,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Mechanoid : public IObject
@@ -872,6 +948,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class ModificationClan : public IObject
@@ -896,6 +975,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class ModificationMap : public IObject
@@ -920,6 +1002,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class ModificationMechanoid : public IObject
@@ -944,6 +1029,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Modification : public IObject
@@ -985,6 +1073,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Modificator : public IObject
@@ -1019,6 +1110,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Object : public IObject
@@ -1049,6 +1143,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Player : public IObject
@@ -1076,6 +1173,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Projectile : public IObject
@@ -1111,6 +1211,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class QuestRewardEquipment : public IObject
@@ -1136,6 +1239,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class QuestRewardGlider : public IObject
@@ -1161,6 +1267,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class QuestRewardGood : public IObject
@@ -1186,6 +1295,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class QuestRewardModificator : public IObject
@@ -1211,6 +1323,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class QuestRewardProjectile : public IObject
@@ -1236,6 +1351,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class QuestRewardReputation : public IObject
@@ -1254,13 +1372,15 @@ public:
     virtual Text getName() const;
 
     bool operator==(const QuestRewardReputation &rhs) const;
-    IdPtr<QuestReward> operator->() const;
 
 private:
     int loadFromSqlite3(int, char**, char**);
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class QuestRewardWeapon : public IObject
@@ -1286,6 +1406,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class QuestReward : public IObject
@@ -1324,6 +1447,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Quest : public IObject
@@ -1357,6 +1483,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class ScriptVariable : public IObject
@@ -1380,6 +1509,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Setting : public IObject
@@ -1402,6 +1534,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 enum class LocalizationType : EnumType
@@ -1438,6 +1573,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 class Weapon : public IObject
@@ -1475,6 +1613,9 @@ private:
 
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
 };
 
 }

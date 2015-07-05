@@ -32,6 +32,8 @@ Text Building::getVariableString(int columnId) const
         return to_string(resource);
     case 3:
         return to_string(name);
+    case 4:
+        return to_string(interactive);
     default:
         return "";
     }
@@ -53,6 +55,9 @@ void Building::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         break;
     case 3:
         name = std::static_pointer_cast<String>(ptr);
+        break;
+    case 4:
+        interactive = std::stoi(text.string());
         break;
     default:
         break;
@@ -84,6 +89,7 @@ Text Building::getName() const
 bool Building::operator==(const Building &rhs) const
 {
     return
+        interactive == rhs.interactive &&
         name == rhs.name &&
         resource == rhs.resource &&
         text_id == rhs.text_id &&
@@ -96,8 +102,25 @@ int Building::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[1]) text_id = cols[1];
     if (cols[2]) resource = cols[2];
     if (cols[3]) name.id = std::stoi(cols[3]);
+    if (cols[4]) interactive = std::stoi(cols[4]);
 
     return 0;
+}
+
+const char *Building::getSql()
+{
+    return
+    " \
+create table \"Buildings\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"resource\" TEXT, \
+\"name_id\" INTEGER, \
+\"interactive\" INTEGER DEFAULT 0, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+); \
+    ";
 }
 
 EObjectType ClanMechanoid::getType() const
@@ -174,6 +197,20 @@ int ClanMechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *ClanMechanoid::getSql()
+{
+    return
+    " \
+create table \"ClanMechanoids\" ( \
+\"clan_id\" INTEGER NOT NULL, \
+\"mechanoid_id\" INTEGER NOT NULL, \
+PRIMARY KEY (\"mechanoid_id\"), \
+FOREIGN KEY (\"clan_id\") REFERENCES \"Clans\" (\"id\"), \
+FOREIGN KEY (\"mechanoid_id\") REFERENCES \"Mechanoids\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType ClanReputation::getType() const
 {
     return EObjectType::ClanReputation;
@@ -229,9 +266,6 @@ Text ClanReputation::getName() const
     n = clan.id < clan2.id ? (to_string(clan).wstring() + L" - " + to_string(clan2).wstring()) : (to_string(clan2).wstring() + L" - " + to_string(clan).wstring());
     if (!n.empty())
         return n;
-    n = to_string(reputation);
-    if (!n.empty())
-        return n;
     return IObject::getName();
 }
 
@@ -244,11 +278,6 @@ bool ClanReputation::operator==(const ClanReputation &rhs) const
         1;
 }
 
-IdPtr<Clan> ClanReputation::operator->() const
-{
-    return clan;
-}
-
 int ClanReputation::loadFromSqlite3(int ncols, char **cols, char **names)
 {
     if (cols[0]) clan.id = std::stoi(cols[0]);
@@ -256,6 +285,21 @@ int ClanReputation::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[2]) reputation = std::stof(cols[2]);
 
     return 0;
+}
+
+const char *ClanReputation::getSql()
+{
+    return
+    " \
+create table \"ClanReputations\" ( \
+\"clan_id\" INTEGER NOT NULL, \
+\"clan_id2\" INTEGER NOT NULL, \
+\"reputation\" REAL, \
+PRIMARY KEY (\"clan_id\", \"clan_id2\"), \
+FOREIGN KEY (\"clan_id\") REFERENCES \"Clans\" (\"id\"), \
+FOREIGN KEY (\"clan_id2\") REFERENCES \"Clans\" (\"id\") \
+); \
+    ";
 }
 
 int Clan::getId() const
@@ -321,12 +365,12 @@ QTreeWidgetItem *Clan::printQtTreeView(QTreeWidgetItem *parent) const
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Mechanoids")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Clan));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ClanMechanoid));
     for (auto &mechanoid : mechanoids)
         mechanoid->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Reputations")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Clan));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ClanReputation));
     for (auto &reputation : reputations)
         reputation->printQtTreeView(root);
 
@@ -364,6 +408,21 @@ int Clan::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[3]) name.id = std::stoi(cols[3]);
 
     return 0;
+}
+
+const char *Clan::getSql()
+{
+    return
+    " \
+create table \"Clans\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"resource\" TEXT, \
+\"name_id\" INTEGER, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+); \
+    ";
 }
 
 EObjectType ConfigurationEquipment::getType() const
@@ -447,6 +506,21 @@ int ConfigurationEquipment::loadFromSqlite3(int ncols, char **cols, char **names
     return 0;
 }
 
+const char *ConfigurationEquipment::getSql()
+{
+    return
+    " \
+create table \"ConfigurationEquipments\" ( \
+\"configuration_id\" INTEGER NOT NULL, \
+\"equipment_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"configuration_id\", \"equipment_id\"), \
+FOREIGN KEY (\"configuration_id\") REFERENCES \"Configurations\" (\"id\"), \
+FOREIGN KEY (\"equipment_id\") REFERENCES \"Equipments\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType ConfigurationGood::getType() const
 {
     return EObjectType::ConfigurationGood;
@@ -526,6 +600,21 @@ int ConfigurationGood::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[2]) quantity = std::stoi(cols[2]);
 
     return 0;
+}
+
+const char *ConfigurationGood::getSql()
+{
+    return
+    " \
+create table \"ConfigurationGoods\" ( \
+\"configuration_id\" INTEGER NOT NULL, \
+\"good_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"configuration_id\", \"good_id\"), \
+FOREIGN KEY (\"configuration_id\") REFERENCES \"Configurations\" (\"id\"), \
+FOREIGN KEY (\"good_id\") REFERENCES \"Goods\" (\"id\") \
+); \
+    ";
 }
 
 EObjectType ConfigurationProjectile::getType() const
@@ -609,6 +698,21 @@ int ConfigurationProjectile::loadFromSqlite3(int ncols, char **cols, char **name
     return 0;
 }
 
+const char *ConfigurationProjectile::getSql()
+{
+    return
+    " \
+create table \"ConfigurationProjectiles\" ( \
+\"configuration_id\" INTEGER NOT NULL, \
+\"projectile_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"configuration_id\", \"projectile_id\"), \
+FOREIGN KEY (\"configuration_id\") REFERENCES \"Configurations\" (\"id\"), \
+FOREIGN KEY (\"projectile_id\") REFERENCES \"Projectiles\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType ConfigurationWeapon::getType() const
 {
     return EObjectType::ConfigurationWeapon;
@@ -690,6 +794,21 @@ int ConfigurationWeapon::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *ConfigurationWeapon::getSql()
+{
+    return
+    " \
+create table \"ConfigurationWeapons\" ( \
+\"configuration_id\" INTEGER NOT NULL, \
+\"weapon_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"configuration_id\", \"weapon_id\"), \
+FOREIGN KEY (\"configuration_id\") REFERENCES \"Configurations\" (\"id\"), \
+FOREIGN KEY (\"weapon_id\") REFERENCES \"Weapons\" (\"id\") \
+); \
+    ";
+}
+
 int Configuration::getId() const
 {
     return id;
@@ -753,22 +872,22 @@ QTreeWidgetItem *Configuration::printQtTreeView(QTreeWidgetItem *parent) const
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Equipments")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Configuration));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ConfigurationEquipment));
     for (auto &equipment : equipments)
         equipment->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Configuration));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ConfigurationGood));
     for (auto &good : goods)
         good->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Projectiles")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Configuration));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ConfigurationProjectile));
     for (auto &projectile : projectiles)
         projectile->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Weapons")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Configuration));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ConfigurationWeapon));
     for (auto &weapon : weapons)
         weapon->printQtTreeView(root);
 
@@ -806,6 +925,22 @@ int Configuration::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[3]) glider.id = std::stoi(cols[3]);
 
     return 0;
+}
+
+const char *Configuration::getSql()
+{
+    return
+    " \
+create table \"Configurations\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"name_id\" INTEGER, \
+\"glider_id\" INTEGER, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\"), \
+FOREIGN KEY (\"glider_id\") REFERENCES \"Gliders\" (\"id\") \
+); \
+    ";
 }
 
 int Equipment::getId() const
@@ -980,6 +1115,32 @@ int Equipment::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *Equipment::getSql()
+{
+    return
+    " \
+create table \"Equipments\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"resource\" TEXT, \
+\"name_id\" INTEGER, \
+\"type\" INTEGER, \
+\"standard\" INTEGER, \
+\"weight\" REAL, \
+\"durability\" REAL, \
+\"power\" REAL, \
+\"value1\" REAL, \
+\"value2\" REAL, \
+\"value3\" REAL, \
+\"manual\" INTEGER, \
+\"price\" REAL, \
+\"notrade\" INTEGER, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+); \
+    ";
+}
+
 int Glider::getId() const
 {
     return id;
@@ -1138,6 +1299,30 @@ int Glider::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *Glider::getSql()
+{
+    return
+    " \
+create table \"Gliders\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"resource\" TEXT, \
+\"name_id\" INTEGER, \
+\"standard\" INTEGER, \
+\"weight\" REAL, \
+\"maxweight\" REAL, \
+\"rotatespeed\" REAL, \
+\"armor\" REAL, \
+\"price\" INTEGER, \
+\"restore\" REAL, \
+\"power\" REAL, \
+\"special\" INTEGER, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+); \
+    ";
+}
+
 int Good::getId() const
 {
     return id;
@@ -1254,6 +1439,24 @@ int Good::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *Good::getSql()
+{
+    return
+    " \
+create table \"Goods\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"resource\" TEXT, \
+\"name_id\" INTEGER, \
+\"price\" INTEGER, \
+\"notrade\" INTEGER, \
+\"weight\" REAL, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType GroupMechanoid::getType() const
 {
     return EObjectType::GroupMechanoid;
@@ -1328,6 +1531,20 @@ int GroupMechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *GroupMechanoid::getSql()
+{
+    return
+    " \
+create table \"GroupMechanoids\" ( \
+\"group_id\" INTEGER NOT NULL, \
+\"mechanoid_id\" INTEGER NOT NULL, \
+PRIMARY KEY (\"mechanoid_id\"), \
+FOREIGN KEY (\"group_id\") REFERENCES \"Groups\" (\"id\"), \
+FOREIGN KEY (\"mechanoid_id\") REFERENCES \"Mechanoids\" (\"id\") \
+); \
+    ";
+}
+
 int Group::getId() const
 {
     return id;
@@ -1386,7 +1603,7 @@ QTreeWidgetItem *Group::printQtTreeView(QTreeWidgetItem *parent) const
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Mechanoids")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Group));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::GroupMechanoid));
     for (auto &mechanoid : mechanoids)
         mechanoid->printQtTreeView(root);
 
@@ -1422,6 +1639,20 @@ int Group::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[2]) name.id = std::stoi(cols[2]);
 
     return 0;
+}
+
+const char *Group::getSql()
+{
+    return
+    " \
+create table \"Groups\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"name_id\" INTEGER, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+); \
+    ";
 }
 
 EObjectType MapBuildingEquipment::getType() const
@@ -1505,6 +1736,21 @@ int MapBuildingEquipment::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *MapBuildingEquipment::getSql()
+{
+    return
+    " \
+create table \"MapBuildingEquipments\" ( \
+\"mapBuilding_id\" INTEGER NOT NULL, \
+\"equipment_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"mapBuilding_id\", \"equipment_id\"), \
+FOREIGN KEY (\"mapBuilding_id\") REFERENCES \"MapBuildings\" (\"id\"), \
+FOREIGN KEY (\"equipment_id\") REFERENCES \"Equipments\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType MapBuildingGlider::getType() const
 {
     return EObjectType::MapBuildingGlider;
@@ -1584,6 +1830,21 @@ int MapBuildingGlider::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[2]) quantity = std::stoi(cols[2]);
 
     return 0;
+}
+
+const char *MapBuildingGlider::getSql()
+{
+    return
+    " \
+create table \"MapBuildingGliders\" ( \
+\"mapBuilding_id\" INTEGER NOT NULL, \
+\"glider_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"mapBuilding_id\", \"glider_id\"), \
+FOREIGN KEY (\"mapBuilding_id\") REFERENCES \"MapBuildings\" (\"id\"), \
+FOREIGN KEY (\"glider_id\") REFERENCES \"Gliders\" (\"id\") \
+); \
+    ";
 }
 
 EObjectType MapBuildingGood::getType() const
@@ -1667,6 +1928,21 @@ int MapBuildingGood::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *MapBuildingGood::getSql()
+{
+    return
+    " \
+create table \"MapBuildingGoods\" ( \
+\"mapBuilding_id\" INTEGER NOT NULL, \
+\"good_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"mapBuilding_id\", \"good_id\"), \
+FOREIGN KEY (\"mapBuilding_id\") REFERENCES \"MapBuildings\" (\"id\"), \
+FOREIGN KEY (\"good_id\") REFERENCES \"Goods\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType MapBuildingModificator::getType() const
 {
     return EObjectType::MapBuildingModificator;
@@ -1746,6 +2022,21 @@ int MapBuildingModificator::loadFromSqlite3(int ncols, char **cols, char **names
     if (cols[2]) quantity = std::stoi(cols[2]);
 
     return 0;
+}
+
+const char *MapBuildingModificator::getSql()
+{
+    return
+    " \
+create table \"MapBuildingModificators\" ( \
+\"mapBuilding_id\" INTEGER NOT NULL, \
+\"modificator_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"mapBuilding_id\", \"modificator_id\"), \
+FOREIGN KEY (\"mapBuilding_id\") REFERENCES \"MapBuildings\" (\"id\"), \
+FOREIGN KEY (\"modificator_id\") REFERENCES \"Modificators\" (\"id\") \
+); \
+    ";
 }
 
 EObjectType MapBuildingProjectile::getType() const
@@ -1829,6 +2120,21 @@ int MapBuildingProjectile::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *MapBuildingProjectile::getSql()
+{
+    return
+    " \
+create table \"MapBuildingProjectiles\" ( \
+\"mapBuilding_id\" INTEGER NOT NULL, \
+\"projectile_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"mapBuilding_id\", \"projectile_id\"), \
+FOREIGN KEY (\"mapBuilding_id\") REFERENCES \"MapBuildings\" (\"id\"), \
+FOREIGN KEY (\"projectile_id\") REFERENCES \"Projectiles\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType MapBuildingWeapon::getType() const
 {
     return EObjectType::MapBuildingWeapon;
@@ -1910,6 +2216,21 @@ int MapBuildingWeapon::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *MapBuildingWeapon::getSql()
+{
+    return
+    " \
+create table \"MapBuildingWeapons\" ( \
+\"mapBuilding_id\" INTEGER NOT NULL, \
+\"weapon_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"mapBuilding_id\", \"weapon_id\"), \
+FOREIGN KEY (\"mapBuilding_id\") REFERENCES \"MapBuildings\" (\"id\"), \
+FOREIGN KEY (\"weapon_id\") REFERENCES \"Weapons\" (\"id\") \
+); \
+    ";
+}
+
 int MapBuilding::getId() const
 {
     return id;
@@ -1949,6 +2270,14 @@ Text MapBuilding::getVariableString(int columnId) const
         return to_string(yaw);
     case 9:
         return to_string(roll);
+    case 10:
+        return to_string(scale);
+    case 11:
+        return to_string(scale_x);
+    case 12:
+        return to_string(scale_y);
+    case 13:
+        return to_string(scale_z);
     default:
         return "";
     }
@@ -1989,6 +2318,18 @@ void MapBuilding::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
     case 9:
         roll = std::stof(text.string());
         break;
+    case 10:
+        scale = std::stof(text.string());
+        break;
+    case 11:
+        scale_x = std::stof(text.string());
+        break;
+    case 12:
+        scale_y = std::stof(text.string());
+        break;
+    case 13:
+        scale_z = std::stof(text.string());
+        break;
     default:
         break;
     }
@@ -2003,32 +2344,32 @@ QTreeWidgetItem *MapBuilding::printQtTreeView(QTreeWidgetItem *parent) const
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Equipments")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingEquipment));
     for (auto &equipment : equipments)
         equipment->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Gliders")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingGlider));
     for (auto &glider : gliders)
         glider->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingGood));
     for (auto &good : goods)
         good->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Modificators")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingModificator));
     for (auto &modificator : modificators)
         modificator->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Projectiles")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingProjectile));
     for (auto &projectile : projectiles)
         projectile->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Weapons")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingWeapon));
     for (auto &weapon : weapons)
         weapon->printQtTreeView(root);
 
@@ -2056,6 +2397,10 @@ bool MapBuilding::operator==(const MapBuilding &rhs) const
         map == rhs.map &&
         pitch == rhs.pitch &&
         roll == rhs.roll &&
+        scale == rhs.scale &&
+        scale_x == rhs.scale_x &&
+        scale_y == rhs.scale_y &&
+        scale_z == rhs.scale_z &&
         text_id == rhs.text_id &&
         x == rhs.x &&
         y == rhs.y &&
@@ -2076,8 +2421,38 @@ int MapBuilding::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[7]) pitch = std::stof(cols[7]);
     if (cols[8]) yaw = std::stof(cols[8]);
     if (cols[9]) roll = std::stof(cols[9]);
+    if (cols[10]) scale = std::stof(cols[10]);
+    if (cols[11]) scale_x = std::stof(cols[11]);
+    if (cols[12]) scale_y = std::stof(cols[12]);
+    if (cols[13]) scale_z = std::stof(cols[13]);
 
     return 0;
+}
+
+const char *MapBuilding::getSql()
+{
+    return
+    " \
+create table \"MapBuildings\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"map_id\" INTEGER NOT NULL, \
+\"building_id\" INTEGER NOT NULL, \
+\"x\" REAL, \
+\"y\" REAL, \
+\"z\" REAL, \
+\"pitch\" REAL, \
+\"yaw\" REAL, \
+\"roll\" REAL, \
+\"scale\" REAL DEFAULT 1, \
+\"scale_x\" REAL DEFAULT 1, \
+\"scale_y\" REAL DEFAULT 1, \
+\"scale_z\" REAL DEFAULT 1, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"map_id\") REFERENCES \"Maps\" (\"id\"), \
+FOREIGN KEY (\"building_id\") REFERENCES \"Buildings\" (\"id\") \
+); \
+    ";
 }
 
 int MapObject::getId() const
@@ -2242,6 +2617,32 @@ int MapObject::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *MapObject::getSql()
+{
+    return
+    " \
+create table \"MapObjects\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"map_id\" INTEGER NOT NULL, \
+\"object_id\" INTEGER NOT NULL, \
+\"x\" REAL, \
+\"y\" REAL, \
+\"z\" REAL, \
+\"pitch\" REAL, \
+\"yaw\" REAL, \
+\"roll\" REAL, \
+\"scale\" REAL DEFAULT 1, \
+\"scale_x\" REAL DEFAULT 1, \
+\"scale_y\" REAL DEFAULT 1, \
+\"scale_z\" REAL DEFAULT 1, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"map_id\") REFERENCES \"Maps\" (\"id\"), \
+FOREIGN KEY (\"object_id\") REFERENCES \"Objects\" (\"id\") \
+); \
+    ";
+}
+
 int Map::getId() const
 {
     return id;
@@ -2315,12 +2716,12 @@ QTreeWidgetItem *Map::printQtTreeView(QTreeWidgetItem *parent) const
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Buildings")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Map));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
     for (auto &building : buildings)
         building->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Objects")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Map));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapObject));
     for (auto &object : objects)
         object->printQtTreeView(root);
 
@@ -2332,6 +2733,9 @@ QTreeWidgetItem *Map::printQtTreeView(QTreeWidgetItem *parent) const
 Text Map::getName() const
 {
     Text n;
+    n = text_id;
+    if (!n.empty())
+        return n;
     n = to_string(name);
     if (!n.empty())
         return n;
@@ -2362,6 +2766,23 @@ int Map::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[5]) h_max = std::stof(cols[5]);
 
     return 0;
+}
+
+const char *Map::getSql()
+{
+    return
+    " \
+create table \"Maps\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT NOT NULL, \
+\"resource\" TEXT NOT NULL, \
+\"name_id\" INTEGER, \
+\"h_min\" REAL, \
+\"h_max\" REAL, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+); \
+    ";
 }
 
 EObjectType MechanoidQuest::getType() const
@@ -2443,6 +2864,21 @@ int MechanoidQuest::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[2]) state = std::stoi(cols[2]);
 
     return 0;
+}
+
+const char *MechanoidQuest::getSql()
+{
+    return
+    " \
+create table \"MechanoidQuests\" ( \
+\"mechanoid_id\" INTEGER NOT NULL, \
+\"quest_id\" INTEGER NOT NULL, \
+\"state\" INTEGER, \
+PRIMARY KEY (\"mechanoid_id\", \"quest_id\"), \
+FOREIGN KEY (\"mechanoid_id\") REFERENCES \"Mechanoids\" (\"id\"), \
+FOREIGN KEY (\"quest_id\") REFERENCES \"Quests\" (\"id\") \
+); \
+    ";
 }
 
 int Mechanoid::getId() const
@@ -2588,7 +3024,7 @@ QTreeWidgetItem *Mechanoid::printQtTreeView(QTreeWidgetItem *parent) const
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Quests")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Mechanoid));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MechanoidQuest));
     for (auto &quest : quests)
         quest->printQtTreeView(root);
 
@@ -2658,6 +3094,42 @@ int Mechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[19]) roll = std::stof(cols[19]);
 
     return 0;
+}
+
+const char *Mechanoid::getSql()
+{
+    return
+    " \
+create table \"Mechanoids\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"name_id\" INTEGER, \
+\"generation\" INTEGER, \
+\"rating\" REAL, \
+\"money\" REAL, \
+\"configuration_id\" INTEGER, \
+\"group_id\" INTEGER, \
+\"clan_id\" INTEGER, \
+\"rating_fight\" REAL, \
+\"rating_courier\" REAL, \
+\"rating_trade\" REAL, \
+\"map_id\" INTEGER, \
+\"mapBuilding_id\" INTEGER, \
+\"x\" REAL, \
+\"y\" REAL, \
+\"z\" REAL, \
+\"pitch\" REAL, \
+\"yaw\" REAL, \
+\"roll\" REAL, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"configuration_id\") REFERENCES \"Configurations\" (\"id\"), \
+FOREIGN KEY (\"clan_id\") REFERENCES \"Clans\" (\"id\"), \
+FOREIGN KEY (\"map_id\") REFERENCES \"Maps\" (\"id\"), \
+FOREIGN KEY (\"mapBuilding_id\") REFERENCES \"MapBuildings\" (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\"), \
+FOREIGN KEY (\"group_id\") REFERENCES \"Groups\" (\"id\") \
+); \
+    ";
 }
 
 EObjectType ModificationClan::getType() const
@@ -2734,6 +3206,20 @@ int ModificationClan::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *ModificationClan::getSql()
+{
+    return
+    " \
+create table \"ModificationClans\" ( \
+\"modification_id\" INTEGER NOT NULL, \
+\"clan_id\" INTEGER NOT NULL, \
+PRIMARY KEY (\"modification_id\", \"clan_id\"), \
+FOREIGN KEY (\"modification_id\") REFERENCES \"Modifications\" (\"id\"), \
+FOREIGN KEY (\"clan_id\") REFERENCES \"Clans\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType ModificationMap::getType() const
 {
     return EObjectType::ModificationMap;
@@ -2808,6 +3294,20 @@ int ModificationMap::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *ModificationMap::getSql()
+{
+    return
+    " \
+create table \"ModificationMaps\" ( \
+\"modification_id\" INTEGER NOT NULL, \
+\"map_id\" INTEGER NOT NULL, \
+PRIMARY KEY (\"modification_id\", \"map_id\"), \
+FOREIGN KEY (\"modification_id\") REFERENCES \"Modifications\" (\"id\"), \
+FOREIGN KEY (\"map_id\") REFERENCES \"Maps\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType ModificationMechanoid::getType() const
 {
     return EObjectType::ModificationMechanoid;
@@ -2880,6 +3380,20 @@ int ModificationMechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[1]) mechanoid.id = std::stoi(cols[1]);
 
     return 0;
+}
+
+const char *ModificationMechanoid::getSql()
+{
+    return
+    " \
+create table \"ModificationMechanoids\" ( \
+\"modification_id\" INTEGER NOT NULL, \
+\"mechanoid_id\" INTEGER NOT NULL, \
+PRIMARY KEY (\"modification_id\", \"mechanoid_id\"), \
+FOREIGN KEY (\"modification_id\") REFERENCES \"Modifications\" (\"id\"), \
+FOREIGN KEY (\"mechanoid_id\") REFERENCES \"Mechanoids\" (\"id\") \
+); \
+    ";
 }
 
 int Modification::getId() const
@@ -2985,17 +3499,17 @@ QTreeWidgetItem *Modification::printQtTreeView(QTreeWidgetItem *parent) const
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Clans")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Modification));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ModificationClan));
     for (auto &clan : clans)
         clan->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Maps")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Modification));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ModificationMap));
     for (auto &map : maps)
         map->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Mechanoids")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Modification));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ModificationMechanoid));
     for (auto &mechanoid : mechanoids)
         mechanoid->printQtTreeView(root);
 
@@ -3046,6 +3560,31 @@ int Modification::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[11]) cooperative_player_configuration.id = std::stoi(cols[11]);
 
     return 0;
+}
+
+const char *Modification::getSql()
+{
+    return
+    " \
+create table \"Modifications\" ( \
+\"id\" INTEGER NOT NULL, \
+\"name_id\" INTEGER, \
+\"directory\" TEXT NOT NULL, \
+\"author\" TEXT, \
+\"date_created\" TEXT, \
+\"date_modified\" TEXT, \
+\"comment\" TEXT, \
+\"version\" TEXT, \
+\"script_language\" TEXT, \
+\"script_main\" TEXT, \
+\"player_mechanoid_id\" INTEGER, \
+\"cooperative_player_configuration_id\" INTEGER, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\"), \
+FOREIGN KEY (\"player_mechanoid_id\") REFERENCES \"Mechanoids\" (\"id\"), \
+FOREIGN KEY (\"cooperative_player_configuration_id\") REFERENCES \"Configurations\" (\"id\") \
+); \
+    ";
 }
 
 int Modificator::getId() const
@@ -3178,6 +3717,26 @@ int Modificator::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *Modificator::getSql()
+{
+    return
+    " \
+create table \"Modificators\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"resource\" TEXT, \
+\"name_id\" INTEGER, \
+\"probability\" REAL, \
+\"price\" REAL, \
+\"k_price\" REAL, \
+\"k_param1\" REAL, \
+\"k_param2\" REAL, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+); \
+    ";
+}
+
 int Object::getId() const
 {
     return id;
@@ -3280,6 +3839,22 @@ int Object::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *Object::getSql()
+{
+    return
+    " \
+create table \"Objects\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"resource\" TEXT, \
+\"name_id\" INTEGER, \
+\"type\" INTEGER, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+); \
+    ";
+}
+
 int Player::getId() const
 {
     return id;
@@ -3356,6 +3931,19 @@ int Player::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[1]) mechanoid.id = std::stoi(cols[1]);
 
     return 0;
+}
+
+const char *Player::getSql()
+{
+    return
+    " \
+create table \"Players\" ( \
+\"id\" INTEGER NOT NULL, \
+\"mechanoid_id\" INTEGER, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"mechanoid_id\") REFERENCES \"Mechanoids\" (\"id\") \
+); \
+    ";
 }
 
 int Projectile::getId() const
@@ -3495,6 +4083,27 @@ int Projectile::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *Projectile::getSql()
+{
+    return
+    " \
+create table \"Projectiles\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"resource\" TEXT, \
+\"name_id\" INTEGER, \
+\"type\" INTEGER, \
+\"weight\" REAL, \
+\"damage\" REAL, \
+\"speed\" REAL, \
+\"scale\" REAL, \
+\"notrade\" INTEGER, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType QuestRewardEquipment::getType() const
 {
     return EObjectType::QuestRewardEquipment;
@@ -3574,6 +4183,21 @@ int QuestRewardEquipment::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[2]) quantity = std::stoi(cols[2]);
 
     return 0;
+}
+
+const char *QuestRewardEquipment::getSql()
+{
+    return
+    " \
+create table \"QuestRewardEquipments\" ( \
+\"questReward_id\" INTEGER NOT NULL, \
+\"equipment_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"questReward_id\", \"equipment_id\"), \
+FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
+FOREIGN KEY (\"equipment_id\") REFERENCES \"Equipments\" (\"id\") \
+); \
+    ";
 }
 
 EObjectType QuestRewardGlider::getType() const
@@ -3657,6 +4281,21 @@ int QuestRewardGlider::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *QuestRewardGlider::getSql()
+{
+    return
+    " \
+create table \"QuestRewardGliders\" ( \
+\"questReward_id\" INTEGER NOT NULL, \
+\"glider_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"questReward_id\", \"glider_id\"), \
+FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
+FOREIGN KEY (\"glider_id\") REFERENCES \"Gliders\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType QuestRewardGood::getType() const
 {
     return EObjectType::QuestRewardGood;
@@ -3736,6 +4375,21 @@ int QuestRewardGood::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[2]) quantity = std::stoi(cols[2]);
 
     return 0;
+}
+
+const char *QuestRewardGood::getSql()
+{
+    return
+    " \
+create table \"QuestRewardGoods\" ( \
+\"questReward_id\" INTEGER NOT NULL, \
+\"good_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"questReward_id\", \"good_id\"), \
+FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
+FOREIGN KEY (\"good_id\") REFERENCES \"Goods\" (\"id\") \
+); \
+    ";
 }
 
 EObjectType QuestRewardModificator::getType() const
@@ -3819,6 +4473,21 @@ int QuestRewardModificator::loadFromSqlite3(int ncols, char **cols, char **names
     return 0;
 }
 
+const char *QuestRewardModificator::getSql()
+{
+    return
+    " \
+create table \"QuestRewardModificators\" ( \
+\"questReward_id\" INTEGER NOT NULL, \
+\"modificator_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"questReward_id\", \"modificator_id\"), \
+FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
+FOREIGN KEY (\"modificator_id\") REFERENCES \"Modificators\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType QuestRewardProjectile::getType() const
 {
     return EObjectType::QuestRewardProjectile;
@@ -3900,6 +4569,21 @@ int QuestRewardProjectile::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *QuestRewardProjectile::getSql()
+{
+    return
+    " \
+create table \"QuestRewardProjectiles\" ( \
+\"questReward_id\" INTEGER NOT NULL, \
+\"projectile_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"questReward_id\", \"projectile_id\"), \
+FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
+FOREIGN KEY (\"projectile_id\") REFERENCES \"Projectiles\" (\"id\") \
+); \
+    ";
+}
+
 EObjectType QuestRewardReputation::getType() const
 {
     return EObjectType::QuestRewardReputation;
@@ -3952,9 +4636,6 @@ QTreeWidgetItem *QuestRewardReputation::printQtTreeView(QTreeWidgetItem *parent)
 Text QuestRewardReputation::getName() const
 {
     Text n;
-    n = to_string(reputation);
-    if (!n.empty())
-        return n;
     return IObject::getName();
 }
 
@@ -3967,11 +4648,6 @@ bool QuestRewardReputation::operator==(const QuestRewardReputation &rhs) const
         1;
 }
 
-IdPtr<QuestReward> QuestRewardReputation::operator->() const
-{
-    return questReward;
-}
-
 int QuestRewardReputation::loadFromSqlite3(int ncols, char **cols, char **names)
 {
     if (cols[0]) questReward.id = std::stoi(cols[0]);
@@ -3979,6 +4655,21 @@ int QuestRewardReputation::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[2]) reputation = std::stof(cols[2]);
 
     return 0;
+}
+
+const char *QuestRewardReputation::getSql()
+{
+    return
+    " \
+create table \"QuestRewardReputations\" ( \
+\"questReward_id\" INTEGER NOT NULL, \
+\"clan_id\" INTEGER NOT NULL, \
+\"reputation\" REAL, \
+PRIMARY KEY (\"questReward_id\", \"clan_id\"), \
+FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
+FOREIGN KEY (\"clan_id\") REFERENCES \"Clans\" (\"id\") \
+); \
+    ";
 }
 
 EObjectType QuestRewardWeapon::getType() const
@@ -4062,6 +4753,21 @@ int QuestRewardWeapon::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *QuestRewardWeapon::getSql()
+{
+    return
+    " \
+create table \"QuestRewardWeapons\" ( \
+\"questReward_id\" INTEGER NOT NULL, \
+\"weapon_id\" INTEGER NOT NULL, \
+\"quantity\" INTEGER, \
+PRIMARY KEY (\"questReward_id\", \"weapon_id\"), \
+FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
+FOREIGN KEY (\"weapon_id\") REFERENCES \"Weapons\" (\"id\") \
+); \
+    ";
+}
+
 int QuestReward::getId() const
 {
     return id;
@@ -4130,37 +4836,37 @@ QTreeWidgetItem *QuestReward::printQtTreeView(QTreeWidgetItem *parent) const
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Equipments")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardEquipment));
     for (auto &equipment : equipments)
         equipment->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Gliders")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardGlider));
     for (auto &glider : gliders)
         glider->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardGood));
     for (auto &good : goods)
         good->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Modificators")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardModificator));
     for (auto &modificator : modificators)
         modificator->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Projectiles")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardProjectile));
     for (auto &projectile : projectiles)
         projectile->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Reputations")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardReputation));
     for (auto &reputation : reputations)
         reputation->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Weapons")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardWeapon));
     for (auto &weapon : weapons)
         weapon->printQtTreeView(root);
 
@@ -4200,6 +4906,22 @@ int QuestReward::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[4]) rating = std::stof(cols[4]);
 
     return 0;
+}
+
+const char *QuestReward::getSql()
+{
+    return
+    " \
+create table \"QuestRewards\" ( \
+\"id\" INTEGER NOT NULL, \
+\"quest_id\" INTEGER, \
+\"text_id\" TEXT, \
+\"money\" INTEGER, \
+\"rating\" REAL, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"quest_id\") REFERENCES \"Quests\" (\"id\") \
+); \
+    ";
 }
 
 int Quest::getId() const
@@ -4275,7 +4997,7 @@ QTreeWidgetItem *Quest::printQtTreeView(QTreeWidgetItem *parent) const
     QTreeWidgetItem *root;
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Rewards")));
-    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Quest));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
     for (auto &reward : rewards)
         reward->printQtTreeView(root);
 
@@ -4317,6 +5039,25 @@ int Quest::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[5]) time = std::stoi(cols[5]);
 
     return 0;
+}
+
+const char *Quest::getSql()
+{
+    return
+    " \
+create table \"Quests\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"name_id\" INTEGER, \
+\"title_id\" INTEGER, \
+\"description_id\" INTEGER, \
+\"time\" INTEGER, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\"), \
+FOREIGN KEY (\"title_id\") REFERENCES \"Strings\" (\"id\"), \
+FOREIGN KEY (\"description_id\") REFERENCES \"Strings\" (\"id\") \
+); \
+    ";
 }
 
 EObjectType ScriptVariable::getType() const
@@ -4388,6 +5129,18 @@ int ScriptVariable::loadFromSqlite3(int ncols, char **cols, char **names)
     return 0;
 }
 
+const char *ScriptVariable::getSql()
+{
+    return
+    " \
+create table \"ScriptVariables\" ( \
+\"variable\" TEXT NOT NULL, \
+\"value\" TEXT, \
+PRIMARY KEY (\"variable\") \
+); \
+    ";
+}
+
 EObjectType Setting::getType() const
 {
     return EObjectType::Setting;
@@ -4445,6 +5198,18 @@ int Setting::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[0]) player.id = std::stoi(cols[0]);
 
     return 0;
+}
+
+const char *Setting::getSql()
+{
+    return
+    " \
+create table \"Settings\" ( \
+\"player_id\" INTEGER NOT NULL, \
+PRIMARY KEY (\"player_id\"), \
+FOREIGN KEY (\"player_id\") REFERENCES \"Players\" (\"id\") \
+); \
+    ";
 }
 
 int String::getId() const
@@ -4535,6 +5300,19 @@ int String::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[2]) en = cols[2];
 
     return 0;
+}
+
+const char *String::getSql()
+{
+    return
+    " \
+create table \"Strings\" ( \
+\"id\" INTEGER NOT NULL, \
+\"ru\" TEXT, \
+\"en\" TEXT, \
+PRIMARY KEY (\"id\") \
+); \
+    ";
 }
 
 int Weapon::getId() const
@@ -4686,5 +5464,29 @@ int Weapon::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[11]) projectile.id = std::stoi(cols[11]);
 
     return 0;
+}
+
+const char *Weapon::getSql()
+{
+    return
+    " \
+create table \"Weapons\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"resource\" TEXT, \
+\"name_id\" INTEGER, \
+\"type\" INTEGER, \
+\"standard\" INTEGER, \
+\"weight\" REAL, \
+\"power\" REAL, \
+\"firerate\" REAL, \
+\"damage\" REAL, \
+\"price\" REAL, \
+\"projectile_id\" INTEGER, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\"), \
+FOREIGN KEY (\"projectile_id\") REFERENCES \"Projectiles\" (\"id\") \
+); \
+    ";
 }
 

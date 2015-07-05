@@ -39,6 +39,7 @@ void StorageImpl::_saveBuildings() const
         query += "'" + building.second->text_id.string() + "',";
         query += "'" + building.second->resource.string() + "',";
         query += "'" + std::to_string(building.second->name.id) + "',";
+        query += "'" + std::to_string(building.second->interactive) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
     }
@@ -1113,6 +1114,10 @@ void StorageImpl::_saveMapBuildings() const
         query += "'" + std::to_string(mapBuilding.second->pitch) + "',";
         query += "'" + std::to_string(mapBuilding.second->yaw) + "',";
         query += "'" + std::to_string(mapBuilding.second->roll) + "',";
+        query += "'" + std::to_string(mapBuilding.second->scale) + "',";
+        query += "'" + std::to_string(mapBuilding.second->scale_x) + "',";
+        query += "'" + std::to_string(mapBuilding.second->scale_y) + "',";
+        query += "'" + std::to_string(mapBuilding.second->scale_z) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
     }
@@ -2480,6 +2485,56 @@ void StorageImpl::_saveWeapons() const
     db->execute(query.c_str(), 0, 0);
 }
 
+void StorageImpl::create() const
+{
+    db->execute(Building::getSql());
+    db->execute(ClanMechanoid::getSql());
+    db->execute(ClanReputation::getSql());
+    db->execute(Clan::getSql());
+    db->execute(ConfigurationEquipment::getSql());
+    db->execute(ConfigurationGood::getSql());
+    db->execute(ConfigurationProjectile::getSql());
+    db->execute(ConfigurationWeapon::getSql());
+    db->execute(Configuration::getSql());
+    db->execute(Equipment::getSql());
+    db->execute(Glider::getSql());
+    db->execute(Good::getSql());
+    db->execute(GroupMechanoid::getSql());
+    db->execute(Group::getSql());
+    db->execute(MapBuildingEquipment::getSql());
+    db->execute(MapBuildingGlider::getSql());
+    db->execute(MapBuildingGood::getSql());
+    db->execute(MapBuildingModificator::getSql());
+    db->execute(MapBuildingProjectile::getSql());
+    db->execute(MapBuildingWeapon::getSql());
+    db->execute(MapBuilding::getSql());
+    db->execute(MapObject::getSql());
+    db->execute(Map::getSql());
+    db->execute(MechanoidQuest::getSql());
+    db->execute(Mechanoid::getSql());
+    db->execute(ModificationClan::getSql());
+    db->execute(ModificationMap::getSql());
+    db->execute(ModificationMechanoid::getSql());
+    db->execute(Modification::getSql());
+    db->execute(Modificator::getSql());
+    db->execute(Object::getSql());
+    db->execute(Player::getSql());
+    db->execute(Projectile::getSql());
+    db->execute(QuestRewardEquipment::getSql());
+    db->execute(QuestRewardGlider::getSql());
+    db->execute(QuestRewardGood::getSql());
+    db->execute(QuestRewardModificator::getSql());
+    db->execute(QuestRewardProjectile::getSql());
+    db->execute(QuestRewardReputation::getSql());
+    db->execute(QuestRewardWeapon::getSql());
+    db->execute(QuestReward::getSql());
+    db->execute(Quest::getSql());
+    db->execute(ScriptVariable::getSql());
+    db->execute(Setting::getSql());
+    db->execute(String::getSql());
+    db->execute(Weapon::getSql());
+}
+
 void StorageImpl::clear()
 {
     buildings.clear();
@@ -3682,9 +3737,6 @@ Ptr<QuestReward> StorageImpl::addQuestReward(IObject *parent)
     auto v = std::make_shared<QuestReward>();
     v->id = id;
     questRewards[v->id] = v;
-    Quest *quest = (Quest *)parent;
-    quest->rewards.push_back(v);
-    v->quest = quests[quest->id];
     return v;
 }
 

@@ -141,6 +141,7 @@ void retranslateFieldNames()
         { "h_max", QCoreApplication::translate("DB", "h_max") },
         { "h_min", QCoreApplication::translate("DB", "h_min") },
         { "id", QCoreApplication::translate("DB", "id") },
+        { "interactive", QCoreApplication::translate("DB", "interactive") },
         { "k_param1", QCoreApplication::translate("DB", "k_param1") },
         { "k_param2", QCoreApplication::translate("DB", "k_param2") },
         { "k_price", QCoreApplication::translate("DB", "k_price") },

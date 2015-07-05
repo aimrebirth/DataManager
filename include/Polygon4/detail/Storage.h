@@ -51,6 +51,7 @@ public:
     CMap<Ptr<Weapon>> weapons;
 
 public:
+    virtual void create() const = 0;
     virtual void clear() = 0;
     virtual void load(ProgressCallback callback = ProgressCallback()) = 0;
     virtual void save(ProgressCallback callback = ProgressCallback()) const = 0;
