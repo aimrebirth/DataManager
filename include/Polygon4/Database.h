@@ -34,10 +34,10 @@ class Database
     typedef std::function<int(int, char**, char**)> DatabaseCallback;
 
 public:
-    Database(std::string dbname);
+    Database(const std::string &dbname);
     ~Database();
 
-    void loadDatabase(std::string dbname);
+    void loadDatabase(const std::string &dbname);
     bool isLoaded() const;
 
     void getSchema(DatabaseSchema *schema) const;

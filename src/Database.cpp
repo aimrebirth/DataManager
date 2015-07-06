@@ -45,7 +45,7 @@ std::shared_ptr<Storage> initStorage(std::shared_ptr<Database> db)
     return std::make_shared<detail::StorageImpl>(db);
 }
 
-Database::Database(std::string dbname)
+Database::Database(const std::string &dbname)
 {
     loadDatabase(dbname);
     name = dbname.substr(std::max((int)dbname.rfind("/"), (int)dbname.rfind("\\")) + 1);
@@ -58,7 +58,7 @@ Database::~Database()
     db = 0;
 }
 
-void Database::loadDatabase(std::string dbname)
+void Database::loadDatabase(const std::string &dbname)
 {
     if (db)
         return;
