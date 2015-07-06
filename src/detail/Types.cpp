@@ -30,10 +30,6 @@ Text Building::getVariableString(int columnId) const
         return to_string(text_id);
     case 2:
         return to_string(resource);
-    case 3:
-        return to_string(name);
-    case 4:
-        return to_string(interactive);
     default:
         return "";
     }
@@ -53,12 +49,6 @@ void Building::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
     case 2:
         resource = text.string();
         break;
-    case 3:
-        name = std::static_pointer_cast<String>(ptr);
-        break;
-    case 4:
-        interactive = std::stoi(text.string());
-        break;
     default:
         break;
     }
@@ -77,9 +67,6 @@ QTreeWidgetItem *Building::printQtTreeView(QTreeWidgetItem *parent) const
 Text Building::getName() const
 {
     Text n;
-    n = to_string(name);
-    if (!n.empty())
-        return n;
     n = text_id;
     if (!n.empty())
         return n;
@@ -89,8 +76,6 @@ Text Building::getName() const
 bool Building::operator==(const Building &rhs) const
 {
     return
-        interactive == rhs.interactive &&
-        name == rhs.name &&
         resource == rhs.resource &&
         text_id == rhs.text_id &&
         1;
@@ -101,8 +86,6 @@ int Building::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[0]) id = std::stoi(cols[0]);
     if (cols[1]) text_id = cols[1];
     if (cols[2]) resource = cols[2];
-    if (cols[3]) name.id = std::stoi(cols[3]);
-    if (cols[4]) interactive = std::stoi(cols[4]);
 
     return 0;
 }
@@ -115,10 +98,7 @@ create table \"Buildings\" ( \
 \"id\" INTEGER NOT NULL, \
 \"text_id\" TEXT, \
 \"resource\" TEXT, \
-\"name_id\" INTEGER, \
-\"interactive\" INTEGER DEFAULT 0, \
-PRIMARY KEY (\"id\"), \
-FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+PRIMARY KEY (\"id\") \
 ); \
     ";
 }
@@ -2283,24 +2263,28 @@ Text MapBuilding::getVariableString(int columnId) const
     case 3:
         return to_string(building);
     case 4:
-        return to_string(x);
+        return to_string(name);
     case 5:
-        return to_string(y);
+        return to_string(interactive);
     case 6:
-        return to_string(z);
+        return to_string(x);
     case 7:
-        return to_string(pitch);
+        return to_string(y);
     case 8:
-        return to_string(yaw);
+        return to_string(z);
     case 9:
-        return to_string(roll);
+        return to_string(pitch);
     case 10:
-        return to_string(scale);
+        return to_string(yaw);
     case 11:
-        return to_string(scale_x);
+        return to_string(roll);
     case 12:
-        return to_string(scale_y);
+        return to_string(scale);
     case 13:
+        return to_string(scale_x);
+    case 14:
+        return to_string(scale_y);
+    case 15:
         return to_string(scale_z);
     default:
         return "";
@@ -2325,33 +2309,39 @@ void MapBuilding::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         building = std::static_pointer_cast<Building>(ptr);
         break;
     case 4:
-        x = std::stof(text.string());
+        name = std::static_pointer_cast<String>(ptr);
         break;
     case 5:
-        y = std::stof(text.string());
+        interactive = std::stoi(text.string());
         break;
     case 6:
-        z = std::stof(text.string());
+        x = std::stof(text.string());
         break;
     case 7:
-        pitch = std::stof(text.string());
+        y = std::stof(text.string());
         break;
     case 8:
-        yaw = std::stof(text.string());
+        z = std::stof(text.string());
         break;
     case 9:
-        roll = std::stof(text.string());
+        pitch = std::stof(text.string());
         break;
     case 10:
-        scale = std::stof(text.string());
+        yaw = std::stof(text.string());
         break;
     case 11:
-        scale_x = std::stof(text.string());
+        roll = std::stof(text.string());
         break;
     case 12:
-        scale_y = std::stof(text.string());
+        scale = std::stof(text.string());
         break;
     case 13:
+        scale_x = std::stof(text.string());
+        break;
+    case 14:
+        scale_y = std::stof(text.string());
+        break;
+    case 15:
         scale_z = std::stof(text.string());
         break;
     default:
@@ -2408,6 +2398,9 @@ Text MapBuilding::getName() const
     n = to_string(building);
     if (!n.empty())
         return n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
     n = text_id;
     if (!n.empty())
         return n;
@@ -2418,7 +2411,9 @@ bool MapBuilding::operator==(const MapBuilding &rhs) const
 {
     return
         building == rhs.building &&
+        interactive == rhs.interactive &&
         map == rhs.map &&
+        name == rhs.name &&
         pitch == rhs.pitch &&
         roll == rhs.roll &&
         scale == rhs.scale &&
@@ -2439,16 +2434,18 @@ int MapBuilding::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[1]) text_id = cols[1];
     if (cols[2]) map.id = std::stoi(cols[2]);
     if (cols[3]) building.id = std::stoi(cols[3]);
-    if (cols[4]) x = std::stof(cols[4]);
-    if (cols[5]) y = std::stof(cols[5]);
-    if (cols[6]) z = std::stof(cols[6]);
-    if (cols[7]) pitch = std::stof(cols[7]);
-    if (cols[8]) yaw = std::stof(cols[8]);
-    if (cols[9]) roll = std::stof(cols[9]);
-    if (cols[10]) scale = std::stof(cols[10]);
-    if (cols[11]) scale_x = std::stof(cols[11]);
-    if (cols[12]) scale_y = std::stof(cols[12]);
-    if (cols[13]) scale_z = std::stof(cols[13]);
+    if (cols[4]) name.id = std::stoi(cols[4]);
+    if (cols[5]) interactive = std::stoi(cols[5]);
+    if (cols[6]) x = std::stof(cols[6]);
+    if (cols[7]) y = std::stof(cols[7]);
+    if (cols[8]) z = std::stof(cols[8]);
+    if (cols[9]) pitch = std::stof(cols[9]);
+    if (cols[10]) yaw = std::stof(cols[10]);
+    if (cols[11]) roll = std::stof(cols[11]);
+    if (cols[12]) scale = std::stof(cols[12]);
+    if (cols[13]) scale_x = std::stof(cols[13]);
+    if (cols[14]) scale_y = std::stof(cols[14]);
+    if (cols[15]) scale_z = std::stof(cols[15]);
 
     return 0;
 }
@@ -2462,6 +2459,8 @@ create table \"MapBuildings\" ( \
 \"text_id\" TEXT, \
 \"map_id\" INTEGER NOT NULL, \
 \"building_id\" INTEGER NOT NULL, \
+\"name_id\" INTEGER, \
+\"interactive\" INTEGER, \
 \"x\" REAL, \
 \"y\" REAL, \
 \"z\" REAL, \
@@ -2474,7 +2473,8 @@ create table \"MapBuildings\" ( \
 \"scale_z\" REAL DEFAULT 1, \
 PRIMARY KEY (\"id\"), \
 FOREIGN KEY (\"map_id\") REFERENCES \"Maps\" (\"id\"), \
-FOREIGN KEY (\"building_id\") REFERENCES \"Buildings\" (\"id\") \
+FOREIGN KEY (\"building_id\") REFERENCES \"Buildings\" (\"id\"), \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
 ); \
     ";
 }

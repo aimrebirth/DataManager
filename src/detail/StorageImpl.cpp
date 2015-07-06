@@ -14,8 +14,6 @@ void StorageImpl::_loadBuildingsPtrs()
 {
     for (auto &building : buildings)
     {
-        if (strings.find(building.second->name.id) != strings.end())
-            building.second->name.ptr = strings[building.second->name.id];
     }
 }
 
@@ -38,8 +36,6 @@ void StorageImpl::_saveBuildings() const
         query += "'" + std::to_string(building.second->id) + "',";
         query += "'" + building.second->text_id.string() + "',";
         query += "'" + building.second->resource.string() + "',";
-        query += "'" + std::to_string(building.second->name.id) + "',";
-        query += "'" + std::to_string(building.second->interactive) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
     }
@@ -1064,6 +1060,8 @@ void StorageImpl::_loadMapBuildingsPtrs()
             mapBuilding.second->map.ptr = maps[mapBuilding.second->map.id];
         if (buildings.find(mapBuilding.second->building.id) != buildings.end())
             mapBuilding.second->building.ptr = buildings[mapBuilding.second->building.id];
+        if (strings.find(mapBuilding.second->name.id) != strings.end())
+            mapBuilding.second->name.ptr = strings[mapBuilding.second->name.id];
     }
 }
 
@@ -1108,6 +1106,8 @@ void StorageImpl::_saveMapBuildings() const
         query += "'" + mapBuilding.second->text_id.string() + "',";
         query += "'" + std::to_string(mapBuilding.second->map.id) + "',";
         query += "'" + std::to_string(mapBuilding.second->building.id) + "',";
+        query += "'" + std::to_string(mapBuilding.second->name.id) + "',";
+        query += "'" + std::to_string(mapBuilding.second->interactive) + "',";
         query += "'" + std::to_string(mapBuilding.second->x) + "',";
         query += "'" + std::to_string(mapBuilding.second->y) + "',";
         query += "'" + std::to_string(mapBuilding.second->z) + "',";

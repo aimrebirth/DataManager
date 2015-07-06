@@ -136,8 +136,6 @@ private:
 public:
     Text text_id;
     Text resource;
-    IdPtr<String> name;
-    int interactive = 0;
 
     int getId() const;
     void setId(int id);
@@ -755,6 +753,8 @@ public:
     Text text_id;
     IdPtr<Map> map;
     IdPtr<Building> building;
+    IdPtr<String> name;
+    int interactive = 0;
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
