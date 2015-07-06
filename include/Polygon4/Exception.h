@@ -31,11 +31,11 @@ namespace polygon4
 class Exception : public std::exception
 {
 public:
-    Exception() {}
+    Exception(){}
     Exception(const char *file, const char *function, int line, const std::string &msg)
     {
         std::stringstream ss;
-        ss << "Exception in file: " << file << ", function: " << function << ", line: " << line << ".\n"
+        ss << "Exception in file: " << file << ", function: " << function << ", line: " << line << ". "
            << "Error description: " << msg;
 
         what_str = ss.str();
