@@ -452,12 +452,20 @@ public:
     int standard = 0;
     float weight = 0.0f;
     float maxweight = 0.0f;
-    float rotatespeed = 0.0f;
     float armor = 0.0f;
     int price = 0;
     float restore = 0.0f;
     float power = 0.0f;
     int special = 0;
+    float rotatespeed = 0.0f;
+    float resfront = 0.0f;
+    float restop = 0.0f;
+    float resside = 0.0f;
+    float stabfront = 0.0f;
+    float stabside = 0.0f;
+    float careen = 0.0f;
+    float delta_t = 0.0f;
+    float turbulence = 0.0f;
 
     int getId() const;
     void setId(int id);
@@ -489,6 +497,7 @@ private:
 public:
     Text text_id;
     Text resource;
+    Text resource_drop;
     IdPtr<String> name;
     int price = 0;
     int notrade = 0;

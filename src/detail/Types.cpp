@@ -1165,17 +1165,33 @@ Text Glider::getVariableString(int columnId) const
     case 6:
         return to_string(maxweight);
     case 7:
-        return to_string(rotatespeed);
-    case 8:
         return to_string(armor);
-    case 9:
+    case 8:
         return to_string(price);
-    case 10:
+    case 9:
         return to_string(restore);
-    case 11:
+    case 10:
         return to_string(power);
-    case 12:
+    case 11:
         return to_string(special);
+    case 12:
+        return to_string(rotatespeed);
+    case 13:
+        return to_string(resfront);
+    case 14:
+        return to_string(restop);
+    case 15:
+        return to_string(resside);
+    case 16:
+        return to_string(stabfront);
+    case 17:
+        return to_string(stabside);
+    case 18:
+        return to_string(careen);
+    case 19:
+        return to_string(delta_t);
+    case 20:
+        return to_string(turbulence);
     default:
         return "";
     }
@@ -1208,22 +1224,46 @@ void Glider::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         maxweight = std::stof(text.string());
         break;
     case 7:
-        rotatespeed = std::stof(text.string());
-        break;
-    case 8:
         armor = std::stof(text.string());
         break;
-    case 9:
+    case 8:
         price = std::stoi(text.string());
         break;
-    case 10:
+    case 9:
         restore = std::stof(text.string());
         break;
-    case 11:
+    case 10:
         power = std::stof(text.string());
         break;
-    case 12:
+    case 11:
         special = std::stoi(text.string());
+        break;
+    case 12:
+        rotatespeed = std::stof(text.string());
+        break;
+    case 13:
+        resfront = std::stof(text.string());
+        break;
+    case 14:
+        restop = std::stof(text.string());
+        break;
+    case 15:
+        resside = std::stof(text.string());
+        break;
+    case 16:
+        stabfront = std::stof(text.string());
+        break;
+    case 17:
+        stabside = std::stof(text.string());
+        break;
+    case 18:
+        careen = std::stof(text.string());
+        break;
+    case 19:
+        delta_t = std::stof(text.string());
+        break;
+    case 20:
+        turbulence = std::stof(text.string());
         break;
     default:
         break;
@@ -1256,16 +1296,24 @@ bool Glider::operator==(const Glider &rhs) const
 {
     return
         armor == rhs.armor &&
+        careen == rhs.careen &&
+        delta_t == rhs.delta_t &&
         maxweight == rhs.maxweight &&
         name == rhs.name &&
         power == rhs.power &&
         price == rhs.price &&
+        resfront == rhs.resfront &&
         resource == rhs.resource &&
+        resside == rhs.resside &&
+        restop == rhs.restop &&
         restore == rhs.restore &&
         rotatespeed == rhs.rotatespeed &&
         special == rhs.special &&
+        stabfront == rhs.stabfront &&
+        stabside == rhs.stabside &&
         standard == rhs.standard &&
         text_id == rhs.text_id &&
+        turbulence == rhs.turbulence &&
         weight == rhs.weight &&
         1;
 }
@@ -1279,12 +1327,20 @@ int Glider::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[4]) standard = std::stoi(cols[4]);
     if (cols[5]) weight = std::stof(cols[5]);
     if (cols[6]) maxweight = std::stof(cols[6]);
-    if (cols[7]) rotatespeed = std::stof(cols[7]);
-    if (cols[8]) armor = std::stof(cols[8]);
-    if (cols[9]) price = std::stoi(cols[9]);
-    if (cols[10]) restore = std::stof(cols[10]);
-    if (cols[11]) power = std::stof(cols[11]);
-    if (cols[12]) special = std::stoi(cols[12]);
+    if (cols[7]) armor = std::stof(cols[7]);
+    if (cols[8]) price = std::stoi(cols[8]);
+    if (cols[9]) restore = std::stof(cols[9]);
+    if (cols[10]) power = std::stof(cols[10]);
+    if (cols[11]) special = std::stoi(cols[11]);
+    if (cols[12]) rotatespeed = std::stof(cols[12]);
+    if (cols[13]) resfront = std::stof(cols[13]);
+    if (cols[14]) restop = std::stof(cols[14]);
+    if (cols[15]) resside = std::stof(cols[15]);
+    if (cols[16]) stabfront = std::stof(cols[16]);
+    if (cols[17]) stabside = std::stof(cols[17]);
+    if (cols[18]) careen = std::stof(cols[18]);
+    if (cols[19]) delta_t = std::stof(cols[19]);
+    if (cols[20]) turbulence = std::stof(cols[20]);
 
     return 0;
 }
@@ -1301,12 +1357,20 @@ create table \"Gliders\" ( \
 \"standard\" INTEGER, \
 \"weight\" REAL, \
 \"maxweight\" REAL, \
-\"rotatespeed\" REAL, \
 \"armor\" REAL, \
 \"price\" INTEGER, \
 \"restore\" REAL, \
 \"power\" REAL, \
 \"special\" INTEGER, \
+\"rotatespeed\" REAL, \
+\"resfront\" REAL, \
+\"restop\" REAL, \
+\"resside\" REAL, \
+\"stabfront\" REAL, \
+\"stabside\" REAL, \
+\"careen\" REAL, \
+\"delta_t\" REAL, \
+\"turbulence\" REAL, \
 PRIMARY KEY (\"id\"), \
 FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
 ); \
@@ -1339,12 +1403,14 @@ Text Good::getVariableString(int columnId) const
     case 2:
         return to_string(resource);
     case 3:
-        return to_string(name);
+        return to_string(resource_drop);
     case 4:
-        return to_string(price);
+        return to_string(name);
     case 5:
-        return to_string(notrade);
+        return to_string(price);
     case 6:
+        return to_string(notrade);
+    case 7:
         return to_string(weight);
     default:
         return "";
@@ -1366,15 +1432,18 @@ void Good::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         resource = text.string();
         break;
     case 3:
-        name = std::static_pointer_cast<String>(ptr);
+        resource_drop = text.string();
         break;
     case 4:
-        price = std::stoi(text.string());
+        name = std::static_pointer_cast<String>(ptr);
         break;
     case 5:
-        notrade = std::stoi(text.string());
+        price = std::stoi(text.string());
         break;
     case 6:
+        notrade = std::stoi(text.string());
+        break;
+    case 7:
         weight = std::stof(text.string());
         break;
     default:
@@ -1411,6 +1480,7 @@ bool Good::operator==(const Good &rhs) const
         notrade == rhs.notrade &&
         price == rhs.price &&
         resource == rhs.resource &&
+        resource_drop == rhs.resource_drop &&
         text_id == rhs.text_id &&
         weight == rhs.weight &&
         1;
@@ -1421,10 +1491,11 @@ int Good::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[0]) id = std::stoi(cols[0]);
     if (cols[1]) text_id = cols[1];
     if (cols[2]) resource = cols[2];
-    if (cols[3]) name.id = std::stoi(cols[3]);
-    if (cols[4]) price = std::stoi(cols[4]);
-    if (cols[5]) notrade = std::stoi(cols[5]);
-    if (cols[6]) weight = std::stof(cols[6]);
+    if (cols[3]) resource_drop = cols[3];
+    if (cols[4]) name.id = std::stoi(cols[4]);
+    if (cols[5]) price = std::stoi(cols[5]);
+    if (cols[6]) notrade = std::stoi(cols[6]);
+    if (cols[7]) weight = std::stof(cols[7]);
 
     return 0;
 }
@@ -1437,6 +1508,7 @@ create table \"Goods\" ( \
 \"id\" INTEGER NOT NULL, \
 \"text_id\" TEXT, \
 \"resource\" TEXT, \
+\"resource_drop\" TEXT, \
 \"name_id\" INTEGER, \
 \"price\" INTEGER, \
 \"notrade\" INTEGER, \

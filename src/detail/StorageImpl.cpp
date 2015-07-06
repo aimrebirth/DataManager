@@ -571,12 +571,20 @@ void StorageImpl::_saveGliders() const
         query += "'" + std::to_string(glider.second->standard) + "',";
         query += "'" + std::to_string(glider.second->weight) + "',";
         query += "'" + std::to_string(glider.second->maxweight) + "',";
-        query += "'" + std::to_string(glider.second->rotatespeed) + "',";
         query += "'" + std::to_string(glider.second->armor) + "',";
         query += "'" + std::to_string(glider.second->price) + "',";
         query += "'" + std::to_string(glider.second->restore) + "',";
         query += "'" + std::to_string(glider.second->power) + "',";
         query += "'" + std::to_string(glider.second->special) + "',";
+        query += "'" + std::to_string(glider.second->rotatespeed) + "',";
+        query += "'" + std::to_string(glider.second->resfront) + "',";
+        query += "'" + std::to_string(glider.second->restop) + "',";
+        query += "'" + std::to_string(glider.second->resside) + "',";
+        query += "'" + std::to_string(glider.second->stabfront) + "',";
+        query += "'" + std::to_string(glider.second->stabside) + "',";
+        query += "'" + std::to_string(glider.second->careen) + "',";
+        query += "'" + std::to_string(glider.second->delta_t) + "',";
+        query += "'" + std::to_string(glider.second->turbulence) + "',";
         query.resize(query.size() - 1);
         query += "),\n";
     }
@@ -625,6 +633,7 @@ void StorageImpl::_saveGoods() const
         query += "'" + std::to_string(good.second->id) + "',";
         query += "'" + good.second->text_id.string() + "',";
         query += "'" + good.second->resource.string() + "',";
+        query += "'" + good.second->resource_drop.string() + "',";
         query += "'" + std::to_string(good.second->name.id) + "',";
         query += "'" + std::to_string(good.second->price) + "',";
         query += "'" + std::to_string(good.second->notrade) + "',";

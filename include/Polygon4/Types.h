@@ -109,8 +109,8 @@ struct IdPtr
 template<class T>
 inline Text to_string(IdPtr<T> ptr)
 {
-    if (ptr.ptr)
-        return to_string(ptr.ptr->getName());
+    if (ptr)
+        return to_string(ptr->getName());
     return Text();
 }
 
