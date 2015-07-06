@@ -28,6 +28,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "Exception.h"
 #include "String.h"
 
 #ifdef USE_QT
@@ -89,7 +90,9 @@ struct IdPtr
 
     Ptr<T> operator->() const
     {
-        return ptr;
+        if (ptr)
+            return ptr;
+        throw EXCEPTION("Value is missing");
     }
 
     operator bool() const

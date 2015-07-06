@@ -186,7 +186,9 @@ bool ClanMechanoid::operator==(const ClanMechanoid &rhs) const
 
 IdPtr<Clan> ClanMechanoid::operator->() const
 {
-    return clan;
+    if (clan)
+        return clan;
+    throw EXCEPTION("Value is missing");
 }
 
 int ClanMechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -494,7 +496,9 @@ bool ConfigurationEquipment::operator==(const ConfigurationEquipment &rhs) const
 
 IdPtr<Configuration> ConfigurationEquipment::operator->() const
 {
-    return configuration;
+    if (configuration)
+        return configuration;
+    throw EXCEPTION("Value is missing");
 }
 
 int ConfigurationEquipment::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -590,7 +594,9 @@ bool ConfigurationGood::operator==(const ConfigurationGood &rhs) const
 
 IdPtr<Configuration> ConfigurationGood::operator->() const
 {
-    return configuration;
+    if (configuration)
+        return configuration;
+    throw EXCEPTION("Value is missing");
 }
 
 int ConfigurationGood::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -686,7 +692,9 @@ bool ConfigurationProjectile::operator==(const ConfigurationProjectile &rhs) con
 
 IdPtr<Configuration> ConfigurationProjectile::operator->() const
 {
-    return configuration;
+    if (configuration)
+        return configuration;
+    throw EXCEPTION("Value is missing");
 }
 
 int ConfigurationProjectile::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -782,7 +790,9 @@ bool ConfigurationWeapon::operator==(const ConfigurationWeapon &rhs) const
 
 IdPtr<Configuration> ConfigurationWeapon::operator->() const
 {
-    return configuration;
+    if (configuration)
+        return configuration;
+    throw EXCEPTION("Value is missing");
 }
 
 int ConfigurationWeapon::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -1520,7 +1530,9 @@ bool GroupMechanoid::operator==(const GroupMechanoid &rhs) const
 
 IdPtr<Group> GroupMechanoid::operator->() const
 {
-    return group;
+    if (group)
+        return group;
+    throw EXCEPTION("Value is missing");
 }
 
 int GroupMechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -1724,7 +1736,9 @@ bool MapBuildingEquipment::operator==(const MapBuildingEquipment &rhs) const
 
 IdPtr<MapBuilding> MapBuildingEquipment::operator->() const
 {
-    return mapBuilding;
+    if (mapBuilding)
+        return mapBuilding;
+    throw EXCEPTION("Value is missing");
 }
 
 int MapBuildingEquipment::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -1820,7 +1834,9 @@ bool MapBuildingGlider::operator==(const MapBuildingGlider &rhs) const
 
 IdPtr<MapBuilding> MapBuildingGlider::operator->() const
 {
-    return mapBuilding;
+    if (mapBuilding)
+        return mapBuilding;
+    throw EXCEPTION("Value is missing");
 }
 
 int MapBuildingGlider::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -1916,7 +1932,9 @@ bool MapBuildingGood::operator==(const MapBuildingGood &rhs) const
 
 IdPtr<MapBuilding> MapBuildingGood::operator->() const
 {
-    return mapBuilding;
+    if (mapBuilding)
+        return mapBuilding;
+    throw EXCEPTION("Value is missing");
 }
 
 int MapBuildingGood::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -2012,7 +2030,9 @@ bool MapBuildingModificator::operator==(const MapBuildingModificator &rhs) const
 
 IdPtr<MapBuilding> MapBuildingModificator::operator->() const
 {
-    return mapBuilding;
+    if (mapBuilding)
+        return mapBuilding;
+    throw EXCEPTION("Value is missing");
 }
 
 int MapBuildingModificator::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -2108,7 +2128,9 @@ bool MapBuildingProjectile::operator==(const MapBuildingProjectile &rhs) const
 
 IdPtr<MapBuilding> MapBuildingProjectile::operator->() const
 {
-    return mapBuilding;
+    if (mapBuilding)
+        return mapBuilding;
+    throw EXCEPTION("Value is missing");
 }
 
 int MapBuildingProjectile::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -2204,7 +2226,9 @@ bool MapBuildingWeapon::operator==(const MapBuildingWeapon &rhs) const
 
 IdPtr<MapBuilding> MapBuildingWeapon::operator->() const
 {
-    return mapBuilding;
+    if (mapBuilding)
+        return mapBuilding;
+    throw EXCEPTION("Value is missing");
 }
 
 int MapBuildingWeapon::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -2854,7 +2878,9 @@ bool MechanoidQuest::operator==(const MechanoidQuest &rhs) const
 
 IdPtr<Mechanoid> MechanoidQuest::operator->() const
 {
-    return mechanoid;
+    if (mechanoid)
+        return mechanoid;
+    throw EXCEPTION("Value is missing");
 }
 
 int MechanoidQuest::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -3195,7 +3221,9 @@ bool ModificationClan::operator==(const ModificationClan &rhs) const
 
 IdPtr<Modification> ModificationClan::operator->() const
 {
-    return modification;
+    if (modification)
+        return modification;
+    throw EXCEPTION("Value is missing");
 }
 
 int ModificationClan::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -3283,7 +3311,9 @@ bool ModificationMap::operator==(const ModificationMap &rhs) const
 
 IdPtr<Modification> ModificationMap::operator->() const
 {
-    return modification;
+    if (modification)
+        return modification;
+    throw EXCEPTION("Value is missing");
 }
 
 int ModificationMap::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -3371,7 +3401,9 @@ bool ModificationMechanoid::operator==(const ModificationMechanoid &rhs) const
 
 IdPtr<Modification> ModificationMechanoid::operator->() const
 {
-    return modification;
+    if (modification)
+        return modification;
+    throw EXCEPTION("Value is missing");
 }
 
 int ModificationMechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -4173,7 +4205,9 @@ bool QuestRewardEquipment::operator==(const QuestRewardEquipment &rhs) const
 
 IdPtr<QuestReward> QuestRewardEquipment::operator->() const
 {
-    return questReward;
+    if (questReward)
+        return questReward;
+    throw EXCEPTION("Value is missing");
 }
 
 int QuestRewardEquipment::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -4269,7 +4303,9 @@ bool QuestRewardGlider::operator==(const QuestRewardGlider &rhs) const
 
 IdPtr<QuestReward> QuestRewardGlider::operator->() const
 {
-    return questReward;
+    if (questReward)
+        return questReward;
+    throw EXCEPTION("Value is missing");
 }
 
 int QuestRewardGlider::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -4365,7 +4401,9 @@ bool QuestRewardGood::operator==(const QuestRewardGood &rhs) const
 
 IdPtr<QuestReward> QuestRewardGood::operator->() const
 {
-    return questReward;
+    if (questReward)
+        return questReward;
+    throw EXCEPTION("Value is missing");
 }
 
 int QuestRewardGood::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -4461,7 +4499,9 @@ bool QuestRewardModificator::operator==(const QuestRewardModificator &rhs) const
 
 IdPtr<QuestReward> QuestRewardModificator::operator->() const
 {
-    return questReward;
+    if (questReward)
+        return questReward;
+    throw EXCEPTION("Value is missing");
 }
 
 int QuestRewardModificator::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -4557,7 +4597,9 @@ bool QuestRewardProjectile::operator==(const QuestRewardProjectile &rhs) const
 
 IdPtr<QuestReward> QuestRewardProjectile::operator->() const
 {
-    return questReward;
+    if (questReward)
+        return questReward;
+    throw EXCEPTION("Value is missing");
 }
 
 int QuestRewardProjectile::loadFromSqlite3(int ncols, char **cols, char **names)
@@ -4741,7 +4783,9 @@ bool QuestRewardWeapon::operator==(const QuestRewardWeapon &rhs) const
 
 IdPtr<QuestReward> QuestRewardWeapon::operator->() const
 {
-    return questReward;
+    if (questReward)
+        return questReward;
+    throw EXCEPTION("Value is missing");
 }
 
 int QuestRewardWeapon::loadFromSqlite3(int ncols, char **cols, char **names)

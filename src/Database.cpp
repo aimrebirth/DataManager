@@ -25,6 +25,7 @@
 #include <Polygon4/DatabaseSchema.h>
 #include <Polygon4/Storage.h>
 #include <Polygon4/StorageImpl.h>
+#include <Polygon4/Exception.h>
 
 #include "Logger.h"
 DECLARE_STATIC_LOGGER(logger, "db");
@@ -66,7 +67,7 @@ void Database::loadDatabase(const std::string &dbname)
     {
         std::string error = "Can't open database file: " + dbname + " error: " + sqlite3_errmsg(db);
         LOG_ERROR(logger, error);
-        throw std::runtime_error(error.c_str());
+        throw EXCEPTION(error);
     }
     execute("PRAGMA foreign_keys = OFF;", 0, 0); // this can be turned on in the future
 }
@@ -96,7 +97,7 @@ bool Database::execute(const std::string &sql, void *object, Sqlite3Callback cal
                 *err = error;
         }
         else
-            throw std::runtime_error(error.c_str());
+            throw EXCEPTION(error);
     }
     return error.empty();
 }
@@ -128,7 +129,7 @@ bool Database::execute(const std::string &sql, DatabaseCallback callback, bool n
                 *err = error;
         }
         else
-            throw std::exception(error.c_str());
+            throw EXCEPTION(error);
     }
     return error.empty();
 }
