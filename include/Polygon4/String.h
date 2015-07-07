@@ -31,7 +31,7 @@
 
 inline std::wstring to_wstring(std::string s)
 {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     return converter.from_bytes(s.c_str());
 }
 inline std::wstring to_wstring(const char *s)
@@ -41,7 +41,7 @@ inline std::wstring to_wstring(const char *s)
 
 inline std::string to_string(std::wstring s)
 {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     return converter.to_bytes(s.c_str());
 }
 inline std::string to_string(const wchar_t *s)
@@ -80,6 +80,12 @@ public:
     {
         copy(s.c_str(), s.size() + 1, 2);
     }
+#ifdef USE_QT
+    String(const QString &s)
+        : String(s.toStdWString())
+    {
+    }
+#endif
     String &operator=(const char *s)
     {
         if (s)
@@ -106,6 +112,13 @@ public:
         copy(s.c_str(), s.size() + 1, 2);
         return *this;
     }
+#ifdef USE_QT
+    String &operator=(const QString &s)
+    {
+        return *this = s.toStdWString();
+    }
+#endif
+
     ~String()
     {
 
@@ -187,6 +200,32 @@ public:
         data.reset();
         length = 0;
         multiplier = 1;
+    }
+
+    // operator +
+    String &operator+(const String &rhs)
+    {
+        if (rhs.length == 0)
+            return *this;
+        std::wstring s = wstring() + rhs.wstring();
+        copy(s.c_str(), s.size() + 1, 2);
+        return *this;
+    }
+    String &operator+(const std::wstring &rhs)
+    {
+        if (rhs.empty())
+            return *this;
+        std::wstring s = wstring() + rhs;
+        copy(s.c_str(), s.size() + 1, 2);
+        return *this;
+    }
+    String &operator+(const std::string &rhs)
+    {
+        if (rhs.empty())
+            return *this;
+        std::wstring s = wstring() + to_wstring(rhs);
+        copy(s.c_str(), s.size() + 1, 2);
+        return *this;
     }
 
 private:

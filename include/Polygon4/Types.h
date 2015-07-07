@@ -114,9 +114,6 @@ inline Text to_string(IdPtr<T> ptr)
     return Text();
 }
 
-class Coordinate;
-inline Text to_string(const Coordinate &coordinate);
-
 typedef std::function<void(double)> ProgressCallback;
 
 } // namespace detail

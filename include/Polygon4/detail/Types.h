@@ -12,6 +12,8 @@ namespace detail
 
 enum class EObjectType : int
 {
+    None,
+
     Building,
     ClanMechanoid,
     ClanReputation,
@@ -33,6 +35,7 @@ enum class EObjectType : int
     MapBuildingProjectile,
     MapBuildingWeapon,
     MapBuilding,
+    MapGood,
     MapObject,
     Map,
     MechanoidQuest,
@@ -57,7 +60,10 @@ enum class EObjectType : int
     ScriptVariable,
     Setting,
     String,
+    Table,
     Weapon,
+
+    Any,
 };
 
 class Building;
@@ -81,6 +87,7 @@ class MapBuildingModificator;
 class MapBuildingProjectile;
 class MapBuildingWeapon;
 class MapBuilding;
+class MapGood;
 class MapObject;
 class Map;
 class MechanoidQuest;
@@ -105,6 +112,7 @@ class Quest;
 class ScriptVariable;
 class Setting;
 class String;
+class Table;
 class Weapon;
 
 class IObject
@@ -222,6 +230,15 @@ public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
+    IdPtr<String> member_name;
+    int bonusexp = 0;
+    int bonusrepair = 0;
+    int bonustrade = 0;
+    int helpness = 0;
+    float Volatile = 0.0f;
+    float noblivion = 0.0f;
+    float playereffect = 0.0f;
+    int color = 0;
 
     CVector<Ptr<ClanMechanoid>> mechanoids;
     CVector<Ptr<ClanReputation>> reputations;
@@ -254,7 +271,7 @@ class ConfigurationEquipment : public IObject
 public:
     IdPtr<Configuration> configuration;
     IdPtr<Equipment> equipment;
-    int quantity = 0;
+    int quantity = 1;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -282,7 +299,7 @@ class ConfigurationGood : public IObject
 public:
     IdPtr<Configuration> configuration;
     IdPtr<Good> good;
-    int quantity = 0;
+    int quantity = 1;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -310,7 +327,7 @@ class ConfigurationProjectile : public IObject
 public:
     IdPtr<Configuration> configuration;
     IdPtr<Projectile> projectile;
-    int quantity = 0;
+    int quantity = 1;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -338,7 +355,7 @@ class ConfigurationWeapon : public IObject
 public:
     IdPtr<Configuration> configuration;
     IdPtr<Weapon> weapon;
-    int quantity = 0;
+    int quantity = 1;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -500,8 +517,9 @@ public:
     Text resource_drop;
     IdPtr<String> name;
     int price = 0;
-    int notrade = 0;
     float weight = 0.0f;
+    int notrade = 0;
+    int type = 0;
 
     int getId() const;
     void setId(int id);
@@ -805,6 +823,48 @@ public:
     static const char *getSql();
 };
 
+class MapGood : public IObject
+{
+private:
+    int id = 0;
+public:
+    int text_id = 0;
+    IdPtr<Map> map;
+    IdPtr<Good> good;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float pitch = 0.0f;
+    float yaw = 0.0f;
+    float roll = 0.0f;
+    float scale = 0.0f;
+    float scale_x = 0.0f;
+    float scale_y = 0.0f;
+    float scale_z = 0.0f;
+
+    int getId() const;
+    void setId(int id);
+
+    virtual EObjectType getType() const;
+    virtual Text getVariableString(int columnId) const;
+    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
+#ifdef USE_QT
+    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
+#endif
+    virtual Text getName() const;
+
+    bool operator==(const MapGood &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
+};
+
 class MapObject : public IObject
 {
 private:
@@ -859,6 +919,7 @@ public:
     float h_max = 0.0f;
 
     CVector<Ptr<MapBuilding>> buildings;
+    CVector<Ptr<MapGood>> goods;
     CVector<Ptr<MapObject>> objects;
 
     int getId() const;
@@ -1100,6 +1161,8 @@ public:
     float k_price = 0.0f;
     float k_param1 = 0.0f;
     float k_param2 = 0.0f;
+    int unicum_id = 0;
+    int mask = 0;
 
     int getId() const;
     void setId(int id);
@@ -1198,8 +1261,17 @@ public:
     int type = 0;
     float weight = 0.0f;
     float damage = 0.0f;
+    Text T;
     float speed = 0.0f;
     float scale = 0.0f;
+    int numstate = 0;
+    float rotate = 0.0f;
+    int subtype = 0;
+    float life_time = 0.0f;
+    float detonation_delay = 0.0f;
+    float distance_detonation = 0.0f;
+    float strength = 0.0f;
+    float price = 0.0f;
     int notrade = 0;
 
     int getId() const;
@@ -1230,7 +1302,7 @@ class QuestRewardEquipment : public IObject
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Equipment> equipment;
-    int quantity = 0;
+    int quantity = 1;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1258,7 +1330,7 @@ class QuestRewardGlider : public IObject
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Glider> glider;
-    int quantity = 0;
+    int quantity = 1;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1286,7 +1358,7 @@ class QuestRewardGood : public IObject
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Good> good;
-    int quantity = 0;
+    int quantity = 1;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1314,7 +1386,7 @@ class QuestRewardModificator : public IObject
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Modificator> modificator;
-    int quantity = 0;
+    int quantity = 1;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1342,7 +1414,7 @@ class QuestRewardProjectile : public IObject
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Projectile> projectile;
-    int quantity = 0;
+    int quantity = 1;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1370,7 +1442,7 @@ class QuestRewardReputation : public IObject
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Clan> clan;
-    float reputation = 0.0f;
+    float reputation = 1;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1397,7 +1469,7 @@ class QuestRewardWeapon : public IObject
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Weapon> weapon;
-    int quantity = 0;
+    int quantity = 1;
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1561,6 +1633,8 @@ class String : public IObject
 private:
     int id = 0;
 public:
+    Text text_id;
+    IdPtr<Table> table;
     Text ru;
     Text en;
 
@@ -1587,6 +1661,36 @@ public:
     static const char *getSql();
 };
 
+class Table : public IObject
+{
+private:
+    int id = 0;
+public:
+    Text text_id;
+
+    int getId() const;
+    void setId(int id);
+
+    virtual EObjectType getType() const;
+    virtual Text getVariableString(int columnId) const;
+    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
+#ifdef USE_QT
+    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const;
+#endif
+    virtual Text getName() const;
+
+    bool operator==(const Table &rhs) const;
+
+private:
+    int loadFromSqlite3(int, char**, char**);
+
+    friend class StorageImpl;
+    template <typename T> friend struct IdPtr;
+
+public:
+    static const char *getSql();
+};
+
 class Weapon : public IObject
 {
 private:
@@ -1595,6 +1699,7 @@ public:
     Text text_id;
     Text resource;
     IdPtr<String> name;
+    IdPtr<Projectile> projectile;
     int type = 0;
     int standard = 0;
     float weight = 0.0f;
@@ -1602,7 +1707,28 @@ public:
     float firerate = 0.0f;
     float damage = 0.0f;
     float price = 0.0f;
-    IdPtr<Projectile> projectile;
+    float fx = 0.0f;
+    int shoottype = 0;
+    float shootscale = 0.0f;
+    int xstate = 0;
+    float rcolor = 0.0f;
+    float gcolor = 0.0f;
+    float bcolor = 0.0f;
+    int typearms = 0;
+    float tfire = 0.0f;
+    int vtype = 0;
+    float spare = 0.0f;
+    float reconstruction = 0.0f;
+    float maxdistance = 0.0f;
+    float angle = 0.0f;
+    float fxtime = 0.0f;
+    int damagetype = 0;
+    float fxmodeltime = 0.0f;
+    float inside_mul = 0.0f;
+    float inside_x = 0.0f;
+    float inside_y = 0.0f;
+    float inside_z = 0.0f;
+    int notrade = 0;
 
     int getId() const;
     void setId(int id);

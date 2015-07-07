@@ -311,6 +311,24 @@ Text Clan::getVariableString(int columnId) const
         return to_string(resource);
     case 3:
         return to_string(name);
+    case 4:
+        return to_string(member_name);
+    case 5:
+        return to_string(bonusexp);
+    case 6:
+        return to_string(bonusrepair);
+    case 7:
+        return to_string(bonustrade);
+    case 8:
+        return to_string(helpness);
+    case 9:
+        return to_string(Volatile);
+    case 10:
+        return to_string(noblivion);
+    case 11:
+        return to_string(playereffect);
+    case 12:
+        return to_string(color);
     default:
         return "";
     }
@@ -332,6 +350,33 @@ void Clan::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         break;
     case 3:
         name = std::static_pointer_cast<String>(ptr);
+        break;
+    case 4:
+        member_name = std::static_pointer_cast<String>(ptr);
+        break;
+    case 5:
+        bonusexp = std::stoi(text.string());
+        break;
+    case 6:
+        bonusrepair = std::stoi(text.string());
+        break;
+    case 7:
+        bonustrade = std::stoi(text.string());
+        break;
+    case 8:
+        helpness = std::stoi(text.string());
+        break;
+    case 9:
+        Volatile = std::stof(text.string());
+        break;
+    case 10:
+        noblivion = std::stof(text.string());
+        break;
+    case 11:
+        playereffect = std::stof(text.string());
+        break;
+    case 12:
+        color = std::stoi(text.string());
         break;
     default:
         break;
@@ -376,7 +421,16 @@ Text Clan::getName() const
 bool Clan::operator==(const Clan &rhs) const
 {
     return
+        Volatile == rhs.Volatile &&
+        bonusexp == rhs.bonusexp &&
+        bonusrepair == rhs.bonusrepair &&
+        bonustrade == rhs.bonustrade &&
+        color == rhs.color &&
+        helpness == rhs.helpness &&
+        member_name == rhs.member_name &&
         name == rhs.name &&
+        noblivion == rhs.noblivion &&
+        playereffect == rhs.playereffect &&
         resource == rhs.resource &&
         text_id == rhs.text_id &&
         1;
@@ -388,6 +442,15 @@ int Clan::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[1]) text_id = cols[1];
     if (cols[2]) resource = cols[2];
     if (cols[3]) name.id = std::stoi(cols[3]);
+    if (cols[4]) member_name.id = std::stoi(cols[4]);
+    if (cols[5]) bonusexp = std::stoi(cols[5]);
+    if (cols[6]) bonusrepair = std::stoi(cols[6]);
+    if (cols[7]) bonustrade = std::stoi(cols[7]);
+    if (cols[8]) helpness = std::stoi(cols[8]);
+    if (cols[9]) Volatile = std::stof(cols[9]);
+    if (cols[10]) noblivion = std::stof(cols[10]);
+    if (cols[11]) playereffect = std::stof(cols[11]);
+    if (cols[12]) color = std::stoi(cols[12]);
 
     return 0;
 }
@@ -401,8 +464,18 @@ create table \"Clans\" ( \
 \"text_id\" TEXT, \
 \"resource\" TEXT, \
 \"name_id\" INTEGER, \
+\"member_name_id\" INTEGER, \
+\"bonusexp\" INTEGER, \
+\"bonusrepair\" INTEGER, \
+\"bonustrade\" INTEGER, \
+\"helpness\" INTEGER, \
+\"Volatile\" REAL, \
+\"noblivion\" REAL, \
+\"playereffect\" REAL, \
+\"color\" INTEGER, \
 PRIMARY KEY (\"id\"), \
-FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\"), \
+FOREIGN KEY (\"member_name_id\") REFERENCES \"Strings\" (\"id\") \
 ); \
     ";
 }
@@ -497,7 +570,7 @@ const char *ConfigurationEquipment::getSql()
 create table \"ConfigurationEquipments\" ( \
 \"configuration_id\" INTEGER NOT NULL, \
 \"equipment_id\" INTEGER NOT NULL, \
-\"quantity\" INTEGER, \
+\"quantity\" INTEGER DEFAULT 1, \
 PRIMARY KEY (\"configuration_id\", \"equipment_id\"), \
 FOREIGN KEY (\"configuration_id\") REFERENCES \"Configurations\" (\"id\"), \
 FOREIGN KEY (\"equipment_id\") REFERENCES \"Equipments\" (\"id\") \
@@ -595,7 +668,7 @@ const char *ConfigurationGood::getSql()
 create table \"ConfigurationGoods\" ( \
 \"configuration_id\" INTEGER NOT NULL, \
 \"good_id\" INTEGER NOT NULL, \
-\"quantity\" INTEGER, \
+\"quantity\" INTEGER DEFAULT 1, \
 PRIMARY KEY (\"configuration_id\", \"good_id\"), \
 FOREIGN KEY (\"configuration_id\") REFERENCES \"Configurations\" (\"id\"), \
 FOREIGN KEY (\"good_id\") REFERENCES \"Goods\" (\"id\") \
@@ -693,7 +766,7 @@ const char *ConfigurationProjectile::getSql()
 create table \"ConfigurationProjectiles\" ( \
 \"configuration_id\" INTEGER NOT NULL, \
 \"projectile_id\" INTEGER NOT NULL, \
-\"quantity\" INTEGER, \
+\"quantity\" INTEGER DEFAULT 1, \
 PRIMARY KEY (\"configuration_id\", \"projectile_id\"), \
 FOREIGN KEY (\"configuration_id\") REFERENCES \"Configurations\" (\"id\"), \
 FOREIGN KEY (\"projectile_id\") REFERENCES \"Projectiles\" (\"id\") \
@@ -791,7 +864,7 @@ const char *ConfigurationWeapon::getSql()
 create table \"ConfigurationWeapons\" ( \
 \"configuration_id\" INTEGER NOT NULL, \
 \"weapon_id\" INTEGER NOT NULL, \
-\"quantity\" INTEGER, \
+\"quantity\" INTEGER DEFAULT 1, \
 PRIMARY KEY (\"configuration_id\", \"weapon_id\"), \
 FOREIGN KEY (\"configuration_id\") REFERENCES \"Configurations\" (\"id\"), \
 FOREIGN KEY (\"weapon_id\") REFERENCES \"Weapons\" (\"id\") \
@@ -1409,9 +1482,11 @@ Text Good::getVariableString(int columnId) const
     case 5:
         return to_string(price);
     case 6:
-        return to_string(notrade);
-    case 7:
         return to_string(weight);
+    case 7:
+        return to_string(notrade);
+    case 8:
+        return to_string(type);
     default:
         return "";
     }
@@ -1441,10 +1516,13 @@ void Good::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         price = std::stoi(text.string());
         break;
     case 6:
-        notrade = std::stoi(text.string());
+        weight = std::stof(text.string());
         break;
     case 7:
-        weight = std::stof(text.string());
+        notrade = std::stoi(text.string());
+        break;
+    case 8:
+        type = std::stoi(text.string());
         break;
     default:
         break;
@@ -1482,6 +1560,7 @@ bool Good::operator==(const Good &rhs) const
         resource == rhs.resource &&
         resource_drop == rhs.resource_drop &&
         text_id == rhs.text_id &&
+        type == rhs.type &&
         weight == rhs.weight &&
         1;
 }
@@ -1494,8 +1573,9 @@ int Good::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[3]) resource_drop = cols[3];
     if (cols[4]) name.id = std::stoi(cols[4]);
     if (cols[5]) price = std::stoi(cols[5]);
-    if (cols[6]) notrade = std::stoi(cols[6]);
-    if (cols[7]) weight = std::stof(cols[7]);
+    if (cols[6]) weight = std::stof(cols[6]);
+    if (cols[7]) notrade = std::stoi(cols[7]);
+    if (cols[8]) type = std::stoi(cols[8]);
 
     return 0;
 }
@@ -1511,8 +1591,9 @@ create table \"Goods\" ( \
 \"resource_drop\" TEXT, \
 \"name_id\" INTEGER, \
 \"price\" INTEGER, \
-\"notrade\" INTEGER, \
 \"weight\" REAL, \
+\"notrade\" INTEGER, \
+\"type\" INTEGER, \
 PRIMARY KEY (\"id\"), \
 FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
 ); \
@@ -2467,16 +2548,14 @@ QTreeWidgetItem *MapBuilding::printQtTreeView(QTreeWidgetItem *parent) const
 Text MapBuilding::getName() const
 {
     Text n;
-    n = to_string(building);
-    if (!n.empty())
-        return n;
+    std::wstring p = L" (" + (map ? map->getName().wstring() : L"") + L")";
     n = to_string(name);
     if (!n.empty())
-        return n;
+        return n + p;
     n = text_id;
     if (!n.empty())
-        return n;
-    return IObject::getName();
+        return n + p;
+    return IObject::getName() + p;
 }
 
 bool MapBuilding::operator==(const MapBuilding &rhs) const
@@ -2547,6 +2626,195 @@ PRIMARY KEY (\"id\"), \
 FOREIGN KEY (\"map_id\") REFERENCES \"Maps\" (\"id\"), \
 FOREIGN KEY (\"building_id\") REFERENCES \"Buildings\" (\"id\"), \
 FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
+); \
+    ";
+}
+
+int MapGood::getId() const
+{
+    return id;
+}
+
+void MapGood::setId(int id)
+{
+    this->id = id;
+}
+
+EObjectType MapGood::getType() const
+{
+    return EObjectType::MapGood;
+}
+
+Text MapGood::getVariableString(int columnId) const
+{
+    switch (columnId)
+    {
+    case 0:
+        return to_string(id);
+    case 1:
+        return to_string(text_id);
+    case 2:
+        return to_string(map);
+    case 3:
+        return to_string(good);
+    case 4:
+        return to_string(x);
+    case 5:
+        return to_string(y);
+    case 6:
+        return to_string(z);
+    case 7:
+        return to_string(pitch);
+    case 8:
+        return to_string(yaw);
+    case 9:
+        return to_string(roll);
+    case 10:
+        return to_string(scale);
+    case 11:
+        return to_string(scale_x);
+    case 12:
+        return to_string(scale_y);
+    case 13:
+        return to_string(scale_z);
+    default:
+        return "";
+    }
+    return "";
+}
+
+void MapGood::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
+{
+    switch (columnId)
+    {
+    case 0:
+        id = std::stoi(text.string());
+        break;
+    case 1:
+        text_id = std::stoi(text.string());
+        break;
+    case 2:
+        map = std::static_pointer_cast<Map>(ptr);
+        break;
+    case 3:
+        good = std::static_pointer_cast<Good>(ptr);
+        break;
+    case 4:
+        x = std::stof(text.string());
+        break;
+    case 5:
+        y = std::stof(text.string());
+        break;
+    case 6:
+        z = std::stof(text.string());
+        break;
+    case 7:
+        pitch = std::stof(text.string());
+        break;
+    case 8:
+        yaw = std::stof(text.string());
+        break;
+    case 9:
+        roll = std::stof(text.string());
+        break;
+    case 10:
+        scale = std::stof(text.string());
+        break;
+    case 11:
+        scale_x = std::stof(text.string());
+        break;
+    case 12:
+        scale_y = std::stof(text.string());
+        break;
+    case 13:
+        scale_z = std::stof(text.string());
+        break;
+    default:
+        break;
+    }
+}
+
+#ifdef USE_QT
+QTreeWidgetItem *MapGood::printQtTreeView(QTreeWidgetItem *parent) const
+{
+    auto item = new QTreeWidgetItem(parent, QStringList(QString::fromStdWString(getName())));
+    item->setData(0, Qt::UserRole, (uint64_t)this);
+    item->sortChildren(0, Qt::AscendingOrder);
+    return item;
+}
+#endif
+
+Text MapGood::getName() const
+{
+    Text n;
+    std::wstring p = L" (" + (map ? map->getName().wstring() : L"") + L")";
+    n = to_string(text_id);
+    if (!n.empty())
+        return n + p;
+    return IObject::getName() + p;
+}
+
+bool MapGood::operator==(const MapGood &rhs) const
+{
+    return
+        good == rhs.good &&
+        map == rhs.map &&
+        pitch == rhs.pitch &&
+        roll == rhs.roll &&
+        scale == rhs.scale &&
+        scale_x == rhs.scale_x &&
+        scale_y == rhs.scale_y &&
+        scale_z == rhs.scale_z &&
+        text_id == rhs.text_id &&
+        x == rhs.x &&
+        y == rhs.y &&
+        yaw == rhs.yaw &&
+        z == rhs.z &&
+        1;
+}
+
+int MapGood::loadFromSqlite3(int ncols, char **cols, char **names)
+{
+    if (cols[0]) id = std::stoi(cols[0]);
+    if (cols[1]) text_id = std::stoi(cols[1]);
+    if (cols[2]) map.id = std::stoi(cols[2]);
+    if (cols[3]) good.id = std::stoi(cols[3]);
+    if (cols[4]) x = std::stof(cols[4]);
+    if (cols[5]) y = std::stof(cols[5]);
+    if (cols[6]) z = std::stof(cols[6]);
+    if (cols[7]) pitch = std::stof(cols[7]);
+    if (cols[8]) yaw = std::stof(cols[8]);
+    if (cols[9]) roll = std::stof(cols[9]);
+    if (cols[10]) scale = std::stof(cols[10]);
+    if (cols[11]) scale_x = std::stof(cols[11]);
+    if (cols[12]) scale_y = std::stof(cols[12]);
+    if (cols[13]) scale_z = std::stof(cols[13]);
+
+    return 0;
+}
+
+const char *MapGood::getSql()
+{
+    return
+    " \
+create table \"MapGoods\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" INTEGER, \
+\"map_id\" INTEGER, \
+\"good_id\" INTEGER, \
+\"x\" REAL, \
+\"y\" REAL, \
+\"z\" REAL, \
+\"pitch\" REAL, \
+\"yaw\" REAL, \
+\"roll\" REAL, \
+\"scale\" REAL, \
+\"scale_x\" REAL, \
+\"scale_y\" REAL, \
+\"scale_z\" REAL, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"map_id\") REFERENCES \"Maps\" (\"id\"), \
+FOREIGN KEY (\"good_id\") REFERENCES \"Goods\" (\"id\") \
 ); \
     ";
 }
@@ -2668,10 +2936,11 @@ QTreeWidgetItem *MapObject::printQtTreeView(QTreeWidgetItem *parent) const
 Text MapObject::getName() const
 {
     Text n;
+    std::wstring p = L" (" + (map ? map->getName().wstring() : L"") + L")";
     n = text_id;
     if (!n.empty())
-        return n;
-    return IObject::getName();
+        return n + p;
+    return IObject::getName() + p;
 }
 
 bool MapObject::operator==(const MapObject &rhs) const
@@ -2815,6 +3084,11 @@ QTreeWidgetItem *Map::printQtTreeView(QTreeWidgetItem *parent) const
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
     for (auto &building : buildings)
         building->printQtTreeView(root);
+
+    root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
+    root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapGood));
+    for (auto &good : goods)
+        good->printQtTreeView(root);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Objects")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapObject));
@@ -3728,6 +4002,10 @@ Text Modificator::getVariableString(int columnId) const
         return to_string(k_param1);
     case 8:
         return to_string(k_param2);
+    case 9:
+        return to_string(unicum_id);
+    case 10:
+        return to_string(mask);
     default:
         return "";
     }
@@ -3765,6 +4043,12 @@ void Modificator::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
     case 8:
         k_param2 = std::stof(text.string());
         break;
+    case 9:
+        unicum_id = std::stoi(text.string());
+        break;
+    case 10:
+        mask = std::stoi(text.string());
+        break;
     default:
         break;
     }
@@ -3798,11 +4082,13 @@ bool Modificator::operator==(const Modificator &rhs) const
         k_param1 == rhs.k_param1 &&
         k_param2 == rhs.k_param2 &&
         k_price == rhs.k_price &&
+        mask == rhs.mask &&
         name == rhs.name &&
         price == rhs.price &&
         probability == rhs.probability &&
         resource == rhs.resource &&
         text_id == rhs.text_id &&
+        unicum_id == rhs.unicum_id &&
         1;
 }
 
@@ -3817,6 +4103,8 @@ int Modificator::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[6]) k_price = std::stof(cols[6]);
     if (cols[7]) k_param1 = std::stof(cols[7]);
     if (cols[8]) k_param2 = std::stof(cols[8]);
+    if (cols[9]) unicum_id = std::stoi(cols[9]);
+    if (cols[10]) mask = std::stoi(cols[10]);
 
     return 0;
 }
@@ -3835,6 +4123,8 @@ create table \"Modificators\" ( \
 \"k_price\" REAL, \
 \"k_param1\" REAL, \
 \"k_param2\" REAL, \
+\"unicum_id\" INTEGER, \
+\"mask\" INTEGER, \
 PRIMARY KEY (\"id\"), \
 FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
 ); \
@@ -4084,10 +4374,28 @@ Text Projectile::getVariableString(int columnId) const
     case 6:
         return to_string(damage);
     case 7:
-        return to_string(speed);
+        return to_string(T);
     case 8:
-        return to_string(scale);
+        return to_string(speed);
     case 9:
+        return to_string(scale);
+    case 10:
+        return to_string(numstate);
+    case 11:
+        return to_string(rotate);
+    case 12:
+        return to_string(subtype);
+    case 13:
+        return to_string(life_time);
+    case 14:
+        return to_string(detonation_delay);
+    case 15:
+        return to_string(distance_detonation);
+    case 16:
+        return to_string(strength);
+    case 17:
+        return to_string(price);
+    case 18:
         return to_string(notrade);
     default:
         return "";
@@ -4121,12 +4429,39 @@ void Projectile::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         damage = std::stof(text.string());
         break;
     case 7:
-        speed = std::stof(text.string());
+        T = text.string();
         break;
     case 8:
-        scale = std::stof(text.string());
+        speed = std::stof(text.string());
         break;
     case 9:
+        scale = std::stof(text.string());
+        break;
+    case 10:
+        numstate = std::stoi(text.string());
+        break;
+    case 11:
+        rotate = std::stof(text.string());
+        break;
+    case 12:
+        subtype = std::stoi(text.string());
+        break;
+    case 13:
+        life_time = std::stof(text.string());
+        break;
+    case 14:
+        detonation_delay = std::stof(text.string());
+        break;
+    case 15:
+        distance_detonation = std::stof(text.string());
+        break;
+    case 16:
+        strength = std::stof(text.string());
+        break;
+    case 17:
+        price = std::stof(text.string());
+        break;
+    case 18:
         notrade = std::stoi(text.string());
         break;
     default:
@@ -4159,12 +4494,21 @@ Text Projectile::getName() const
 bool Projectile::operator==(const Projectile &rhs) const
 {
     return
+        T == rhs.T &&
         damage == rhs.damage &&
+        detonation_delay == rhs.detonation_delay &&
+        distance_detonation == rhs.distance_detonation &&
+        life_time == rhs.life_time &&
         name == rhs.name &&
         notrade == rhs.notrade &&
+        numstate == rhs.numstate &&
+        price == rhs.price &&
         resource == rhs.resource &&
+        rotate == rhs.rotate &&
         scale == rhs.scale &&
         speed == rhs.speed &&
+        strength == rhs.strength &&
+        subtype == rhs.subtype &&
         text_id == rhs.text_id &&
         type == rhs.type &&
         weight == rhs.weight &&
@@ -4180,9 +4524,18 @@ int Projectile::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[4]) type = std::stoi(cols[4]);
     if (cols[5]) weight = std::stof(cols[5]);
     if (cols[6]) damage = std::stof(cols[6]);
-    if (cols[7]) speed = std::stof(cols[7]);
-    if (cols[8]) scale = std::stof(cols[8]);
-    if (cols[9]) notrade = std::stoi(cols[9]);
+    if (cols[7]) T = cols[7];
+    if (cols[8]) speed = std::stof(cols[8]);
+    if (cols[9]) scale = std::stof(cols[9]);
+    if (cols[10]) numstate = std::stoi(cols[10]);
+    if (cols[11]) rotate = std::stof(cols[11]);
+    if (cols[12]) subtype = std::stoi(cols[12]);
+    if (cols[13]) life_time = std::stof(cols[13]);
+    if (cols[14]) detonation_delay = std::stof(cols[14]);
+    if (cols[15]) distance_detonation = std::stof(cols[15]);
+    if (cols[16]) strength = std::stof(cols[16]);
+    if (cols[17]) price = std::stof(cols[17]);
+    if (cols[18]) notrade = std::stoi(cols[18]);
 
     return 0;
 }
@@ -4199,8 +4552,17 @@ create table \"Projectiles\" ( \
 \"type\" INTEGER, \
 \"weight\" REAL, \
 \"damage\" REAL, \
+\"T\" TEXT, \
 \"speed\" REAL, \
 \"scale\" REAL, \
+\"numstate\" INTEGER, \
+\"rotate\" REAL, \
+\"subtype\" INTEGER, \
+\"life_time\" REAL, \
+\"detonation_delay\" REAL, \
+\"distance_detonation\" REAL, \
+\"strength\" REAL, \
+\"price\" REAL, \
 \"notrade\" INTEGER, \
 PRIMARY KEY (\"id\"), \
 FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
@@ -4298,7 +4660,7 @@ const char *QuestRewardEquipment::getSql()
 create table \"QuestRewardEquipments\" ( \
 \"questReward_id\" INTEGER NOT NULL, \
 \"equipment_id\" INTEGER NOT NULL, \
-\"quantity\" INTEGER, \
+\"quantity\" INTEGER DEFAULT 1, \
 PRIMARY KEY (\"questReward_id\", \"equipment_id\"), \
 FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
 FOREIGN KEY (\"equipment_id\") REFERENCES \"Equipments\" (\"id\") \
@@ -4396,7 +4758,7 @@ const char *QuestRewardGlider::getSql()
 create table \"QuestRewardGliders\" ( \
 \"questReward_id\" INTEGER NOT NULL, \
 \"glider_id\" INTEGER NOT NULL, \
-\"quantity\" INTEGER, \
+\"quantity\" INTEGER DEFAULT 1, \
 PRIMARY KEY (\"questReward_id\", \"glider_id\"), \
 FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
 FOREIGN KEY (\"glider_id\") REFERENCES \"Gliders\" (\"id\") \
@@ -4494,7 +4856,7 @@ const char *QuestRewardGood::getSql()
 create table \"QuestRewardGoods\" ( \
 \"questReward_id\" INTEGER NOT NULL, \
 \"good_id\" INTEGER NOT NULL, \
-\"quantity\" INTEGER, \
+\"quantity\" INTEGER DEFAULT 1, \
 PRIMARY KEY (\"questReward_id\", \"good_id\"), \
 FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
 FOREIGN KEY (\"good_id\") REFERENCES \"Goods\" (\"id\") \
@@ -4592,7 +4954,7 @@ const char *QuestRewardModificator::getSql()
 create table \"QuestRewardModificators\" ( \
 \"questReward_id\" INTEGER NOT NULL, \
 \"modificator_id\" INTEGER NOT NULL, \
-\"quantity\" INTEGER, \
+\"quantity\" INTEGER DEFAULT 1, \
 PRIMARY KEY (\"questReward_id\", \"modificator_id\"), \
 FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
 FOREIGN KEY (\"modificator_id\") REFERENCES \"Modificators\" (\"id\") \
@@ -4690,7 +5052,7 @@ const char *QuestRewardProjectile::getSql()
 create table \"QuestRewardProjectiles\" ( \
 \"questReward_id\" INTEGER NOT NULL, \
 \"projectile_id\" INTEGER NOT NULL, \
-\"quantity\" INTEGER, \
+\"quantity\" INTEGER DEFAULT 1, \
 PRIMARY KEY (\"questReward_id\", \"projectile_id\"), \
 FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
 FOREIGN KEY (\"projectile_id\") REFERENCES \"Projectiles\" (\"id\") \
@@ -4778,7 +5140,7 @@ const char *QuestRewardReputation::getSql()
 create table \"QuestRewardReputations\" ( \
 \"questReward_id\" INTEGER NOT NULL, \
 \"clan_id\" INTEGER NOT NULL, \
-\"reputation\" REAL, \
+\"reputation\" REAL DEFAULT 1, \
 PRIMARY KEY (\"questReward_id\", \"clan_id\"), \
 FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
 FOREIGN KEY (\"clan_id\") REFERENCES \"Clans\" (\"id\") \
@@ -4876,7 +5238,7 @@ const char *QuestRewardWeapon::getSql()
 create table \"QuestRewardWeapons\" ( \
 \"questReward_id\" INTEGER NOT NULL, \
 \"weapon_id\" INTEGER NOT NULL, \
-\"quantity\" INTEGER, \
+\"quantity\" INTEGER DEFAULT 1, \
 PRIMARY KEY (\"questReward_id\", \"weapon_id\"), \
 FOREIGN KEY (\"questReward_id\") REFERENCES \"QuestRewards\" (\"id\"), \
 FOREIGN KEY (\"weapon_id\") REFERENCES \"Weapons\" (\"id\") \
@@ -5350,8 +5712,12 @@ Text String::getVariableString(int columnId) const
     case 0:
         return to_string(id);
     case 1:
-        return to_string(ru);
+        return to_string(text_id);
     case 2:
+        return to_string(table);
+    case 3:
+        return to_string(ru);
+    case 4:
         return to_string(en);
     default:
         return "";
@@ -5367,9 +5733,15 @@ void String::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         id = std::stoi(text.string());
         break;
     case 1:
-        ru = text.string();
+        text_id = text.string();
         break;
     case 2:
+        table = std::static_pointer_cast<Table>(ptr);
+        break;
+    case 3:
+        ru = text.string();
+        break;
+    case 4:
         en = text.string();
         break;
     default:
@@ -5392,6 +5764,9 @@ Text String::getName() const
     auto s = ((Text *)&ru)[gCurrentLocalizationId];
     if (!s.empty())
         return s;
+    s = text_id;
+    if (!s.empty())
+        return s;
     for (int i = 0; i < static_cast<int>(LocalizationType::max); i++)
     {
         s = ((Text *)&ru)[i];
@@ -5406,14 +5781,18 @@ bool String::operator==(const String &rhs) const
     return
         en == rhs.en &&
         ru == rhs.ru &&
+        table == rhs.table &&
+        text_id == rhs.text_id &&
         1;
 }
 
 int String::loadFromSqlite3(int ncols, char **cols, char **names)
 {
     if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) ru = cols[1];
-    if (cols[2]) en = cols[2];
+    if (cols[1]) text_id = cols[1];
+    if (cols[2]) table.id = std::stoi(cols[2]);
+    if (cols[3]) ru = cols[3];
+    if (cols[4]) en = cols[4];
 
     return 0;
 }
@@ -5424,10 +5803,153 @@ const char *String::getSql()
     " \
 create table \"Strings\" ( \
 \"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
+\"table_id\" INTEGER, \
 \"ru\" TEXT, \
 \"en\" TEXT, \
+PRIMARY KEY (\"id\"), \
+FOREIGN KEY (\"table_id\") REFERENCES \"Tables\" (\"id\") \
+); \
+    ";
+}
+
+int Table::getId() const
+{
+    return id;
+}
+
+void Table::setId(int id)
+{
+    this->id = id;
+}
+
+EObjectType Table::getType() const
+{
+    return EObjectType::Table;
+}
+
+Text Table::getVariableString(int columnId) const
+{
+    switch (columnId)
+    {
+    case 0:
+        return to_string(id);
+    case 1:
+        return to_string(text_id);
+    default:
+        return "";
+    }
+    return "";
+}
+
+void Table::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
+{
+    switch (columnId)
+    {
+    case 0:
+        id = std::stoi(text.string());
+        break;
+    case 1:
+        text_id = text.string();
+        break;
+    default:
+        break;
+    }
+}
+
+#ifdef USE_QT
+QTreeWidgetItem *Table::printQtTreeView(QTreeWidgetItem *parent) const
+{
+    auto item = new QTreeWidgetItem(parent, QStringList(QString::fromStdWString(getName())));
+    item->setData(0, Qt::UserRole, (uint64_t)this);
+    item->sortChildren(0, Qt::AscendingOrder);
+    return item;
+}
+#endif
+
+Text Table::getName() const
+{
+    Text n;
+    n = text_id;
+    if (!n.empty())
+        return n;
+    return IObject::getName();
+}
+
+bool Table::operator==(const Table &rhs) const
+{
+    return
+        text_id == rhs.text_id &&
+        1;
+}
+
+int Table::loadFromSqlite3(int ncols, char **cols, char **names)
+{
+    if (cols[0]) id = std::stoi(cols[0]);
+    if (cols[1]) text_id = cols[1];
+
+    return 0;
+}
+
+const char *Table::getSql()
+{
+    return
+    " \
+create table \"Tables\" ( \
+\"id\" INTEGER NOT NULL, \
+\"text_id\" TEXT, \
 PRIMARY KEY (\"id\") \
 ); \
+insert into \"Tables\" (\"text_id\") values \
+(\"Buildings\"), \
+(\"ClanMechanoids\"), \
+(\"ClanReputations\"), \
+(\"Clans\"), \
+(\"ConfigurationEquipments\"), \
+(\"ConfigurationGoods\"), \
+(\"ConfigurationProjectiles\"), \
+(\"ConfigurationWeapons\"), \
+(\"Configurations\"), \
+(\"Equipments\"), \
+(\"Gliders\"), \
+(\"Goods\"), \
+(\"GroupMechanoids\"), \
+(\"Groups\"), \
+(\"MapBuildingEquipments\"), \
+(\"MapBuildingGliders\"), \
+(\"MapBuildingGoods\"), \
+(\"MapBuildingModificators\"), \
+(\"MapBuildingProjectiles\"), \
+(\"MapBuildingWeapons\"), \
+(\"MapBuildings\"), \
+(\"MapGoods\"), \
+(\"MapObjects\"), \
+(\"Maps\"), \
+(\"MechanoidQuests\"), \
+(\"Mechanoids\"), \
+(\"ModificationClans\"), \
+(\"ModificationMaps\"), \
+(\"ModificationMechanoids\"), \
+(\"Modifications\"), \
+(\"Modificators\"), \
+(\"Objects\"), \
+(\"Players\"), \
+(\"Projectiles\"), \
+(\"QuestRewardEquipments\"), \
+(\"QuestRewardGliders\"), \
+(\"QuestRewardGoods\"), \
+(\"QuestRewardModificators\"), \
+(\"QuestRewardProjectiles\"), \
+(\"QuestRewardReputations\"), \
+(\"QuestRewardWeapons\"), \
+(\"QuestRewards\"), \
+(\"Quests\"), \
+(\"ScriptVariables\"), \
+(\"Settings\"), \
+(\"Strings\"), \
+(\"Tables\"), \
+(\"Weapons\"), \
+(\"AnyTable\"); \
     ";
 }
 
@@ -5459,21 +5981,65 @@ Text Weapon::getVariableString(int columnId) const
     case 3:
         return to_string(name);
     case 4:
-        return to_string(type);
-    case 5:
-        return to_string(standard);
-    case 6:
-        return to_string(weight);
-    case 7:
-        return to_string(power);
-    case 8:
-        return to_string(firerate);
-    case 9:
-        return to_string(damage);
-    case 10:
-        return to_string(price);
-    case 11:
         return to_string(projectile);
+    case 5:
+        return to_string(type);
+    case 6:
+        return to_string(standard);
+    case 7:
+        return to_string(weight);
+    case 8:
+        return to_string(power);
+    case 9:
+        return to_string(firerate);
+    case 10:
+        return to_string(damage);
+    case 11:
+        return to_string(price);
+    case 12:
+        return to_string(fx);
+    case 13:
+        return to_string(shoottype);
+    case 14:
+        return to_string(shootscale);
+    case 15:
+        return to_string(xstate);
+    case 16:
+        return to_string(rcolor);
+    case 17:
+        return to_string(gcolor);
+    case 18:
+        return to_string(bcolor);
+    case 19:
+        return to_string(typearms);
+    case 20:
+        return to_string(tfire);
+    case 21:
+        return to_string(vtype);
+    case 22:
+        return to_string(spare);
+    case 23:
+        return to_string(reconstruction);
+    case 24:
+        return to_string(maxdistance);
+    case 25:
+        return to_string(angle);
+    case 26:
+        return to_string(fxtime);
+    case 27:
+        return to_string(damagetype);
+    case 28:
+        return to_string(fxmodeltime);
+    case 29:
+        return to_string(inside_mul);
+    case 30:
+        return to_string(inside_x);
+    case 31:
+        return to_string(inside_y);
+    case 32:
+        return to_string(inside_z);
+    case 33:
+        return to_string(notrade);
     default:
         return "";
     }
@@ -5497,28 +6063,94 @@ void Weapon::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         name = std::static_pointer_cast<String>(ptr);
         break;
     case 4:
-        type = std::stoi(text.string());
+        projectile = std::static_pointer_cast<Projectile>(ptr);
         break;
     case 5:
-        standard = std::stoi(text.string());
+        type = std::stoi(text.string());
         break;
     case 6:
-        weight = std::stof(text.string());
+        standard = std::stoi(text.string());
         break;
     case 7:
-        power = std::stof(text.string());
+        weight = std::stof(text.string());
         break;
     case 8:
-        firerate = std::stof(text.string());
+        power = std::stof(text.string());
         break;
     case 9:
-        damage = std::stof(text.string());
+        firerate = std::stof(text.string());
         break;
     case 10:
-        price = std::stof(text.string());
+        damage = std::stof(text.string());
         break;
     case 11:
-        projectile = std::static_pointer_cast<Projectile>(ptr);
+        price = std::stof(text.string());
+        break;
+    case 12:
+        fx = std::stof(text.string());
+        break;
+    case 13:
+        shoottype = std::stoi(text.string());
+        break;
+    case 14:
+        shootscale = std::stof(text.string());
+        break;
+    case 15:
+        xstate = std::stoi(text.string());
+        break;
+    case 16:
+        rcolor = std::stof(text.string());
+        break;
+    case 17:
+        gcolor = std::stof(text.string());
+        break;
+    case 18:
+        bcolor = std::stof(text.string());
+        break;
+    case 19:
+        typearms = std::stoi(text.string());
+        break;
+    case 20:
+        tfire = std::stof(text.string());
+        break;
+    case 21:
+        vtype = std::stoi(text.string());
+        break;
+    case 22:
+        spare = std::stof(text.string());
+        break;
+    case 23:
+        reconstruction = std::stof(text.string());
+        break;
+    case 24:
+        maxdistance = std::stof(text.string());
+        break;
+    case 25:
+        angle = std::stof(text.string());
+        break;
+    case 26:
+        fxtime = std::stof(text.string());
+        break;
+    case 27:
+        damagetype = std::stoi(text.string());
+        break;
+    case 28:
+        fxmodeltime = std::stof(text.string());
+        break;
+    case 29:
+        inside_mul = std::stof(text.string());
+        break;
+    case 30:
+        inside_x = std::stof(text.string());
+        break;
+    case 31:
+        inside_y = std::stof(text.string());
+        break;
+    case 32:
+        inside_z = std::stof(text.string());
+        break;
+    case 33:
+        notrade = std::stoi(text.string());
         break;
     default:
         break;
@@ -5550,17 +6182,39 @@ Text Weapon::getName() const
 bool Weapon::operator==(const Weapon &rhs) const
 {
     return
+        angle == rhs.angle &&
+        bcolor == rhs.bcolor &&
         damage == rhs.damage &&
+        damagetype == rhs.damagetype &&
         firerate == rhs.firerate &&
+        fx == rhs.fx &&
+        fxmodeltime == rhs.fxmodeltime &&
+        fxtime == rhs.fxtime &&
+        gcolor == rhs.gcolor &&
+        inside_mul == rhs.inside_mul &&
+        inside_x == rhs.inside_x &&
+        inside_y == rhs.inside_y &&
+        inside_z == rhs.inside_z &&
+        maxdistance == rhs.maxdistance &&
         name == rhs.name &&
+        notrade == rhs.notrade &&
         power == rhs.power &&
         price == rhs.price &&
         projectile == rhs.projectile &&
+        rcolor == rhs.rcolor &&
+        reconstruction == rhs.reconstruction &&
         resource == rhs.resource &&
+        shootscale == rhs.shootscale &&
+        shoottype == rhs.shoottype &&
+        spare == rhs.spare &&
         standard == rhs.standard &&
         text_id == rhs.text_id &&
+        tfire == rhs.tfire &&
         type == rhs.type &&
+        typearms == rhs.typearms &&
+        vtype == rhs.vtype &&
         weight == rhs.weight &&
+        xstate == rhs.xstate &&
         1;
 }
 
@@ -5570,14 +6224,36 @@ int Weapon::loadFromSqlite3(int ncols, char **cols, char **names)
     if (cols[1]) text_id = cols[1];
     if (cols[2]) resource = cols[2];
     if (cols[3]) name.id = std::stoi(cols[3]);
-    if (cols[4]) type = std::stoi(cols[4]);
-    if (cols[5]) standard = std::stoi(cols[5]);
-    if (cols[6]) weight = std::stof(cols[6]);
-    if (cols[7]) power = std::stof(cols[7]);
-    if (cols[8]) firerate = std::stof(cols[8]);
-    if (cols[9]) damage = std::stof(cols[9]);
-    if (cols[10]) price = std::stof(cols[10]);
-    if (cols[11]) projectile.id = std::stoi(cols[11]);
+    if (cols[4]) projectile.id = std::stoi(cols[4]);
+    if (cols[5]) type = std::stoi(cols[5]);
+    if (cols[6]) standard = std::stoi(cols[6]);
+    if (cols[7]) weight = std::stof(cols[7]);
+    if (cols[8]) power = std::stof(cols[8]);
+    if (cols[9]) firerate = std::stof(cols[9]);
+    if (cols[10]) damage = std::stof(cols[10]);
+    if (cols[11]) price = std::stof(cols[11]);
+    if (cols[12]) fx = std::stof(cols[12]);
+    if (cols[13]) shoottype = std::stoi(cols[13]);
+    if (cols[14]) shootscale = std::stof(cols[14]);
+    if (cols[15]) xstate = std::stoi(cols[15]);
+    if (cols[16]) rcolor = std::stof(cols[16]);
+    if (cols[17]) gcolor = std::stof(cols[17]);
+    if (cols[18]) bcolor = std::stof(cols[18]);
+    if (cols[19]) typearms = std::stoi(cols[19]);
+    if (cols[20]) tfire = std::stof(cols[20]);
+    if (cols[21]) vtype = std::stoi(cols[21]);
+    if (cols[22]) spare = std::stof(cols[22]);
+    if (cols[23]) reconstruction = std::stof(cols[23]);
+    if (cols[24]) maxdistance = std::stof(cols[24]);
+    if (cols[25]) angle = std::stof(cols[25]);
+    if (cols[26]) fxtime = std::stof(cols[26]);
+    if (cols[27]) damagetype = std::stoi(cols[27]);
+    if (cols[28]) fxmodeltime = std::stof(cols[28]);
+    if (cols[29]) inside_mul = std::stof(cols[29]);
+    if (cols[30]) inside_x = std::stof(cols[30]);
+    if (cols[31]) inside_y = std::stof(cols[31]);
+    if (cols[32]) inside_z = std::stof(cols[32]);
+    if (cols[33]) notrade = std::stoi(cols[33]);
 
     return 0;
 }
@@ -5591,6 +6267,7 @@ create table \"Weapons\" ( \
 \"text_id\" TEXT, \
 \"resource\" TEXT, \
 \"name_id\" INTEGER, \
+\"projectile_id\" INTEGER, \
 \"type\" INTEGER, \
 \"standard\" INTEGER, \
 \"weight\" REAL, \
@@ -5598,7 +6275,28 @@ create table \"Weapons\" ( \
 \"firerate\" REAL, \
 \"damage\" REAL, \
 \"price\" REAL, \
-\"projectile_id\" INTEGER, \
+\"fx\" REAL, \
+\"shoottype\" INTEGER, \
+\"shootscale\" REAL, \
+\"xstate\" INTEGER, \
+\"rcolor\" REAL, \
+\"gcolor\" REAL, \
+\"bcolor\" REAL, \
+\"typearms\" INTEGER, \
+\"tfire\" REAL, \
+\"vtype\" INTEGER, \
+\"spare\" REAL, \
+\"reconstruction\" REAL, \
+\"maxdistance\" REAL, \
+\"angle\" REAL, \
+\"fxtime\" REAL, \
+\"damagetype\" INTEGER, \
+\"fxmodeltime\" REAL, \
+\"inside_mul\" REAL, \
+\"inside_x\" REAL, \
+\"inside_y\" REAL, \
+\"inside_z\" REAL, \
+\"notrade\" INTEGER, \
 PRIMARY KEY (\"id\"), \
 FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\"), \
 FOREIGN KEY (\"projectile_id\") REFERENCES \"Projectiles\" (\"id\") \
