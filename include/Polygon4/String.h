@@ -236,6 +236,11 @@ private:
     void copy(const void *data, size_t length, size_t multiplier = 1)
     {
         length *= multiplier;
+        if (length == multiplier)
+        {
+            this->data.reset();
+            return;
+        }
         auto s = new char[length];
         memcpy(s, data, length);
         this->data = std::shared_ptr<char>(s, [](char *s){ delete[] s; });

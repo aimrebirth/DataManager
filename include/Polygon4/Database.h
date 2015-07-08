@@ -39,6 +39,7 @@ public:
 
     void loadDatabase(const std::string &dbname);
     bool isLoaded() const;
+    sqlite3 *getDb() const;
 
     void getSchema(DatabaseSchema *schema) const;
     std::string getName() const;

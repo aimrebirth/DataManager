@@ -2,14 +2,20 @@
 
 void StorageImpl::_loadBuildings()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Buildings;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Building> building = std::make_shared<Building>();
-        int ret = building->loadFromSqlite3(ncols, cols, names);
-        buildings[building->id] = building;
-        return ret;
-    };
-    db->execute("select * from Buildings;", callback);
+        auto v = std::make_shared<Building>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->resource = (const char *)sqlite3_column_text(stmt, 2);
+        buildings[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadBuildingsPtrs()
@@ -22,37 +28,41 @@ void StorageImpl::_loadBuildingsArrays()
 
 void StorageImpl::_saveBuildings() const
 {
-    std::string query;
-    query += "delete from Buildings;";
-    db->execute(query.c_str());
-    query.clear();
-    if (buildings.empty())
-        return;
-    query += "insert or replace into Buildings values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Buildings;");
+    const std::string query = "insert into Buildings values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &building : buildings)
     {
-        query += "(";
-        query += "'" + std::to_string(building.second->id) + "',";
-        query += "'" + building.second->text_id.string() + "',";
-        query += "'" + building.second->resource.string() + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = building.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadClanMechanoids()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from ClanMechanoids;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<ClanMechanoid> clanMechanoid = std::make_shared<ClanMechanoid>();
-        int ret = clanMechanoid->loadFromSqlite3(ncols, cols, names);
-        clanMechanoids.push_back(clanMechanoid);
-        return ret;
-    };
-    db->execute("select * from ClanMechanoids;", callback);
+        auto v = std::make_shared<ClanMechanoid>();
+        v->clan.id = sqlite3_column_int(stmt, 0);
+        v->mechanoid.id = sqlite3_column_int(stmt, 1);
+        clanMechanoids.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadClanMechanoidsPtrs()
@@ -72,36 +82,41 @@ void StorageImpl::_loadClanMechanoidsArrays()
 
 void StorageImpl::_saveClanMechanoids() const
 {
-    std::string query;
-    query += "delete from ClanMechanoids;";
-    db->execute(query.c_str());
-    query.clear();
-    if (clanMechanoids.empty())
-        return;
-    query += "insert or replace into ClanMechanoids values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from ClanMechanoids;");
+    const std::string query = "insert into ClanMechanoids values (?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &clanMechanoid : clanMechanoids)
     {
-        query += "(";
-        query += "'" + std::to_string(clanMechanoid->clan.id) + "',";
-        query += "'" + std::to_string(clanMechanoid->mechanoid.id) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = clanMechanoid;
+        ret = sqlite3_bind_int(stmt, 1, v->clan.id);
+        ret = sqlite3_bind_int(stmt, 2, v->mechanoid.id);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadClanReputations()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from ClanReputations;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<ClanReputation> clanReputation = std::make_shared<ClanReputation>();
-        int ret = clanReputation->loadFromSqlite3(ncols, cols, names);
-        clanReputations.push_back(clanReputation);
-        return ret;
-    };
-    db->execute("select * from ClanReputations;", callback);
+        auto v = std::make_shared<ClanReputation>();
+        v->clan.id = sqlite3_column_int(stmt, 0);
+        v->clan2.id = sqlite3_column_int(stmt, 1);
+        v->reputation = sqlite3_column_double(stmt, 2);
+        clanReputations.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadClanReputationsPtrs()
@@ -121,37 +136,52 @@ void StorageImpl::_loadClanReputationsArrays()
 
 void StorageImpl::_saveClanReputations() const
 {
-    std::string query;
-    query += "delete from ClanReputations;";
-    db->execute(query.c_str());
-    query.clear();
-    if (clanReputations.empty())
-        return;
-    query += "insert or replace into ClanReputations values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from ClanReputations;");
+    const std::string query = "insert into ClanReputations values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &clanReputation : clanReputations)
     {
-        query += "(";
-        query += "'" + std::to_string(clanReputation->clan.id) + "',";
-        query += "'" + std::to_string(clanReputation->clan2.id) + "',";
-        query += "'" + std::to_string(clanReputation->reputation) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = clanReputation;
+        ret = sqlite3_bind_int(stmt, 1, v->clan.id);
+        ret = sqlite3_bind_int(stmt, 2, v->clan2.id);
+        ret = sqlite3_bind_double(stmt, 3, v->reputation);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadClans()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Clans;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Clan> clan = std::make_shared<Clan>();
-        int ret = clan->loadFromSqlite3(ncols, cols, names);
-        clans[clan->id] = clan;
-        return ret;
-    };
-    db->execute("select * from Clans;", callback);
+        auto v = std::make_shared<Clan>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->resource = (const char *)sqlite3_column_text(stmt, 2);
+        v->name.id = sqlite3_column_int(stmt, 3);
+        v->member_name.id = sqlite3_column_int(stmt, 4);
+        v->bonusexp = sqlite3_column_int(stmt, 5);
+        v->bonusrepair = sqlite3_column_int(stmt, 6);
+        v->bonustrade = sqlite3_column_int(stmt, 7);
+        v->helpness = sqlite3_column_int(stmt, 8);
+        v->Volatile = sqlite3_column_double(stmt, 9);
+        v->noblivion = sqlite3_column_double(stmt, 10);
+        v->playereffect = sqlite3_column_double(stmt, 11);
+        v->color = sqlite3_column_int(stmt, 12);
+        clans[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadClansPtrs()
@@ -180,47 +210,52 @@ void StorageImpl::_loadClansArrays()
 
 void StorageImpl::_saveClans() const
 {
-    std::string query;
-    query += "delete from Clans;";
-    db->execute(query.c_str());
-    query.clear();
-    if (clans.empty())
-        return;
-    query += "insert or replace into Clans values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Clans;");
+    const std::string query = "insert into Clans values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &clan : clans)
     {
-        query += "(";
-        query += "'" + std::to_string(clan.second->id) + "',";
-        query += "'" + clan.second->text_id.string() + "',";
-        query += "'" + clan.second->resource.string() + "',";
-        query += "'" + std::to_string(clan.second->name.id) + "',";
-        query += "'" + std::to_string(clan.second->member_name.id) + "',";
-        query += "'" + std::to_string(clan.second->bonusexp) + "',";
-        query += "'" + std::to_string(clan.second->bonusrepair) + "',";
-        query += "'" + std::to_string(clan.second->bonustrade) + "',";
-        query += "'" + std::to_string(clan.second->helpness) + "',";
-        query += "'" + std::to_string(clan.second->Volatile) + "',";
-        query += "'" + std::to_string(clan.second->noblivion) + "',";
-        query += "'" + std::to_string(clan.second->playereffect) + "',";
-        query += "'" + std::to_string(clan.second->color) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = clan.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_int(stmt, 5, v->member_name.id);
+        ret = sqlite3_bind_int(stmt, 6, v->bonusexp);
+        ret = sqlite3_bind_int(stmt, 7, v->bonusrepair);
+        ret = sqlite3_bind_int(stmt, 8, v->bonustrade);
+        ret = sqlite3_bind_int(stmt, 9, v->helpness);
+        ret = sqlite3_bind_double(stmt, 10, v->Volatile);
+        ret = sqlite3_bind_double(stmt, 11, v->noblivion);
+        ret = sqlite3_bind_double(stmt, 12, v->playereffect);
+        ret = sqlite3_bind_int(stmt, 13, v->color);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadConfigurationEquipments()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from ConfigurationEquipments;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<ConfigurationEquipment> configurationEquipment = std::make_shared<ConfigurationEquipment>();
-        int ret = configurationEquipment->loadFromSqlite3(ncols, cols, names);
-        configurationEquipments.push_back(configurationEquipment);
-        return ret;
-    };
-    db->execute("select * from ConfigurationEquipments;", callback);
+        auto v = std::make_shared<ConfigurationEquipment>();
+        v->configuration.id = sqlite3_column_int(stmt, 0);
+        v->equipment.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        configurationEquipments.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadConfigurationEquipmentsPtrs()
@@ -240,37 +275,42 @@ void StorageImpl::_loadConfigurationEquipmentsArrays()
 
 void StorageImpl::_saveConfigurationEquipments() const
 {
-    std::string query;
-    query += "delete from ConfigurationEquipments;";
-    db->execute(query.c_str());
-    query.clear();
-    if (configurationEquipments.empty())
-        return;
-    query += "insert or replace into ConfigurationEquipments values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from ConfigurationEquipments;");
+    const std::string query = "insert into ConfigurationEquipments values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &configurationEquipment : configurationEquipments)
     {
-        query += "(";
-        query += "'" + std::to_string(configurationEquipment->configuration.id) + "',";
-        query += "'" + std::to_string(configurationEquipment->equipment.id) + "',";
-        query += "'" + std::to_string(configurationEquipment->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = configurationEquipment;
+        ret = sqlite3_bind_int(stmt, 1, v->configuration.id);
+        ret = sqlite3_bind_int(stmt, 2, v->equipment.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadConfigurationGoods()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from ConfigurationGoods;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<ConfigurationGood> configurationGood = std::make_shared<ConfigurationGood>();
-        int ret = configurationGood->loadFromSqlite3(ncols, cols, names);
-        configurationGoods.push_back(configurationGood);
-        return ret;
-    };
-    db->execute("select * from ConfigurationGoods;", callback);
+        auto v = std::make_shared<ConfigurationGood>();
+        v->configuration.id = sqlite3_column_int(stmt, 0);
+        v->good.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        configurationGoods.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadConfigurationGoodsPtrs()
@@ -290,37 +330,42 @@ void StorageImpl::_loadConfigurationGoodsArrays()
 
 void StorageImpl::_saveConfigurationGoods() const
 {
-    std::string query;
-    query += "delete from ConfigurationGoods;";
-    db->execute(query.c_str());
-    query.clear();
-    if (configurationGoods.empty())
-        return;
-    query += "insert or replace into ConfigurationGoods values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from ConfigurationGoods;");
+    const std::string query = "insert into ConfigurationGoods values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &configurationGood : configurationGoods)
     {
-        query += "(";
-        query += "'" + std::to_string(configurationGood->configuration.id) + "',";
-        query += "'" + std::to_string(configurationGood->good.id) + "',";
-        query += "'" + std::to_string(configurationGood->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = configurationGood;
+        ret = sqlite3_bind_int(stmt, 1, v->configuration.id);
+        ret = sqlite3_bind_int(stmt, 2, v->good.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadConfigurationProjectiles()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from ConfigurationProjectiles;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<ConfigurationProjectile> configurationProjectile = std::make_shared<ConfigurationProjectile>();
-        int ret = configurationProjectile->loadFromSqlite3(ncols, cols, names);
-        configurationProjectiles.push_back(configurationProjectile);
-        return ret;
-    };
-    db->execute("select * from ConfigurationProjectiles;", callback);
+        auto v = std::make_shared<ConfigurationProjectile>();
+        v->configuration.id = sqlite3_column_int(stmt, 0);
+        v->projectile.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        configurationProjectiles.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadConfigurationProjectilesPtrs()
@@ -340,37 +385,42 @@ void StorageImpl::_loadConfigurationProjectilesArrays()
 
 void StorageImpl::_saveConfigurationProjectiles() const
 {
-    std::string query;
-    query += "delete from ConfigurationProjectiles;";
-    db->execute(query.c_str());
-    query.clear();
-    if (configurationProjectiles.empty())
-        return;
-    query += "insert or replace into ConfigurationProjectiles values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from ConfigurationProjectiles;");
+    const std::string query = "insert into ConfigurationProjectiles values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &configurationProjectile : configurationProjectiles)
     {
-        query += "(";
-        query += "'" + std::to_string(configurationProjectile->configuration.id) + "',";
-        query += "'" + std::to_string(configurationProjectile->projectile.id) + "',";
-        query += "'" + std::to_string(configurationProjectile->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = configurationProjectile;
+        ret = sqlite3_bind_int(stmt, 1, v->configuration.id);
+        ret = sqlite3_bind_int(stmt, 2, v->projectile.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadConfigurationWeapons()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from ConfigurationWeapons;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<ConfigurationWeapon> configurationWeapon = std::make_shared<ConfigurationWeapon>();
-        int ret = configurationWeapon->loadFromSqlite3(ncols, cols, names);
-        configurationWeapons.push_back(configurationWeapon);
-        return ret;
-    };
-    db->execute("select * from ConfigurationWeapons;", callback);
+        auto v = std::make_shared<ConfigurationWeapon>();
+        v->configuration.id = sqlite3_column_int(stmt, 0);
+        v->weapon.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        configurationWeapons.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadConfigurationWeaponsPtrs()
@@ -390,37 +440,43 @@ void StorageImpl::_loadConfigurationWeaponsArrays()
 
 void StorageImpl::_saveConfigurationWeapons() const
 {
-    std::string query;
-    query += "delete from ConfigurationWeapons;";
-    db->execute(query.c_str());
-    query.clear();
-    if (configurationWeapons.empty())
-        return;
-    query += "insert or replace into ConfigurationWeapons values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from ConfigurationWeapons;");
+    const std::string query = "insert into ConfigurationWeapons values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &configurationWeapon : configurationWeapons)
     {
-        query += "(";
-        query += "'" + std::to_string(configurationWeapon->configuration.id) + "',";
-        query += "'" + std::to_string(configurationWeapon->weapon.id) + "',";
-        query += "'" + std::to_string(configurationWeapon->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = configurationWeapon;
+        ret = sqlite3_bind_int(stmt, 1, v->configuration.id);
+        ret = sqlite3_bind_int(stmt, 2, v->weapon.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadConfigurations()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Configurations;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Configuration> configuration = std::make_shared<Configuration>();
-        int ret = configuration->loadFromSqlite3(ncols, cols, names);
-        configurations[configuration->id] = configuration;
-        return ret;
-    };
-    db->execute("select * from Configurations;", callback);
+        auto v = std::make_shared<Configuration>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->name.id = sqlite3_column_int(stmt, 2);
+        v->glider.id = sqlite3_column_int(stmt, 3);
+        configurations[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadConfigurationsPtrs()
@@ -455,38 +511,55 @@ void StorageImpl::_loadConfigurationsArrays()
 
 void StorageImpl::_saveConfigurations() const
 {
-    std::string query;
-    query += "delete from Configurations;";
-    db->execute(query.c_str());
-    query.clear();
-    if (configurations.empty())
-        return;
-    query += "insert or replace into Configurations values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Configurations;");
+    const std::string query = "insert into Configurations values (?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &configuration : configurations)
     {
-        query += "(";
-        query += "'" + std::to_string(configuration.second->id) + "',";
-        query += "'" + configuration.second->text_id.string() + "',";
-        query += "'" + std::to_string(configuration.second->name.id) + "',";
-        query += "'" + std::to_string(configuration.second->glider.id) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = configuration.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->name.id);
+        ret = sqlite3_bind_int(stmt, 4, v->glider.id);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadEquipments()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Equipments;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Equipment> equipment = std::make_shared<Equipment>();
-        int ret = equipment->loadFromSqlite3(ncols, cols, names);
-        equipments[equipment->id] = equipment;
-        return ret;
-    };
-    db->execute("select * from Equipments;", callback);
+        auto v = std::make_shared<Equipment>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->resource = (const char *)sqlite3_column_text(stmt, 2);
+        v->name.id = sqlite3_column_int(stmt, 3);
+        v->type = sqlite3_column_int(stmt, 4);
+        v->standard = sqlite3_column_int(stmt, 5);
+        v->weight = sqlite3_column_double(stmt, 6);
+        v->durability = sqlite3_column_double(stmt, 7);
+        v->power = sqlite3_column_double(stmt, 8);
+        v->value1 = sqlite3_column_double(stmt, 9);
+        v->value2 = sqlite3_column_double(stmt, 10);
+        v->value3 = sqlite3_column_double(stmt, 11);
+        v->manual = sqlite3_column_int(stmt, 12);
+        v->price = sqlite3_column_double(stmt, 13);
+        v->notrade = sqlite3_column_int(stmt, 14);
+        equipments[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadEquipmentsPtrs()
@@ -504,49 +577,72 @@ void StorageImpl::_loadEquipmentsArrays()
 
 void StorageImpl::_saveEquipments() const
 {
-    std::string query;
-    query += "delete from Equipments;";
-    db->execute(query.c_str());
-    query.clear();
-    if (equipments.empty())
-        return;
-    query += "insert or replace into Equipments values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Equipments;");
+    const std::string query = "insert into Equipments values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &equipment : equipments)
     {
-        query += "(";
-        query += "'" + std::to_string(equipment.second->id) + "',";
-        query += "'" + equipment.second->text_id.string() + "',";
-        query += "'" + equipment.second->resource.string() + "',";
-        query += "'" + std::to_string(equipment.second->name.id) + "',";
-        query += "'" + std::to_string(equipment.second->type) + "',";
-        query += "'" + std::to_string(equipment.second->standard) + "',";
-        query += "'" + std::to_string(equipment.second->weight) + "',";
-        query += "'" + std::to_string(equipment.second->durability) + "',";
-        query += "'" + std::to_string(equipment.second->power) + "',";
-        query += "'" + std::to_string(equipment.second->value1) + "',";
-        query += "'" + std::to_string(equipment.second->value2) + "',";
-        query += "'" + std::to_string(equipment.second->value3) + "',";
-        query += "'" + std::to_string(equipment.second->manual) + "',";
-        query += "'" + std::to_string(equipment.second->price) + "',";
-        query += "'" + std::to_string(equipment.second->notrade) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = equipment.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_int(stmt, 5, v->type);
+        ret = sqlite3_bind_int(stmt, 6, v->standard);
+        ret = sqlite3_bind_double(stmt, 7, v->weight);
+        ret = sqlite3_bind_double(stmt, 8, v->durability);
+        ret = sqlite3_bind_double(stmt, 9, v->power);
+        ret = sqlite3_bind_double(stmt, 10, v->value1);
+        ret = sqlite3_bind_double(stmt, 11, v->value2);
+        ret = sqlite3_bind_double(stmt, 12, v->value3);
+        ret = sqlite3_bind_int(stmt, 13, v->manual);
+        ret = sqlite3_bind_double(stmt, 14, v->price);
+        ret = sqlite3_bind_int(stmt, 15, v->notrade);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadGliders()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Gliders;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Glider> glider = std::make_shared<Glider>();
-        int ret = glider->loadFromSqlite3(ncols, cols, names);
-        gliders[glider->id] = glider;
-        return ret;
-    };
-    db->execute("select * from Gliders;", callback);
+        auto v = std::make_shared<Glider>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->resource = (const char *)sqlite3_column_text(stmt, 2);
+        v->name.id = sqlite3_column_int(stmt, 3);
+        v->standard = sqlite3_column_int(stmt, 4);
+        v->weight = sqlite3_column_double(stmt, 5);
+        v->maxweight = sqlite3_column_double(stmt, 6);
+        v->armor = sqlite3_column_double(stmt, 7);
+        v->price = sqlite3_column_int(stmt, 8);
+        v->restore = sqlite3_column_double(stmt, 9);
+        v->power = sqlite3_column_double(stmt, 10);
+        v->special = sqlite3_column_int(stmt, 11);
+        v->rotatespeed = sqlite3_column_double(stmt, 12);
+        v->resfront = sqlite3_column_double(stmt, 13);
+        v->restop = sqlite3_column_double(stmt, 14);
+        v->resside = sqlite3_column_double(stmt, 15);
+        v->stabfront = sqlite3_column_double(stmt, 16);
+        v->stabside = sqlite3_column_double(stmt, 17);
+        v->careen = sqlite3_column_double(stmt, 18);
+        v->delta_t = sqlite3_column_double(stmt, 19);
+        v->turbulence = sqlite3_column_double(stmt, 20);
+        gliders[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadGlidersPtrs()
@@ -564,55 +660,66 @@ void StorageImpl::_loadGlidersArrays()
 
 void StorageImpl::_saveGliders() const
 {
-    std::string query;
-    query += "delete from Gliders;";
-    db->execute(query.c_str());
-    query.clear();
-    if (gliders.empty())
-        return;
-    query += "insert or replace into Gliders values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Gliders;");
+    const std::string query = "insert into Gliders values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &glider : gliders)
     {
-        query += "(";
-        query += "'" + std::to_string(glider.second->id) + "',";
-        query += "'" + glider.second->text_id.string() + "',";
-        query += "'" + glider.second->resource.string() + "',";
-        query += "'" + std::to_string(glider.second->name.id) + "',";
-        query += "'" + std::to_string(glider.second->standard) + "',";
-        query += "'" + std::to_string(glider.second->weight) + "',";
-        query += "'" + std::to_string(glider.second->maxweight) + "',";
-        query += "'" + std::to_string(glider.second->armor) + "',";
-        query += "'" + std::to_string(glider.second->price) + "',";
-        query += "'" + std::to_string(glider.second->restore) + "',";
-        query += "'" + std::to_string(glider.second->power) + "',";
-        query += "'" + std::to_string(glider.second->special) + "',";
-        query += "'" + std::to_string(glider.second->rotatespeed) + "',";
-        query += "'" + std::to_string(glider.second->resfront) + "',";
-        query += "'" + std::to_string(glider.second->restop) + "',";
-        query += "'" + std::to_string(glider.second->resside) + "',";
-        query += "'" + std::to_string(glider.second->stabfront) + "',";
-        query += "'" + std::to_string(glider.second->stabside) + "',";
-        query += "'" + std::to_string(glider.second->careen) + "',";
-        query += "'" + std::to_string(glider.second->delta_t) + "',";
-        query += "'" + std::to_string(glider.second->turbulence) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = glider.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_int(stmt, 5, v->standard);
+        ret = sqlite3_bind_double(stmt, 6, v->weight);
+        ret = sqlite3_bind_double(stmt, 7, v->maxweight);
+        ret = sqlite3_bind_double(stmt, 8, v->armor);
+        ret = sqlite3_bind_int(stmt, 9, v->price);
+        ret = sqlite3_bind_double(stmt, 10, v->restore);
+        ret = sqlite3_bind_double(stmt, 11, v->power);
+        ret = sqlite3_bind_int(stmt, 12, v->special);
+        ret = sqlite3_bind_double(stmt, 13, v->rotatespeed);
+        ret = sqlite3_bind_double(stmt, 14, v->resfront);
+        ret = sqlite3_bind_double(stmt, 15, v->restop);
+        ret = sqlite3_bind_double(stmt, 16, v->resside);
+        ret = sqlite3_bind_double(stmt, 17, v->stabfront);
+        ret = sqlite3_bind_double(stmt, 18, v->stabside);
+        ret = sqlite3_bind_double(stmt, 19, v->careen);
+        ret = sqlite3_bind_double(stmt, 20, v->delta_t);
+        ret = sqlite3_bind_double(stmt, 21, v->turbulence);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadGoods()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Goods;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Good> good = std::make_shared<Good>();
-        int ret = good->loadFromSqlite3(ncols, cols, names);
-        goods[good->id] = good;
-        return ret;
-    };
-    db->execute("select * from Goods;", callback);
+        auto v = std::make_shared<Good>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->resource = (const char *)sqlite3_column_text(stmt, 2);
+        v->resource_drop = (const char *)sqlite3_column_text(stmt, 3);
+        v->name.id = sqlite3_column_int(stmt, 4);
+        v->price = sqlite3_column_int(stmt, 5);
+        v->weight = sqlite3_column_double(stmt, 6);
+        v->notrade = sqlite3_column_int(stmt, 7);
+        v->type = sqlite3_column_int(stmt, 8);
+        goods[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadGoodsPtrs()
@@ -630,43 +737,47 @@ void StorageImpl::_loadGoodsArrays()
 
 void StorageImpl::_saveGoods() const
 {
-    std::string query;
-    query += "delete from Goods;";
-    db->execute(query.c_str());
-    query.clear();
-    if (goods.empty())
-        return;
-    query += "insert or replace into Goods values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Goods;");
+    const std::string query = "insert into Goods values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &good : goods)
     {
-        query += "(";
-        query += "'" + std::to_string(good.second->id) + "',";
-        query += "'" + good.second->text_id.string() + "',";
-        query += "'" + good.second->resource.string() + "',";
-        query += "'" + good.second->resource_drop.string() + "',";
-        query += "'" + std::to_string(good.second->name.id) + "',";
-        query += "'" + std::to_string(good.second->price) + "',";
-        query += "'" + std::to_string(good.second->weight) + "',";
-        query += "'" + std::to_string(good.second->notrade) + "',";
-        query += "'" + std::to_string(good.second->type) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = good.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 4, v->resource_drop.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 5, v->name.id);
+        ret = sqlite3_bind_int(stmt, 6, v->price);
+        ret = sqlite3_bind_double(stmt, 7, v->weight);
+        ret = sqlite3_bind_int(stmt, 8, v->notrade);
+        ret = sqlite3_bind_int(stmt, 9, v->type);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadGroupMechanoids()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from GroupMechanoids;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<GroupMechanoid> groupMechanoid = std::make_shared<GroupMechanoid>();
-        int ret = groupMechanoid->loadFromSqlite3(ncols, cols, names);
-        groupMechanoids.push_back(groupMechanoid);
-        return ret;
-    };
-    db->execute("select * from GroupMechanoids;", callback);
+        auto v = std::make_shared<GroupMechanoid>();
+        v->group.id = sqlite3_column_int(stmt, 0);
+        v->mechanoid.id = sqlite3_column_int(stmt, 1);
+        groupMechanoids.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadGroupMechanoidsPtrs()
@@ -686,36 +797,41 @@ void StorageImpl::_loadGroupMechanoidsArrays()
 
 void StorageImpl::_saveGroupMechanoids() const
 {
-    std::string query;
-    query += "delete from GroupMechanoids;";
-    db->execute(query.c_str());
-    query.clear();
-    if (groupMechanoids.empty())
-        return;
-    query += "insert or replace into GroupMechanoids values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from GroupMechanoids;");
+    const std::string query = "insert into GroupMechanoids values (?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &groupMechanoid : groupMechanoids)
     {
-        query += "(";
-        query += "'" + std::to_string(groupMechanoid->group.id) + "',";
-        query += "'" + std::to_string(groupMechanoid->mechanoid.id) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = groupMechanoid;
+        ret = sqlite3_bind_int(stmt, 1, v->group.id);
+        ret = sqlite3_bind_int(stmt, 2, v->mechanoid.id);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadGroups()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Groups;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Group> group = std::make_shared<Group>();
-        int ret = group->loadFromSqlite3(ncols, cols, names);
-        groups[group->id] = group;
-        return ret;
-    };
-    db->execute("select * from Groups;", callback);
+        auto v = std::make_shared<Group>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->name.id = sqlite3_column_int(stmt, 2);
+        groups[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadGroupsPtrs()
@@ -739,37 +855,42 @@ void StorageImpl::_loadGroupsArrays()
 
 void StorageImpl::_saveGroups() const
 {
-    std::string query;
-    query += "delete from Groups;";
-    db->execute(query.c_str());
-    query.clear();
-    if (groups.empty())
-        return;
-    query += "insert or replace into Groups values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Groups;");
+    const std::string query = "insert into Groups values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &group : groups)
     {
-        query += "(";
-        query += "'" + std::to_string(group.second->id) + "',";
-        query += "'" + group.second->text_id.string() + "',";
-        query += "'" + std::to_string(group.second->name.id) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = group.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->name.id);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadMapBuildingEquipments()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from MapBuildingEquipments;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<MapBuildingEquipment> mapBuildingEquipment = std::make_shared<MapBuildingEquipment>();
-        int ret = mapBuildingEquipment->loadFromSqlite3(ncols, cols, names);
-        mapBuildingEquipments.push_back(mapBuildingEquipment);
-        return ret;
-    };
-    db->execute("select * from MapBuildingEquipments;", callback);
+        auto v = std::make_shared<MapBuildingEquipment>();
+        v->mapBuilding.id = sqlite3_column_int(stmt, 0);
+        v->equipment.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        mapBuildingEquipments.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadMapBuildingEquipmentsPtrs()
@@ -789,37 +910,42 @@ void StorageImpl::_loadMapBuildingEquipmentsArrays()
 
 void StorageImpl::_saveMapBuildingEquipments() const
 {
-    std::string query;
-    query += "delete from MapBuildingEquipments;";
-    db->execute(query.c_str());
-    query.clear();
-    if (mapBuildingEquipments.empty())
-        return;
-    query += "insert or replace into MapBuildingEquipments values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildingEquipments;");
+    const std::string query = "insert into MapBuildingEquipments values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &mapBuildingEquipment : mapBuildingEquipments)
     {
-        query += "(";
-        query += "'" + std::to_string(mapBuildingEquipment->mapBuilding.id) + "',";
-        query += "'" + std::to_string(mapBuildingEquipment->equipment.id) + "',";
-        query += "'" + std::to_string(mapBuildingEquipment->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = mapBuildingEquipment;
+        ret = sqlite3_bind_int(stmt, 1, v->mapBuilding.id);
+        ret = sqlite3_bind_int(stmt, 2, v->equipment.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadMapBuildingGliders()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from MapBuildingGliders;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<MapBuildingGlider> mapBuildingGlider = std::make_shared<MapBuildingGlider>();
-        int ret = mapBuildingGlider->loadFromSqlite3(ncols, cols, names);
-        mapBuildingGliders.push_back(mapBuildingGlider);
-        return ret;
-    };
-    db->execute("select * from MapBuildingGliders;", callback);
+        auto v = std::make_shared<MapBuildingGlider>();
+        v->mapBuilding.id = sqlite3_column_int(stmt, 0);
+        v->glider.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        mapBuildingGliders.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadMapBuildingGlidersPtrs()
@@ -839,37 +965,42 @@ void StorageImpl::_loadMapBuildingGlidersArrays()
 
 void StorageImpl::_saveMapBuildingGliders() const
 {
-    std::string query;
-    query += "delete from MapBuildingGliders;";
-    db->execute(query.c_str());
-    query.clear();
-    if (mapBuildingGliders.empty())
-        return;
-    query += "insert or replace into MapBuildingGliders values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildingGliders;");
+    const std::string query = "insert into MapBuildingGliders values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &mapBuildingGlider : mapBuildingGliders)
     {
-        query += "(";
-        query += "'" + std::to_string(mapBuildingGlider->mapBuilding.id) + "',";
-        query += "'" + std::to_string(mapBuildingGlider->glider.id) + "',";
-        query += "'" + std::to_string(mapBuildingGlider->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = mapBuildingGlider;
+        ret = sqlite3_bind_int(stmt, 1, v->mapBuilding.id);
+        ret = sqlite3_bind_int(stmt, 2, v->glider.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadMapBuildingGoods()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from MapBuildingGoods;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<MapBuildingGood> mapBuildingGood = std::make_shared<MapBuildingGood>();
-        int ret = mapBuildingGood->loadFromSqlite3(ncols, cols, names);
-        mapBuildingGoods.push_back(mapBuildingGood);
-        return ret;
-    };
-    db->execute("select * from MapBuildingGoods;", callback);
+        auto v = std::make_shared<MapBuildingGood>();
+        v->mapBuilding.id = sqlite3_column_int(stmt, 0);
+        v->good.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        mapBuildingGoods.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadMapBuildingGoodsPtrs()
@@ -889,37 +1020,42 @@ void StorageImpl::_loadMapBuildingGoodsArrays()
 
 void StorageImpl::_saveMapBuildingGoods() const
 {
-    std::string query;
-    query += "delete from MapBuildingGoods;";
-    db->execute(query.c_str());
-    query.clear();
-    if (mapBuildingGoods.empty())
-        return;
-    query += "insert or replace into MapBuildingGoods values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildingGoods;");
+    const std::string query = "insert into MapBuildingGoods values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &mapBuildingGood : mapBuildingGoods)
     {
-        query += "(";
-        query += "'" + std::to_string(mapBuildingGood->mapBuilding.id) + "',";
-        query += "'" + std::to_string(mapBuildingGood->good.id) + "',";
-        query += "'" + std::to_string(mapBuildingGood->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = mapBuildingGood;
+        ret = sqlite3_bind_int(stmt, 1, v->mapBuilding.id);
+        ret = sqlite3_bind_int(stmt, 2, v->good.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadMapBuildingModificators()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from MapBuildingModificators;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<MapBuildingModificator> mapBuildingModificator = std::make_shared<MapBuildingModificator>();
-        int ret = mapBuildingModificator->loadFromSqlite3(ncols, cols, names);
-        mapBuildingModificators.push_back(mapBuildingModificator);
-        return ret;
-    };
-    db->execute("select * from MapBuildingModificators;", callback);
+        auto v = std::make_shared<MapBuildingModificator>();
+        v->mapBuilding.id = sqlite3_column_int(stmt, 0);
+        v->modificator.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        mapBuildingModificators.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadMapBuildingModificatorsPtrs()
@@ -939,37 +1075,42 @@ void StorageImpl::_loadMapBuildingModificatorsArrays()
 
 void StorageImpl::_saveMapBuildingModificators() const
 {
-    std::string query;
-    query += "delete from MapBuildingModificators;";
-    db->execute(query.c_str());
-    query.clear();
-    if (mapBuildingModificators.empty())
-        return;
-    query += "insert or replace into MapBuildingModificators values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildingModificators;");
+    const std::string query = "insert into MapBuildingModificators values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &mapBuildingModificator : mapBuildingModificators)
     {
-        query += "(";
-        query += "'" + std::to_string(mapBuildingModificator->mapBuilding.id) + "',";
-        query += "'" + std::to_string(mapBuildingModificator->modificator.id) + "',";
-        query += "'" + std::to_string(mapBuildingModificator->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = mapBuildingModificator;
+        ret = sqlite3_bind_int(stmt, 1, v->mapBuilding.id);
+        ret = sqlite3_bind_int(stmt, 2, v->modificator.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadMapBuildingProjectiles()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from MapBuildingProjectiles;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<MapBuildingProjectile> mapBuildingProjectile = std::make_shared<MapBuildingProjectile>();
-        int ret = mapBuildingProjectile->loadFromSqlite3(ncols, cols, names);
-        mapBuildingProjectiles.push_back(mapBuildingProjectile);
-        return ret;
-    };
-    db->execute("select * from MapBuildingProjectiles;", callback);
+        auto v = std::make_shared<MapBuildingProjectile>();
+        v->mapBuilding.id = sqlite3_column_int(stmt, 0);
+        v->projectile.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        mapBuildingProjectiles.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadMapBuildingProjectilesPtrs()
@@ -989,37 +1130,42 @@ void StorageImpl::_loadMapBuildingProjectilesArrays()
 
 void StorageImpl::_saveMapBuildingProjectiles() const
 {
-    std::string query;
-    query += "delete from MapBuildingProjectiles;";
-    db->execute(query.c_str());
-    query.clear();
-    if (mapBuildingProjectiles.empty())
-        return;
-    query += "insert or replace into MapBuildingProjectiles values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildingProjectiles;");
+    const std::string query = "insert into MapBuildingProjectiles values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &mapBuildingProjectile : mapBuildingProjectiles)
     {
-        query += "(";
-        query += "'" + std::to_string(mapBuildingProjectile->mapBuilding.id) + "',";
-        query += "'" + std::to_string(mapBuildingProjectile->projectile.id) + "',";
-        query += "'" + std::to_string(mapBuildingProjectile->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = mapBuildingProjectile;
+        ret = sqlite3_bind_int(stmt, 1, v->mapBuilding.id);
+        ret = sqlite3_bind_int(stmt, 2, v->projectile.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadMapBuildingWeapons()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from MapBuildingWeapons;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<MapBuildingWeapon> mapBuildingWeapon = std::make_shared<MapBuildingWeapon>();
-        int ret = mapBuildingWeapon->loadFromSqlite3(ncols, cols, names);
-        mapBuildingWeapons.push_back(mapBuildingWeapon);
-        return ret;
-    };
-    db->execute("select * from MapBuildingWeapons;", callback);
+        auto v = std::make_shared<MapBuildingWeapon>();
+        v->mapBuilding.id = sqlite3_column_int(stmt, 0);
+        v->weapon.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        mapBuildingWeapons.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadMapBuildingWeaponsPtrs()
@@ -1039,37 +1185,55 @@ void StorageImpl::_loadMapBuildingWeaponsArrays()
 
 void StorageImpl::_saveMapBuildingWeapons() const
 {
-    std::string query;
-    query += "delete from MapBuildingWeapons;";
-    db->execute(query.c_str());
-    query.clear();
-    if (mapBuildingWeapons.empty())
-        return;
-    query += "insert or replace into MapBuildingWeapons values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildingWeapons;");
+    const std::string query = "insert into MapBuildingWeapons values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &mapBuildingWeapon : mapBuildingWeapons)
     {
-        query += "(";
-        query += "'" + std::to_string(mapBuildingWeapon->mapBuilding.id) + "',";
-        query += "'" + std::to_string(mapBuildingWeapon->weapon.id) + "',";
-        query += "'" + std::to_string(mapBuildingWeapon->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = mapBuildingWeapon;
+        ret = sqlite3_bind_int(stmt, 1, v->mapBuilding.id);
+        ret = sqlite3_bind_int(stmt, 2, v->weapon.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadMapBuildings()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from MapBuildings;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<MapBuilding> mapBuilding = std::make_shared<MapBuilding>();
-        int ret = mapBuilding->loadFromSqlite3(ncols, cols, names);
-        mapBuildings[mapBuilding->id] = mapBuilding;
-        return ret;
-    };
-    db->execute("select * from MapBuildings;", callback);
+        auto v = std::make_shared<MapBuilding>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->map.id = sqlite3_column_int(stmt, 2);
+        v->building.id = sqlite3_column_int(stmt, 3);
+        v->name.id = sqlite3_column_int(stmt, 4);
+        v->interactive = sqlite3_column_int(stmt, 5);
+        v->x = sqlite3_column_double(stmt, 6);
+        v->y = sqlite3_column_double(stmt, 7);
+        v->z = sqlite3_column_double(stmt, 8);
+        v->roll = sqlite3_column_double(stmt, 9);
+        v->pitch = sqlite3_column_double(stmt, 10);
+        v->yaw = sqlite3_column_double(stmt, 11);
+        v->scale = sqlite3_column_double(stmt, 12);
+        v->scale_x = sqlite3_column_double(stmt, 13);
+        v->scale_y = sqlite3_column_double(stmt, 14);
+        v->scale_z = sqlite3_column_double(stmt, 15);
+        mapBuildings[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadMapBuildingsPtrs()
@@ -1112,50 +1276,66 @@ void StorageImpl::_loadMapBuildingsArrays()
 
 void StorageImpl::_saveMapBuildings() const
 {
-    std::string query;
-    query += "delete from MapBuildings;";
-    db->execute(query.c_str());
-    query.clear();
-    if (mapBuildings.empty())
-        return;
-    query += "insert or replace into MapBuildings values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildings;");
+    const std::string query = "insert into MapBuildings values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &mapBuilding : mapBuildings)
     {
-        query += "(";
-        query += "'" + std::to_string(mapBuilding.second->id) + "',";
-        query += "'" + mapBuilding.second->text_id.string() + "',";
-        query += "'" + std::to_string(mapBuilding.second->map.id) + "',";
-        query += "'" + std::to_string(mapBuilding.second->building.id) + "',";
-        query += "'" + std::to_string(mapBuilding.second->name.id) + "',";
-        query += "'" + std::to_string(mapBuilding.second->interactive) + "',";
-        query += "'" + std::to_string(mapBuilding.second->x) + "',";
-        query += "'" + std::to_string(mapBuilding.second->y) + "',";
-        query += "'" + std::to_string(mapBuilding.second->z) + "',";
-        query += "'" + std::to_string(mapBuilding.second->pitch) + "',";
-        query += "'" + std::to_string(mapBuilding.second->yaw) + "',";
-        query += "'" + std::to_string(mapBuilding.second->roll) + "',";
-        query += "'" + std::to_string(mapBuilding.second->scale) + "',";
-        query += "'" + std::to_string(mapBuilding.second->scale_x) + "',";
-        query += "'" + std::to_string(mapBuilding.second->scale_y) + "',";
-        query += "'" + std::to_string(mapBuilding.second->scale_z) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = mapBuilding.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->map.id);
+        ret = sqlite3_bind_int(stmt, 4, v->building.id);
+        ret = sqlite3_bind_int(stmt, 5, v->name.id);
+        ret = sqlite3_bind_int(stmt, 6, v->interactive);
+        ret = sqlite3_bind_double(stmt, 7, v->x);
+        ret = sqlite3_bind_double(stmt, 8, v->y);
+        ret = sqlite3_bind_double(stmt, 9, v->z);
+        ret = sqlite3_bind_double(stmt, 10, v->roll);
+        ret = sqlite3_bind_double(stmt, 11, v->pitch);
+        ret = sqlite3_bind_double(stmt, 12, v->yaw);
+        ret = sqlite3_bind_double(stmt, 13, v->scale);
+        ret = sqlite3_bind_double(stmt, 14, v->scale_x);
+        ret = sqlite3_bind_double(stmt, 15, v->scale_y);
+        ret = sqlite3_bind_double(stmt, 16, v->scale_z);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadMapGoods()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from MapGoods;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<MapGood> mapGood = std::make_shared<MapGood>();
-        int ret = mapGood->loadFromSqlite3(ncols, cols, names);
-        mapGoods[mapGood->id] = mapGood;
-        return ret;
-    };
-    db->execute("select * from MapGoods;", callback);
+        auto v = std::make_shared<MapGood>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = sqlite3_column_int(stmt, 1);
+        v->map.id = sqlite3_column_int(stmt, 2);
+        v->good.id = sqlite3_column_int(stmt, 3);
+        v->x = sqlite3_column_double(stmt, 4);
+        v->y = sqlite3_column_double(stmt, 5);
+        v->z = sqlite3_column_double(stmt, 6);
+        v->roll = sqlite3_column_double(stmt, 7);
+        v->pitch = sqlite3_column_double(stmt, 8);
+        v->yaw = sqlite3_column_double(stmt, 9);
+        v->scale = sqlite3_column_double(stmt, 10);
+        v->scale_x = sqlite3_column_double(stmt, 11);
+        v->scale_y = sqlite3_column_double(stmt, 12);
+        v->scale_z = sqlite3_column_double(stmt, 13);
+        mapGoods[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadMapGoodsPtrs()
@@ -1175,48 +1355,64 @@ void StorageImpl::_loadMapGoodsArrays()
 
 void StorageImpl::_saveMapGoods() const
 {
-    std::string query;
-    query += "delete from MapGoods;";
-    db->execute(query.c_str());
-    query.clear();
-    if (mapGoods.empty())
-        return;
-    query += "insert or replace into MapGoods values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from MapGoods;");
+    const std::string query = "insert into MapGoods values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &mapGood : mapGoods)
     {
-        query += "(";
-        query += "'" + std::to_string(mapGood.second->id) + "',";
-        query += "'" + std::to_string(mapGood.second->text_id) + "',";
-        query += "'" + std::to_string(mapGood.second->map.id) + "',";
-        query += "'" + std::to_string(mapGood.second->good.id) + "',";
-        query += "'" + std::to_string(mapGood.second->x) + "',";
-        query += "'" + std::to_string(mapGood.second->y) + "',";
-        query += "'" + std::to_string(mapGood.second->z) + "',";
-        query += "'" + std::to_string(mapGood.second->pitch) + "',";
-        query += "'" + std::to_string(mapGood.second->yaw) + "',";
-        query += "'" + std::to_string(mapGood.second->roll) + "',";
-        query += "'" + std::to_string(mapGood.second->scale) + "',";
-        query += "'" + std::to_string(mapGood.second->scale_x) + "',";
-        query += "'" + std::to_string(mapGood.second->scale_y) + "',";
-        query += "'" + std::to_string(mapGood.second->scale_z) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = mapGood.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_int(stmt, 2, v->text_id);
+        ret = sqlite3_bind_int(stmt, 3, v->map.id);
+        ret = sqlite3_bind_int(stmt, 4, v->good.id);
+        ret = sqlite3_bind_double(stmt, 5, v->x);
+        ret = sqlite3_bind_double(stmt, 6, v->y);
+        ret = sqlite3_bind_double(stmt, 7, v->z);
+        ret = sqlite3_bind_double(stmt, 8, v->roll);
+        ret = sqlite3_bind_double(stmt, 9, v->pitch);
+        ret = sqlite3_bind_double(stmt, 10, v->yaw);
+        ret = sqlite3_bind_double(stmt, 11, v->scale);
+        ret = sqlite3_bind_double(stmt, 12, v->scale_x);
+        ret = sqlite3_bind_double(stmt, 13, v->scale_y);
+        ret = sqlite3_bind_double(stmt, 14, v->scale_z);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadMapObjects()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from MapObjects;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<MapObject> mapObject = std::make_shared<MapObject>();
-        int ret = mapObject->loadFromSqlite3(ncols, cols, names);
-        mapObjects[mapObject->id] = mapObject;
-        return ret;
-    };
-    db->execute("select * from MapObjects;", callback);
+        auto v = std::make_shared<MapObject>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->map.id = sqlite3_column_int(stmt, 2);
+        v->object.id = sqlite3_column_int(stmt, 3);
+        v->x = sqlite3_column_double(stmt, 4);
+        v->y = sqlite3_column_double(stmt, 5);
+        v->z = sqlite3_column_double(stmt, 6);
+        v->roll = sqlite3_column_double(stmt, 7);
+        v->pitch = sqlite3_column_double(stmt, 8);
+        v->yaw = sqlite3_column_double(stmt, 9);
+        v->scale = sqlite3_column_double(stmt, 10);
+        v->scale_x = sqlite3_column_double(stmt, 11);
+        v->scale_y = sqlite3_column_double(stmt, 12);
+        v->scale_z = sqlite3_column_double(stmt, 13);
+        mapObjects[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadMapObjectsPtrs()
@@ -1236,48 +1432,56 @@ void StorageImpl::_loadMapObjectsArrays()
 
 void StorageImpl::_saveMapObjects() const
 {
-    std::string query;
-    query += "delete from MapObjects;";
-    db->execute(query.c_str());
-    query.clear();
-    if (mapObjects.empty())
-        return;
-    query += "insert or replace into MapObjects values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from MapObjects;");
+    const std::string query = "insert into MapObjects values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &mapObject : mapObjects)
     {
-        query += "(";
-        query += "'" + std::to_string(mapObject.second->id) + "',";
-        query += "'" + mapObject.second->text_id.string() + "',";
-        query += "'" + std::to_string(mapObject.second->map.id) + "',";
-        query += "'" + std::to_string(mapObject.second->object.id) + "',";
-        query += "'" + std::to_string(mapObject.second->x) + "',";
-        query += "'" + std::to_string(mapObject.second->y) + "',";
-        query += "'" + std::to_string(mapObject.second->z) + "',";
-        query += "'" + std::to_string(mapObject.second->pitch) + "',";
-        query += "'" + std::to_string(mapObject.second->yaw) + "',";
-        query += "'" + std::to_string(mapObject.second->roll) + "',";
-        query += "'" + std::to_string(mapObject.second->scale) + "',";
-        query += "'" + std::to_string(mapObject.second->scale_x) + "',";
-        query += "'" + std::to_string(mapObject.second->scale_y) + "',";
-        query += "'" + std::to_string(mapObject.second->scale_z) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = mapObject.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->map.id);
+        ret = sqlite3_bind_int(stmt, 4, v->object.id);
+        ret = sqlite3_bind_double(stmt, 5, v->x);
+        ret = sqlite3_bind_double(stmt, 6, v->y);
+        ret = sqlite3_bind_double(stmt, 7, v->z);
+        ret = sqlite3_bind_double(stmt, 8, v->roll);
+        ret = sqlite3_bind_double(stmt, 9, v->pitch);
+        ret = sqlite3_bind_double(stmt, 10, v->yaw);
+        ret = sqlite3_bind_double(stmt, 11, v->scale);
+        ret = sqlite3_bind_double(stmt, 12, v->scale_x);
+        ret = sqlite3_bind_double(stmt, 13, v->scale_y);
+        ret = sqlite3_bind_double(stmt, 14, v->scale_z);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadMaps()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Maps;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Map> map = std::make_shared<Map>();
-        int ret = map->loadFromSqlite3(ncols, cols, names);
-        maps[map->id] = map;
-        return ret;
-    };
-    db->execute("select * from Maps;", callback);
+        auto v = std::make_shared<Map>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->resource = (const char *)sqlite3_column_text(stmt, 2);
+        v->name.id = sqlite3_column_int(stmt, 3);
+        v->h_min = sqlite3_column_double(stmt, 4);
+        v->h_max = sqlite3_column_double(stmt, 5);
+        maps[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadMapsPtrs()
@@ -1307,40 +1511,45 @@ void StorageImpl::_loadMapsArrays()
 
 void StorageImpl::_saveMaps() const
 {
-    std::string query;
-    query += "delete from Maps;";
-    db->execute(query.c_str());
-    query.clear();
-    if (maps.empty())
-        return;
-    query += "insert or replace into Maps values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Maps;");
+    const std::string query = "insert into Maps values (?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &map : maps)
     {
-        query += "(";
-        query += "'" + std::to_string(map.second->id) + "',";
-        query += "'" + map.second->text_id.string() + "',";
-        query += "'" + map.second->resource.string() + "',";
-        query += "'" + std::to_string(map.second->name.id) + "',";
-        query += "'" + std::to_string(map.second->h_min) + "',";
-        query += "'" + std::to_string(map.second->h_max) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = map.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_double(stmt, 5, v->h_min);
+        ret = sqlite3_bind_double(stmt, 6, v->h_max);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadMechanoidQuests()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from MechanoidQuests;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<MechanoidQuest> mechanoidQuest = std::make_shared<MechanoidQuest>();
-        int ret = mechanoidQuest->loadFromSqlite3(ncols, cols, names);
-        mechanoidQuests.push_back(mechanoidQuest);
-        return ret;
-    };
-    db->execute("select * from MechanoidQuests;", callback);
+        auto v = std::make_shared<MechanoidQuest>();
+        v->mechanoid.id = sqlite3_column_int(stmt, 0);
+        v->quest.id = sqlite3_column_int(stmt, 1);
+        v->state = sqlite3_column_int(stmt, 2);
+        mechanoidQuests.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadMechanoidQuestsPtrs()
@@ -1360,37 +1569,59 @@ void StorageImpl::_loadMechanoidQuestsArrays()
 
 void StorageImpl::_saveMechanoidQuests() const
 {
-    std::string query;
-    query += "delete from MechanoidQuests;";
-    db->execute(query.c_str());
-    query.clear();
-    if (mechanoidQuests.empty())
-        return;
-    query += "insert or replace into MechanoidQuests values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from MechanoidQuests;");
+    const std::string query = "insert into MechanoidQuests values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &mechanoidQuest : mechanoidQuests)
     {
-        query += "(";
-        query += "'" + std::to_string(mechanoidQuest->mechanoid.id) + "',";
-        query += "'" + std::to_string(mechanoidQuest->quest.id) + "',";
-        query += "'" + std::to_string(mechanoidQuest->state) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = mechanoidQuest;
+        ret = sqlite3_bind_int(stmt, 1, v->mechanoid.id);
+        ret = sqlite3_bind_int(stmt, 2, v->quest.id);
+        ret = sqlite3_bind_int(stmt, 3, v->state);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadMechanoids()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Mechanoids;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Mechanoid> mechanoid = std::make_shared<Mechanoid>();
-        int ret = mechanoid->loadFromSqlite3(ncols, cols, names);
-        mechanoids[mechanoid->id] = mechanoid;
-        return ret;
-    };
-    db->execute("select * from Mechanoids;", callback);
+        auto v = std::make_shared<Mechanoid>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->name.id = sqlite3_column_int(stmt, 2);
+        v->generation = sqlite3_column_int(stmt, 3);
+        v->rating = sqlite3_column_double(stmt, 4);
+        v->money = sqlite3_column_double(stmt, 5);
+        v->configuration.id = sqlite3_column_int(stmt, 6);
+        v->group.id = sqlite3_column_int(stmt, 7);
+        v->clan.id = sqlite3_column_int(stmt, 8);
+        v->rating_fight = sqlite3_column_double(stmt, 9);
+        v->rating_courier = sqlite3_column_double(stmt, 10);
+        v->rating_trade = sqlite3_column_double(stmt, 11);
+        v->map.id = sqlite3_column_int(stmt, 12);
+        v->mapBuilding.id = sqlite3_column_int(stmt, 13);
+        v->x = sqlite3_column_double(stmt, 14);
+        v->y = sqlite3_column_double(stmt, 15);
+        v->z = sqlite3_column_double(stmt, 16);
+        v->roll = sqlite3_column_double(stmt, 17);
+        v->pitch = sqlite3_column_double(stmt, 18);
+        v->yaw = sqlite3_column_double(stmt, 19);
+        mechanoids[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadMechanoidsPtrs()
@@ -1424,54 +1655,58 @@ void StorageImpl::_loadMechanoidsArrays()
 
 void StorageImpl::_saveMechanoids() const
 {
-    std::string query;
-    query += "delete from Mechanoids;";
-    db->execute(query.c_str());
-    query.clear();
-    if (mechanoids.empty())
-        return;
-    query += "insert or replace into Mechanoids values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Mechanoids;");
+    const std::string query = "insert into Mechanoids values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &mechanoid : mechanoids)
     {
-        query += "(";
-        query += "'" + std::to_string(mechanoid.second->id) + "',";
-        query += "'" + mechanoid.second->text_id.string() + "',";
-        query += "'" + std::to_string(mechanoid.second->name.id) + "',";
-        query += "'" + std::to_string(mechanoid.second->generation) + "',";
-        query += "'" + std::to_string(mechanoid.second->rating) + "',";
-        query += "'" + std::to_string(mechanoid.second->money) + "',";
-        query += "'" + std::to_string(mechanoid.second->configuration.id) + "',";
-        query += "'" + std::to_string(mechanoid.second->group.id) + "',";
-        query += "'" + std::to_string(mechanoid.second->clan.id) + "',";
-        query += "'" + std::to_string(mechanoid.second->rating_fight) + "',";
-        query += "'" + std::to_string(mechanoid.second->rating_courier) + "',";
-        query += "'" + std::to_string(mechanoid.second->rating_trade) + "',";
-        query += "'" + std::to_string(mechanoid.second->map.id) + "',";
-        query += "'" + std::to_string(mechanoid.second->mapBuilding.id) + "',";
-        query += "'" + std::to_string(mechanoid.second->x) + "',";
-        query += "'" + std::to_string(mechanoid.second->y) + "',";
-        query += "'" + std::to_string(mechanoid.second->z) + "',";
-        query += "'" + std::to_string(mechanoid.second->pitch) + "',";
-        query += "'" + std::to_string(mechanoid.second->yaw) + "',";
-        query += "'" + std::to_string(mechanoid.second->roll) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = mechanoid.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->name.id);
+        ret = sqlite3_bind_int(stmt, 4, v->generation);
+        ret = sqlite3_bind_double(stmt, 5, v->rating);
+        ret = sqlite3_bind_double(stmt, 6, v->money);
+        ret = sqlite3_bind_int(stmt, 7, v->configuration.id);
+        ret = sqlite3_bind_int(stmt, 8, v->group.id);
+        ret = sqlite3_bind_int(stmt, 9, v->clan.id);
+        ret = sqlite3_bind_double(stmt, 10, v->rating_fight);
+        ret = sqlite3_bind_double(stmt, 11, v->rating_courier);
+        ret = sqlite3_bind_double(stmt, 12, v->rating_trade);
+        ret = sqlite3_bind_int(stmt, 13, v->map.id);
+        ret = sqlite3_bind_int(stmt, 14, v->mapBuilding.id);
+        ret = sqlite3_bind_double(stmt, 15, v->x);
+        ret = sqlite3_bind_double(stmt, 16, v->y);
+        ret = sqlite3_bind_double(stmt, 17, v->z);
+        ret = sqlite3_bind_double(stmt, 18, v->roll);
+        ret = sqlite3_bind_double(stmt, 19, v->pitch);
+        ret = sqlite3_bind_double(stmt, 20, v->yaw);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadModificationClans()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from ModificationClans;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<ModificationClan> modificationClan = std::make_shared<ModificationClan>();
-        int ret = modificationClan->loadFromSqlite3(ncols, cols, names);
-        modificationClans.push_back(modificationClan);
-        return ret;
-    };
-    db->execute("select * from ModificationClans;", callback);
+        auto v = std::make_shared<ModificationClan>();
+        v->modification.id = sqlite3_column_int(stmt, 0);
+        v->clan.id = sqlite3_column_int(stmt, 1);
+        modificationClans.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadModificationClansPtrs()
@@ -1491,36 +1726,40 @@ void StorageImpl::_loadModificationClansArrays()
 
 void StorageImpl::_saveModificationClans() const
 {
-    std::string query;
-    query += "delete from ModificationClans;";
-    db->execute(query.c_str());
-    query.clear();
-    if (modificationClans.empty())
-        return;
-    query += "insert or replace into ModificationClans values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from ModificationClans;");
+    const std::string query = "insert into ModificationClans values (?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &modificationClan : modificationClans)
     {
-        query += "(";
-        query += "'" + std::to_string(modificationClan->modification.id) + "',";
-        query += "'" + std::to_string(modificationClan->clan.id) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = modificationClan;
+        ret = sqlite3_bind_int(stmt, 1, v->modification.id);
+        ret = sqlite3_bind_int(stmt, 2, v->clan.id);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadModificationMaps()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from ModificationMaps;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<ModificationMap> modificationMap = std::make_shared<ModificationMap>();
-        int ret = modificationMap->loadFromSqlite3(ncols, cols, names);
-        modificationMaps.push_back(modificationMap);
-        return ret;
-    };
-    db->execute("select * from ModificationMaps;", callback);
+        auto v = std::make_shared<ModificationMap>();
+        v->modification.id = sqlite3_column_int(stmt, 0);
+        v->map.id = sqlite3_column_int(stmt, 1);
+        modificationMaps.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadModificationMapsPtrs()
@@ -1540,36 +1779,40 @@ void StorageImpl::_loadModificationMapsArrays()
 
 void StorageImpl::_saveModificationMaps() const
 {
-    std::string query;
-    query += "delete from ModificationMaps;";
-    db->execute(query.c_str());
-    query.clear();
-    if (modificationMaps.empty())
-        return;
-    query += "insert or replace into ModificationMaps values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from ModificationMaps;");
+    const std::string query = "insert into ModificationMaps values (?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &modificationMap : modificationMaps)
     {
-        query += "(";
-        query += "'" + std::to_string(modificationMap->modification.id) + "',";
-        query += "'" + std::to_string(modificationMap->map.id) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = modificationMap;
+        ret = sqlite3_bind_int(stmt, 1, v->modification.id);
+        ret = sqlite3_bind_int(stmt, 2, v->map.id);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadModificationMechanoids()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from ModificationMechanoids;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<ModificationMechanoid> modificationMechanoid = std::make_shared<ModificationMechanoid>();
-        int ret = modificationMechanoid->loadFromSqlite3(ncols, cols, names);
-        modificationMechanoids.push_back(modificationMechanoid);
-        return ret;
-    };
-    db->execute("select * from ModificationMechanoids;", callback);
+        auto v = std::make_shared<ModificationMechanoid>();
+        v->modification.id = sqlite3_column_int(stmt, 0);
+        v->mechanoid.id = sqlite3_column_int(stmt, 1);
+        modificationMechanoids.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadModificationMechanoidsPtrs()
@@ -1589,36 +1832,50 @@ void StorageImpl::_loadModificationMechanoidsArrays()
 
 void StorageImpl::_saveModificationMechanoids() const
 {
-    std::string query;
-    query += "delete from ModificationMechanoids;";
-    db->execute(query.c_str());
-    query.clear();
-    if (modificationMechanoids.empty())
-        return;
-    query += "insert or replace into ModificationMechanoids values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from ModificationMechanoids;");
+    const std::string query = "insert into ModificationMechanoids values (?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &modificationMechanoid : modificationMechanoids)
     {
-        query += "(";
-        query += "'" + std::to_string(modificationMechanoid->modification.id) + "',";
-        query += "'" + std::to_string(modificationMechanoid->mechanoid.id) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = modificationMechanoid;
+        ret = sqlite3_bind_int(stmt, 1, v->modification.id);
+        ret = sqlite3_bind_int(stmt, 2, v->mechanoid.id);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadModifications()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Modifications;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Modification> modification = std::make_shared<Modification>();
-        int ret = modification->loadFromSqlite3(ncols, cols, names);
-        modifications[modification->id] = modification;
-        return ret;
-    };
-    db->execute("select * from Modifications;", callback);
+        auto v = std::make_shared<Modification>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->name.id = sqlite3_column_int(stmt, 1);
+        v->directory = (const char *)sqlite3_column_text(stmt, 2);
+        v->author = (const char *)sqlite3_column_text(stmt, 3);
+        v->date_created = (const char *)sqlite3_column_text(stmt, 4);
+        v->date_modified = (const char *)sqlite3_column_text(stmt, 5);
+        v->comment = (const char *)sqlite3_column_text(stmt, 6);
+        v->version = (const char *)sqlite3_column_text(stmt, 7);
+        v->script_language = (const char *)sqlite3_column_text(stmt, 8);
+        v->script_main = (const char *)sqlite3_column_text(stmt, 9);
+        v->player_mechanoid.id = sqlite3_column_int(stmt, 10);
+        v->cooperative_player_configuration.id = sqlite3_column_int(stmt, 11);
+        modifications[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadModificationsPtrs()
@@ -1652,46 +1909,59 @@ void StorageImpl::_loadModificationsArrays()
 
 void StorageImpl::_saveModifications() const
 {
-    std::string query;
-    query += "delete from Modifications;";
-    db->execute(query.c_str());
-    query.clear();
-    if (modifications.empty())
-        return;
-    query += "insert or replace into Modifications values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Modifications;");
+    const std::string query = "insert into Modifications values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &modification : modifications)
     {
-        query += "(";
-        query += "'" + std::to_string(modification.second->id) + "',";
-        query += "'" + std::to_string(modification.second->name.id) + "',";
-        query += "'" + modification.second->directory.string() + "',";
-        query += "'" + modification.second->author.string() + "',";
-        query += "'" + modification.second->date_created.string() + "',";
-        query += "'" + modification.second->date_modified.string() + "',";
-        query += "'" + modification.second->comment.string() + "',";
-        query += "'" + modification.second->version.string() + "',";
-        query += "'" + modification.second->script_language.string() + "',";
-        query += "'" + modification.second->script_main.string() + "',";
-        query += "'" + std::to_string(modification.second->player_mechanoid.id) + "',";
-        query += "'" + std::to_string(modification.second->cooperative_player_configuration.id) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = modification.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_int(stmt, 2, v->name.id);
+        ret = sqlite3_bind_text(stmt, 3, v->directory.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 4, v->author.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 5, v->date_created.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 6, v->date_modified.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 7, v->comment.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 8, v->version.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 9, v->script_language.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 10, v->script_main.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 11, v->player_mechanoid.id);
+        ret = sqlite3_bind_int(stmt, 12, v->cooperative_player_configuration.id);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadModificators()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Modificators;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Modificator> modificator = std::make_shared<Modificator>();
-        int ret = modificator->loadFromSqlite3(ncols, cols, names);
-        modificators[modificator->id] = modificator;
-        return ret;
-    };
-    db->execute("select * from Modificators;", callback);
+        auto v = std::make_shared<Modificator>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->resource = (const char *)sqlite3_column_text(stmt, 2);
+        v->name.id = sqlite3_column_int(stmt, 3);
+        v->probability = sqlite3_column_double(stmt, 4);
+        v->price = sqlite3_column_double(stmt, 5);
+        v->k_price = sqlite3_column_double(stmt, 6);
+        v->k_param1 = sqlite3_column_double(stmt, 7);
+        v->k_param2 = sqlite3_column_double(stmt, 8);
+        v->unicum_id = sqlite3_column_int(stmt, 9);
+        v->mask = sqlite3_column_int(stmt, 10);
+        modificators[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadModificatorsPtrs()
@@ -1709,45 +1979,52 @@ void StorageImpl::_loadModificatorsArrays()
 
 void StorageImpl::_saveModificators() const
 {
-    std::string query;
-    query += "delete from Modificators;";
-    db->execute(query.c_str());
-    query.clear();
-    if (modificators.empty())
-        return;
-    query += "insert or replace into Modificators values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Modificators;");
+    const std::string query = "insert into Modificators values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &modificator : modificators)
     {
-        query += "(";
-        query += "'" + std::to_string(modificator.second->id) + "',";
-        query += "'" + modificator.second->text_id.string() + "',";
-        query += "'" + modificator.second->resource.string() + "',";
-        query += "'" + std::to_string(modificator.second->name.id) + "',";
-        query += "'" + std::to_string(modificator.second->probability) + "',";
-        query += "'" + std::to_string(modificator.second->price) + "',";
-        query += "'" + std::to_string(modificator.second->k_price) + "',";
-        query += "'" + std::to_string(modificator.second->k_param1) + "',";
-        query += "'" + std::to_string(modificator.second->k_param2) + "',";
-        query += "'" + std::to_string(modificator.second->unicum_id) + "',";
-        query += "'" + std::to_string(modificator.second->mask) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = modificator.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_double(stmt, 5, v->probability);
+        ret = sqlite3_bind_double(stmt, 6, v->price);
+        ret = sqlite3_bind_double(stmt, 7, v->k_price);
+        ret = sqlite3_bind_double(stmt, 8, v->k_param1);
+        ret = sqlite3_bind_double(stmt, 9, v->k_param2);
+        ret = sqlite3_bind_int(stmt, 10, v->unicum_id);
+        ret = sqlite3_bind_int(stmt, 11, v->mask);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadObjects()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Objects;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Object> object = std::make_shared<Object>();
-        int ret = object->loadFromSqlite3(ncols, cols, names);
-        objects[object->id] = object;
-        return ret;
-    };
-    db->execute("select * from Objects;", callback);
+        auto v = std::make_shared<Object>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->resource = (const char *)sqlite3_column_text(stmt, 2);
+        v->name.id = sqlite3_column_int(stmt, 3);
+        v->type = sqlite3_column_int(stmt, 4);
+        objects[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadObjectsPtrs()
@@ -1765,39 +2042,43 @@ void StorageImpl::_loadObjectsArrays()
 
 void StorageImpl::_saveObjects() const
 {
-    std::string query;
-    query += "delete from Objects;";
-    db->execute(query.c_str());
-    query.clear();
-    if (objects.empty())
-        return;
-    query += "insert or replace into Objects values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Objects;");
+    const std::string query = "insert into Objects values (?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &object : objects)
     {
-        query += "(";
-        query += "'" + std::to_string(object.second->id) + "',";
-        query += "'" + object.second->text_id.string() + "',";
-        query += "'" + object.second->resource.string() + "',";
-        query += "'" + std::to_string(object.second->name.id) + "',";
-        query += "'" + std::to_string(object.second->type) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = object.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_int(stmt, 5, v->type);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadPlayers()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Players;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Player> player = std::make_shared<Player>();
-        int ret = player->loadFromSqlite3(ncols, cols, names);
-        players[player->id] = player;
-        return ret;
-    };
-    db->execute("select * from Players;", callback);
+        auto v = std::make_shared<Player>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->mechanoid.id = sqlite3_column_int(stmt, 1);
+        players[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadPlayersPtrs()
@@ -1815,36 +2096,57 @@ void StorageImpl::_loadPlayersArrays()
 
 void StorageImpl::_savePlayers() const
 {
-    std::string query;
-    query += "delete from Players;";
-    db->execute(query.c_str());
-    query.clear();
-    if (players.empty())
-        return;
-    query += "insert or replace into Players values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Players;");
+    const std::string query = "insert into Players values (?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &player : players)
     {
-        query += "(";
-        query += "'" + std::to_string(player.second->id) + "',";
-        query += "'" + std::to_string(player.second->mechanoid.id) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = player.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_int(stmt, 2, v->mechanoid.id);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadProjectiles()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Projectiles;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Projectile> projectile = std::make_shared<Projectile>();
-        int ret = projectile->loadFromSqlite3(ncols, cols, names);
-        projectiles[projectile->id] = projectile;
-        return ret;
-    };
-    db->execute("select * from Projectiles;", callback);
+        auto v = std::make_shared<Projectile>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->resource = (const char *)sqlite3_column_text(stmt, 2);
+        v->name.id = sqlite3_column_int(stmt, 3);
+        v->type = sqlite3_column_int(stmt, 4);
+        v->weight = sqlite3_column_double(stmt, 5);
+        v->damage = sqlite3_column_double(stmt, 6);
+        v->T = (const char *)sqlite3_column_text(stmt, 7);
+        v->speed = sqlite3_column_double(stmt, 8);
+        v->scale = sqlite3_column_double(stmt, 9);
+        v->numstate = sqlite3_column_int(stmt, 10);
+        v->rotate = sqlite3_column_double(stmt, 11);
+        v->subtype = sqlite3_column_int(stmt, 12);
+        v->life_time = sqlite3_column_double(stmt, 13);
+        v->detonation_delay = sqlite3_column_double(stmt, 14);
+        v->distance_detonation = sqlite3_column_double(stmt, 15);
+        v->strength = sqlite3_column_double(stmt, 16);
+        v->price = sqlite3_column_double(stmt, 17);
+        v->notrade = sqlite3_column_int(stmt, 18);
+        projectiles[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadProjectilesPtrs()
@@ -1862,53 +2164,58 @@ void StorageImpl::_loadProjectilesArrays()
 
 void StorageImpl::_saveProjectiles() const
 {
-    std::string query;
-    query += "delete from Projectiles;";
-    db->execute(query.c_str());
-    query.clear();
-    if (projectiles.empty())
-        return;
-    query += "insert or replace into Projectiles values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Projectiles;");
+    const std::string query = "insert into Projectiles values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &projectile : projectiles)
     {
-        query += "(";
-        query += "'" + std::to_string(projectile.second->id) + "',";
-        query += "'" + projectile.second->text_id.string() + "',";
-        query += "'" + projectile.second->resource.string() + "',";
-        query += "'" + std::to_string(projectile.second->name.id) + "',";
-        query += "'" + std::to_string(projectile.second->type) + "',";
-        query += "'" + std::to_string(projectile.second->weight) + "',";
-        query += "'" + std::to_string(projectile.second->damage) + "',";
-        query += "'" + projectile.second->T.string() + "',";
-        query += "'" + std::to_string(projectile.second->speed) + "',";
-        query += "'" + std::to_string(projectile.second->scale) + "',";
-        query += "'" + std::to_string(projectile.second->numstate) + "',";
-        query += "'" + std::to_string(projectile.second->rotate) + "',";
-        query += "'" + std::to_string(projectile.second->subtype) + "',";
-        query += "'" + std::to_string(projectile.second->life_time) + "',";
-        query += "'" + std::to_string(projectile.second->detonation_delay) + "',";
-        query += "'" + std::to_string(projectile.second->distance_detonation) + "',";
-        query += "'" + std::to_string(projectile.second->strength) + "',";
-        query += "'" + std::to_string(projectile.second->price) + "',";
-        query += "'" + std::to_string(projectile.second->notrade) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = projectile.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_int(stmt, 5, v->type);
+        ret = sqlite3_bind_double(stmt, 6, v->weight);
+        ret = sqlite3_bind_double(stmt, 7, v->damage);
+        ret = sqlite3_bind_text(stmt, 8, v->T.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_double(stmt, 9, v->speed);
+        ret = sqlite3_bind_double(stmt, 10, v->scale);
+        ret = sqlite3_bind_int(stmt, 11, v->numstate);
+        ret = sqlite3_bind_double(stmt, 12, v->rotate);
+        ret = sqlite3_bind_int(stmt, 13, v->subtype);
+        ret = sqlite3_bind_double(stmt, 14, v->life_time);
+        ret = sqlite3_bind_double(stmt, 15, v->detonation_delay);
+        ret = sqlite3_bind_double(stmt, 16, v->distance_detonation);
+        ret = sqlite3_bind_double(stmt, 17, v->strength);
+        ret = sqlite3_bind_double(stmt, 18, v->price);
+        ret = sqlite3_bind_int(stmt, 19, v->notrade);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadQuestRewardEquipments()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from QuestRewardEquipments;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<QuestRewardEquipment> questRewardEquipment = std::make_shared<QuestRewardEquipment>();
-        int ret = questRewardEquipment->loadFromSqlite3(ncols, cols, names);
-        questRewardEquipments.push_back(questRewardEquipment);
-        return ret;
-    };
-    db->execute("select * from QuestRewardEquipments;", callback);
+        auto v = std::make_shared<QuestRewardEquipment>();
+        v->questReward.id = sqlite3_column_int(stmt, 0);
+        v->equipment.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        questRewardEquipments.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadQuestRewardEquipmentsPtrs()
@@ -1928,37 +2235,42 @@ void StorageImpl::_loadQuestRewardEquipmentsArrays()
 
 void StorageImpl::_saveQuestRewardEquipments() const
 {
-    std::string query;
-    query += "delete from QuestRewardEquipments;";
-    db->execute(query.c_str());
-    query.clear();
-    if (questRewardEquipments.empty())
-        return;
-    query += "insert or replace into QuestRewardEquipments values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from QuestRewardEquipments;");
+    const std::string query = "insert into QuestRewardEquipments values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &questRewardEquipment : questRewardEquipments)
     {
-        query += "(";
-        query += "'" + std::to_string(questRewardEquipment->questReward.id) + "',";
-        query += "'" + std::to_string(questRewardEquipment->equipment.id) + "',";
-        query += "'" + std::to_string(questRewardEquipment->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = questRewardEquipment;
+        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
+        ret = sqlite3_bind_int(stmt, 2, v->equipment.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadQuestRewardGliders()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from QuestRewardGliders;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<QuestRewardGlider> questRewardGlider = std::make_shared<QuestRewardGlider>();
-        int ret = questRewardGlider->loadFromSqlite3(ncols, cols, names);
-        questRewardGliders.push_back(questRewardGlider);
-        return ret;
-    };
-    db->execute("select * from QuestRewardGliders;", callback);
+        auto v = std::make_shared<QuestRewardGlider>();
+        v->questReward.id = sqlite3_column_int(stmt, 0);
+        v->glider.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        questRewardGliders.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadQuestRewardGlidersPtrs()
@@ -1978,37 +2290,42 @@ void StorageImpl::_loadQuestRewardGlidersArrays()
 
 void StorageImpl::_saveQuestRewardGliders() const
 {
-    std::string query;
-    query += "delete from QuestRewardGliders;";
-    db->execute(query.c_str());
-    query.clear();
-    if (questRewardGliders.empty())
-        return;
-    query += "insert or replace into QuestRewardGliders values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from QuestRewardGliders;");
+    const std::string query = "insert into QuestRewardGliders values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &questRewardGlider : questRewardGliders)
     {
-        query += "(";
-        query += "'" + std::to_string(questRewardGlider->questReward.id) + "',";
-        query += "'" + std::to_string(questRewardGlider->glider.id) + "',";
-        query += "'" + std::to_string(questRewardGlider->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = questRewardGlider;
+        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
+        ret = sqlite3_bind_int(stmt, 2, v->glider.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadQuestRewardGoods()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from QuestRewardGoods;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<QuestRewardGood> questRewardGood = std::make_shared<QuestRewardGood>();
-        int ret = questRewardGood->loadFromSqlite3(ncols, cols, names);
-        questRewardGoods.push_back(questRewardGood);
-        return ret;
-    };
-    db->execute("select * from QuestRewardGoods;", callback);
+        auto v = std::make_shared<QuestRewardGood>();
+        v->questReward.id = sqlite3_column_int(stmt, 0);
+        v->good.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        questRewardGoods.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadQuestRewardGoodsPtrs()
@@ -2028,37 +2345,42 @@ void StorageImpl::_loadQuestRewardGoodsArrays()
 
 void StorageImpl::_saveQuestRewardGoods() const
 {
-    std::string query;
-    query += "delete from QuestRewardGoods;";
-    db->execute(query.c_str());
-    query.clear();
-    if (questRewardGoods.empty())
-        return;
-    query += "insert or replace into QuestRewardGoods values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from QuestRewardGoods;");
+    const std::string query = "insert into QuestRewardGoods values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &questRewardGood : questRewardGoods)
     {
-        query += "(";
-        query += "'" + std::to_string(questRewardGood->questReward.id) + "',";
-        query += "'" + std::to_string(questRewardGood->good.id) + "',";
-        query += "'" + std::to_string(questRewardGood->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = questRewardGood;
+        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
+        ret = sqlite3_bind_int(stmt, 2, v->good.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadQuestRewardModificators()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from QuestRewardModificators;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<QuestRewardModificator> questRewardModificator = std::make_shared<QuestRewardModificator>();
-        int ret = questRewardModificator->loadFromSqlite3(ncols, cols, names);
-        questRewardModificators.push_back(questRewardModificator);
-        return ret;
-    };
-    db->execute("select * from QuestRewardModificators;", callback);
+        auto v = std::make_shared<QuestRewardModificator>();
+        v->questReward.id = sqlite3_column_int(stmt, 0);
+        v->modificator.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        questRewardModificators.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadQuestRewardModificatorsPtrs()
@@ -2078,37 +2400,42 @@ void StorageImpl::_loadQuestRewardModificatorsArrays()
 
 void StorageImpl::_saveQuestRewardModificators() const
 {
-    std::string query;
-    query += "delete from QuestRewardModificators;";
-    db->execute(query.c_str());
-    query.clear();
-    if (questRewardModificators.empty())
-        return;
-    query += "insert or replace into QuestRewardModificators values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from QuestRewardModificators;");
+    const std::string query = "insert into QuestRewardModificators values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &questRewardModificator : questRewardModificators)
     {
-        query += "(";
-        query += "'" + std::to_string(questRewardModificator->questReward.id) + "',";
-        query += "'" + std::to_string(questRewardModificator->modificator.id) + "',";
-        query += "'" + std::to_string(questRewardModificator->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = questRewardModificator;
+        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
+        ret = sqlite3_bind_int(stmt, 2, v->modificator.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadQuestRewardProjectiles()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from QuestRewardProjectiles;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<QuestRewardProjectile> questRewardProjectile = std::make_shared<QuestRewardProjectile>();
-        int ret = questRewardProjectile->loadFromSqlite3(ncols, cols, names);
-        questRewardProjectiles.push_back(questRewardProjectile);
-        return ret;
-    };
-    db->execute("select * from QuestRewardProjectiles;", callback);
+        auto v = std::make_shared<QuestRewardProjectile>();
+        v->questReward.id = sqlite3_column_int(stmt, 0);
+        v->projectile.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        questRewardProjectiles.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadQuestRewardProjectilesPtrs()
@@ -2128,37 +2455,42 @@ void StorageImpl::_loadQuestRewardProjectilesArrays()
 
 void StorageImpl::_saveQuestRewardProjectiles() const
 {
-    std::string query;
-    query += "delete from QuestRewardProjectiles;";
-    db->execute(query.c_str());
-    query.clear();
-    if (questRewardProjectiles.empty())
-        return;
-    query += "insert or replace into QuestRewardProjectiles values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from QuestRewardProjectiles;");
+    const std::string query = "insert into QuestRewardProjectiles values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &questRewardProjectile : questRewardProjectiles)
     {
-        query += "(";
-        query += "'" + std::to_string(questRewardProjectile->questReward.id) + "',";
-        query += "'" + std::to_string(questRewardProjectile->projectile.id) + "',";
-        query += "'" + std::to_string(questRewardProjectile->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = questRewardProjectile;
+        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
+        ret = sqlite3_bind_int(stmt, 2, v->projectile.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadQuestRewardReputations()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from QuestRewardReputations;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<QuestRewardReputation> questRewardReputation = std::make_shared<QuestRewardReputation>();
-        int ret = questRewardReputation->loadFromSqlite3(ncols, cols, names);
-        questRewardReputations.push_back(questRewardReputation);
-        return ret;
-    };
-    db->execute("select * from QuestRewardReputations;", callback);
+        auto v = std::make_shared<QuestRewardReputation>();
+        v->questReward.id = sqlite3_column_int(stmt, 0);
+        v->clan.id = sqlite3_column_int(stmt, 1);
+        v->reputation = sqlite3_column_double(stmt, 2);
+        questRewardReputations.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadQuestRewardReputationsPtrs()
@@ -2178,37 +2510,42 @@ void StorageImpl::_loadQuestRewardReputationsArrays()
 
 void StorageImpl::_saveQuestRewardReputations() const
 {
-    std::string query;
-    query += "delete from QuestRewardReputations;";
-    db->execute(query.c_str());
-    query.clear();
-    if (questRewardReputations.empty())
-        return;
-    query += "insert or replace into QuestRewardReputations values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from QuestRewardReputations;");
+    const std::string query = "insert into QuestRewardReputations values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &questRewardReputation : questRewardReputations)
     {
-        query += "(";
-        query += "'" + std::to_string(questRewardReputation->questReward.id) + "',";
-        query += "'" + std::to_string(questRewardReputation->clan.id) + "',";
-        query += "'" + std::to_string(questRewardReputation->reputation) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = questRewardReputation;
+        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
+        ret = sqlite3_bind_int(stmt, 2, v->clan.id);
+        ret = sqlite3_bind_double(stmt, 3, v->reputation);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadQuestRewardWeapons()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from QuestRewardWeapons;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<QuestRewardWeapon> questRewardWeapon = std::make_shared<QuestRewardWeapon>();
-        int ret = questRewardWeapon->loadFromSqlite3(ncols, cols, names);
-        questRewardWeapons.push_back(questRewardWeapon);
-        return ret;
-    };
-    db->execute("select * from QuestRewardWeapons;", callback);
+        auto v = std::make_shared<QuestRewardWeapon>();
+        v->questReward.id = sqlite3_column_int(stmt, 0);
+        v->weapon.id = sqlite3_column_int(stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        questRewardWeapons.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadQuestRewardWeaponsPtrs()
@@ -2228,37 +2565,44 @@ void StorageImpl::_loadQuestRewardWeaponsArrays()
 
 void StorageImpl::_saveQuestRewardWeapons() const
 {
-    std::string query;
-    query += "delete from QuestRewardWeapons;";
-    db->execute(query.c_str());
-    query.clear();
-    if (questRewardWeapons.empty())
-        return;
-    query += "insert or replace into QuestRewardWeapons values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from QuestRewardWeapons;");
+    const std::string query = "insert into QuestRewardWeapons values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &questRewardWeapon : questRewardWeapons)
     {
-        query += "(";
-        query += "'" + std::to_string(questRewardWeapon->questReward.id) + "',";
-        query += "'" + std::to_string(questRewardWeapon->weapon.id) + "',";
-        query += "'" + std::to_string(questRewardWeapon->quantity) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = questRewardWeapon;
+        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
+        ret = sqlite3_bind_int(stmt, 2, v->weapon.id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadQuestRewards()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from QuestRewards;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<QuestReward> questReward = std::make_shared<QuestReward>();
-        int ret = questReward->loadFromSqlite3(ncols, cols, names);
-        questRewards[questReward->id] = questReward;
-        return ret;
-    };
-    db->execute("select * from QuestRewards;", callback);
+        auto v = std::make_shared<QuestReward>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->quest.id = sqlite3_column_int(stmt, 1);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 2);
+        v->money = sqlite3_column_int(stmt, 3);
+        v->rating = sqlite3_column_double(stmt, 4);
+        questRewards[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadQuestRewardsPtrs()
@@ -2300,39 +2644,47 @@ void StorageImpl::_loadQuestRewardsArrays()
 
 void StorageImpl::_saveQuestRewards() const
 {
-    std::string query;
-    query += "delete from QuestRewards;";
-    db->execute(query.c_str());
-    query.clear();
-    if (questRewards.empty())
-        return;
-    query += "insert or replace into QuestRewards values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from QuestRewards;");
+    const std::string query = "insert into QuestRewards values (?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &questReward : questRewards)
     {
-        query += "(";
-        query += "'" + std::to_string(questReward.second->id) + "',";
-        query += "'" + std::to_string(questReward.second->quest.id) + "',";
-        query += "'" + questReward.second->text_id.string() + "',";
-        query += "'" + std::to_string(questReward.second->money) + "',";
-        query += "'" + std::to_string(questReward.second->rating) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = questReward.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_int(stmt, 2, v->quest.id);
+        ret = sqlite3_bind_text(stmt, 3, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->money);
+        ret = sqlite3_bind_double(stmt, 5, v->rating);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadQuests()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Quests;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Quest> quest = std::make_shared<Quest>();
-        int ret = quest->loadFromSqlite3(ncols, cols, names);
-        quests[quest->id] = quest;
-        return ret;
-    };
-    db->execute("select * from Quests;", callback);
+        auto v = std::make_shared<Quest>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->name.id = sqlite3_column_int(stmt, 2);
+        v->title.id = sqlite3_column_int(stmt, 3);
+        v->description.id = sqlite3_column_int(stmt, 4);
+        v->time = sqlite3_column_int(stmt, 5);
+        quests[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadQuestsPtrs()
@@ -2360,40 +2712,44 @@ void StorageImpl::_loadQuestsArrays()
 
 void StorageImpl::_saveQuests() const
 {
-    std::string query;
-    query += "delete from Quests;";
-    db->execute(query.c_str());
-    query.clear();
-    if (quests.empty())
-        return;
-    query += "insert or replace into Quests values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Quests;");
+    const std::string query = "insert into Quests values (?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &quest : quests)
     {
-        query += "(";
-        query += "'" + std::to_string(quest.second->id) + "',";
-        query += "'" + quest.second->text_id.string() + "',";
-        query += "'" + std::to_string(quest.second->name.id) + "',";
-        query += "'" + std::to_string(quest.second->title.id) + "',";
-        query += "'" + std::to_string(quest.second->description.id) + "',";
-        query += "'" + std::to_string(quest.second->time) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = quest.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->name.id);
+        ret = sqlite3_bind_int(stmt, 4, v->title.id);
+        ret = sqlite3_bind_int(stmt, 5, v->description.id);
+        ret = sqlite3_bind_int(stmt, 6, v->time);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadScriptVariables()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from ScriptVariables;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<ScriptVariable> scriptVariable = std::make_shared<ScriptVariable>();
-        int ret = scriptVariable->loadFromSqlite3(ncols, cols, names);
-        scriptVariables.push_back(scriptVariable);
-        return ret;
-    };
-    db->execute("select * from ScriptVariables;", callback);
+        auto v = std::make_shared<ScriptVariable>();
+        v->variable = (const char *)sqlite3_column_text(stmt, 0);
+        v->value = (const char *)sqlite3_column_text(stmt, 1);
+        scriptVariables.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadScriptVariablesPtrs()
@@ -2406,36 +2762,39 @@ void StorageImpl::_loadScriptVariablesArrays()
 
 void StorageImpl::_saveScriptVariables() const
 {
-    std::string query;
-    query += "delete from ScriptVariables;";
-    db->execute(query.c_str());
-    query.clear();
-    if (scriptVariables.empty())
-        return;
-    query += "insert or replace into ScriptVariables values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from ScriptVariables;");
+    const std::string query = "insert into ScriptVariables values (?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &scriptVariable : scriptVariables)
     {
-        query += "(";
-        query += "'" + scriptVariable->variable.string() + "',";
-        query += "'" + scriptVariable->value.string() + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = scriptVariable;
+        ret = sqlite3_bind_text(stmt, 1, v->variable.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 2, v->value.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadSettings()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Settings;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Setting> setting = std::make_shared<Setting>();
-        int ret = setting->loadFromSqlite3(ncols, cols, names);
-        settings.push_back(setting);
-        return ret;
-    };
-    db->execute("select * from Settings;", callback);
+        auto v = std::make_shared<Setting>();
+        v->player.id = sqlite3_column_int(stmt, 0);
+        settings.push_back(v);
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadSettingsPtrs()
@@ -2453,35 +2812,42 @@ void StorageImpl::_loadSettingsArrays()
 
 void StorageImpl::_saveSettings() const
 {
-    std::string query;
-    query += "delete from Settings;";
-    db->execute(query.c_str());
-    query.clear();
-    if (settings.empty())
-        return;
-    query += "insert or replace into Settings values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Settings;");
+    const std::string query = "insert into Settings values (?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &setting : settings)
     {
-        query += "(";
-        query += "'" + std::to_string(setting->player.id) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = setting;
+        ret = sqlite3_bind_int(stmt, 1, v->player.id);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadStrings()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Strings;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<String> string = std::make_shared<String>();
-        int ret = string->loadFromSqlite3(ncols, cols, names);
-        strings[string->id] = string;
-        return ret;
-    };
-    db->execute("select * from Strings;", callback);
+        auto v = std::make_shared<String>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->table.id = sqlite3_column_int(stmt, 2);
+        v->ru = (const char *)sqlite3_column_text(stmt, 3);
+        v->en = (const char *)sqlite3_column_text(stmt, 4);
+        strings[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadStringsPtrs()
@@ -2499,39 +2865,43 @@ void StorageImpl::_loadStringsArrays()
 
 void StorageImpl::_saveStrings() const
 {
-    std::string query;
-    query += "delete from Strings;";
-    db->execute(query.c_str());
-    query.clear();
-    if (strings.empty())
-        return;
-    query += "insert or replace into Strings values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Strings;");
+    const std::string query = "insert into Strings values (?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &string : strings)
     {
-        query += "(";
-        query += "'" + std::to_string(string.second->id) + "',";
-        query += "'" + string.second->text_id.string() + "',";
-        query += "'" + std::to_string(string.second->table.id) + "',";
-        query += "'" + string.second->ru.string() + "',";
-        query += "'" + string.second->en.string() + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = string.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->table.id);
+        ret = sqlite3_bind_text(stmt, 4, v->ru.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 5, v->en.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadTables()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Tables;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Table> table = std::make_shared<Table>();
-        int ret = table->loadFromSqlite3(ncols, cols, names);
-        tables[table->id] = table;
-        return ret;
-    };
-    db->execute("select * from Tables;", callback);
+        auto v = std::make_shared<Table>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        tables[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadTablesPtrs()
@@ -2544,36 +2914,72 @@ void StorageImpl::_loadTablesArrays()
 
 void StorageImpl::_saveTables() const
 {
-    std::string query;
-    query += "delete from Tables;";
-    db->execute(query.c_str());
-    query.clear();
-    if (tables.empty())
-        return;
-    query += "insert or replace into Tables values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Tables;");
+    const std::string query = "insert into Tables values (?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &table : tables)
     {
-        query += "(";
-        query += "'" + std::to_string(table.second->id) + "',";
-        query += "'" + table.second->text_id.string() + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = table.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::_loadWeapons()
 {
-    auto callback = [this](int ncols, char **cols, char **names)
+    int ret = 0;
+    const std::string query = "select * from Weapons;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        Ptr<Weapon> weapon = std::make_shared<Weapon>();
-        int ret = weapon->loadFromSqlite3(ncols, cols, names);
-        weapons[weapon->id] = weapon;
-        return ret;
-    };
-    db->execute("select * from Weapons;", callback);
+        auto v = std::make_shared<Weapon>();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->resource = (const char *)sqlite3_column_text(stmt, 2);
+        v->name.id = sqlite3_column_int(stmt, 3);
+        v->projectile.id = sqlite3_column_int(stmt, 4);
+        v->type = sqlite3_column_int(stmt, 5);
+        v->standard = sqlite3_column_int(stmt, 6);
+        v->weight = sqlite3_column_double(stmt, 7);
+        v->power = sqlite3_column_double(stmt, 8);
+        v->firerate = sqlite3_column_double(stmt, 9);
+        v->damage = sqlite3_column_double(stmt, 10);
+        v->price = sqlite3_column_double(stmt, 11);
+        v->fx = sqlite3_column_double(stmt, 12);
+        v->shoottype = sqlite3_column_int(stmt, 13);
+        v->shootscale = sqlite3_column_double(stmt, 14);
+        v->xstate = sqlite3_column_int(stmt, 15);
+        v->rcolor = sqlite3_column_double(stmt, 16);
+        v->gcolor = sqlite3_column_double(stmt, 17);
+        v->bcolor = sqlite3_column_double(stmt, 18);
+        v->typearms = sqlite3_column_int(stmt, 19);
+        v->tfire = sqlite3_column_double(stmt, 20);
+        v->vtype = sqlite3_column_int(stmt, 21);
+        v->spare = sqlite3_column_double(stmt, 22);
+        v->reconstruction = sqlite3_column_double(stmt, 23);
+        v->maxdistance = sqlite3_column_double(stmt, 24);
+        v->angle = sqlite3_column_double(stmt, 25);
+        v->fxtime = sqlite3_column_double(stmt, 26);
+        v->damagetype = sqlite3_column_int(stmt, 27);
+        v->fxmodeltime = sqlite3_column_double(stmt, 28);
+        v->inside_mul = sqlite3_column_double(stmt, 29);
+        v->inside_x = sqlite3_column_double(stmt, 30);
+        v->inside_y = sqlite3_column_double(stmt, 31);
+        v->inside_z = sqlite3_column_double(stmt, 32);
+        v->notrade = sqlite3_column_int(stmt, 33);
+        weapons[v->id] = v;
+    }
+    ret = sqlite3_finalize(stmt);
 }
 
 void StorageImpl::_loadWeaponsPtrs()
@@ -2593,56 +2999,55 @@ void StorageImpl::_loadWeaponsArrays()
 
 void StorageImpl::_saveWeapons() const
 {
-    std::string query;
-    query += "delete from Weapons;";
-    db->execute(query.c_str());
-    query.clear();
-    if (weapons.empty())
-        return;
-    query += "insert or replace into Weapons values\n";
+    db->execute("BEGIN;");
+    db->execute("delete from Weapons;");
+    const std::string query = "insert into Weapons values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &weapon : weapons)
     {
-        query += "(";
-        query += "'" + std::to_string(weapon.second->id) + "',";
-        query += "'" + weapon.second->text_id.string() + "',";
-        query += "'" + weapon.second->resource.string() + "',";
-        query += "'" + std::to_string(weapon.second->name.id) + "',";
-        query += "'" + std::to_string(weapon.second->projectile.id) + "',";
-        query += "'" + std::to_string(weapon.second->type) + "',";
-        query += "'" + std::to_string(weapon.second->standard) + "',";
-        query += "'" + std::to_string(weapon.second->weight) + "',";
-        query += "'" + std::to_string(weapon.second->power) + "',";
-        query += "'" + std::to_string(weapon.second->firerate) + "',";
-        query += "'" + std::to_string(weapon.second->damage) + "',";
-        query += "'" + std::to_string(weapon.second->price) + "',";
-        query += "'" + std::to_string(weapon.second->fx) + "',";
-        query += "'" + std::to_string(weapon.second->shoottype) + "',";
-        query += "'" + std::to_string(weapon.second->shootscale) + "',";
-        query += "'" + std::to_string(weapon.second->xstate) + "',";
-        query += "'" + std::to_string(weapon.second->rcolor) + "',";
-        query += "'" + std::to_string(weapon.second->gcolor) + "',";
-        query += "'" + std::to_string(weapon.second->bcolor) + "',";
-        query += "'" + std::to_string(weapon.second->typearms) + "',";
-        query += "'" + std::to_string(weapon.second->tfire) + "',";
-        query += "'" + std::to_string(weapon.second->vtype) + "',";
-        query += "'" + std::to_string(weapon.second->spare) + "',";
-        query += "'" + std::to_string(weapon.second->reconstruction) + "',";
-        query += "'" + std::to_string(weapon.second->maxdistance) + "',";
-        query += "'" + std::to_string(weapon.second->angle) + "',";
-        query += "'" + std::to_string(weapon.second->fxtime) + "',";
-        query += "'" + std::to_string(weapon.second->damagetype) + "',";
-        query += "'" + std::to_string(weapon.second->fxmodeltime) + "',";
-        query += "'" + std::to_string(weapon.second->inside_mul) + "',";
-        query += "'" + std::to_string(weapon.second->inside_x) + "',";
-        query += "'" + std::to_string(weapon.second->inside_y) + "',";
-        query += "'" + std::to_string(weapon.second->inside_z) + "',";
-        query += "'" + std::to_string(weapon.second->notrade) + "',";
-        query.resize(query.size() - 1);
-        query += "),\n";
+        auto &v = weapon.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_int(stmt, 5, v->projectile.id);
+        ret = sqlite3_bind_int(stmt, 6, v->type);
+        ret = sqlite3_bind_int(stmt, 7, v->standard);
+        ret = sqlite3_bind_double(stmt, 8, v->weight);
+        ret = sqlite3_bind_double(stmt, 9, v->power);
+        ret = sqlite3_bind_double(stmt, 10, v->firerate);
+        ret = sqlite3_bind_double(stmt, 11, v->damage);
+        ret = sqlite3_bind_double(stmt, 12, v->price);
+        ret = sqlite3_bind_double(stmt, 13, v->fx);
+        ret = sqlite3_bind_int(stmt, 14, v->shoottype);
+        ret = sqlite3_bind_double(stmt, 15, v->shootscale);
+        ret = sqlite3_bind_int(stmt, 16, v->xstate);
+        ret = sqlite3_bind_double(stmt, 17, v->rcolor);
+        ret = sqlite3_bind_double(stmt, 18, v->gcolor);
+        ret = sqlite3_bind_double(stmt, 19, v->bcolor);
+        ret = sqlite3_bind_int(stmt, 20, v->typearms);
+        ret = sqlite3_bind_double(stmt, 21, v->tfire);
+        ret = sqlite3_bind_int(stmt, 22, v->vtype);
+        ret = sqlite3_bind_double(stmt, 23, v->spare);
+        ret = sqlite3_bind_double(stmt, 24, v->reconstruction);
+        ret = sqlite3_bind_double(stmt, 25, v->maxdistance);
+        ret = sqlite3_bind_double(stmt, 26, v->angle);
+        ret = sqlite3_bind_double(stmt, 27, v->fxtime);
+        ret = sqlite3_bind_int(stmt, 28, v->damagetype);
+        ret = sqlite3_bind_double(stmt, 29, v->fxmodeltime);
+        ret = sqlite3_bind_double(stmt, 30, v->inside_mul);
+        ret = sqlite3_bind_double(stmt, 31, v->inside_x);
+        ret = sqlite3_bind_double(stmt, 32, v->inside_y);
+        ret = sqlite3_bind_double(stmt, 33, v->inside_z);
+        ret = sqlite3_bind_int(stmt, 34, v->notrade);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
     }
-    query.resize(query.size() - 2);
-    query += ";";
-    db->execute(query.c_str());
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
 }
 
 void StorageImpl::create() const
@@ -4691,7 +5096,7 @@ void StorageImpl::deleteRecord(QTreeWidgetItem *item)
 }
 #endif
 
-OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type) const
+OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type, IObject *parent) const
 {
     switch (type)
     {
@@ -4736,11 +5141,38 @@ OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type) const
     case EObjectType::MapBuildingWeapon:
         return ::getOrderedMap(mapBuildingWeapons);
     case EObjectType::MapBuilding:
-        return ::getOrderedMap(mapBuildings);
+    {
+        std::function<bool(Ptr<MapBuilding>)> f = [parent](Ptr<MapBuilding> o)
+        {
+            if (!parent || parent->getType() != EObjectType::Mechanoid)
+                return true;
+            Mechanoid *m = (Mechanoid *)parent;
+            return m->map == o->map;
+        };
+        return ::getOrderedMap(mapBuildings, f);
+    }
     case EObjectType::MapGood:
-        return ::getOrderedMap(mapGoods);
+    {
+        std::function<bool(Ptr<MapGood>)> f = [parent](Ptr<MapGood> o)
+        {
+            if (!parent || parent->getType() != EObjectType::Mechanoid)
+                return true;
+            Mechanoid *m = (Mechanoid *)parent;
+            return m->map == o->map;
+        };
+        return ::getOrderedMap(mapGoods, f);
+    }
     case EObjectType::MapObject:
-        return ::getOrderedMap(mapObjects);
+    {
+        std::function<bool(Ptr<MapObject>)> f = [parent](Ptr<MapObject> o)
+        {
+            if (!parent || parent->getType() != EObjectType::Mechanoid)
+                return true;
+            Mechanoid *m = (Mechanoid *)parent;
+            return m->map == o->map;
+        };
+        return ::getOrderedMap(mapObjects, f);
+    }
     case EObjectType::Map:
         return ::getOrderedMap(maps);
     case EObjectType::MechanoidQuest:

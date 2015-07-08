@@ -66,7 +66,7 @@ public:
     virtual void deleteRecord(QTreeWidgetItem *item) = 0;
 #endif
 
-    virtual OrderedObjectMap getOrderedMap(EObjectType type) const = 0;
+    virtual OrderedObjectMap getOrderedMap(EObjectType type, IObject *parent = 0) const = 0;
 
     virtual Ptr<Building> addBuilding(IObject *parent = 0) = 0;
     virtual void deleteBuilding(Building *object) = 0;

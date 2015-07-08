@@ -159,8 +159,6 @@ public:
     bool operator==(const Building &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -186,8 +184,6 @@ public:
     IdPtr<Clan> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -213,8 +209,6 @@ public:
     bool operator==(const ClanReputation &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -257,8 +251,6 @@ public:
     bool operator==(const Clan &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -285,8 +277,6 @@ public:
     IdPtr<Configuration> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -313,8 +303,6 @@ public:
     IdPtr<Configuration> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -341,8 +329,6 @@ public:
     IdPtr<Configuration> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -369,8 +355,6 @@ public:
     IdPtr<Configuration> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -406,8 +390,6 @@ public:
     bool operator==(const Configuration &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -449,8 +431,6 @@ public:
     bool operator==(const Equipment &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -498,8 +478,6 @@ public:
     bool operator==(const Glider &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -535,8 +513,6 @@ public:
     bool operator==(const Good &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -562,8 +538,6 @@ public:
     IdPtr<Group> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -595,8 +569,6 @@ public:
     bool operator==(const Group &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -623,8 +595,6 @@ public:
     IdPtr<MapBuilding> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -651,8 +621,6 @@ public:
     IdPtr<MapBuilding> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -679,8 +647,6 @@ public:
     IdPtr<MapBuilding> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -707,8 +673,6 @@ public:
     IdPtr<MapBuilding> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -735,8 +699,6 @@ public:
     IdPtr<MapBuilding> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -763,8 +725,6 @@ public:
     IdPtr<MapBuilding> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -785,9 +745,9 @@ public:
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
+    float roll = 0.0f;
     float pitch = 0.0f;
     float yaw = 0.0f;
-    float roll = 0.0f;
     float scale = 1;
     float scale_x = 1;
     float scale_y = 1;
@@ -814,8 +774,6 @@ public:
     bool operator==(const MapBuilding &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -834,9 +792,9 @@ public:
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
+    float roll = 0.0f;
     float pitch = 0.0f;
     float yaw = 0.0f;
-    float roll = 0.0f;
     float scale = 0.0f;
     float scale_x = 0.0f;
     float scale_y = 0.0f;
@@ -856,8 +814,6 @@ public:
     bool operator==(const MapGood &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -876,9 +832,9 @@ public:
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
+    float roll = 0.0f;
     float pitch = 0.0f;
     float yaw = 0.0f;
-    float roll = 0.0f;
     float scale = 1;
     float scale_x = 1;
     float scale_y = 1;
@@ -898,8 +854,6 @@ public:
     bool operator==(const MapObject &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -936,8 +890,6 @@ public:
     bool operator==(const Map &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -964,8 +916,6 @@ public:
     IdPtr<Mechanoid> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -994,9 +944,9 @@ public:
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
+    float roll = 0.0f;
     float pitch = 0.0f;
     float yaw = 0.0f;
-    float roll = 0.0f;
 
     CVector<Ptr<MechanoidQuest>> quests;
 
@@ -1014,8 +964,6 @@ public:
     bool operator==(const Mechanoid &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1041,8 +989,6 @@ public:
     IdPtr<Modification> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1068,8 +1014,6 @@ public:
     IdPtr<Modification> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1095,8 +1039,6 @@ public:
     IdPtr<Modification> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1139,8 +1081,6 @@ public:
     bool operator==(const Modification &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1178,8 +1118,6 @@ public:
     bool operator==(const Modificator &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1211,8 +1149,6 @@ public:
     bool operator==(const Object &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1241,8 +1177,6 @@ public:
     bool operator==(const Player &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1288,8 +1222,6 @@ public:
     bool operator==(const Projectile &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1316,8 +1248,6 @@ public:
     IdPtr<QuestReward> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1344,8 +1274,6 @@ public:
     IdPtr<QuestReward> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1372,8 +1300,6 @@ public:
     IdPtr<QuestReward> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1400,8 +1326,6 @@ public:
     IdPtr<QuestReward> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1428,8 +1352,6 @@ public:
     IdPtr<QuestReward> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1455,8 +1377,6 @@ public:
     bool operator==(const QuestRewardReputation &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1483,8 +1403,6 @@ public:
     IdPtr<QuestReward> operator->() const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1524,8 +1442,6 @@ public:
     bool operator==(const QuestReward &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1560,8 +1476,6 @@ public:
     bool operator==(const Quest &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1586,8 +1500,6 @@ public:
     bool operator==(const ScriptVariable &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1611,8 +1523,6 @@ public:
     bool operator==(const Setting &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1652,8 +1562,6 @@ public:
     bool operator==(const String &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1682,8 +1590,6 @@ public:
     bool operator==(const Table &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 
@@ -1744,8 +1650,6 @@ public:
     bool operator==(const Weapon &rhs) const;
 
 private:
-    int loadFromSqlite3(int, char**, char**);
-
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
 

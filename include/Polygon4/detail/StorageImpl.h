@@ -367,6 +367,6 @@ public:
     virtual QTreeWidgetItem *addRecord(QTreeWidgetItem *item);
     virtual void deleteRecord(QTreeWidgetItem *item);
 #endif
-    virtual OrderedObjectMap getOrderedMap(EObjectType type) const;
+    virtual OrderedObjectMap getOrderedMap(EObjectType type, IObject *parent = 0) const;
 };
 

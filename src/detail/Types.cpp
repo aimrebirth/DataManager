@@ -81,15 +81,6 @@ bool Building::operator==(const Building &rhs) const
         1;
 }
 
-int Building::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) resource = cols[2];
-
-    return 0;
-}
-
 const char *Building::getSql()
 {
     return
@@ -171,14 +162,6 @@ IdPtr<Clan> ClanMechanoid::operator->() const
     throw EXCEPTION("Value is missing");
 }
 
-int ClanMechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) clan.id = std::stoi(cols[0]);
-    if (cols[1]) mechanoid.id = std::stoi(cols[1]);
-
-    return 0;
-}
-
 const char *ClanMechanoid::getSql()
 {
     return
@@ -258,15 +241,6 @@ bool ClanReputation::operator==(const ClanReputation &rhs) const
         clan2 == rhs.clan2 &&
         reputation == rhs.reputation &&
         1;
-}
-
-int ClanReputation::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) clan.id = std::stoi(cols[0]);
-    if (cols[1]) clan2.id = std::stoi(cols[1]);
-    if (cols[2]) reputation = std::stof(cols[2]);
-
-    return 0;
 }
 
 const char *ClanReputation::getSql()
@@ -436,25 +410,6 @@ bool Clan::operator==(const Clan &rhs) const
         1;
 }
 
-int Clan::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) resource = cols[2];
-    if (cols[3]) name.id = std::stoi(cols[3]);
-    if (cols[4]) member_name.id = std::stoi(cols[4]);
-    if (cols[5]) bonusexp = std::stoi(cols[5]);
-    if (cols[6]) bonusrepair = std::stoi(cols[6]);
-    if (cols[7]) bonustrade = std::stoi(cols[7]);
-    if (cols[8]) helpness = std::stoi(cols[8]);
-    if (cols[9]) Volatile = std::stof(cols[9]);
-    if (cols[10]) noblivion = std::stof(cols[10]);
-    if (cols[11]) playereffect = std::stof(cols[11]);
-    if (cols[12]) color = std::stoi(cols[12]);
-
-    return 0;
-}
-
 const char *Clan::getSql()
 {
     return
@@ -554,15 +509,6 @@ IdPtr<Configuration> ConfigurationEquipment::operator->() const
     throw EXCEPTION("Value is missing");
 }
 
-int ConfigurationEquipment::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) configuration.id = std::stoi(cols[0]);
-    if (cols[1]) equipment.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
-}
-
 const char *ConfigurationEquipment::getSql()
 {
     return
@@ -650,15 +596,6 @@ IdPtr<Configuration> ConfigurationGood::operator->() const
     if (configuration)
         return configuration;
     throw EXCEPTION("Value is missing");
-}
-
-int ConfigurationGood::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) configuration.id = std::stoi(cols[0]);
-    if (cols[1]) good.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
 }
 
 const char *ConfigurationGood::getSql()
@@ -750,15 +687,6 @@ IdPtr<Configuration> ConfigurationProjectile::operator->() const
     throw EXCEPTION("Value is missing");
 }
 
-int ConfigurationProjectile::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) configuration.id = std::stoi(cols[0]);
-    if (cols[1]) projectile.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
-}
-
 const char *ConfigurationProjectile::getSql()
 {
     return
@@ -846,15 +774,6 @@ IdPtr<Configuration> ConfigurationWeapon::operator->() const
     if (configuration)
         return configuration;
     throw EXCEPTION("Value is missing");
-}
-
-int ConfigurationWeapon::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) configuration.id = std::stoi(cols[0]);
-    if (cols[1]) weapon.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
 }
 
 const char *ConfigurationWeapon::getSql()
@@ -978,16 +897,6 @@ bool Configuration::operator==(const Configuration &rhs) const
         name == rhs.name &&
         text_id == rhs.text_id &&
         1;
-}
-
-int Configuration::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) name.id = std::stoi(cols[2]);
-    if (cols[3]) glider.id = std::stoi(cols[3]);
-
-    return 0;
 }
 
 const char *Configuration::getSql()
@@ -1155,27 +1064,6 @@ bool Equipment::operator==(const Equipment &rhs) const
         value3 == rhs.value3 &&
         weight == rhs.weight &&
         1;
-}
-
-int Equipment::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) resource = cols[2];
-    if (cols[3]) name.id = std::stoi(cols[3]);
-    if (cols[4]) type = std::stoi(cols[4]);
-    if (cols[5]) standard = std::stoi(cols[5]);
-    if (cols[6]) weight = std::stof(cols[6]);
-    if (cols[7]) durability = std::stof(cols[7]);
-    if (cols[8]) power = std::stof(cols[8]);
-    if (cols[9]) value1 = std::stof(cols[9]);
-    if (cols[10]) value2 = std::stof(cols[10]);
-    if (cols[11]) value3 = std::stof(cols[11]);
-    if (cols[12]) manual = std::stoi(cols[12]);
-    if (cols[13]) price = std::stof(cols[13]);
-    if (cols[14]) notrade = std::stoi(cols[14]);
-
-    return 0;
 }
 
 const char *Equipment::getSql()
@@ -1391,33 +1279,6 @@ bool Glider::operator==(const Glider &rhs) const
         1;
 }
 
-int Glider::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) resource = cols[2];
-    if (cols[3]) name.id = std::stoi(cols[3]);
-    if (cols[4]) standard = std::stoi(cols[4]);
-    if (cols[5]) weight = std::stof(cols[5]);
-    if (cols[6]) maxweight = std::stof(cols[6]);
-    if (cols[7]) armor = std::stof(cols[7]);
-    if (cols[8]) price = std::stoi(cols[8]);
-    if (cols[9]) restore = std::stof(cols[9]);
-    if (cols[10]) power = std::stof(cols[10]);
-    if (cols[11]) special = std::stoi(cols[11]);
-    if (cols[12]) rotatespeed = std::stof(cols[12]);
-    if (cols[13]) resfront = std::stof(cols[13]);
-    if (cols[14]) restop = std::stof(cols[14]);
-    if (cols[15]) resside = std::stof(cols[15]);
-    if (cols[16]) stabfront = std::stof(cols[16]);
-    if (cols[17]) stabside = std::stof(cols[17]);
-    if (cols[18]) careen = std::stof(cols[18]);
-    if (cols[19]) delta_t = std::stof(cols[19]);
-    if (cols[20]) turbulence = std::stof(cols[20]);
-
-    return 0;
-}
-
 const char *Glider::getSql()
 {
     return
@@ -1565,21 +1426,6 @@ bool Good::operator==(const Good &rhs) const
         1;
 }
 
-int Good::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) resource = cols[2];
-    if (cols[3]) resource_drop = cols[3];
-    if (cols[4]) name.id = std::stoi(cols[4]);
-    if (cols[5]) price = std::stoi(cols[5]);
-    if (cols[6]) weight = std::stof(cols[6]);
-    if (cols[7]) notrade = std::stoi(cols[7]);
-    if (cols[8]) type = std::stoi(cols[8]);
-
-    return 0;
-}
-
 const char *Good::getSql()
 {
     return
@@ -1666,14 +1512,6 @@ IdPtr<Group> GroupMechanoid::operator->() const
     if (group)
         return group;
     throw EXCEPTION("Value is missing");
-}
-
-int GroupMechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) group.id = std::stoi(cols[0]);
-    if (cols[1]) mechanoid.id = std::stoi(cols[1]);
-
-    return 0;
 }
 
 const char *GroupMechanoid::getSql()
@@ -1777,15 +1615,6 @@ bool Group::operator==(const Group &rhs) const
         1;
 }
 
-int Group::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) name.id = std::stoi(cols[2]);
-
-    return 0;
-}
-
 const char *Group::getSql()
 {
     return
@@ -1872,15 +1701,6 @@ IdPtr<MapBuilding> MapBuildingEquipment::operator->() const
     if (mapBuilding)
         return mapBuilding;
     throw EXCEPTION("Value is missing");
-}
-
-int MapBuildingEquipment::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) mapBuilding.id = std::stoi(cols[0]);
-    if (cols[1]) equipment.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
 }
 
 const char *MapBuildingEquipment::getSql()
@@ -1972,15 +1792,6 @@ IdPtr<MapBuilding> MapBuildingGlider::operator->() const
     throw EXCEPTION("Value is missing");
 }
 
-int MapBuildingGlider::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) mapBuilding.id = std::stoi(cols[0]);
-    if (cols[1]) glider.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
-}
-
 const char *MapBuildingGlider::getSql()
 {
     return
@@ -2068,15 +1879,6 @@ IdPtr<MapBuilding> MapBuildingGood::operator->() const
     if (mapBuilding)
         return mapBuilding;
     throw EXCEPTION("Value is missing");
-}
-
-int MapBuildingGood::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) mapBuilding.id = std::stoi(cols[0]);
-    if (cols[1]) good.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
 }
 
 const char *MapBuildingGood::getSql()
@@ -2168,15 +1970,6 @@ IdPtr<MapBuilding> MapBuildingModificator::operator->() const
     throw EXCEPTION("Value is missing");
 }
 
-int MapBuildingModificator::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) mapBuilding.id = std::stoi(cols[0]);
-    if (cols[1]) modificator.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
-}
-
 const char *MapBuildingModificator::getSql()
 {
     return
@@ -2264,15 +2057,6 @@ IdPtr<MapBuilding> MapBuildingProjectile::operator->() const
     if (mapBuilding)
         return mapBuilding;
     throw EXCEPTION("Value is missing");
-}
-
-int MapBuildingProjectile::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) mapBuilding.id = std::stoi(cols[0]);
-    if (cols[1]) projectile.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
 }
 
 const char *MapBuildingProjectile::getSql()
@@ -2364,15 +2148,6 @@ IdPtr<MapBuilding> MapBuildingWeapon::operator->() const
     throw EXCEPTION("Value is missing");
 }
 
-int MapBuildingWeapon::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) mapBuilding.id = std::stoi(cols[0]);
-    if (cols[1]) weapon.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
-}
-
 const char *MapBuildingWeapon::getSql()
 {
     return
@@ -2426,11 +2201,11 @@ Text MapBuilding::getVariableString(int columnId) const
     case 8:
         return to_string(z);
     case 9:
-        return to_string(pitch);
-    case 10:
-        return to_string(yaw);
-    case 11:
         return to_string(roll);
+    case 10:
+        return to_string(pitch);
+    case 11:
+        return to_string(yaw);
     case 12:
         return to_string(scale);
     case 13:
@@ -2477,13 +2252,13 @@ void MapBuilding::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         z = std::stof(text.string());
         break;
     case 9:
-        pitch = std::stof(text.string());
+        roll = std::stof(text.string());
         break;
     case 10:
-        yaw = std::stof(text.string());
+        pitch = std::stof(text.string());
         break;
     case 11:
-        roll = std::stof(text.string());
+        yaw = std::stof(text.string());
         break;
     case 12:
         scale = std::stof(text.string());
@@ -2548,14 +2323,16 @@ QTreeWidgetItem *MapBuilding::printQtTreeView(QTreeWidgetItem *parent) const
 Text MapBuilding::getName() const
 {
     Text n;
-    std::wstring p = L" (" + (map ? map->getName().wstring() : L"") + L")";
-    n = to_string(name);
-    if (!n.empty())
-        return n + p;
     n = text_id;
     if (!n.empty())
-        return n + p;
-    return IObject::getName() + p;
+        return n;
+    n = to_string(name);
+    if (!n.empty())
+        return n;
+    n = to_string(building);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool MapBuilding::operator==(const MapBuilding &rhs) const
@@ -2579,28 +2356,6 @@ bool MapBuilding::operator==(const MapBuilding &rhs) const
         1;
 }
 
-int MapBuilding::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) map.id = std::stoi(cols[2]);
-    if (cols[3]) building.id = std::stoi(cols[3]);
-    if (cols[4]) name.id = std::stoi(cols[4]);
-    if (cols[5]) interactive = std::stoi(cols[5]);
-    if (cols[6]) x = std::stof(cols[6]);
-    if (cols[7]) y = std::stof(cols[7]);
-    if (cols[8]) z = std::stof(cols[8]);
-    if (cols[9]) pitch = std::stof(cols[9]);
-    if (cols[10]) yaw = std::stof(cols[10]);
-    if (cols[11]) roll = std::stof(cols[11]);
-    if (cols[12]) scale = std::stof(cols[12]);
-    if (cols[13]) scale_x = std::stof(cols[13]);
-    if (cols[14]) scale_y = std::stof(cols[14]);
-    if (cols[15]) scale_z = std::stof(cols[15]);
-
-    return 0;
-}
-
 const char *MapBuilding::getSql()
 {
     return
@@ -2615,9 +2370,9 @@ create table \"MapBuildings\" ( \
 \"x\" REAL, \
 \"y\" REAL, \
 \"z\" REAL, \
+\"roll\" REAL, \
 \"pitch\" REAL, \
 \"yaw\" REAL, \
-\"roll\" REAL, \
 \"scale\" REAL DEFAULT 1, \
 \"scale_x\" REAL DEFAULT 1, \
 \"scale_y\" REAL DEFAULT 1, \
@@ -2664,11 +2419,11 @@ Text MapGood::getVariableString(int columnId) const
     case 6:
         return to_string(z);
     case 7:
-        return to_string(pitch);
-    case 8:
-        return to_string(yaw);
-    case 9:
         return to_string(roll);
+    case 8:
+        return to_string(pitch);
+    case 9:
+        return to_string(yaw);
     case 10:
         return to_string(scale);
     case 11:
@@ -2709,13 +2464,13 @@ void MapGood::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         z = std::stof(text.string());
         break;
     case 7:
-        pitch = std::stof(text.string());
+        roll = std::stof(text.string());
         break;
     case 8:
-        yaw = std::stof(text.string());
+        pitch = std::stof(text.string());
         break;
     case 9:
-        roll = std::stof(text.string());
+        yaw = std::stof(text.string());
         break;
     case 10:
         scale = std::stof(text.string());
@@ -2747,11 +2502,13 @@ QTreeWidgetItem *MapGood::printQtTreeView(QTreeWidgetItem *parent) const
 Text MapGood::getName() const
 {
     Text n;
-    std::wstring p = L" (" + (map ? map->getName().wstring() : L"") + L")";
     n = to_string(text_id);
     if (!n.empty())
-        return n + p;
-    return IObject::getName() + p;
+        return n;
+    n = to_string(good);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool MapGood::operator==(const MapGood &rhs) const
@@ -2773,26 +2530,6 @@ bool MapGood::operator==(const MapGood &rhs) const
         1;
 }
 
-int MapGood::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = std::stoi(cols[1]);
-    if (cols[2]) map.id = std::stoi(cols[2]);
-    if (cols[3]) good.id = std::stoi(cols[3]);
-    if (cols[4]) x = std::stof(cols[4]);
-    if (cols[5]) y = std::stof(cols[5]);
-    if (cols[6]) z = std::stof(cols[6]);
-    if (cols[7]) pitch = std::stof(cols[7]);
-    if (cols[8]) yaw = std::stof(cols[8]);
-    if (cols[9]) roll = std::stof(cols[9]);
-    if (cols[10]) scale = std::stof(cols[10]);
-    if (cols[11]) scale_x = std::stof(cols[11]);
-    if (cols[12]) scale_y = std::stof(cols[12]);
-    if (cols[13]) scale_z = std::stof(cols[13]);
-
-    return 0;
-}
-
 const char *MapGood::getSql()
 {
     return
@@ -2805,9 +2542,9 @@ create table \"MapGoods\" ( \
 \"x\" REAL, \
 \"y\" REAL, \
 \"z\" REAL, \
+\"roll\" REAL, \
 \"pitch\" REAL, \
 \"yaw\" REAL, \
-\"roll\" REAL, \
 \"scale\" REAL, \
 \"scale_x\" REAL, \
 \"scale_y\" REAL, \
@@ -2853,11 +2590,11 @@ Text MapObject::getVariableString(int columnId) const
     case 6:
         return to_string(z);
     case 7:
-        return to_string(pitch);
-    case 8:
-        return to_string(yaw);
-    case 9:
         return to_string(roll);
+    case 8:
+        return to_string(pitch);
+    case 9:
+        return to_string(yaw);
     case 10:
         return to_string(scale);
     case 11:
@@ -2898,13 +2635,13 @@ void MapObject::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         z = std::stof(text.string());
         break;
     case 7:
-        pitch = std::stof(text.string());
+        roll = std::stof(text.string());
         break;
     case 8:
-        yaw = std::stof(text.string());
+        pitch = std::stof(text.string());
         break;
     case 9:
-        roll = std::stof(text.string());
+        yaw = std::stof(text.string());
         break;
     case 10:
         scale = std::stof(text.string());
@@ -2936,11 +2673,13 @@ QTreeWidgetItem *MapObject::printQtTreeView(QTreeWidgetItem *parent) const
 Text MapObject::getName() const
 {
     Text n;
-    std::wstring p = L" (" + (map ? map->getName().wstring() : L"") + L")";
     n = text_id;
     if (!n.empty())
-        return n + p;
-    return IObject::getName() + p;
+        return n;
+    n = to_string(object);
+    if (!n.empty())
+        return n;
+    return IObject::getName();
 }
 
 bool MapObject::operator==(const MapObject &rhs) const
@@ -2962,26 +2701,6 @@ bool MapObject::operator==(const MapObject &rhs) const
         1;
 }
 
-int MapObject::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) map.id = std::stoi(cols[2]);
-    if (cols[3]) object.id = std::stoi(cols[3]);
-    if (cols[4]) x = std::stof(cols[4]);
-    if (cols[5]) y = std::stof(cols[5]);
-    if (cols[6]) z = std::stof(cols[6]);
-    if (cols[7]) pitch = std::stof(cols[7]);
-    if (cols[8]) yaw = std::stof(cols[8]);
-    if (cols[9]) roll = std::stof(cols[9]);
-    if (cols[10]) scale = std::stof(cols[10]);
-    if (cols[11]) scale_x = std::stof(cols[11]);
-    if (cols[12]) scale_y = std::stof(cols[12]);
-    if (cols[13]) scale_z = std::stof(cols[13]);
-
-    return 0;
-}
-
 const char *MapObject::getSql()
 {
     return
@@ -2994,9 +2713,9 @@ create table \"MapObjects\" ( \
 \"x\" REAL, \
 \"y\" REAL, \
 \"z\" REAL, \
+\"roll\" REAL, \
 \"pitch\" REAL, \
 \"yaw\" REAL, \
-\"roll\" REAL, \
 \"scale\" REAL DEFAULT 1, \
 \"scale_x\" REAL DEFAULT 1, \
 \"scale_y\" REAL DEFAULT 1, \
@@ -3126,18 +2845,6 @@ bool Map::operator==(const Map &rhs) const
         1;
 }
 
-int Map::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) resource = cols[2];
-    if (cols[3]) name.id = std::stoi(cols[3]);
-    if (cols[4]) h_min = std::stof(cols[4]);
-    if (cols[5]) h_max = std::stof(cols[5]);
-
-    return 0;
-}
-
 const char *Map::getSql()
 {
     return
@@ -3229,15 +2936,6 @@ IdPtr<Mechanoid> MechanoidQuest::operator->() const
     throw EXCEPTION("Value is missing");
 }
 
-int MechanoidQuest::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) mechanoid.id = std::stoi(cols[0]);
-    if (cols[1]) quest.id = std::stoi(cols[1]);
-    if (cols[2]) state = std::stoi(cols[2]);
-
-    return 0;
-}
-
 const char *MechanoidQuest::getSql()
 {
     return
@@ -3307,11 +3005,11 @@ Text Mechanoid::getVariableString(int columnId) const
     case 16:
         return to_string(z);
     case 17:
-        return to_string(pitch);
-    case 18:
-        return to_string(yaw);
-    case 19:
         return to_string(roll);
+    case 18:
+        return to_string(pitch);
+    case 19:
+        return to_string(yaw);
     default:
         return "";
     }
@@ -3374,13 +3072,13 @@ void Mechanoid::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         z = std::stof(text.string());
         break;
     case 17:
-        pitch = std::stof(text.string());
+        roll = std::stof(text.string());
         break;
     case 18:
-        yaw = std::stof(text.string());
+        pitch = std::stof(text.string());
         break;
     case 19:
-        roll = std::stof(text.string());
+        yaw = std::stof(text.string());
         break;
     default:
         break;
@@ -3442,32 +3140,6 @@ bool Mechanoid::operator==(const Mechanoid &rhs) const
         1;
 }
 
-int Mechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) name.id = std::stoi(cols[2]);
-    if (cols[3]) generation = std::stoi(cols[3]);
-    if (cols[4]) rating = std::stof(cols[4]);
-    if (cols[5]) money = std::stof(cols[5]);
-    if (cols[6]) configuration.id = std::stoi(cols[6]);
-    if (cols[7]) group.id = std::stoi(cols[7]);
-    if (cols[8]) clan.id = std::stoi(cols[8]);
-    if (cols[9]) rating_fight = std::stof(cols[9]);
-    if (cols[10]) rating_courier = std::stof(cols[10]);
-    if (cols[11]) rating_trade = std::stof(cols[11]);
-    if (cols[12]) map.id = std::stoi(cols[12]);
-    if (cols[13]) mapBuilding.id = std::stoi(cols[13]);
-    if (cols[14]) x = std::stof(cols[14]);
-    if (cols[15]) y = std::stof(cols[15]);
-    if (cols[16]) z = std::stof(cols[16]);
-    if (cols[17]) pitch = std::stof(cols[17]);
-    if (cols[18]) yaw = std::stof(cols[18]);
-    if (cols[19]) roll = std::stof(cols[19]);
-
-    return 0;
-}
-
 const char *Mechanoid::getSql()
 {
     return
@@ -3490,9 +3162,9 @@ create table \"Mechanoids\" ( \
 \"x\" REAL, \
 \"y\" REAL, \
 \"z\" REAL, \
+\"roll\" REAL, \
 \"pitch\" REAL, \
 \"yaw\" REAL, \
-\"roll\" REAL, \
 PRIMARY KEY (\"id\"), \
 FOREIGN KEY (\"configuration_id\") REFERENCES \"Configurations\" (\"id\"), \
 FOREIGN KEY (\"clan_id\") REFERENCES \"Clans\" (\"id\"), \
@@ -3570,14 +3242,6 @@ IdPtr<Modification> ModificationClan::operator->() const
     if (modification)
         return modification;
     throw EXCEPTION("Value is missing");
-}
-
-int ModificationClan::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) modification.id = std::stoi(cols[0]);
-    if (cols[1]) clan.id = std::stoi(cols[1]);
-
-    return 0;
 }
 
 const char *ModificationClan::getSql()
@@ -3662,14 +3326,6 @@ IdPtr<Modification> ModificationMap::operator->() const
     throw EXCEPTION("Value is missing");
 }
 
-int ModificationMap::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) modification.id = std::stoi(cols[0]);
-    if (cols[1]) map.id = std::stoi(cols[1]);
-
-    return 0;
-}
-
 const char *ModificationMap::getSql()
 {
     return
@@ -3750,14 +3406,6 @@ IdPtr<Modification> ModificationMechanoid::operator->() const
     if (modification)
         return modification;
     throw EXCEPTION("Value is missing");
-}
-
-int ModificationMechanoid::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) modification.id = std::stoi(cols[0]);
-    if (cols[1]) mechanoid.id = std::stoi(cols[1]);
-
-    return 0;
 }
 
 const char *ModificationMechanoid::getSql()
@@ -3922,24 +3570,6 @@ bool Modification::operator==(const Modification &rhs) const
         1;
 }
 
-int Modification::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) name.id = std::stoi(cols[1]);
-    if (cols[2]) directory = cols[2];
-    if (cols[3]) author = cols[3];
-    if (cols[4]) date_created = cols[4];
-    if (cols[5]) date_modified = cols[5];
-    if (cols[6]) comment = cols[6];
-    if (cols[7]) version = cols[7];
-    if (cols[8]) script_language = cols[8];
-    if (cols[9]) script_main = cols[9];
-    if (cols[10]) player_mechanoid.id = std::stoi(cols[10]);
-    if (cols[11]) cooperative_player_configuration.id = std::stoi(cols[11]);
-
-    return 0;
-}
-
 const char *Modification::getSql()
 {
     return
@@ -4092,23 +3722,6 @@ bool Modificator::operator==(const Modificator &rhs) const
         1;
 }
 
-int Modificator::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) resource = cols[2];
-    if (cols[3]) name.id = std::stoi(cols[3]);
-    if (cols[4]) probability = std::stof(cols[4]);
-    if (cols[5]) price = std::stof(cols[5]);
-    if (cols[6]) k_price = std::stof(cols[6]);
-    if (cols[7]) k_param1 = std::stof(cols[7]);
-    if (cols[8]) k_param2 = std::stof(cols[8]);
-    if (cols[9]) unicum_id = std::stoi(cols[9]);
-    if (cols[10]) mask = std::stoi(cols[10]);
-
-    return 0;
-}
-
 const char *Modificator::getSql()
 {
     return
@@ -4222,17 +3835,6 @@ bool Object::operator==(const Object &rhs) const
         1;
 }
 
-int Object::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) resource = cols[2];
-    if (cols[3]) name.id = std::stoi(cols[3]);
-    if (cols[4]) type = std::stoi(cols[4]);
-
-    return 0;
-}
-
 const char *Object::getSql()
 {
     return
@@ -4317,14 +3919,6 @@ bool Player::operator==(const Player &rhs) const
     return
         mechanoid == rhs.mechanoid &&
         1;
-}
-
-int Player::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) mechanoid.id = std::stoi(cols[1]);
-
-    return 0;
 }
 
 const char *Player::getSql()
@@ -4515,31 +4109,6 @@ bool Projectile::operator==(const Projectile &rhs) const
         1;
 }
 
-int Projectile::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) resource = cols[2];
-    if (cols[3]) name.id = std::stoi(cols[3]);
-    if (cols[4]) type = std::stoi(cols[4]);
-    if (cols[5]) weight = std::stof(cols[5]);
-    if (cols[6]) damage = std::stof(cols[6]);
-    if (cols[7]) T = cols[7];
-    if (cols[8]) speed = std::stof(cols[8]);
-    if (cols[9]) scale = std::stof(cols[9]);
-    if (cols[10]) numstate = std::stoi(cols[10]);
-    if (cols[11]) rotate = std::stof(cols[11]);
-    if (cols[12]) subtype = std::stoi(cols[12]);
-    if (cols[13]) life_time = std::stof(cols[13]);
-    if (cols[14]) detonation_delay = std::stof(cols[14]);
-    if (cols[15]) distance_detonation = std::stof(cols[15]);
-    if (cols[16]) strength = std::stof(cols[16]);
-    if (cols[17]) price = std::stof(cols[17]);
-    if (cols[18]) notrade = std::stoi(cols[18]);
-
-    return 0;
-}
-
 const char *Projectile::getSql()
 {
     return
@@ -4644,15 +4213,6 @@ IdPtr<QuestReward> QuestRewardEquipment::operator->() const
     throw EXCEPTION("Value is missing");
 }
 
-int QuestRewardEquipment::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) questReward.id = std::stoi(cols[0]);
-    if (cols[1]) equipment.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
-}
-
 const char *QuestRewardEquipment::getSql()
 {
     return
@@ -4740,15 +4300,6 @@ IdPtr<QuestReward> QuestRewardGlider::operator->() const
     if (questReward)
         return questReward;
     throw EXCEPTION("Value is missing");
-}
-
-int QuestRewardGlider::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) questReward.id = std::stoi(cols[0]);
-    if (cols[1]) glider.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
 }
 
 const char *QuestRewardGlider::getSql()
@@ -4840,15 +4391,6 @@ IdPtr<QuestReward> QuestRewardGood::operator->() const
     throw EXCEPTION("Value is missing");
 }
 
-int QuestRewardGood::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) questReward.id = std::stoi(cols[0]);
-    if (cols[1]) good.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
-}
-
 const char *QuestRewardGood::getSql()
 {
     return
@@ -4936,15 +4478,6 @@ IdPtr<QuestReward> QuestRewardModificator::operator->() const
     if (questReward)
         return questReward;
     throw EXCEPTION("Value is missing");
-}
-
-int QuestRewardModificator::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) questReward.id = std::stoi(cols[0]);
-    if (cols[1]) modificator.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
 }
 
 const char *QuestRewardModificator::getSql()
@@ -5036,15 +4569,6 @@ IdPtr<QuestReward> QuestRewardProjectile::operator->() const
     throw EXCEPTION("Value is missing");
 }
 
-int QuestRewardProjectile::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) questReward.id = std::stoi(cols[0]);
-    if (cols[1]) projectile.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
-}
-
 const char *QuestRewardProjectile::getSql()
 {
     return
@@ -5122,15 +4646,6 @@ bool QuestRewardReputation::operator==(const QuestRewardReputation &rhs) const
         questReward == rhs.questReward &&
         reputation == rhs.reputation &&
         1;
-}
-
-int QuestRewardReputation::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) questReward.id = std::stoi(cols[0]);
-    if (cols[1]) clan.id = std::stoi(cols[1]);
-    if (cols[2]) reputation = std::stof(cols[2]);
-
-    return 0;
 }
 
 const char *QuestRewardReputation::getSql()
@@ -5220,15 +4735,6 @@ IdPtr<QuestReward> QuestRewardWeapon::operator->() const
     if (questReward)
         return questReward;
     throw EXCEPTION("Value is missing");
-}
-
-int QuestRewardWeapon::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) questReward.id = std::stoi(cols[0]);
-    if (cols[1]) weapon.id = std::stoi(cols[1]);
-    if (cols[2]) quantity = std::stoi(cols[2]);
-
-    return 0;
 }
 
 const char *QuestRewardWeapon::getSql()
@@ -5375,17 +4881,6 @@ bool QuestReward::operator==(const QuestReward &rhs) const
         1;
 }
 
-int QuestReward::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) quest.id = std::stoi(cols[1]);
-    if (cols[2]) text_id = cols[2];
-    if (cols[3]) money = std::stoi(cols[3]);
-    if (cols[4]) rating = std::stof(cols[4]);
-
-    return 0;
-}
-
 const char *QuestReward::getSql()
 {
     return
@@ -5507,18 +5002,6 @@ bool Quest::operator==(const Quest &rhs) const
         1;
 }
 
-int Quest::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) name.id = std::stoi(cols[2]);
-    if (cols[3]) title.id = std::stoi(cols[3]);
-    if (cols[4]) description.id = std::stoi(cols[4]);
-    if (cols[5]) time = std::stoi(cols[5]);
-
-    return 0;
-}
-
 const char *Quest::getSql()
 {
     return
@@ -5599,14 +5082,6 @@ bool ScriptVariable::operator==(const ScriptVariable &rhs) const
         1;
 }
 
-int ScriptVariable::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) variable = cols[0];
-    if (cols[1]) value = cols[1];
-
-    return 0;
-}
-
 const char *ScriptVariable::getSql()
 {
     return
@@ -5669,13 +5144,6 @@ bool Setting::operator==(const Setting &rhs) const
     return
         player == rhs.player &&
         1;
-}
-
-int Setting::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) player.id = std::stoi(cols[0]);
-
-    return 0;
 }
 
 const char *Setting::getSql()
@@ -5786,17 +5254,6 @@ bool String::operator==(const String &rhs) const
         1;
 }
 
-int String::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) table.id = std::stoi(cols[2]);
-    if (cols[3]) ru = cols[3];
-    if (cols[4]) en = cols[4];
-
-    return 0;
-}
-
 const char *String::getSql()
 {
     return
@@ -5881,14 +5338,6 @@ bool Table::operator==(const Table &rhs) const
     return
         text_id == rhs.text_id &&
         1;
-}
-
-int Table::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-
-    return 0;
 }
 
 const char *Table::getSql()
@@ -6216,46 +5665,6 @@ bool Weapon::operator==(const Weapon &rhs) const
         weight == rhs.weight &&
         xstate == rhs.xstate &&
         1;
-}
-
-int Weapon::loadFromSqlite3(int ncols, char **cols, char **names)
-{
-    if (cols[0]) id = std::stoi(cols[0]);
-    if (cols[1]) text_id = cols[1];
-    if (cols[2]) resource = cols[2];
-    if (cols[3]) name.id = std::stoi(cols[3]);
-    if (cols[4]) projectile.id = std::stoi(cols[4]);
-    if (cols[5]) type = std::stoi(cols[5]);
-    if (cols[6]) standard = std::stoi(cols[6]);
-    if (cols[7]) weight = std::stof(cols[7]);
-    if (cols[8]) power = std::stof(cols[8]);
-    if (cols[9]) firerate = std::stof(cols[9]);
-    if (cols[10]) damage = std::stof(cols[10]);
-    if (cols[11]) price = std::stof(cols[11]);
-    if (cols[12]) fx = std::stof(cols[12]);
-    if (cols[13]) shoottype = std::stoi(cols[13]);
-    if (cols[14]) shootscale = std::stof(cols[14]);
-    if (cols[15]) xstate = std::stoi(cols[15]);
-    if (cols[16]) rcolor = std::stof(cols[16]);
-    if (cols[17]) gcolor = std::stof(cols[17]);
-    if (cols[18]) bcolor = std::stof(cols[18]);
-    if (cols[19]) typearms = std::stoi(cols[19]);
-    if (cols[20]) tfire = std::stof(cols[20]);
-    if (cols[21]) vtype = std::stoi(cols[21]);
-    if (cols[22]) spare = std::stof(cols[22]);
-    if (cols[23]) reconstruction = std::stof(cols[23]);
-    if (cols[24]) maxdistance = std::stof(cols[24]);
-    if (cols[25]) angle = std::stof(cols[25]);
-    if (cols[26]) fxtime = std::stof(cols[26]);
-    if (cols[27]) damagetype = std::stoi(cols[27]);
-    if (cols[28]) fxmodeltime = std::stof(cols[28]);
-    if (cols[29]) inside_mul = std::stof(cols[29]);
-    if (cols[30]) inside_x = std::stof(cols[30]);
-    if (cols[31]) inside_y = std::stof(cols[31]);
-    if (cols[32]) inside_z = std::stof(cols[32]);
-    if (cols[33]) notrade = std::stoi(cols[33]);
-
-    return 0;
 }
 
 const char *Weapon::getSql()

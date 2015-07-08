@@ -24,6 +24,8 @@
 #include <qtreewidget.h>
 #endif
 
+#include <sqlite3/sqlite3.h>
+
 #include <Polygon4/Database.h>
 
 #define PROGRESS_CALLBACK(p) if (callback) callback(p)
@@ -38,6 +40,18 @@ OrderedObjectMap getOrderedMap(const CMap<T> &array)
     OrderedObjectMap map;
     for (auto &v : array)
         map.insert(std::make_pair(v.second->getName(), v.second));
+    return map;
+}
+
+template <class T>
+OrderedObjectMap getOrderedMap(const CMap<T> &array, std::function<bool(T)> f)
+{
+    if (!f)
+        return getOrderedMap(array);
+    OrderedObjectMap map;
+    for (auto &v : array)
+        if (f(v.second))
+            map.insert(std::make_pair(v.second->getName(), v.second));
     return map;
 }
 

@@ -69,7 +69,11 @@ void Database::loadDatabase(const std::string &dbname)
         LOG_ERROR(logger, error);
         throw EXCEPTION(error);
     }
-    execute("PRAGMA foreign_keys = OFF;", 0, 0); // this can be turned on in the future
+    execute("PRAGMA cache_size = 8000;"); // cache size (N * page size)
+    execute("PRAGMA page_size = 2048;"); // page size bytes (N * page size)
+    execute("PRAGMA journal_mode = OFF;"); // set to no journal
+    execute("PRAGMA synchronous = 1;"); // set to wait for OS sync (0 - no wait, 1 - wait OS, 2 - wait all)
+    execute("PRAGMA foreign_keys = OFF;"); // this can be turned on in the future
 }
 
 bool Database::isLoaded() const
@@ -142,6 +146,11 @@ std::string Database::getName() const
 std::string Database::getFullName() const
 {
     return fullName;
+}
+
+sqlite3 *Database::getDb() const
+{
+    return db;
 }
 
 void Database::getSchema(DatabaseSchema *schema) const
