@@ -44,6 +44,15 @@ struct TablePair : public std::pair<T1, T2>
         }
         return second;
     }
+    const T2 &operator->() const
+    {
+        if (!second)
+        {
+            throw EXCEPTION("Trying to get empty object for id (" + std::to_string(first) + 
+                "). This should not happen. Check your database or source code");
+        }
+        return second;
+    }
 };
 
 template <class T>
@@ -152,14 +161,10 @@ public:
     void push_back(ptr_type &v)
     {
         insert(v);
-        //idHandler.setKey(v, maxId);
-        //data[maxId++] = v;
     }
     void push_back(value_type &v)
     {
         insert(v.second);
-        //idHandler.setKey(v.second, maxId);
-        //data[maxId++] = v.second;
     }
     // get by key
     ptr_type operator[](const key_type &i) const // do not changes the container
