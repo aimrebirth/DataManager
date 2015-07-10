@@ -9,11 +9,11 @@ void StorageImpl::_loadBuildings()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Building>();
+        auto v = buildings.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
-        buildings[v->id] = v;
+        buildings.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -57,10 +57,10 @@ void StorageImpl::_loadClanMechanoids()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<ClanMechanoid>();
+        auto v = clanMechanoids.create();
         v->clan.id = sqlite3_column_int(stmt, 0);
         v->mechanoid.id = sqlite3_column_int(stmt, 1);
-        clanMechanoids.push_back(v);
+        clanMechanoids.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -110,11 +110,11 @@ void StorageImpl::_loadClanReputations()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<ClanReputation>();
+        auto v = clanReputations.create();
         v->clan.id = sqlite3_column_int(stmt, 0);
         v->clan2.id = sqlite3_column_int(stmt, 1);
         v->reputation = sqlite3_column_double(stmt, 2);
-        clanReputations.push_back(v);
+        clanReputations.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -165,7 +165,7 @@ void StorageImpl::_loadClans()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Clan>();
+        auto v = clans.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
@@ -179,7 +179,7 @@ void StorageImpl::_loadClans()
         v->noblivion = sqlite3_column_double(stmt, 10);
         v->playereffect = sqlite3_column_double(stmt, 11);
         v->color = sqlite3_column_int(stmt, 12);
-        clans[v->id] = v;
+        clans.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -201,10 +201,10 @@ void StorageImpl::_loadClansArrays()
     {
         for (auto &clanMechanoid : clanMechanoids)
             if (clan.first == clanMechanoid->clan.id)
-                clan.second->mechanoids.push_back(clanMechanoid);
+                clan->mechanoids.push_back(clanMechanoid);
         for (auto &clanReputation : clanReputations)
             if (clan.first == clanReputation->clan.id)
-                clan.second->reputations.push_back(clanReputation);
+                clan->reputations.push_back(clanReputation);
     }
 }
 
@@ -249,11 +249,11 @@ void StorageImpl::_loadConfigurationEquipments()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<ConfigurationEquipment>();
+        auto v = configurationEquipments.create();
         v->configuration.id = sqlite3_column_int(stmt, 0);
         v->equipment.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        configurationEquipments.push_back(v);
+        configurationEquipments.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -304,11 +304,11 @@ void StorageImpl::_loadConfigurationGoods()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<ConfigurationGood>();
+        auto v = configurationGoods.create();
         v->configuration.id = sqlite3_column_int(stmt, 0);
         v->good.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        configurationGoods.push_back(v);
+        configurationGoods.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -359,11 +359,11 @@ void StorageImpl::_loadConfigurationProjectiles()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<ConfigurationProjectile>();
+        auto v = configurationProjectiles.create();
         v->configuration.id = sqlite3_column_int(stmt, 0);
         v->projectile.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        configurationProjectiles.push_back(v);
+        configurationProjectiles.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -414,11 +414,11 @@ void StorageImpl::_loadConfigurationWeapons()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<ConfigurationWeapon>();
+        auto v = configurationWeapons.create();
         v->configuration.id = sqlite3_column_int(stmt, 0);
         v->weapon.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        configurationWeapons.push_back(v);
+        configurationWeapons.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -469,12 +469,12 @@ void StorageImpl::_loadConfigurations()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Configuration>();
+        auto v = configurations.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->name.id = sqlite3_column_int(stmt, 2);
         v->glider.id = sqlite3_column_int(stmt, 3);
-        configurations[v->id] = v;
+        configurations.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -496,16 +496,16 @@ void StorageImpl::_loadConfigurationsArrays()
     {
         for (auto &configurationEquipment : configurationEquipments)
             if (configuration.first == configurationEquipment->configuration.id)
-                configuration.second->equipments.push_back(configurationEquipment);
+                configuration->equipments.push_back(configurationEquipment);
         for (auto &configurationGood : configurationGoods)
             if (configuration.first == configurationGood->configuration.id)
-                configuration.second->goods.push_back(configurationGood);
+                configuration->goods.push_back(configurationGood);
         for (auto &configurationProjectile : configurationProjectiles)
             if (configuration.first == configurationProjectile->configuration.id)
-                configuration.second->projectiles.push_back(configurationProjectile);
+                configuration->projectiles.push_back(configurationProjectile);
         for (auto &configurationWeapon : configurationWeapons)
             if (configuration.first == configurationWeapon->configuration.id)
-                configuration.second->weapons.push_back(configurationWeapon);
+                configuration->weapons.push_back(configurationWeapon);
     }
 }
 
@@ -541,7 +541,7 @@ void StorageImpl::_loadEquipments()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Equipment>();
+        auto v = equipments.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
@@ -557,7 +557,7 @@ void StorageImpl::_loadEquipments()
         v->manual = sqlite3_column_int(stmt, 12);
         v->price = sqlite3_column_double(stmt, 13);
         v->notrade = sqlite3_column_int(stmt, 14);
-        equipments[v->id] = v;
+        equipments.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -618,7 +618,7 @@ void StorageImpl::_loadGliders()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Glider>();
+        auto v = gliders.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
@@ -640,7 +640,7 @@ void StorageImpl::_loadGliders()
         v->careen = sqlite3_column_double(stmt, 18);
         v->delta_t = sqlite3_column_double(stmt, 19);
         v->turbulence = sqlite3_column_double(stmt, 20);
-        gliders[v->id] = v;
+        gliders.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -707,7 +707,7 @@ void StorageImpl::_loadGoods()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Good>();
+        auto v = goods.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
@@ -717,7 +717,7 @@ void StorageImpl::_loadGoods()
         v->weight = sqlite3_column_double(stmt, 6);
         v->notrade = sqlite3_column_int(stmt, 7);
         v->type = sqlite3_column_int(stmt, 8);
-        goods[v->id] = v;
+        goods.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -772,10 +772,10 @@ void StorageImpl::_loadGroupMechanoids()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<GroupMechanoid>();
+        auto v = groupMechanoids.create();
         v->group.id = sqlite3_column_int(stmt, 0);
         v->mechanoid.id = sqlite3_column_int(stmt, 1);
-        groupMechanoids.push_back(v);
+        groupMechanoids.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -825,11 +825,11 @@ void StorageImpl::_loadGroups()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Group>();
+        auto v = groups.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->name.id = sqlite3_column_int(stmt, 2);
-        groups[v->id] = v;
+        groups.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -849,7 +849,7 @@ void StorageImpl::_loadGroupsArrays()
     {
         for (auto &groupMechanoid : groupMechanoids)
             if (group.first == groupMechanoid->group.id)
-                group.second->mechanoids.push_back(groupMechanoid);
+                group->mechanoids.push_back(groupMechanoid);
     }
 }
 
@@ -884,11 +884,11 @@ void StorageImpl::_loadMapBuildingEquipments()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<MapBuildingEquipment>();
+        auto v = mapBuildingEquipments.create();
         v->mapBuilding.id = sqlite3_column_int(stmt, 0);
         v->equipment.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        mapBuildingEquipments.push_back(v);
+        mapBuildingEquipments.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -939,11 +939,11 @@ void StorageImpl::_loadMapBuildingGliders()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<MapBuildingGlider>();
+        auto v = mapBuildingGliders.create();
         v->mapBuilding.id = sqlite3_column_int(stmt, 0);
         v->glider.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        mapBuildingGliders.push_back(v);
+        mapBuildingGliders.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -994,11 +994,11 @@ void StorageImpl::_loadMapBuildingGoods()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<MapBuildingGood>();
+        auto v = mapBuildingGoods.create();
         v->mapBuilding.id = sqlite3_column_int(stmt, 0);
         v->good.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        mapBuildingGoods.push_back(v);
+        mapBuildingGoods.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1049,11 +1049,11 @@ void StorageImpl::_loadMapBuildingModificators()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<MapBuildingModificator>();
+        auto v = mapBuildingModificators.create();
         v->mapBuilding.id = sqlite3_column_int(stmt, 0);
         v->modificator.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        mapBuildingModificators.push_back(v);
+        mapBuildingModificators.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1104,11 +1104,11 @@ void StorageImpl::_loadMapBuildingProjectiles()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<MapBuildingProjectile>();
+        auto v = mapBuildingProjectiles.create();
         v->mapBuilding.id = sqlite3_column_int(stmt, 0);
         v->projectile.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        mapBuildingProjectiles.push_back(v);
+        mapBuildingProjectiles.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1159,11 +1159,11 @@ void StorageImpl::_loadMapBuildingWeapons()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<MapBuildingWeapon>();
+        auto v = mapBuildingWeapons.create();
         v->mapBuilding.id = sqlite3_column_int(stmt, 0);
         v->weapon.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        mapBuildingWeapons.push_back(v);
+        mapBuildingWeapons.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1214,7 +1214,7 @@ void StorageImpl::_loadMapBuildings()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<MapBuilding>();
+        auto v = mapBuildings.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->map.id = sqlite3_column_int(stmt, 2);
@@ -1231,7 +1231,7 @@ void StorageImpl::_loadMapBuildings()
         v->scale_x = sqlite3_column_double(stmt, 13);
         v->scale_y = sqlite3_column_double(stmt, 14);
         v->scale_z = sqlite3_column_double(stmt, 15);
-        mapBuildings[v->id] = v;
+        mapBuildings.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1255,22 +1255,22 @@ void StorageImpl::_loadMapBuildingsArrays()
     {
         for (auto &mapBuildingEquipment : mapBuildingEquipments)
             if (mapBuilding.first == mapBuildingEquipment->mapBuilding.id)
-                mapBuilding.second->equipments.push_back(mapBuildingEquipment);
+                mapBuilding->equipments.push_back(mapBuildingEquipment);
         for (auto &mapBuildingGlider : mapBuildingGliders)
             if (mapBuilding.first == mapBuildingGlider->mapBuilding.id)
-                mapBuilding.second->gliders.push_back(mapBuildingGlider);
+                mapBuilding->gliders.push_back(mapBuildingGlider);
         for (auto &mapBuildingGood : mapBuildingGoods)
             if (mapBuilding.first == mapBuildingGood->mapBuilding.id)
-                mapBuilding.second->goods.push_back(mapBuildingGood);
+                mapBuilding->goods.push_back(mapBuildingGood);
         for (auto &mapBuildingModificator : mapBuildingModificators)
             if (mapBuilding.first == mapBuildingModificator->mapBuilding.id)
-                mapBuilding.second->modificators.push_back(mapBuildingModificator);
+                mapBuilding->modificators.push_back(mapBuildingModificator);
         for (auto &mapBuildingProjectile : mapBuildingProjectiles)
             if (mapBuilding.first == mapBuildingProjectile->mapBuilding.id)
-                mapBuilding.second->projectiles.push_back(mapBuildingProjectile);
+                mapBuilding->projectiles.push_back(mapBuildingProjectile);
         for (auto &mapBuildingWeapon : mapBuildingWeapons)
             if (mapBuilding.first == mapBuildingWeapon->mapBuilding.id)
-                mapBuilding.second->weapons.push_back(mapBuildingWeapon);
+                mapBuilding->weapons.push_back(mapBuildingWeapon);
     }
 }
 
@@ -1318,7 +1318,7 @@ void StorageImpl::_loadMapGoods()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<MapGood>();
+        auto v = mapGoods.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = sqlite3_column_int(stmt, 1);
         v->map.id = sqlite3_column_int(stmt, 2);
@@ -1333,7 +1333,7 @@ void StorageImpl::_loadMapGoods()
         v->scale_x = sqlite3_column_double(stmt, 11);
         v->scale_y = sqlite3_column_double(stmt, 12);
         v->scale_z = sqlite3_column_double(stmt, 13);
-        mapGoods[v->id] = v;
+        mapGoods.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1395,7 +1395,7 @@ void StorageImpl::_loadMapObjects()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<MapObject>();
+        auto v = mapObjects.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->map.id = sqlite3_column_int(stmt, 2);
@@ -1410,7 +1410,7 @@ void StorageImpl::_loadMapObjects()
         v->scale_x = sqlite3_column_double(stmt, 11);
         v->scale_y = sqlite3_column_double(stmt, 12);
         v->scale_z = sqlite3_column_double(stmt, 13);
-        mapObjects[v->id] = v;
+        mapObjects.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1472,14 +1472,14 @@ void StorageImpl::_loadMaps()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Map>();
+        auto v = maps.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
         v->name.id = sqlite3_column_int(stmt, 3);
         v->h_min = sqlite3_column_double(stmt, 4);
         v->h_max = sqlite3_column_double(stmt, 5);
-        maps[v->id] = v;
+        maps.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1498,14 +1498,14 @@ void StorageImpl::_loadMapsArrays()
     for (auto &map : maps)
     {
         for (auto &mapBuilding : mapBuildings)
-            if (map.first == mapBuilding.second->map.id)
-                map.second->buildings.push_back(mapBuilding.second);
+            if (map.first == mapBuilding->map.id)
+                map->buildings.push_back(mapBuilding);
         for (auto &mapGood : mapGoods)
-            if (map.first == mapGood.second->map.id)
-                map.second->goods.push_back(mapGood.second);
+            if (map.first == mapGood->map.id)
+                map->goods.push_back(mapGood);
         for (auto &mapObject : mapObjects)
-            if (map.first == mapObject.second->map.id)
-                map.second->objects.push_back(mapObject.second);
+            if (map.first == mapObject->map.id)
+                map->objects.push_back(mapObject);
     }
 }
 
@@ -1543,11 +1543,11 @@ void StorageImpl::_loadMechanoidQuests()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<MechanoidQuest>();
+        auto v = mechanoidQuests.create();
         v->mechanoid.id = sqlite3_column_int(stmt, 0);
         v->quest.id = sqlite3_column_int(stmt, 1);
         v->state = sqlite3_column_int(stmt, 2);
-        mechanoidQuests.push_back(v);
+        mechanoidQuests.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1598,7 +1598,7 @@ void StorageImpl::_loadMechanoids()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Mechanoid>();
+        auto v = mechanoids.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->name.id = sqlite3_column_int(stmt, 2);
@@ -1619,7 +1619,7 @@ void StorageImpl::_loadMechanoids()
         v->roll = sqlite3_column_double(stmt, 17);
         v->pitch = sqlite3_column_double(stmt, 18);
         v->yaw = sqlite3_column_double(stmt, 19);
-        mechanoids[v->id] = v;
+        mechanoids.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1649,7 +1649,7 @@ void StorageImpl::_loadMechanoidsArrays()
     {
         for (auto &mechanoidQuest : mechanoidQuests)
             if (mechanoid.first == mechanoidQuest->mechanoid.id)
-                mechanoid.second->quests.push_back(mechanoidQuest);
+                mechanoid->quests.push_back(mechanoidQuest);
     }
 }
 
@@ -1701,10 +1701,10 @@ void StorageImpl::_loadModificationClans()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<ModificationClan>();
+        auto v = modificationClans.create();
         v->modification.id = sqlite3_column_int(stmt, 0);
         v->clan.id = sqlite3_column_int(stmt, 1);
-        modificationClans.push_back(v);
+        modificationClans.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1754,10 +1754,10 @@ void StorageImpl::_loadModificationMaps()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<ModificationMap>();
+        auto v = modificationMaps.create();
         v->modification.id = sqlite3_column_int(stmt, 0);
         v->map.id = sqlite3_column_int(stmt, 1);
-        modificationMaps.push_back(v);
+        modificationMaps.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1807,10 +1807,10 @@ void StorageImpl::_loadModificationMechanoids()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<ModificationMechanoid>();
+        auto v = modificationMechanoids.create();
         v->modification.id = sqlite3_column_int(stmt, 0);
         v->mechanoid.id = sqlite3_column_int(stmt, 1);
-        modificationMechanoids.push_back(v);
+        modificationMechanoids.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1860,7 +1860,7 @@ void StorageImpl::_loadModifications()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Modification>();
+        auto v = modifications.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->name.id = sqlite3_column_int(stmt, 1);
         v->directory = (const char *)sqlite3_column_text(stmt, 2);
@@ -1873,7 +1873,7 @@ void StorageImpl::_loadModifications()
         v->script_main = (const char *)sqlite3_column_text(stmt, 9);
         v->player_mechanoid.id = sqlite3_column_int(stmt, 10);
         v->cooperative_player_configuration.id = sqlite3_column_int(stmt, 11);
-        modifications[v->id] = v;
+        modifications.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -1897,13 +1897,13 @@ void StorageImpl::_loadModificationsArrays()
     {
         for (auto &modificationClan : modificationClans)
             if (modification.first == modificationClan->modification.id)
-                modification.second->clans.push_back(modificationClan);
+                modification->clans.push_back(modificationClan);
         for (auto &modificationMap : modificationMaps)
             if (modification.first == modificationMap->modification.id)
-                modification.second->maps.push_back(modificationMap);
+                modification->maps.push_back(modificationMap);
         for (auto &modificationMechanoid : modificationMechanoids)
             if (modification.first == modificationMechanoid->modification.id)
-                modification.second->mechanoids.push_back(modificationMechanoid);
+                modification->mechanoids.push_back(modificationMechanoid);
     }
 }
 
@@ -1947,7 +1947,7 @@ void StorageImpl::_loadModificators()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Modificator>();
+        auto v = modificators.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
@@ -1959,7 +1959,7 @@ void StorageImpl::_loadModificators()
         v->k_param2 = sqlite3_column_double(stmt, 8);
         v->unicum_id = sqlite3_column_int(stmt, 9);
         v->mask = sqlite3_column_int(stmt, 10);
-        modificators[v->id] = v;
+        modificators.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2016,13 +2016,13 @@ void StorageImpl::_loadObjects()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Object>();
+        auto v = objects.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
         v->name.id = sqlite3_column_int(stmt, 3);
         v->type = sqlite3_column_int(stmt, 4);
-        objects[v->id] = v;
+        objects.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2073,10 +2073,10 @@ void StorageImpl::_loadPlayers()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Player>();
+        auto v = players.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->mechanoid.id = sqlite3_column_int(stmt, 1);
-        players[v->id] = v;
+        players.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2124,7 +2124,7 @@ void StorageImpl::_loadProjectiles()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Projectile>();
+        auto v = projectiles.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
@@ -2144,7 +2144,7 @@ void StorageImpl::_loadProjectiles()
         v->strength = sqlite3_column_double(stmt, 16);
         v->price = sqlite3_column_double(stmt, 17);
         v->notrade = sqlite3_column_int(stmt, 18);
-        projectiles[v->id] = v;
+        projectiles.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2209,11 +2209,11 @@ void StorageImpl::_loadQuestRewardEquipments()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<QuestRewardEquipment>();
+        auto v = questRewardEquipments.create();
         v->questReward.id = sqlite3_column_int(stmt, 0);
         v->equipment.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        questRewardEquipments.push_back(v);
+        questRewardEquipments.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2264,11 +2264,11 @@ void StorageImpl::_loadQuestRewardGliders()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<QuestRewardGlider>();
+        auto v = questRewardGliders.create();
         v->questReward.id = sqlite3_column_int(stmt, 0);
         v->glider.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        questRewardGliders.push_back(v);
+        questRewardGliders.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2319,11 +2319,11 @@ void StorageImpl::_loadQuestRewardGoods()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<QuestRewardGood>();
+        auto v = questRewardGoods.create();
         v->questReward.id = sqlite3_column_int(stmt, 0);
         v->good.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        questRewardGoods.push_back(v);
+        questRewardGoods.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2374,11 +2374,11 @@ void StorageImpl::_loadQuestRewardModificators()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<QuestRewardModificator>();
+        auto v = questRewardModificators.create();
         v->questReward.id = sqlite3_column_int(stmt, 0);
         v->modificator.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        questRewardModificators.push_back(v);
+        questRewardModificators.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2429,11 +2429,11 @@ void StorageImpl::_loadQuestRewardProjectiles()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<QuestRewardProjectile>();
+        auto v = questRewardProjectiles.create();
         v->questReward.id = sqlite3_column_int(stmt, 0);
         v->projectile.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        questRewardProjectiles.push_back(v);
+        questRewardProjectiles.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2484,11 +2484,11 @@ void StorageImpl::_loadQuestRewardReputations()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<QuestRewardReputation>();
+        auto v = questRewardReputations.create();
         v->questReward.id = sqlite3_column_int(stmt, 0);
         v->clan.id = sqlite3_column_int(stmt, 1);
         v->reputation = sqlite3_column_double(stmt, 2);
-        questRewardReputations.push_back(v);
+        questRewardReputations.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2539,11 +2539,11 @@ void StorageImpl::_loadQuestRewardWeapons()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<QuestRewardWeapon>();
+        auto v = questRewardWeapons.create();
         v->questReward.id = sqlite3_column_int(stmt, 0);
         v->weapon.id = sqlite3_column_int(stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
-        questRewardWeapons.push_back(v);
+        questRewardWeapons.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2594,13 +2594,13 @@ void StorageImpl::_loadQuestRewards()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<QuestReward>();
+        auto v = questRewards.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->quest.id = sqlite3_column_int(stmt, 1);
         v->text_id = (const char *)sqlite3_column_text(stmt, 2);
         v->money = sqlite3_column_int(stmt, 3);
         v->rating = sqlite3_column_double(stmt, 4);
-        questRewards[v->id] = v;
+        questRewards.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2620,25 +2620,25 @@ void StorageImpl::_loadQuestRewardsArrays()
     {
         for (auto &questRewardEquipment : questRewardEquipments)
             if (questReward.first == questRewardEquipment->questReward.id)
-                questReward.second->equipments.push_back(questRewardEquipment);
+                questReward->equipments.push_back(questRewardEquipment);
         for (auto &questRewardGlider : questRewardGliders)
             if (questReward.first == questRewardGlider->questReward.id)
-                questReward.second->gliders.push_back(questRewardGlider);
+                questReward->gliders.push_back(questRewardGlider);
         for (auto &questRewardGood : questRewardGoods)
             if (questReward.first == questRewardGood->questReward.id)
-                questReward.second->goods.push_back(questRewardGood);
+                questReward->goods.push_back(questRewardGood);
         for (auto &questRewardModificator : questRewardModificators)
             if (questReward.first == questRewardModificator->questReward.id)
-                questReward.second->modificators.push_back(questRewardModificator);
+                questReward->modificators.push_back(questRewardModificator);
         for (auto &questRewardProjectile : questRewardProjectiles)
             if (questReward.first == questRewardProjectile->questReward.id)
-                questReward.second->projectiles.push_back(questRewardProjectile);
+                questReward->projectiles.push_back(questRewardProjectile);
         for (auto &questRewardReputation : questRewardReputations)
             if (questReward.first == questRewardReputation->questReward.id)
-                questReward.second->reputations.push_back(questRewardReputation);
+                questReward->reputations.push_back(questRewardReputation);
         for (auto &questRewardWeapon : questRewardWeapons)
             if (questReward.first == questRewardWeapon->questReward.id)
-                questReward.second->weapons.push_back(questRewardWeapon);
+                questReward->weapons.push_back(questRewardWeapon);
     }
 }
 
@@ -2675,14 +2675,14 @@ void StorageImpl::_loadQuests()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Quest>();
+        auto v = quests.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->name.id = sqlite3_column_int(stmt, 2);
         v->title.id = sqlite3_column_int(stmt, 3);
         v->description.id = sqlite3_column_int(stmt, 4);
         v->time = sqlite3_column_int(stmt, 5);
-        quests[v->id] = v;
+        quests.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2705,8 +2705,8 @@ void StorageImpl::_loadQuestsArrays()
     for (auto &quest : quests)
     {
         for (auto &questReward : questRewards)
-            if (quest.first == questReward.second->quest.id)
-                quest.second->rewards.push_back(questReward.second);
+            if (quest.first == questReward->quest.id)
+                quest->rewards.push_back(questReward);
     }
 }
 
@@ -2744,10 +2744,13 @@ void StorageImpl::_loadScriptVariables()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<ScriptVariable>();
-        v->variable = (const char *)sqlite3_column_text(stmt, 0);
-        v->value = (const char *)sqlite3_column_text(stmt, 1);
-        scriptVariables.push_back(v);
+        auto v = scriptVariables.create();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->variable = (const char *)sqlite3_column_text(stmt, 1);
+        v->value_int = sqlite3_column_int(stmt, 2);
+        v->value_float = sqlite3_column_double(stmt, 3);
+        v->value_text = (const char *)sqlite3_column_text(stmt, 4);
+        scriptVariables.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2764,16 +2767,19 @@ void StorageImpl::_saveScriptVariables() const
 {
     db->execute("BEGIN;");
     db->execute("delete from ScriptVariables;");
-    const std::string query = "insert into ScriptVariables values (?, ?);";
+    const std::string query = "insert into ScriptVariables values (?, ?, ?, ?, ?);";
     int ret = 0;
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &scriptVariable : scriptVariables)
     {
-        auto &v = scriptVariable;
-        ret = sqlite3_bind_text(stmt, 1, v->variable.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 2, v->value.string().c_str(), -1, SQLITE_TRANSIENT);
+        auto &v = scriptVariable.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, v->variable.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->value_int);
+        ret = sqlite3_bind_double(stmt, 4, v->value_float);
+        ret = sqlite3_bind_text(stmt, 5, v->value_text.string().c_str(), -1, SQLITE_TRANSIENT);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -2790,9 +2796,14 @@ void StorageImpl::_loadSettings()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Setting>();
-        v->player.id = sqlite3_column_int(stmt, 0);
-        settings.push_back(v);
+        auto v = settings.create();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->player.id = sqlite3_column_int(stmt, 1);
+        v->value_int = sqlite3_column_int(stmt, 2);
+        v->value_float = sqlite3_column_double(stmt, 3);
+        v->value_text = (const char *)sqlite3_column_text(stmt, 4);
+        v->value_blob = Blob(sqlite3_column_blob(stmt, 5), sqlite3_column_bytes(stmt, 5));
+        settings.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2801,8 +2812,8 @@ void StorageImpl::_loadSettingsPtrs()
 {
     for (auto &setting : settings)
     {
-        if (players.find(setting->player.id) != players.end())
-            setting->player.ptr = players[setting->player.id];
+        if (players.find(setting.second->player.id) != players.end())
+            setting.second->player.ptr = players[setting.second->player.id];
     }
 }
 
@@ -2814,15 +2825,20 @@ void StorageImpl::_saveSettings() const
 {
     db->execute("BEGIN;");
     db->execute("delete from Settings;");
-    const std::string query = "insert into Settings values (?);";
+    const std::string query = "insert into Settings values (?, ?, ?, ?, ?, ?);";
     int ret = 0;
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     for (auto &setting : settings)
     {
-        auto &v = setting;
-        ret = sqlite3_bind_int(stmt, 1, v->player.id);
+        auto &v = setting.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_int(stmt, 2, v->player.id);
+        ret = sqlite3_bind_int(stmt, 3, v->value_int);
+        ret = sqlite3_bind_double(stmt, 4, v->value_float);
+        ret = sqlite3_bind_text(stmt, 5, v->value_text.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_blob(stmt, 6, v->value_blob.getRawData(), v->value_blob.getLength(), SQLITE_TRANSIENT);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -2839,13 +2855,13 @@ void StorageImpl::_loadStrings()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<String>();
+        auto v = strings.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->table.id = sqlite3_column_int(stmt, 2);
         v->ru = (const char *)sqlite3_column_text(stmt, 3);
         v->en = (const char *)sqlite3_column_text(stmt, 4);
-        strings[v->id] = v;
+        strings.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2896,10 +2912,10 @@ void StorageImpl::_loadTables()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Table>();
+        auto v = tables.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
-        tables[v->id] = v;
+        tables.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -2942,7 +2958,7 @@ void StorageImpl::_loadWeapons()
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = std::make_shared<Weapon>();
+        auto v = weapons.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
@@ -2977,7 +2993,7 @@ void StorageImpl::_loadWeapons()
         v->inside_y = sqlite3_column_double(stmt, 31);
         v->inside_z = sqlite3_column_double(stmt, 32);
         v->notrade = sqlite3_column_int(stmt, 33);
-        weapons[v->id] = v;
+        weapons.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
@@ -3548,15 +3564,9 @@ void StorageImpl::save(ProgressCallback callback) const
     PROGRESS_CALLBACK(100.000000);
 }
 
-Ptr<Building> StorageImpl::addBuilding(IObject *parent)
+Ptr<Building> StorageImpl::addBuilding()
 {
-    int id = 1;
-    if (!buildings.empty())
-        id = buildings.rbegin()->first + 1;
-    auto v = std::make_shared<Building>();
-    v->id = id;
-    buildings[v->id] = v;
-    return v;
+    return buildings.createAtEnd();
 }
 
 void StorageImpl::deleteBuilding(Building *v)
@@ -3566,55 +3576,35 @@ void StorageImpl::deleteBuilding(Building *v)
 
 Ptr<ClanMechanoid> StorageImpl::addClanMechanoid(IObject *parent)
 {
-    auto v = std::make_shared<ClanMechanoid>();
+    auto v = clanMechanoids.createAtEnd();
     Clan *clan = (Clan *)parent;
     clan->mechanoids.push_back(v);
-    clanMechanoids.push_back(v);
     v->clan = clans[clan->id];
     return v;
 }
 
 void StorageImpl::deleteClanMechanoid(ClanMechanoid *v)
 {
-    while (1)
-    {
-        auto i = find_if(clanMechanoids.begin(), clanMechanoids.end(), [v](const Ptr<ClanMechanoid> &p){ return p.get() == v; });
-        if (i == clanMechanoids.end())
-            break;
-        clanMechanoids.erase(i);
-    }
+    clanMechanoids.erase(v);
 }
 
 Ptr<ClanReputation> StorageImpl::addClanReputation(IObject *parent)
 {
-    auto v = std::make_shared<ClanReputation>();
+    auto v = clanReputations.createAtEnd();
     Clan *clan = (Clan *)parent;
     clan->reputations.push_back(v);
-    clanReputations.push_back(v);
     v->clan = clans[clan->id];
     return v;
 }
 
 void StorageImpl::deleteClanReputation(ClanReputation *v)
 {
-    while (1)
-    {
-        auto i = find_if(clanReputations.begin(), clanReputations.end(), [v](const Ptr<ClanReputation> &p){ return p.get() == v; });
-        if (i == clanReputations.end())
-            break;
-        clanReputations.erase(i);
-    }
+    clanReputations.erase(v);
 }
 
-Ptr<Clan> StorageImpl::addClan(IObject *parent)
+Ptr<Clan> StorageImpl::addClan()
 {
-    int id = 1;
-    if (!clans.empty())
-        id = clans.rbegin()->first + 1;
-    auto v = std::make_shared<Clan>();
-    v->id = id;
-    clans[v->id] = v;
-    return v;
+    return clans.createAtEnd();
 }
 
 void StorageImpl::deleteClan(Clan *v)
@@ -3624,97 +3614,63 @@ void StorageImpl::deleteClan(Clan *v)
 
 Ptr<ConfigurationEquipment> StorageImpl::addConfigurationEquipment(IObject *parent)
 {
-    auto v = std::make_shared<ConfigurationEquipment>();
+    auto v = configurationEquipments.createAtEnd();
     Configuration *configuration = (Configuration *)parent;
     configuration->equipments.push_back(v);
-    configurationEquipments.push_back(v);
     v->configuration = configurations[configuration->id];
     return v;
 }
 
 void StorageImpl::deleteConfigurationEquipment(ConfigurationEquipment *v)
 {
-    while (1)
-    {
-        auto i = find_if(configurationEquipments.begin(), configurationEquipments.end(), [v](const Ptr<ConfigurationEquipment> &p){ return p.get() == v; });
-        if (i == configurationEquipments.end())
-            break;
-        configurationEquipments.erase(i);
-    }
+    configurationEquipments.erase(v);
 }
 
 Ptr<ConfigurationGood> StorageImpl::addConfigurationGood(IObject *parent)
 {
-    auto v = std::make_shared<ConfigurationGood>();
+    auto v = configurationGoods.createAtEnd();
     Configuration *configuration = (Configuration *)parent;
     configuration->goods.push_back(v);
-    configurationGoods.push_back(v);
     v->configuration = configurations[configuration->id];
     return v;
 }
 
 void StorageImpl::deleteConfigurationGood(ConfigurationGood *v)
 {
-    while (1)
-    {
-        auto i = find_if(configurationGoods.begin(), configurationGoods.end(), [v](const Ptr<ConfigurationGood> &p){ return p.get() == v; });
-        if (i == configurationGoods.end())
-            break;
-        configurationGoods.erase(i);
-    }
+    configurationGoods.erase(v);
 }
 
 Ptr<ConfigurationProjectile> StorageImpl::addConfigurationProjectile(IObject *parent)
 {
-    auto v = std::make_shared<ConfigurationProjectile>();
+    auto v = configurationProjectiles.createAtEnd();
     Configuration *configuration = (Configuration *)parent;
     configuration->projectiles.push_back(v);
-    configurationProjectiles.push_back(v);
     v->configuration = configurations[configuration->id];
     return v;
 }
 
 void StorageImpl::deleteConfigurationProjectile(ConfigurationProjectile *v)
 {
-    while (1)
-    {
-        auto i = find_if(configurationProjectiles.begin(), configurationProjectiles.end(), [v](const Ptr<ConfigurationProjectile> &p){ return p.get() == v; });
-        if (i == configurationProjectiles.end())
-            break;
-        configurationProjectiles.erase(i);
-    }
+    configurationProjectiles.erase(v);
 }
 
 Ptr<ConfigurationWeapon> StorageImpl::addConfigurationWeapon(IObject *parent)
 {
-    auto v = std::make_shared<ConfigurationWeapon>();
+    auto v = configurationWeapons.createAtEnd();
     Configuration *configuration = (Configuration *)parent;
     configuration->weapons.push_back(v);
-    configurationWeapons.push_back(v);
     v->configuration = configurations[configuration->id];
     return v;
 }
 
 void StorageImpl::deleteConfigurationWeapon(ConfigurationWeapon *v)
 {
-    while (1)
-    {
-        auto i = find_if(configurationWeapons.begin(), configurationWeapons.end(), [v](const Ptr<ConfigurationWeapon> &p){ return p.get() == v; });
-        if (i == configurationWeapons.end())
-            break;
-        configurationWeapons.erase(i);
-    }
+    configurationWeapons.erase(v);
 }
 
-Ptr<Configuration> StorageImpl::addConfiguration(IObject *parent)
+Ptr<Configuration> StorageImpl::addConfiguration()
 {
-    int id = 1;
-    if (!configurations.empty())
-        id = configurations.rbegin()->first + 1;
-    auto v = std::make_shared<Configuration>();
-    v->id = id;
-    configurations[v->id] = v;
-    return v;
+    return configurations.createAtEnd();
 }
 
 void StorageImpl::deleteConfiguration(Configuration *v)
@@ -3722,15 +3678,9 @@ void StorageImpl::deleteConfiguration(Configuration *v)
     configurations.erase(v->id);
 }
 
-Ptr<Equipment> StorageImpl::addEquipment(IObject *parent)
+Ptr<Equipment> StorageImpl::addEquipment()
 {
-    int id = 1;
-    if (!equipments.empty())
-        id = equipments.rbegin()->first + 1;
-    auto v = std::make_shared<Equipment>();
-    v->id = id;
-    equipments[v->id] = v;
-    return v;
+    return equipments.createAtEnd();
 }
 
 void StorageImpl::deleteEquipment(Equipment *v)
@@ -3738,15 +3688,9 @@ void StorageImpl::deleteEquipment(Equipment *v)
     equipments.erase(v->id);
 }
 
-Ptr<Glider> StorageImpl::addGlider(IObject *parent)
+Ptr<Glider> StorageImpl::addGlider()
 {
-    int id = 1;
-    if (!gliders.empty())
-        id = gliders.rbegin()->first + 1;
-    auto v = std::make_shared<Glider>();
-    v->id = id;
-    gliders[v->id] = v;
-    return v;
+    return gliders.createAtEnd();
 }
 
 void StorageImpl::deleteGlider(Glider *v)
@@ -3754,15 +3698,9 @@ void StorageImpl::deleteGlider(Glider *v)
     gliders.erase(v->id);
 }
 
-Ptr<Good> StorageImpl::addGood(IObject *parent)
+Ptr<Good> StorageImpl::addGood()
 {
-    int id = 1;
-    if (!goods.empty())
-        id = goods.rbegin()->first + 1;
-    auto v = std::make_shared<Good>();
-    v->id = id;
-    goods[v->id] = v;
-    return v;
+    return goods.createAtEnd();
 }
 
 void StorageImpl::deleteGood(Good *v)
@@ -3772,34 +3710,21 @@ void StorageImpl::deleteGood(Good *v)
 
 Ptr<GroupMechanoid> StorageImpl::addGroupMechanoid(IObject *parent)
 {
-    auto v = std::make_shared<GroupMechanoid>();
+    auto v = groupMechanoids.createAtEnd();
     Group *group = (Group *)parent;
     group->mechanoids.push_back(v);
-    groupMechanoids.push_back(v);
     v->group = groups[group->id];
     return v;
 }
 
 void StorageImpl::deleteGroupMechanoid(GroupMechanoid *v)
 {
-    while (1)
-    {
-        auto i = find_if(groupMechanoids.begin(), groupMechanoids.end(), [v](const Ptr<GroupMechanoid> &p){ return p.get() == v; });
-        if (i == groupMechanoids.end())
-            break;
-        groupMechanoids.erase(i);
-    }
+    groupMechanoids.erase(v);
 }
 
-Ptr<Group> StorageImpl::addGroup(IObject *parent)
+Ptr<Group> StorageImpl::addGroup()
 {
-    int id = 1;
-    if (!groups.empty())
-        id = groups.rbegin()->first + 1;
-    auto v = std::make_shared<Group>();
-    v->id = id;
-    groups[v->id] = v;
-    return v;
+    return groups.createAtEnd();
 }
 
 void StorageImpl::deleteGroup(Group *v)
@@ -3809,138 +3734,91 @@ void StorageImpl::deleteGroup(Group *v)
 
 Ptr<MapBuildingEquipment> StorageImpl::addMapBuildingEquipment(IObject *parent)
 {
-    auto v = std::make_shared<MapBuildingEquipment>();
+    auto v = mapBuildingEquipments.createAtEnd();
     MapBuilding *mapBuilding = (MapBuilding *)parent;
     mapBuilding->equipments.push_back(v);
-    mapBuildingEquipments.push_back(v);
     v->mapBuilding = mapBuildings[mapBuilding->id];
     return v;
 }
 
 void StorageImpl::deleteMapBuildingEquipment(MapBuildingEquipment *v)
 {
-    while (1)
-    {
-        auto i = find_if(mapBuildingEquipments.begin(), mapBuildingEquipments.end(), [v](const Ptr<MapBuildingEquipment> &p){ return p.get() == v; });
-        if (i == mapBuildingEquipments.end())
-            break;
-        mapBuildingEquipments.erase(i);
-    }
+    mapBuildingEquipments.erase(v);
 }
 
 Ptr<MapBuildingGlider> StorageImpl::addMapBuildingGlider(IObject *parent)
 {
-    auto v = std::make_shared<MapBuildingGlider>();
+    auto v = mapBuildingGliders.createAtEnd();
     MapBuilding *mapBuilding = (MapBuilding *)parent;
     mapBuilding->gliders.push_back(v);
-    mapBuildingGliders.push_back(v);
     v->mapBuilding = mapBuildings[mapBuilding->id];
     return v;
 }
 
 void StorageImpl::deleteMapBuildingGlider(MapBuildingGlider *v)
 {
-    while (1)
-    {
-        auto i = find_if(mapBuildingGliders.begin(), mapBuildingGliders.end(), [v](const Ptr<MapBuildingGlider> &p){ return p.get() == v; });
-        if (i == mapBuildingGliders.end())
-            break;
-        mapBuildingGliders.erase(i);
-    }
+    mapBuildingGliders.erase(v);
 }
 
 Ptr<MapBuildingGood> StorageImpl::addMapBuildingGood(IObject *parent)
 {
-    auto v = std::make_shared<MapBuildingGood>();
+    auto v = mapBuildingGoods.createAtEnd();
     MapBuilding *mapBuilding = (MapBuilding *)parent;
     mapBuilding->goods.push_back(v);
-    mapBuildingGoods.push_back(v);
     v->mapBuilding = mapBuildings[mapBuilding->id];
     return v;
 }
 
 void StorageImpl::deleteMapBuildingGood(MapBuildingGood *v)
 {
-    while (1)
-    {
-        auto i = find_if(mapBuildingGoods.begin(), mapBuildingGoods.end(), [v](const Ptr<MapBuildingGood> &p){ return p.get() == v; });
-        if (i == mapBuildingGoods.end())
-            break;
-        mapBuildingGoods.erase(i);
-    }
+    mapBuildingGoods.erase(v);
 }
 
 Ptr<MapBuildingModificator> StorageImpl::addMapBuildingModificator(IObject *parent)
 {
-    auto v = std::make_shared<MapBuildingModificator>();
+    auto v = mapBuildingModificators.createAtEnd();
     MapBuilding *mapBuilding = (MapBuilding *)parent;
     mapBuilding->modificators.push_back(v);
-    mapBuildingModificators.push_back(v);
     v->mapBuilding = mapBuildings[mapBuilding->id];
     return v;
 }
 
 void StorageImpl::deleteMapBuildingModificator(MapBuildingModificator *v)
 {
-    while (1)
-    {
-        auto i = find_if(mapBuildingModificators.begin(), mapBuildingModificators.end(), [v](const Ptr<MapBuildingModificator> &p){ return p.get() == v; });
-        if (i == mapBuildingModificators.end())
-            break;
-        mapBuildingModificators.erase(i);
-    }
+    mapBuildingModificators.erase(v);
 }
 
 Ptr<MapBuildingProjectile> StorageImpl::addMapBuildingProjectile(IObject *parent)
 {
-    auto v = std::make_shared<MapBuildingProjectile>();
+    auto v = mapBuildingProjectiles.createAtEnd();
     MapBuilding *mapBuilding = (MapBuilding *)parent;
     mapBuilding->projectiles.push_back(v);
-    mapBuildingProjectiles.push_back(v);
     v->mapBuilding = mapBuildings[mapBuilding->id];
     return v;
 }
 
 void StorageImpl::deleteMapBuildingProjectile(MapBuildingProjectile *v)
 {
-    while (1)
-    {
-        auto i = find_if(mapBuildingProjectiles.begin(), mapBuildingProjectiles.end(), [v](const Ptr<MapBuildingProjectile> &p){ return p.get() == v; });
-        if (i == mapBuildingProjectiles.end())
-            break;
-        mapBuildingProjectiles.erase(i);
-    }
+    mapBuildingProjectiles.erase(v);
 }
 
 Ptr<MapBuildingWeapon> StorageImpl::addMapBuildingWeapon(IObject *parent)
 {
-    auto v = std::make_shared<MapBuildingWeapon>();
+    auto v = mapBuildingWeapons.createAtEnd();
     MapBuilding *mapBuilding = (MapBuilding *)parent;
     mapBuilding->weapons.push_back(v);
-    mapBuildingWeapons.push_back(v);
     v->mapBuilding = mapBuildings[mapBuilding->id];
     return v;
 }
 
 void StorageImpl::deleteMapBuildingWeapon(MapBuildingWeapon *v)
 {
-    while (1)
-    {
-        auto i = find_if(mapBuildingWeapons.begin(), mapBuildingWeapons.end(), [v](const Ptr<MapBuildingWeapon> &p){ return p.get() == v; });
-        if (i == mapBuildingWeapons.end())
-            break;
-        mapBuildingWeapons.erase(i);
-    }
+    mapBuildingWeapons.erase(v);
 }
 
 Ptr<MapBuilding> StorageImpl::addMapBuilding(IObject *parent)
 {
-    int id = 1;
-    if (!mapBuildings.empty())
-        id = mapBuildings.rbegin()->first + 1;
-    auto v = std::make_shared<MapBuilding>();
-    v->id = id;
-    mapBuildings[v->id] = v;
+    auto v = mapBuildings.createAtEnd();
     Map *map = (Map *)parent;
     map->buildings.push_back(v);
     v->map = maps[map->id];
@@ -3954,12 +3832,7 @@ void StorageImpl::deleteMapBuilding(MapBuilding *v)
 
 Ptr<MapGood> StorageImpl::addMapGood(IObject *parent)
 {
-    int id = 1;
-    if (!mapGoods.empty())
-        id = mapGoods.rbegin()->first + 1;
-    auto v = std::make_shared<MapGood>();
-    v->id = id;
-    mapGoods[v->id] = v;
+    auto v = mapGoods.createAtEnd();
     Map *map = (Map *)parent;
     map->goods.push_back(v);
     v->map = maps[map->id];
@@ -3973,12 +3846,7 @@ void StorageImpl::deleteMapGood(MapGood *v)
 
 Ptr<MapObject> StorageImpl::addMapObject(IObject *parent)
 {
-    int id = 1;
-    if (!mapObjects.empty())
-        id = mapObjects.rbegin()->first + 1;
-    auto v = std::make_shared<MapObject>();
-    v->id = id;
-    mapObjects[v->id] = v;
+    auto v = mapObjects.createAtEnd();
     Map *map = (Map *)parent;
     map->objects.push_back(v);
     v->map = maps[map->id];
@@ -3990,15 +3858,9 @@ void StorageImpl::deleteMapObject(MapObject *v)
     mapObjects.erase(v->id);
 }
 
-Ptr<Map> StorageImpl::addMap(IObject *parent)
+Ptr<Map> StorageImpl::addMap()
 {
-    int id = 1;
-    if (!maps.empty())
-        id = maps.rbegin()->first + 1;
-    auto v = std::make_shared<Map>();
-    v->id = id;
-    maps[v->id] = v;
-    return v;
+    return maps.createAtEnd();
 }
 
 void StorageImpl::deleteMap(Map *v)
@@ -4008,34 +3870,21 @@ void StorageImpl::deleteMap(Map *v)
 
 Ptr<MechanoidQuest> StorageImpl::addMechanoidQuest(IObject *parent)
 {
-    auto v = std::make_shared<MechanoidQuest>();
+    auto v = mechanoidQuests.createAtEnd();
     Mechanoid *mechanoid = (Mechanoid *)parent;
     mechanoid->quests.push_back(v);
-    mechanoidQuests.push_back(v);
     v->mechanoid = mechanoids[mechanoid->id];
     return v;
 }
 
 void StorageImpl::deleteMechanoidQuest(MechanoidQuest *v)
 {
-    while (1)
-    {
-        auto i = find_if(mechanoidQuests.begin(), mechanoidQuests.end(), [v](const Ptr<MechanoidQuest> &p){ return p.get() == v; });
-        if (i == mechanoidQuests.end())
-            break;
-        mechanoidQuests.erase(i);
-    }
+    mechanoidQuests.erase(v);
 }
 
-Ptr<Mechanoid> StorageImpl::addMechanoid(IObject *parent)
+Ptr<Mechanoid> StorageImpl::addMechanoid()
 {
-    int id = 1;
-    if (!mechanoids.empty())
-        id = mechanoids.rbegin()->first + 1;
-    auto v = std::make_shared<Mechanoid>();
-    v->id = id;
-    mechanoids[v->id] = v;
-    return v;
+    return mechanoids.createAtEnd();
 }
 
 void StorageImpl::deleteMechanoid(Mechanoid *v)
@@ -4045,76 +3894,49 @@ void StorageImpl::deleteMechanoid(Mechanoid *v)
 
 Ptr<ModificationClan> StorageImpl::addModificationClan(IObject *parent)
 {
-    auto v = std::make_shared<ModificationClan>();
+    auto v = modificationClans.createAtEnd();
     Modification *modification = (Modification *)parent;
     modification->clans.push_back(v);
-    modificationClans.push_back(v);
     v->modification = modifications[modification->id];
     return v;
 }
 
 void StorageImpl::deleteModificationClan(ModificationClan *v)
 {
-    while (1)
-    {
-        auto i = find_if(modificationClans.begin(), modificationClans.end(), [v](const Ptr<ModificationClan> &p){ return p.get() == v; });
-        if (i == modificationClans.end())
-            break;
-        modificationClans.erase(i);
-    }
+    modificationClans.erase(v);
 }
 
 Ptr<ModificationMap> StorageImpl::addModificationMap(IObject *parent)
 {
-    auto v = std::make_shared<ModificationMap>();
+    auto v = modificationMaps.createAtEnd();
     Modification *modification = (Modification *)parent;
     modification->maps.push_back(v);
-    modificationMaps.push_back(v);
     v->modification = modifications[modification->id];
     return v;
 }
 
 void StorageImpl::deleteModificationMap(ModificationMap *v)
 {
-    while (1)
-    {
-        auto i = find_if(modificationMaps.begin(), modificationMaps.end(), [v](const Ptr<ModificationMap> &p){ return p.get() == v; });
-        if (i == modificationMaps.end())
-            break;
-        modificationMaps.erase(i);
-    }
+    modificationMaps.erase(v);
 }
 
 Ptr<ModificationMechanoid> StorageImpl::addModificationMechanoid(IObject *parent)
 {
-    auto v = std::make_shared<ModificationMechanoid>();
+    auto v = modificationMechanoids.createAtEnd();
     Modification *modification = (Modification *)parent;
     modification->mechanoids.push_back(v);
-    modificationMechanoids.push_back(v);
     v->modification = modifications[modification->id];
     return v;
 }
 
 void StorageImpl::deleteModificationMechanoid(ModificationMechanoid *v)
 {
-    while (1)
-    {
-        auto i = find_if(modificationMechanoids.begin(), modificationMechanoids.end(), [v](const Ptr<ModificationMechanoid> &p){ return p.get() == v; });
-        if (i == modificationMechanoids.end())
-            break;
-        modificationMechanoids.erase(i);
-    }
+    modificationMechanoids.erase(v);
 }
 
-Ptr<Modification> StorageImpl::addModification(IObject *parent)
+Ptr<Modification> StorageImpl::addModification()
 {
-    int id = 1;
-    if (!modifications.empty())
-        id = modifications.rbegin()->first + 1;
-    auto v = std::make_shared<Modification>();
-    v->id = id;
-    modifications[v->id] = v;
-    return v;
+    return modifications.createAtEnd();
 }
 
 void StorageImpl::deleteModification(Modification *v)
@@ -4122,15 +3944,9 @@ void StorageImpl::deleteModification(Modification *v)
     modifications.erase(v->id);
 }
 
-Ptr<Modificator> StorageImpl::addModificator(IObject *parent)
+Ptr<Modificator> StorageImpl::addModificator()
 {
-    int id = 1;
-    if (!modificators.empty())
-        id = modificators.rbegin()->first + 1;
-    auto v = std::make_shared<Modificator>();
-    v->id = id;
-    modificators[v->id] = v;
-    return v;
+    return modificators.createAtEnd();
 }
 
 void StorageImpl::deleteModificator(Modificator *v)
@@ -4138,15 +3954,9 @@ void StorageImpl::deleteModificator(Modificator *v)
     modificators.erase(v->id);
 }
 
-Ptr<Object> StorageImpl::addObject(IObject *parent)
+Ptr<Object> StorageImpl::addObject()
 {
-    int id = 1;
-    if (!objects.empty())
-        id = objects.rbegin()->first + 1;
-    auto v = std::make_shared<Object>();
-    v->id = id;
-    objects[v->id] = v;
-    return v;
+    return objects.createAtEnd();
 }
 
 void StorageImpl::deleteObject(Object *v)
@@ -4154,15 +3964,9 @@ void StorageImpl::deleteObject(Object *v)
     objects.erase(v->id);
 }
 
-Ptr<Player> StorageImpl::addPlayer(IObject *parent)
+Ptr<Player> StorageImpl::addPlayer()
 {
-    int id = 1;
-    if (!players.empty())
-        id = players.rbegin()->first + 1;
-    auto v = std::make_shared<Player>();
-    v->id = id;
-    players[v->id] = v;
-    return v;
+    return players.createAtEnd();
 }
 
 void StorageImpl::deletePlayer(Player *v)
@@ -4170,15 +3974,9 @@ void StorageImpl::deletePlayer(Player *v)
     players.erase(v->id);
 }
 
-Ptr<Projectile> StorageImpl::addProjectile(IObject *parent)
+Ptr<Projectile> StorageImpl::addProjectile()
 {
-    int id = 1;
-    if (!projectiles.empty())
-        id = projectiles.rbegin()->first + 1;
-    auto v = std::make_shared<Projectile>();
-    v->id = id;
-    projectiles[v->id] = v;
-    return v;
+    return projectiles.createAtEnd();
 }
 
 void StorageImpl::deleteProjectile(Projectile *v)
@@ -4188,160 +3986,105 @@ void StorageImpl::deleteProjectile(Projectile *v)
 
 Ptr<QuestRewardEquipment> StorageImpl::addQuestRewardEquipment(IObject *parent)
 {
-    auto v = std::make_shared<QuestRewardEquipment>();
+    auto v = questRewardEquipments.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
     questReward->equipments.push_back(v);
-    questRewardEquipments.push_back(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
 
 void StorageImpl::deleteQuestRewardEquipment(QuestRewardEquipment *v)
 {
-    while (1)
-    {
-        auto i = find_if(questRewardEquipments.begin(), questRewardEquipments.end(), [v](const Ptr<QuestRewardEquipment> &p){ return p.get() == v; });
-        if (i == questRewardEquipments.end())
-            break;
-        questRewardEquipments.erase(i);
-    }
+    questRewardEquipments.erase(v);
 }
 
 Ptr<QuestRewardGlider> StorageImpl::addQuestRewardGlider(IObject *parent)
 {
-    auto v = std::make_shared<QuestRewardGlider>();
+    auto v = questRewardGliders.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
     questReward->gliders.push_back(v);
-    questRewardGliders.push_back(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
 
 void StorageImpl::deleteQuestRewardGlider(QuestRewardGlider *v)
 {
-    while (1)
-    {
-        auto i = find_if(questRewardGliders.begin(), questRewardGliders.end(), [v](const Ptr<QuestRewardGlider> &p){ return p.get() == v; });
-        if (i == questRewardGliders.end())
-            break;
-        questRewardGliders.erase(i);
-    }
+    questRewardGliders.erase(v);
 }
 
 Ptr<QuestRewardGood> StorageImpl::addQuestRewardGood(IObject *parent)
 {
-    auto v = std::make_shared<QuestRewardGood>();
+    auto v = questRewardGoods.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
     questReward->goods.push_back(v);
-    questRewardGoods.push_back(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
 
 void StorageImpl::deleteQuestRewardGood(QuestRewardGood *v)
 {
-    while (1)
-    {
-        auto i = find_if(questRewardGoods.begin(), questRewardGoods.end(), [v](const Ptr<QuestRewardGood> &p){ return p.get() == v; });
-        if (i == questRewardGoods.end())
-            break;
-        questRewardGoods.erase(i);
-    }
+    questRewardGoods.erase(v);
 }
 
 Ptr<QuestRewardModificator> StorageImpl::addQuestRewardModificator(IObject *parent)
 {
-    auto v = std::make_shared<QuestRewardModificator>();
+    auto v = questRewardModificators.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
     questReward->modificators.push_back(v);
-    questRewardModificators.push_back(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
 
 void StorageImpl::deleteQuestRewardModificator(QuestRewardModificator *v)
 {
-    while (1)
-    {
-        auto i = find_if(questRewardModificators.begin(), questRewardModificators.end(), [v](const Ptr<QuestRewardModificator> &p){ return p.get() == v; });
-        if (i == questRewardModificators.end())
-            break;
-        questRewardModificators.erase(i);
-    }
+    questRewardModificators.erase(v);
 }
 
 Ptr<QuestRewardProjectile> StorageImpl::addQuestRewardProjectile(IObject *parent)
 {
-    auto v = std::make_shared<QuestRewardProjectile>();
+    auto v = questRewardProjectiles.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
     questReward->projectiles.push_back(v);
-    questRewardProjectiles.push_back(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
 
 void StorageImpl::deleteQuestRewardProjectile(QuestRewardProjectile *v)
 {
-    while (1)
-    {
-        auto i = find_if(questRewardProjectiles.begin(), questRewardProjectiles.end(), [v](const Ptr<QuestRewardProjectile> &p){ return p.get() == v; });
-        if (i == questRewardProjectiles.end())
-            break;
-        questRewardProjectiles.erase(i);
-    }
+    questRewardProjectiles.erase(v);
 }
 
 Ptr<QuestRewardReputation> StorageImpl::addQuestRewardReputation(IObject *parent)
 {
-    auto v = std::make_shared<QuestRewardReputation>();
+    auto v = questRewardReputations.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
     questReward->reputations.push_back(v);
-    questRewardReputations.push_back(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
 
 void StorageImpl::deleteQuestRewardReputation(QuestRewardReputation *v)
 {
-    while (1)
-    {
-        auto i = find_if(questRewardReputations.begin(), questRewardReputations.end(), [v](const Ptr<QuestRewardReputation> &p){ return p.get() == v; });
-        if (i == questRewardReputations.end())
-            break;
-        questRewardReputations.erase(i);
-    }
+    questRewardReputations.erase(v);
 }
 
 Ptr<QuestRewardWeapon> StorageImpl::addQuestRewardWeapon(IObject *parent)
 {
-    auto v = std::make_shared<QuestRewardWeapon>();
+    auto v = questRewardWeapons.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
     questReward->weapons.push_back(v);
-    questRewardWeapons.push_back(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
 
 void StorageImpl::deleteQuestRewardWeapon(QuestRewardWeapon *v)
 {
-    while (1)
-    {
-        auto i = find_if(questRewardWeapons.begin(), questRewardWeapons.end(), [v](const Ptr<QuestRewardWeapon> &p){ return p.get() == v; });
-        if (i == questRewardWeapons.end())
-            break;
-        questRewardWeapons.erase(i);
-    }
+    questRewardWeapons.erase(v);
 }
 
 Ptr<QuestReward> StorageImpl::addQuestReward(IObject *parent)
 {
-    int id = 1;
-    if (!questRewards.empty())
-        id = questRewards.rbegin()->first + 1;
-    auto v = std::make_shared<QuestReward>();
-    v->id = id;
-    questRewards[v->id] = v;
-    return v;
+    return questRewards.createAtEnd();
 }
 
 void StorageImpl::deleteQuestReward(QuestReward *v)
@@ -4349,15 +4092,9 @@ void StorageImpl::deleteQuestReward(QuestReward *v)
     questRewards.erase(v->id);
 }
 
-Ptr<Quest> StorageImpl::addQuest(IObject *parent)
+Ptr<Quest> StorageImpl::addQuest()
 {
-    int id = 1;
-    if (!quests.empty())
-        id = quests.rbegin()->first + 1;
-    auto v = std::make_shared<Quest>();
-    v->id = id;
-    quests[v->id] = v;
-    return v;
+    return quests.createAtEnd();
 }
 
 void StorageImpl::deleteQuest(Quest *v)
@@ -4365,51 +4102,29 @@ void StorageImpl::deleteQuest(Quest *v)
     quests.erase(v->id);
 }
 
-Ptr<ScriptVariable> StorageImpl::addScriptVariable(IObject *parent)
+Ptr<ScriptVariable> StorageImpl::addScriptVariable()
 {
-    auto v = std::make_shared<ScriptVariable>();
-    scriptVariables.push_back(v);
-    return v;
+    return scriptVariables.createAtEnd();
 }
 
 void StorageImpl::deleteScriptVariable(ScriptVariable *v)
 {
-    while (1)
-    {
-        auto i = find_if(scriptVariables.begin(), scriptVariables.end(), [v](const Ptr<ScriptVariable> &p){ return p.get() == v; });
-        if (i == scriptVariables.end())
-            break;
-        scriptVariables.erase(i);
-    }
+    scriptVariables.erase(v->id);
 }
 
-Ptr<Setting> StorageImpl::addSetting(IObject *parent)
+Ptr<Setting> StorageImpl::addSetting()
 {
-    auto v = std::make_shared<Setting>();
-    settings.push_back(v);
-    return v;
+    return settings.createAtEnd();
 }
 
 void StorageImpl::deleteSetting(Setting *v)
 {
-    while (1)
-    {
-        auto i = find_if(settings.begin(), settings.end(), [v](const Ptr<Setting> &p){ return p.get() == v; });
-        if (i == settings.end())
-            break;
-        settings.erase(i);
-    }
+    settings.erase(v->id);
 }
 
-Ptr<String> StorageImpl::addString(IObject *parent)
+Ptr<String> StorageImpl::addString()
 {
-    int id = 1;
-    if (!strings.empty())
-        id = strings.rbegin()->first + 1;
-    auto v = std::make_shared<String>();
-    v->id = id;
-    strings[v->id] = v;
-    return v;
+    return strings.createAtEnd();
 }
 
 void StorageImpl::deleteString(String *v)
@@ -4417,15 +4132,9 @@ void StorageImpl::deleteString(String *v)
     strings.erase(v->id);
 }
 
-Ptr<Table> StorageImpl::addTable(IObject *parent)
+Ptr<Table> StorageImpl::addTable()
 {
-    int id = 1;
-    if (!tables.empty())
-        id = tables.rbegin()->first + 1;
-    auto v = std::make_shared<Table>();
-    v->id = id;
-    tables[v->id] = v;
-    return v;
+    return tables.createAtEnd();
 }
 
 void StorageImpl::deleteTable(Table *v)
@@ -4433,15 +4142,9 @@ void StorageImpl::deleteTable(Table *v)
     tables.erase(v->id);
 }
 
-Ptr<Weapon> StorageImpl::addWeapon(IObject *parent)
+Ptr<Weapon> StorageImpl::addWeapon()
 {
-    int id = 1;
-    if (!weapons.empty())
-        id = weapons.rbegin()->first + 1;
-    auto v = std::make_shared<Weapon>();
-    v->id = id;
-    weapons[v->id] = v;
-    return v;
+    return weapons.createAtEnd();
 }
 
 void StorageImpl::deleteWeapon(Weapon *v)
@@ -4455,13 +4158,13 @@ Ptr<IObject> StorageImpl::addRecord(IObject *parent)
     switch (type)
     {
     case EObjectType::Building:
-        return addBuilding(parent);
+        return addBuilding();
     case EObjectType::ClanMechanoid:
         return addClanMechanoid(parent);
     case EObjectType::ClanReputation:
         return addClanReputation(parent);
     case EObjectType::Clan:
-        return addClan(parent);
+        return addClan();
     case EObjectType::ConfigurationEquipment:
         return addConfigurationEquipment(parent);
     case EObjectType::ConfigurationGood:
@@ -4471,17 +4174,17 @@ Ptr<IObject> StorageImpl::addRecord(IObject *parent)
     case EObjectType::ConfigurationWeapon:
         return addConfigurationWeapon(parent);
     case EObjectType::Configuration:
-        return addConfiguration(parent);
+        return addConfiguration();
     case EObjectType::Equipment:
-        return addEquipment(parent);
+        return addEquipment();
     case EObjectType::Glider:
-        return addGlider(parent);
+        return addGlider();
     case EObjectType::Good:
-        return addGood(parent);
+        return addGood();
     case EObjectType::GroupMechanoid:
         return addGroupMechanoid(parent);
     case EObjectType::Group:
-        return addGroup(parent);
+        return addGroup();
     case EObjectType::MapBuildingEquipment:
         return addMapBuildingEquipment(parent);
     case EObjectType::MapBuildingGlider:
@@ -4501,11 +4204,11 @@ Ptr<IObject> StorageImpl::addRecord(IObject *parent)
     case EObjectType::MapObject:
         return addMapObject(parent);
     case EObjectType::Map:
-        return addMap(parent);
+        return addMap();
     case EObjectType::MechanoidQuest:
         return addMechanoidQuest(parent);
     case EObjectType::Mechanoid:
-        return addMechanoid(parent);
+        return addMechanoid();
     case EObjectType::ModificationClan:
         return addModificationClan(parent);
     case EObjectType::ModificationMap:
@@ -4513,15 +4216,15 @@ Ptr<IObject> StorageImpl::addRecord(IObject *parent)
     case EObjectType::ModificationMechanoid:
         return addModificationMechanoid(parent);
     case EObjectType::Modification:
-        return addModification(parent);
+        return addModification();
     case EObjectType::Modificator:
-        return addModificator(parent);
+        return addModificator();
     case EObjectType::Object:
-        return addObject(parent);
+        return addObject();
     case EObjectType::Player:
-        return addPlayer(parent);
+        return addPlayer();
     case EObjectType::Projectile:
-        return addProjectile(parent);
+        return addProjectile();
     case EObjectType::QuestRewardEquipment:
         return addQuestRewardEquipment(parent);
     case EObjectType::QuestRewardGlider:
@@ -4539,17 +4242,17 @@ Ptr<IObject> StorageImpl::addRecord(IObject *parent)
     case EObjectType::QuestReward:
         return addQuestReward(parent);
     case EObjectType::Quest:
-        return addQuest(parent);
+        return addQuest();
     case EObjectType::ScriptVariable:
-        return addScriptVariable(parent);
+        return addScriptVariable();
     case EObjectType::Setting:
-        return addSetting(parent);
+        return addSetting();
     case EObjectType::String:
-        return addString(parent);
+        return addString();
     case EObjectType::Table:
-        return addTable(parent);
+        return addTable();
     case EObjectType::Weapon:
-        return addWeapon(parent);
+        return addWeapon();
     default:
         return Ptr<IObject>(0);
     }
@@ -4839,13 +4542,13 @@ QTreeWidgetItem *StorageImpl::addRecord(QTreeWidgetItem *item)
     switch (type)
     {
     case EObjectType::Building:
-        return addBuilding(parent)->printQtTreeView(item);
+        return addBuilding()->printQtTreeView(item);
     case EObjectType::ClanMechanoid:
         return addClanMechanoid(parent)->printQtTreeView(item);
     case EObjectType::ClanReputation:
         return addClanReputation(parent)->printQtTreeView(item);
     case EObjectType::Clan:
-        return addClan(parent)->printQtTreeView(item);
+        return addClan()->printQtTreeView(item);
     case EObjectType::ConfigurationEquipment:
         return addConfigurationEquipment(parent)->printQtTreeView(item);
     case EObjectType::ConfigurationGood:
@@ -4855,17 +4558,17 @@ QTreeWidgetItem *StorageImpl::addRecord(QTreeWidgetItem *item)
     case EObjectType::ConfigurationWeapon:
         return addConfigurationWeapon(parent)->printQtTreeView(item);
     case EObjectType::Configuration:
-        return addConfiguration(parent)->printQtTreeView(item);
+        return addConfiguration()->printQtTreeView(item);
     case EObjectType::Equipment:
-        return addEquipment(parent)->printQtTreeView(item);
+        return addEquipment()->printQtTreeView(item);
     case EObjectType::Glider:
-        return addGlider(parent)->printQtTreeView(item);
+        return addGlider()->printQtTreeView(item);
     case EObjectType::Good:
-        return addGood(parent)->printQtTreeView(item);
+        return addGood()->printQtTreeView(item);
     case EObjectType::GroupMechanoid:
         return addGroupMechanoid(parent)->printQtTreeView(item);
     case EObjectType::Group:
-        return addGroup(parent)->printQtTreeView(item);
+        return addGroup()->printQtTreeView(item);
     case EObjectType::MapBuildingEquipment:
         return addMapBuildingEquipment(parent)->printQtTreeView(item);
     case EObjectType::MapBuildingGlider:
@@ -4885,11 +4588,11 @@ QTreeWidgetItem *StorageImpl::addRecord(QTreeWidgetItem *item)
     case EObjectType::MapObject:
         return addMapObject(parent)->printQtTreeView(item);
     case EObjectType::Map:
-        return addMap(parent)->printQtTreeView(item);
+        return addMap()->printQtTreeView(item);
     case EObjectType::MechanoidQuest:
         return addMechanoidQuest(parent)->printQtTreeView(item);
     case EObjectType::Mechanoid:
-        return addMechanoid(parent)->printQtTreeView(item);
+        return addMechanoid()->printQtTreeView(item);
     case EObjectType::ModificationClan:
         return addModificationClan(parent)->printQtTreeView(item);
     case EObjectType::ModificationMap:
@@ -4897,15 +4600,15 @@ QTreeWidgetItem *StorageImpl::addRecord(QTreeWidgetItem *item)
     case EObjectType::ModificationMechanoid:
         return addModificationMechanoid(parent)->printQtTreeView(item);
     case EObjectType::Modification:
-        return addModification(parent)->printQtTreeView(item);
+        return addModification()->printQtTreeView(item);
     case EObjectType::Modificator:
-        return addModificator(parent)->printQtTreeView(item);
+        return addModificator()->printQtTreeView(item);
     case EObjectType::Object:
-        return addObject(parent)->printQtTreeView(item);
+        return addObject()->printQtTreeView(item);
     case EObjectType::Player:
-        return addPlayer(parent)->printQtTreeView(item);
+        return addPlayer()->printQtTreeView(item);
     case EObjectType::Projectile:
-        return addProjectile(parent)->printQtTreeView(item);
+        return addProjectile()->printQtTreeView(item);
     case EObjectType::QuestRewardEquipment:
         return addQuestRewardEquipment(parent)->printQtTreeView(item);
     case EObjectType::QuestRewardGlider:
@@ -4923,17 +4626,17 @@ QTreeWidgetItem *StorageImpl::addRecord(QTreeWidgetItem *item)
     case EObjectType::QuestReward:
         return addQuestReward(parent)->printQtTreeView(item);
     case EObjectType::Quest:
-        return addQuest(parent)->printQtTreeView(item);
+        return addQuest()->printQtTreeView(item);
     case EObjectType::ScriptVariable:
-        return addScriptVariable(parent)->printQtTreeView(item);
+        return addScriptVariable()->printQtTreeView(item);
     case EObjectType::Setting:
-        return addSetting(parent)->printQtTreeView(item);
+        return addSetting()->printQtTreeView(item);
     case EObjectType::String:
-        return addString(parent)->printQtTreeView(item);
+        return addString()->printQtTreeView(item);
     case EObjectType::Table:
-        return addTable(parent)->printQtTreeView(item);
+        return addTable()->printQtTreeView(item);
     case EObjectType::Weapon:
-        return addWeapon(parent)->printQtTreeView(item);
+        return addWeapon()->printQtTreeView(item);
     default:
         return 0;
     }
@@ -5096,133 +4799,106 @@ void StorageImpl::deleteRecord(QTreeWidgetItem *item)
 }
 #endif
 
-OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type, IObject *parent) const
+OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type, std::function<bool(Ptr<IObject>)> f) const
 {
     switch (type)
     {
     case EObjectType::Building:
-        return ::getOrderedMap(buildings);
+        return ::getOrderedMap(buildings, f);
     case EObjectType::ClanMechanoid:
-        return ::getOrderedMap(clanMechanoids);
+        return ::getOrderedMap(clanMechanoids, f);
     case EObjectType::ClanReputation:
-        return ::getOrderedMap(clanReputations);
+        return ::getOrderedMap(clanReputations, f);
     case EObjectType::Clan:
-        return ::getOrderedMap(clans);
+        return ::getOrderedMap(clans, f);
     case EObjectType::ConfigurationEquipment:
-        return ::getOrderedMap(configurationEquipments);
+        return ::getOrderedMap(configurationEquipments, f);
     case EObjectType::ConfigurationGood:
-        return ::getOrderedMap(configurationGoods);
+        return ::getOrderedMap(configurationGoods, f);
     case EObjectType::ConfigurationProjectile:
-        return ::getOrderedMap(configurationProjectiles);
+        return ::getOrderedMap(configurationProjectiles, f);
     case EObjectType::ConfigurationWeapon:
-        return ::getOrderedMap(configurationWeapons);
+        return ::getOrderedMap(configurationWeapons, f);
     case EObjectType::Configuration:
-        return ::getOrderedMap(configurations);
+        return ::getOrderedMap(configurations, f);
     case EObjectType::Equipment:
-        return ::getOrderedMap(equipments);
+        return ::getOrderedMap(equipments, f);
     case EObjectType::Glider:
-        return ::getOrderedMap(gliders);
+        return ::getOrderedMap(gliders, f);
     case EObjectType::Good:
-        return ::getOrderedMap(goods);
+        return ::getOrderedMap(goods, f);
     case EObjectType::GroupMechanoid:
-        return ::getOrderedMap(groupMechanoids);
+        return ::getOrderedMap(groupMechanoids, f);
     case EObjectType::Group:
-        return ::getOrderedMap(groups);
+        return ::getOrderedMap(groups, f);
     case EObjectType::MapBuildingEquipment:
-        return ::getOrderedMap(mapBuildingEquipments);
+        return ::getOrderedMap(mapBuildingEquipments, f);
     case EObjectType::MapBuildingGlider:
-        return ::getOrderedMap(mapBuildingGliders);
+        return ::getOrderedMap(mapBuildingGliders, f);
     case EObjectType::MapBuildingGood:
-        return ::getOrderedMap(mapBuildingGoods);
+        return ::getOrderedMap(mapBuildingGoods, f);
     case EObjectType::MapBuildingModificator:
-        return ::getOrderedMap(mapBuildingModificators);
+        return ::getOrderedMap(mapBuildingModificators, f);
     case EObjectType::MapBuildingProjectile:
-        return ::getOrderedMap(mapBuildingProjectiles);
+        return ::getOrderedMap(mapBuildingProjectiles, f);
     case EObjectType::MapBuildingWeapon:
-        return ::getOrderedMap(mapBuildingWeapons);
+        return ::getOrderedMap(mapBuildingWeapons, f);
     case EObjectType::MapBuilding:
-    {
-        std::function<bool(Ptr<MapBuilding>)> f = [parent](Ptr<MapBuilding> o)
-        {
-            if (!parent || parent->getType() != EObjectType::Mechanoid)
-                return true;
-            Mechanoid *m = (Mechanoid *)parent;
-            return m->map == o->map;
-        };
         return ::getOrderedMap(mapBuildings, f);
-    }
     case EObjectType::MapGood:
-    {
-        std::function<bool(Ptr<MapGood>)> f = [parent](Ptr<MapGood> o)
-        {
-            if (!parent || parent->getType() != EObjectType::Mechanoid)
-                return true;
-            Mechanoid *m = (Mechanoid *)parent;
-            return m->map == o->map;
-        };
         return ::getOrderedMap(mapGoods, f);
-    }
     case EObjectType::MapObject:
-    {
-        std::function<bool(Ptr<MapObject>)> f = [parent](Ptr<MapObject> o)
-        {
-            if (!parent || parent->getType() != EObjectType::Mechanoid)
-                return true;
-            Mechanoid *m = (Mechanoid *)parent;
-            return m->map == o->map;
-        };
         return ::getOrderedMap(mapObjects, f);
-    }
     case EObjectType::Map:
-        return ::getOrderedMap(maps);
+        return ::getOrderedMap(maps, f);
     case EObjectType::MechanoidQuest:
-        return ::getOrderedMap(mechanoidQuests);
+        return ::getOrderedMap(mechanoidQuests, f);
     case EObjectType::Mechanoid:
-        return ::getOrderedMap(mechanoids);
+        return ::getOrderedMap(mechanoids, f);
     case EObjectType::ModificationClan:
-        return ::getOrderedMap(modificationClans);
+        return ::getOrderedMap(modificationClans, f);
     case EObjectType::ModificationMap:
-        return ::getOrderedMap(modificationMaps);
+        return ::getOrderedMap(modificationMaps, f);
     case EObjectType::ModificationMechanoid:
-        return ::getOrderedMap(modificationMechanoids);
+        return ::getOrderedMap(modificationMechanoids, f);
     case EObjectType::Modification:
-        return ::getOrderedMap(modifications);
+        return ::getOrderedMap(modifications, f);
     case EObjectType::Modificator:
-        return ::getOrderedMap(modificators);
+        return ::getOrderedMap(modificators, f);
     case EObjectType::Object:
-        return ::getOrderedMap(objects);
+        return ::getOrderedMap(objects, f);
     case EObjectType::Player:
-        return ::getOrderedMap(players);
+        return ::getOrderedMap(players, f);
     case EObjectType::Projectile:
-        return ::getOrderedMap(projectiles);
+        return ::getOrderedMap(projectiles, f);
     case EObjectType::QuestRewardEquipment:
-        return ::getOrderedMap(questRewardEquipments);
+        return ::getOrderedMap(questRewardEquipments, f);
     case EObjectType::QuestRewardGlider:
-        return ::getOrderedMap(questRewardGliders);
+        return ::getOrderedMap(questRewardGliders, f);
     case EObjectType::QuestRewardGood:
-        return ::getOrderedMap(questRewardGoods);
+        return ::getOrderedMap(questRewardGoods, f);
     case EObjectType::QuestRewardModificator:
-        return ::getOrderedMap(questRewardModificators);
+        return ::getOrderedMap(questRewardModificators, f);
     case EObjectType::QuestRewardProjectile:
-        return ::getOrderedMap(questRewardProjectiles);
+        return ::getOrderedMap(questRewardProjectiles, f);
     case EObjectType::QuestRewardReputation:
-        return ::getOrderedMap(questRewardReputations);
+        return ::getOrderedMap(questRewardReputations, f);
     case EObjectType::QuestRewardWeapon:
-        return ::getOrderedMap(questRewardWeapons);
+        return ::getOrderedMap(questRewardWeapons, f);
     case EObjectType::QuestReward:
-        return ::getOrderedMap(questRewards);
+        return ::getOrderedMap(questRewards, f);
     case EObjectType::Quest:
-        return ::getOrderedMap(quests);
+        return ::getOrderedMap(quests, f);
     case EObjectType::ScriptVariable:
-        return ::getOrderedMap(scriptVariables);
+        return ::getOrderedMap(scriptVariables, f);
     case EObjectType::Setting:
-        return ::getOrderedMap(settings);
+        return ::getOrderedMap(settings, f);
     case EObjectType::String:
-        return ::getOrderedMap(strings);
+        return ::getOrderedMap(strings, f);
     case EObjectType::Table:
-        return ::getOrderedMap(tables);
+        return ::getOrderedMap(tables, f);
     case EObjectType::Weapon:
-        return ::getOrderedMap(weapons);
+        return ::getOrderedMap(weapons, f);
     default:
         return OrderedObjectMap();
     }

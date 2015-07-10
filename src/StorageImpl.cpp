@@ -30,28 +30,17 @@
 
 #define PROGRESS_CALLBACK(p) if (callback) callback(p)
 
-using polygon4::detail::CMap;
+using polygon4::detail::Ptr;
 using polygon4::detail::CVector;
+using polygon4::detail::IObject;
 using polygon4::detail::OrderedObjectMap;
 
 template <class T>
-OrderedObjectMap getOrderedMap(const CMap<T> &array)
+OrderedObjectMap getOrderedMap(const T &array)
 {
     OrderedObjectMap map;
     for (auto &v : array)
         map.insert(std::make_pair(v.second->getName(), v.second));
-    return map;
-}
-
-template <class T>
-OrderedObjectMap getOrderedMap(const CMap<T> &array, std::function<bool(T)> f)
-{
-    if (!f)
-        return getOrderedMap(array);
-    OrderedObjectMap map;
-    for (auto &v : array)
-        if (f(v.second))
-            map.insert(std::make_pair(v.second->getName(), v.second));
     return map;
 }
 
@@ -61,6 +50,33 @@ OrderedObjectMap getOrderedMap(const CVector<T> &array)
     OrderedObjectMap map;
     for (auto &v : array)
         map.insert(std::make_pair(v->getName(), v));
+    return map;
+}
+
+template <class T>
+OrderedObjectMap getOrderedMap(const T &array, std::function<bool(Ptr<IObject>)> f)
+{
+    if (!f)
+        return getOrderedMap(array);
+    polygon4::detail::OrderedObjectMap map;
+    for (auto &v : array)
+    {
+        auto &value = v.second;
+        if (f(value))
+            map.insert(std::make_pair(value->getName(), value));
+    }
+    return map;
+}
+
+template <class T>
+polygon4::detail::OrderedObjectMap getOrderedMap(const polygon4::detail::CVector<T> &array, std::function<bool(Ptr<IObject>)> f)
+{
+    if (!f)
+        return getOrderedMap(array);
+    polygon4::detail::OrderedObjectMap map;
+    for (auto &v : array)
+        if (f(v))
+            map.insert(std::make_pair(v->getName(), v));
     return map;
 }
 

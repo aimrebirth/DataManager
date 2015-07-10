@@ -22,6 +22,7 @@
 #include <string>
 
 #include "Types.h"
+#include "Table.h"
 
 namespace polygon4
 {

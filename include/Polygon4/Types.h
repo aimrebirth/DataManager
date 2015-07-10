@@ -21,12 +21,8 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <set>
 #include <stdint.h>
-#include <sstream>
 #include <vector>
-#include <unordered_map>
-#include <unordered_set>
 
 #include "Exception.h"
 #include "String.h"
@@ -56,13 +52,9 @@ template <typename T>
 using Ptr = std::shared_ptr<T>;
 
 template <typename T>
-using CVector = std::vector<T>;
+using CVector = std::vector<Ptr<T>>;
 
-template <typename T>
-using CSet = std::set<T>;
-
-template <typename T>
-using CMap = std::map<int, T>;
+typedef std::multimap<Text, Ptr<class IObject>> OrderedObjectMap;
 
 template <typename T>
 struct IdPtr
@@ -92,7 +84,7 @@ struct IdPtr
     {
         if (ptr)
             return ptr;
-        throw EXCEPTION("Value is missing");
+        throw EXCEPTION("Value is missing for id (" + std::to_string(id) + ")");
     }
 
     operator bool() const

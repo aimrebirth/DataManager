@@ -17,7 +17,7 @@ void Building::setId(int id)
 
 EObjectType Building::getType() const
 {
-    return EObjectType::Building;
+    return object_type;
 }
 
 Text Building::getVariableString(int columnId) const
@@ -96,7 +96,7 @@ PRIMARY KEY (\"id\") \
 
 EObjectType ClanMechanoid::getType() const
 {
-    return EObjectType::ClanMechanoid;
+    return object_type;
 }
 
 Text ClanMechanoid::getVariableString(int columnId) const
@@ -178,7 +178,7 @@ FOREIGN KEY (\"mechanoid_id\") REFERENCES \"Mechanoids\" (\"id\") \
 
 EObjectType ClanReputation::getType() const
 {
-    return EObjectType::ClanReputation;
+    return object_type;
 }
 
 Text ClanReputation::getVariableString(int columnId) const
@@ -270,7 +270,7 @@ void Clan::setId(int id)
 
 EObjectType Clan::getType() const
 {
-    return EObjectType::Clan;
+    return object_type;
 }
 
 Text Clan::getVariableString(int columnId) const
@@ -369,11 +369,13 @@ QTreeWidgetItem *Clan::printQtTreeView(QTreeWidgetItem *parent) const
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ClanMechanoid));
     for (auto &mechanoid : mechanoids)
         mechanoid->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Reputations")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ClanReputation));
     for (auto &reputation : reputations)
         reputation->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
@@ -437,7 +439,7 @@ FOREIGN KEY (\"member_name_id\") REFERENCES \"Strings\" (\"id\") \
 
 EObjectType ConfigurationEquipment::getType() const
 {
-    return EObjectType::ConfigurationEquipment;
+    return object_type;
 }
 
 Text ConfigurationEquipment::getVariableString(int columnId) const
@@ -526,7 +528,7 @@ FOREIGN KEY (\"equipment_id\") REFERENCES \"Equipments\" (\"id\") \
 
 EObjectType ConfigurationGood::getType() const
 {
-    return EObjectType::ConfigurationGood;
+    return object_type;
 }
 
 Text ConfigurationGood::getVariableString(int columnId) const
@@ -615,7 +617,7 @@ FOREIGN KEY (\"good_id\") REFERENCES \"Goods\" (\"id\") \
 
 EObjectType ConfigurationProjectile::getType() const
 {
-    return EObjectType::ConfigurationProjectile;
+    return object_type;
 }
 
 Text ConfigurationProjectile::getVariableString(int columnId) const
@@ -704,7 +706,7 @@ FOREIGN KEY (\"projectile_id\") REFERENCES \"Projectiles\" (\"id\") \
 
 EObjectType ConfigurationWeapon::getType() const
 {
-    return EObjectType::ConfigurationWeapon;
+    return object_type;
 }
 
 Text ConfigurationWeapon::getVariableString(int columnId) const
@@ -803,7 +805,7 @@ void Configuration::setId(int id)
 
 EObjectType Configuration::getType() const
 {
-    return EObjectType::Configuration;
+    return object_type;
 }
 
 Text Configuration::getVariableString(int columnId) const
@@ -857,21 +859,25 @@ QTreeWidgetItem *Configuration::printQtTreeView(QTreeWidgetItem *parent) const
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ConfigurationEquipment));
     for (auto &equipment : equipments)
         equipment->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ConfigurationGood));
     for (auto &good : goods)
         good->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Projectiles")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ConfigurationProjectile));
     for (auto &projectile : projectiles)
         projectile->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Weapons")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ConfigurationWeapon));
     for (auto &weapon : weapons)
         weapon->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
@@ -927,7 +933,7 @@ void Equipment::setId(int id)
 
 EObjectType Equipment::getType() const
 {
-    return EObjectType::Equipment;
+    return object_type;
 }
 
 Text Equipment::getVariableString(int columnId) const
@@ -1104,7 +1110,7 @@ void Glider::setId(int id)
 
 EObjectType Glider::getType() const
 {
-    return EObjectType::Glider;
+    return object_type;
 }
 
 Text Glider::getVariableString(int columnId) const
@@ -1323,7 +1329,7 @@ void Good::setId(int id)
 
 EObjectType Good::getType() const
 {
-    return EObjectType::Good;
+    return object_type;
 }
 
 Text Good::getVariableString(int columnId) const
@@ -1448,7 +1454,7 @@ FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
 
 EObjectType GroupMechanoid::getType() const
 {
-    return EObjectType::GroupMechanoid;
+    return object_type;
 }
 
 Text GroupMechanoid::getVariableString(int columnId) const
@@ -1540,7 +1546,7 @@ void Group::setId(int id)
 
 EObjectType Group::getType() const
 {
-    return EObjectType::Group;
+    return object_type;
 }
 
 Text Group::getVariableString(int columnId) const
@@ -1589,6 +1595,7 @@ QTreeWidgetItem *Group::printQtTreeView(QTreeWidgetItem *parent) const
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::GroupMechanoid));
     for (auto &mechanoid : mechanoids)
         mechanoid->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
@@ -1631,7 +1638,7 @@ FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
 
 EObjectType MapBuildingEquipment::getType() const
 {
-    return EObjectType::MapBuildingEquipment;
+    return object_type;
 }
 
 Text MapBuildingEquipment::getVariableString(int columnId) const
@@ -1720,7 +1727,7 @@ FOREIGN KEY (\"equipment_id\") REFERENCES \"Equipments\" (\"id\") \
 
 EObjectType MapBuildingGlider::getType() const
 {
-    return EObjectType::MapBuildingGlider;
+    return object_type;
 }
 
 Text MapBuildingGlider::getVariableString(int columnId) const
@@ -1809,7 +1816,7 @@ FOREIGN KEY (\"glider_id\") REFERENCES \"Gliders\" (\"id\") \
 
 EObjectType MapBuildingGood::getType() const
 {
-    return EObjectType::MapBuildingGood;
+    return object_type;
 }
 
 Text MapBuildingGood::getVariableString(int columnId) const
@@ -1898,7 +1905,7 @@ FOREIGN KEY (\"good_id\") REFERENCES \"Goods\" (\"id\") \
 
 EObjectType MapBuildingModificator::getType() const
 {
-    return EObjectType::MapBuildingModificator;
+    return object_type;
 }
 
 Text MapBuildingModificator::getVariableString(int columnId) const
@@ -1987,7 +1994,7 @@ FOREIGN KEY (\"modificator_id\") REFERENCES \"Modificators\" (\"id\") \
 
 EObjectType MapBuildingProjectile::getType() const
 {
-    return EObjectType::MapBuildingProjectile;
+    return object_type;
 }
 
 Text MapBuildingProjectile::getVariableString(int columnId) const
@@ -2076,7 +2083,7 @@ FOREIGN KEY (\"projectile_id\") REFERENCES \"Projectiles\" (\"id\") \
 
 EObjectType MapBuildingWeapon::getType() const
 {
-    return EObjectType::MapBuildingWeapon;
+    return object_type;
 }
 
 Text MapBuildingWeapon::getVariableString(int columnId) const
@@ -2175,7 +2182,7 @@ void MapBuilding::setId(int id)
 
 EObjectType MapBuilding::getType() const
 {
-    return EObjectType::MapBuilding;
+    return object_type;
 }
 
 Text MapBuilding::getVariableString(int columnId) const
@@ -2289,31 +2296,37 @@ QTreeWidgetItem *MapBuilding::printQtTreeView(QTreeWidgetItem *parent) const
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingEquipment));
     for (auto &equipment : equipments)
         equipment->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Gliders")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingGlider));
     for (auto &glider : gliders)
         glider->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingGood));
     for (auto &good : goods)
         good->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Modificators")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingModificator));
     for (auto &modificator : modificators)
         modificator->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Projectiles")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingProjectile));
     for (auto &projectile : projectiles)
         projectile->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Weapons")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuildingWeapon));
     for (auto &weapon : weapons)
         weapon->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
@@ -2397,7 +2410,7 @@ void MapGood::setId(int id)
 
 EObjectType MapGood::getType() const
 {
-    return EObjectType::MapGood;
+    return object_type;
 }
 
 Text MapGood::getVariableString(int columnId) const
@@ -2568,7 +2581,7 @@ void MapObject::setId(int id)
 
 EObjectType MapObject::getType() const
 {
-    return EObjectType::MapObject;
+    return object_type;
 }
 
 Text MapObject::getVariableString(int columnId) const
@@ -2739,7 +2752,7 @@ void Map::setId(int id)
 
 EObjectType Map::getType() const
 {
-    return EObjectType::Map;
+    return object_type;
 }
 
 Text Map::getVariableString(int columnId) const
@@ -2803,16 +2816,19 @@ QTreeWidgetItem *Map::printQtTreeView(QTreeWidgetItem *parent) const
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapBuilding));
     for (auto &building : buildings)
         building->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapGood));
     for (auto &good : goods)
         good->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Objects")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MapObject));
     for (auto &object : objects)
         object->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
@@ -2864,7 +2880,7 @@ FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
 
 EObjectType MechanoidQuest::getType() const
 {
-    return EObjectType::MechanoidQuest;
+    return object_type;
 }
 
 Text MechanoidQuest::getVariableString(int columnId) const
@@ -2963,7 +2979,7 @@ void Mechanoid::setId(int id)
 
 EObjectType Mechanoid::getType() const
 {
-    return EObjectType::Mechanoid;
+    return object_type;
 }
 
 Text Mechanoid::getVariableString(int columnId) const
@@ -3097,6 +3113,7 @@ QTreeWidgetItem *Mechanoid::printQtTreeView(QTreeWidgetItem *parent) const
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::MechanoidQuest));
     for (auto &quest : quests)
         quest->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
@@ -3178,7 +3195,7 @@ FOREIGN KEY (\"group_id\") REFERENCES \"Groups\" (\"id\") \
 
 EObjectType ModificationClan::getType() const
 {
-    return EObjectType::ModificationClan;
+    return object_type;
 }
 
 Text ModificationClan::getVariableString(int columnId) const
@@ -3260,7 +3277,7 @@ FOREIGN KEY (\"clan_id\") REFERENCES \"Clans\" (\"id\") \
 
 EObjectType ModificationMap::getType() const
 {
-    return EObjectType::ModificationMap;
+    return object_type;
 }
 
 Text ModificationMap::getVariableString(int columnId) const
@@ -3342,7 +3359,7 @@ FOREIGN KEY (\"map_id\") REFERENCES \"Maps\" (\"id\") \
 
 EObjectType ModificationMechanoid::getType() const
 {
-    return EObjectType::ModificationMechanoid;
+    return object_type;
 }
 
 Text ModificationMechanoid::getVariableString(int columnId) const
@@ -3434,7 +3451,7 @@ void Modification::setId(int id)
 
 EObjectType Modification::getType() const
 {
-    return EObjectType::Modification;
+    return object_type;
 }
 
 Text Modification::getVariableString(int columnId) const
@@ -3528,16 +3545,19 @@ QTreeWidgetItem *Modification::printQtTreeView(QTreeWidgetItem *parent) const
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ModificationClan));
     for (auto &clan : clans)
         clan->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Maps")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ModificationMap));
     for (auto &map : maps)
         map->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Mechanoids")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ModificationMechanoid));
     for (auto &mechanoid : mechanoids)
         mechanoid->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
@@ -3607,7 +3627,7 @@ void Modificator::setId(int id)
 
 EObjectType Modificator::getType() const
 {
-    return EObjectType::Modificator;
+    return object_type;
 }
 
 Text Modificator::getVariableString(int columnId) const
@@ -3756,7 +3776,7 @@ void Object::setId(int id)
 
 EObjectType Object::getType() const
 {
-    return EObjectType::Object;
+    return object_type;
 }
 
 Text Object::getVariableString(int columnId) const
@@ -3863,7 +3883,7 @@ void Player::setId(int id)
 
 EObjectType Player::getType() const
 {
-    return EObjectType::Player;
+    return object_type;
 }
 
 Text Player::getVariableString(int columnId) const
@@ -3946,7 +3966,7 @@ void Projectile::setId(int id)
 
 EObjectType Projectile::getType() const
 {
-    return EObjectType::Projectile;
+    return object_type;
 }
 
 Text Projectile::getVariableString(int columnId) const
@@ -4141,7 +4161,7 @@ FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
 
 EObjectType QuestRewardEquipment::getType() const
 {
-    return EObjectType::QuestRewardEquipment;
+    return object_type;
 }
 
 Text QuestRewardEquipment::getVariableString(int columnId) const
@@ -4230,7 +4250,7 @@ FOREIGN KEY (\"equipment_id\") REFERENCES \"Equipments\" (\"id\") \
 
 EObjectType QuestRewardGlider::getType() const
 {
-    return EObjectType::QuestRewardGlider;
+    return object_type;
 }
 
 Text QuestRewardGlider::getVariableString(int columnId) const
@@ -4319,7 +4339,7 @@ FOREIGN KEY (\"glider_id\") REFERENCES \"Gliders\" (\"id\") \
 
 EObjectType QuestRewardGood::getType() const
 {
-    return EObjectType::QuestRewardGood;
+    return object_type;
 }
 
 Text QuestRewardGood::getVariableString(int columnId) const
@@ -4408,7 +4428,7 @@ FOREIGN KEY (\"good_id\") REFERENCES \"Goods\" (\"id\") \
 
 EObjectType QuestRewardModificator::getType() const
 {
-    return EObjectType::QuestRewardModificator;
+    return object_type;
 }
 
 Text QuestRewardModificator::getVariableString(int columnId) const
@@ -4497,7 +4517,7 @@ FOREIGN KEY (\"modificator_id\") REFERENCES \"Modificators\" (\"id\") \
 
 EObjectType QuestRewardProjectile::getType() const
 {
-    return EObjectType::QuestRewardProjectile;
+    return object_type;
 }
 
 Text QuestRewardProjectile::getVariableString(int columnId) const
@@ -4586,7 +4606,7 @@ FOREIGN KEY (\"projectile_id\") REFERENCES \"Projectiles\" (\"id\") \
 
 EObjectType QuestRewardReputation::getType() const
 {
-    return EObjectType::QuestRewardReputation;
+    return object_type;
 }
 
 Text QuestRewardReputation::getVariableString(int columnId) const
@@ -4665,7 +4685,7 @@ FOREIGN KEY (\"clan_id\") REFERENCES \"Clans\" (\"id\") \
 
 EObjectType QuestRewardWeapon::getType() const
 {
-    return EObjectType::QuestRewardWeapon;
+    return object_type;
 }
 
 Text QuestRewardWeapon::getVariableString(int columnId) const
@@ -4764,7 +4784,7 @@ void QuestReward::setId(int id)
 
 EObjectType QuestReward::getType() const
 {
-    return EObjectType::QuestReward;
+    return object_type;
 }
 
 Text QuestReward::getVariableString(int columnId) const
@@ -4823,36 +4843,43 @@ QTreeWidgetItem *QuestReward::printQtTreeView(QTreeWidgetItem *parent) const
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardEquipment));
     for (auto &equipment : equipments)
         equipment->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Gliders")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardGlider));
     for (auto &glider : gliders)
         glider->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Goods")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardGood));
     for (auto &good : goods)
         good->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Modificators")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardModificator));
     for (auto &modificator : modificators)
         modificator->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Projectiles")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardProjectile));
     for (auto &projectile : projectiles)
         projectile->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Reputations")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardReputation));
     for (auto &reputation : reputations)
         reputation->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     root = new QTreeWidgetItem(item, QStringList(QCoreApplication::translate("DB", "Weapons")));
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestRewardWeapon));
     for (auto &weapon : weapons)
         weapon->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
@@ -4909,7 +4936,7 @@ void Quest::setId(int id)
 
 EObjectType Quest::getType() const
 {
-    return EObjectType::Quest;
+    return object_type;
 }
 
 Text Quest::getVariableString(int columnId) const
@@ -4973,6 +5000,7 @@ QTreeWidgetItem *Quest::printQtTreeView(QTreeWidgetItem *parent) const
     root->setData(0, Qt::UserRole, static_cast<int>(EObjectType::QuestReward));
     for (auto &reward : rewards)
         reward->printQtTreeView(root);
+    root->sortChildren(0, Qt::AscendingOrder);
 
     item->sortChildren(0, Qt::AscendingOrder);
     return item;
@@ -5021,9 +5049,19 @@ FOREIGN KEY (\"description_id\") REFERENCES \"Strings\" (\"id\") \
     ";
 }
 
+int ScriptVariable::getId() const
+{
+    return id;
+}
+
+void ScriptVariable::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType ScriptVariable::getType() const
 {
-    return EObjectType::ScriptVariable;
+    return object_type;
 }
 
 Text ScriptVariable::getVariableString(int columnId) const
@@ -5031,9 +5069,15 @@ Text ScriptVariable::getVariableString(int columnId) const
     switch (columnId)
     {
     case 0:
-        return to_string(variable);
+        return to_string(id);
     case 1:
-        return to_string(value);
+        return to_string(variable);
+    case 2:
+        return to_string(value_int);
+    case 3:
+        return to_string(value_float);
+    case 4:
+        return to_string(value_text);
     default:
         return "";
     }
@@ -5045,10 +5089,19 @@ void ScriptVariable::setVariableString(int columnId, Text text, Ptr<IObject> ptr
     switch (columnId)
     {
     case 0:
-        variable = text.string();
+        id = std::stoi(text.string());
         break;
     case 1:
-        value = text.string();
+        variable = text.string();
+        break;
+    case 2:
+        value_int = std::stoi(text.string());
+        break;
+    case 3:
+        value_float = std::stof(text.string());
+        break;
+    case 4:
+        value_text = text.string();
         break;
     default:
         break;
@@ -5071,13 +5124,18 @@ Text ScriptVariable::getName() const
     n = variable;
     if (!n.empty())
         return n;
+    n = value_text;
+    if (!n.empty())
+        return n;
     return IObject::getName();
 }
 
 bool ScriptVariable::operator==(const ScriptVariable &rhs) const
 {
     return
-        value == rhs.value &&
+        value_float == rhs.value_float &&
+        value_int == rhs.value_int &&
+        value_text == rhs.value_text &&
         variable == rhs.variable &&
         1;
 }
@@ -5087,16 +5145,29 @@ const char *ScriptVariable::getSql()
     return
     " \
 create table \"ScriptVariables\" ( \
-\"variable\" TEXT NOT NULL, \
-\"value\" TEXT, \
-PRIMARY KEY (\"variable\") \
+\"id\" INTEGER NOT NULL, \
+\"variable\" TEXT, \
+\"value_int\" INTEGER, \
+\"value_float\" REAL, \
+\"value_text\" TEXT, \
+PRIMARY KEY (\"id\") \
 ); \
     ";
 }
 
+int Setting::getId() const
+{
+    return id;
+}
+
+void Setting::setId(int id)
+{
+    this->id = id;
+}
+
 EObjectType Setting::getType() const
 {
-    return EObjectType::Setting;
+    return object_type;
 }
 
 Text Setting::getVariableString(int columnId) const
@@ -5104,7 +5175,15 @@ Text Setting::getVariableString(int columnId) const
     switch (columnId)
     {
     case 0:
+        return to_string(id);
+    case 1:
         return to_string(player);
+    case 2:
+        return to_string(value_int);
+    case 3:
+        return to_string(value_float);
+    case 4:
+        return to_string(value_text);
     default:
         return "";
     }
@@ -5116,7 +5195,22 @@ void Setting::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
     switch (columnId)
     {
     case 0:
+        id = std::stoi(text.string());
+        break;
+    case 1:
         player = std::static_pointer_cast<Player>(ptr);
+        break;
+    case 2:
+        value_int = std::stoi(text.string());
+        break;
+    case 3:
+        value_float = std::stof(text.string());
+        break;
+    case 4:
+        value_text = text.string();
+        break;
+    case 5:
+        value_blob = text;
         break;
     default:
         break;
@@ -5136,6 +5230,9 @@ QTreeWidgetItem *Setting::printQtTreeView(QTreeWidgetItem *parent) const
 Text Setting::getName() const
 {
     Text n;
+    n = value_text;
+    if (!n.empty())
+        return n;
     return IObject::getName();
 }
 
@@ -5143,6 +5240,10 @@ bool Setting::operator==(const Setting &rhs) const
 {
     return
         player == rhs.player &&
+        value_blob == rhs.value_blob &&
+        value_float == rhs.value_float &&
+        value_int == rhs.value_int &&
+        value_text == rhs.value_text &&
         1;
 }
 
@@ -5151,8 +5252,13 @@ const char *Setting::getSql()
     return
     " \
 create table \"Settings\" ( \
+\"id\" INTEGER NOT NULL, \
 \"player_id\" INTEGER NOT NULL, \
-PRIMARY KEY (\"player_id\"), \
+\"value_int\" INTEGER, \
+\"value_float\" REAL, \
+\"value_text\" TEXT, \
+\"value_blob\" BLOB, \
+PRIMARY KEY (\"id\"), \
 FOREIGN KEY (\"player_id\") REFERENCES \"Players\" (\"id\") \
 ); \
     ";
@@ -5170,7 +5276,7 @@ void String::setId(int id)
 
 EObjectType String::getType() const
 {
-    return EObjectType::String;
+    return object_type;
 }
 
 Text String::getVariableString(int columnId) const
@@ -5282,7 +5388,7 @@ void Table::setId(int id)
 
 EObjectType Table::getType() const
 {
-    return EObjectType::Table;
+    return object_type;
 }
 
 Text Table::getVariableString(int columnId) const
@@ -5414,7 +5520,7 @@ void Weapon::setId(int id)
 
 EObjectType Weapon::getType() const
 {
-    return EObjectType::Weapon;
+    return object_type;
 }
 
 Text Weapon::getVariableString(int columnId) const

@@ -262,13 +262,13 @@ public:
     virtual void load(ProgressCallback callback = ProgressCallback());
     virtual void save(ProgressCallback callback = ProgressCallback()) const;
 
-    virtual Ptr<Building> addBuilding(IObject *parent = 0);
+    virtual Ptr<Building> addBuilding();
     virtual void deleteBuilding(Building *object);
     virtual Ptr<ClanMechanoid> addClanMechanoid(IObject *parent = 0);
     virtual void deleteClanMechanoid(ClanMechanoid *object);
     virtual Ptr<ClanReputation> addClanReputation(IObject *parent = 0);
     virtual void deleteClanReputation(ClanReputation *object);
-    virtual Ptr<Clan> addClan(IObject *parent = 0);
+    virtual Ptr<Clan> addClan();
     virtual void deleteClan(Clan *object);
     virtual Ptr<ConfigurationEquipment> addConfigurationEquipment(IObject *parent = 0);
     virtual void deleteConfigurationEquipment(ConfigurationEquipment *object);
@@ -278,17 +278,17 @@ public:
     virtual void deleteConfigurationProjectile(ConfigurationProjectile *object);
     virtual Ptr<ConfigurationWeapon> addConfigurationWeapon(IObject *parent = 0);
     virtual void deleteConfigurationWeapon(ConfigurationWeapon *object);
-    virtual Ptr<Configuration> addConfiguration(IObject *parent = 0);
+    virtual Ptr<Configuration> addConfiguration();
     virtual void deleteConfiguration(Configuration *object);
-    virtual Ptr<Equipment> addEquipment(IObject *parent = 0);
+    virtual Ptr<Equipment> addEquipment();
     virtual void deleteEquipment(Equipment *object);
-    virtual Ptr<Glider> addGlider(IObject *parent = 0);
+    virtual Ptr<Glider> addGlider();
     virtual void deleteGlider(Glider *object);
-    virtual Ptr<Good> addGood(IObject *parent = 0);
+    virtual Ptr<Good> addGood();
     virtual void deleteGood(Good *object);
     virtual Ptr<GroupMechanoid> addGroupMechanoid(IObject *parent = 0);
     virtual void deleteGroupMechanoid(GroupMechanoid *object);
-    virtual Ptr<Group> addGroup(IObject *parent = 0);
+    virtual Ptr<Group> addGroup();
     virtual void deleteGroup(Group *object);
     virtual Ptr<MapBuildingEquipment> addMapBuildingEquipment(IObject *parent = 0);
     virtual void deleteMapBuildingEquipment(MapBuildingEquipment *object);
@@ -308,11 +308,11 @@ public:
     virtual void deleteMapGood(MapGood *object);
     virtual Ptr<MapObject> addMapObject(IObject *parent = 0);
     virtual void deleteMapObject(MapObject *object);
-    virtual Ptr<Map> addMap(IObject *parent = 0);
+    virtual Ptr<Map> addMap();
     virtual void deleteMap(Map *object);
     virtual Ptr<MechanoidQuest> addMechanoidQuest(IObject *parent = 0);
     virtual void deleteMechanoidQuest(MechanoidQuest *object);
-    virtual Ptr<Mechanoid> addMechanoid(IObject *parent = 0);
+    virtual Ptr<Mechanoid> addMechanoid();
     virtual void deleteMechanoid(Mechanoid *object);
     virtual Ptr<ModificationClan> addModificationClan(IObject *parent = 0);
     virtual void deleteModificationClan(ModificationClan *object);
@@ -320,15 +320,15 @@ public:
     virtual void deleteModificationMap(ModificationMap *object);
     virtual Ptr<ModificationMechanoid> addModificationMechanoid(IObject *parent = 0);
     virtual void deleteModificationMechanoid(ModificationMechanoid *object);
-    virtual Ptr<Modification> addModification(IObject *parent = 0);
+    virtual Ptr<Modification> addModification();
     virtual void deleteModification(Modification *object);
-    virtual Ptr<Modificator> addModificator(IObject *parent = 0);
+    virtual Ptr<Modificator> addModificator();
     virtual void deleteModificator(Modificator *object);
-    virtual Ptr<Object> addObject(IObject *parent = 0);
+    virtual Ptr<Object> addObject();
     virtual void deleteObject(Object *object);
-    virtual Ptr<Player> addPlayer(IObject *parent = 0);
+    virtual Ptr<Player> addPlayer();
     virtual void deletePlayer(Player *object);
-    virtual Ptr<Projectile> addProjectile(IObject *parent = 0);
+    virtual Ptr<Projectile> addProjectile();
     virtual void deleteProjectile(Projectile *object);
     virtual Ptr<QuestRewardEquipment> addQuestRewardEquipment(IObject *parent = 0);
     virtual void deleteQuestRewardEquipment(QuestRewardEquipment *object);
@@ -346,17 +346,17 @@ public:
     virtual void deleteQuestRewardWeapon(QuestRewardWeapon *object);
     virtual Ptr<QuestReward> addQuestReward(IObject *parent = 0);
     virtual void deleteQuestReward(QuestReward *object);
-    virtual Ptr<Quest> addQuest(IObject *parent = 0);
+    virtual Ptr<Quest> addQuest();
     virtual void deleteQuest(Quest *object);
-    virtual Ptr<ScriptVariable> addScriptVariable(IObject *parent = 0);
+    virtual Ptr<ScriptVariable> addScriptVariable();
     virtual void deleteScriptVariable(ScriptVariable *object);
-    virtual Ptr<Setting> addSetting(IObject *parent = 0);
+    virtual Ptr<Setting> addSetting();
     virtual void deleteSetting(Setting *object);
-    virtual Ptr<String> addString(IObject *parent = 0);
+    virtual Ptr<String> addString();
     virtual void deleteString(String *object);
-    virtual Ptr<Table> addTable(IObject *parent = 0);
+    virtual Ptr<Table> addTable();
     virtual void deleteTable(Table *object);
-    virtual Ptr<Weapon> addWeapon(IObject *parent = 0);
+    virtual Ptr<Weapon> addWeapon();
     virtual void deleteWeapon(Weapon *object);
 
     virtual Ptr<IObject> addRecord(IObject *parent = 0);
@@ -367,6 +367,7 @@ public:
     virtual QTreeWidgetItem *addRecord(QTreeWidgetItem *item);
     virtual void deleteRecord(QTreeWidgetItem *item);
 #endif
-    virtual OrderedObjectMap getOrderedMap(EObjectType type, IObject *parent = 0) const;
+
+    virtual OrderedObjectMap getOrderedMap(EObjectType type, std::function<bool(Ptr<IObject>)> f = std::function<bool(Ptr<IObject>)>()) const;
 };
 

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "../Table.h"
+
 #include "../Types.h"
 
 namespace polygon4
@@ -161,8 +163,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Building;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -186,8 +192,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::ClanMechanoid;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -211,8 +221,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::ClanReputation;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -234,8 +248,8 @@ public:
     float playereffect = 0.0f;
     int color = 0;
 
-    CVector<Ptr<ClanMechanoid>> mechanoids;
-    CVector<Ptr<ClanReputation>> reputations;
+    CTable<ClanMechanoid> mechanoids;
+    CTable<ClanReputation> reputations;
 
     int getId() const;
     void setId(int id);
@@ -253,8 +267,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Clan;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -279,8 +297,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::ConfigurationEquipment;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -305,8 +327,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::ConfigurationGood;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -331,8 +357,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::ConfigurationProjectile;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -357,8 +387,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::ConfigurationWeapon;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -371,10 +405,10 @@ public:
     IdPtr<String> name;
     IdPtr<Glider> glider;
 
-    CVector<Ptr<ConfigurationEquipment>> equipments;
-    CVector<Ptr<ConfigurationGood>> goods;
-    CVector<Ptr<ConfigurationProjectile>> projectiles;
-    CVector<Ptr<ConfigurationWeapon>> weapons;
+    CTable<ConfigurationEquipment> equipments;
+    CTable<ConfigurationGood> goods;
+    CTable<ConfigurationProjectile> projectiles;
+    CTable<ConfigurationWeapon> weapons;
 
     int getId() const;
     void setId(int id);
@@ -392,8 +426,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Configuration;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -433,8 +471,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Equipment;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -480,8 +522,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Glider;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -515,8 +561,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Good;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -540,8 +590,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::GroupMechanoid;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -553,7 +607,7 @@ public:
     Text text_id;
     IdPtr<String> name;
 
-    CVector<Ptr<GroupMechanoid>> mechanoids;
+    CTable<GroupMechanoid> mechanoids;
 
     int getId() const;
     void setId(int id);
@@ -571,8 +625,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Group;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -597,8 +655,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::MapBuildingEquipment;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -623,8 +685,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::MapBuildingGlider;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -649,8 +715,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::MapBuildingGood;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -675,8 +745,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::MapBuildingModificator;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -701,8 +775,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::MapBuildingProjectile;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -727,8 +805,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::MapBuildingWeapon;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -753,12 +835,12 @@ public:
     float scale_y = 1;
     float scale_z = 1;
 
-    CVector<Ptr<MapBuildingEquipment>> equipments;
-    CVector<Ptr<MapBuildingGlider>> gliders;
-    CVector<Ptr<MapBuildingGood>> goods;
-    CVector<Ptr<MapBuildingModificator>> modificators;
-    CVector<Ptr<MapBuildingProjectile>> projectiles;
-    CVector<Ptr<MapBuildingWeapon>> weapons;
+    CTable<MapBuildingEquipment> equipments;
+    CTable<MapBuildingGlider> gliders;
+    CTable<MapBuildingGood> goods;
+    CTable<MapBuildingModificator> modificators;
+    CTable<MapBuildingProjectile> projectiles;
+    CTable<MapBuildingWeapon> weapons;
 
     int getId() const;
     void setId(int id);
@@ -776,8 +858,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::MapBuilding;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -816,8 +902,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::MapGood;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -856,8 +946,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::MapObject;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -872,9 +966,9 @@ public:
     float h_min = 0.0f;
     float h_max = 0.0f;
 
-    CVector<Ptr<MapBuilding>> buildings;
-    CVector<Ptr<MapGood>> goods;
-    CVector<Ptr<MapObject>> objects;
+    CTable<MapBuilding> buildings;
+    CTable<MapGood> goods;
+    CTable<MapObject> objects;
 
     int getId() const;
     void setId(int id);
@@ -892,8 +986,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Map;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -918,8 +1016,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::MechanoidQuest;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -948,7 +1050,7 @@ public:
     float pitch = 0.0f;
     float yaw = 0.0f;
 
-    CVector<Ptr<MechanoidQuest>> quests;
+    CTable<MechanoidQuest> quests;
 
     int getId() const;
     void setId(int id);
@@ -966,8 +1068,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Mechanoid;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -991,8 +1097,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::ModificationClan;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -1016,8 +1126,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::ModificationMap;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -1041,8 +1155,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::ModificationMechanoid;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -1063,9 +1181,9 @@ public:
     IdPtr<Mechanoid> player_mechanoid;
     IdPtr<Configuration> cooperative_player_configuration;
 
-    CVector<Ptr<ModificationClan>> clans;
-    CVector<Ptr<ModificationMap>> maps;
-    CVector<Ptr<ModificationMechanoid>> mechanoids;
+    CTable<ModificationClan> clans;
+    CTable<ModificationMap> maps;
+    CTable<ModificationMechanoid> mechanoids;
 
     int getId() const;
     void setId(int id);
@@ -1083,8 +1201,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Modification;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -1120,8 +1242,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Modificator;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -1151,8 +1277,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Object;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -1179,8 +1309,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Player;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -1224,8 +1358,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Projectile;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -1250,8 +1388,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::QuestRewardEquipment;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -1276,8 +1418,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::QuestRewardGlider;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -1302,8 +1448,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::QuestRewardGood;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -1328,8 +1478,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::QuestRewardModificator;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -1354,8 +1508,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::QuestRewardProjectile;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -1379,8 +1537,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::QuestRewardReputation;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -1405,8 +1567,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::QuestRewardWeapon;
+    static const bool has_id = false;
+
     static const char *getSql();
 };
 
@@ -1420,13 +1586,13 @@ public:
     int money = 0;
     float rating = 0.0f;
 
-    CVector<Ptr<QuestRewardEquipment>> equipments;
-    CVector<Ptr<QuestRewardGlider>> gliders;
-    CVector<Ptr<QuestRewardGood>> goods;
-    CVector<Ptr<QuestRewardModificator>> modificators;
-    CVector<Ptr<QuestRewardProjectile>> projectiles;
-    CVector<Ptr<QuestRewardReputation>> reputations;
-    CVector<Ptr<QuestRewardWeapon>> weapons;
+    CTable<QuestRewardEquipment> equipments;
+    CTable<QuestRewardGlider> gliders;
+    CTable<QuestRewardGood> goods;
+    CTable<QuestRewardModificator> modificators;
+    CTable<QuestRewardProjectile> projectiles;
+    CTable<QuestRewardReputation> reputations;
+    CTable<QuestRewardWeapon> weapons;
 
     int getId() const;
     void setId(int id);
@@ -1444,8 +1610,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::QuestReward;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -1460,7 +1630,7 @@ public:
     IdPtr<String> description;
     int time = 0;
 
-    CVector<Ptr<QuestReward>> rewards;
+    CTable<QuestReward> rewards;
 
     int getId() const;
     void setId(int id);
@@ -1478,16 +1648,27 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Quest;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
 class ScriptVariable : public IObject
 {
+private:
+    int id = 0;
 public:
     Text variable;
-    Text value;
+    int value_int = 0;
+    float value_float = 0.0f;
+    Text value_text;
+
+    int getId() const;
+    void setId(int id);
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1502,15 +1683,28 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::ScriptVariable;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
 class Setting : public IObject
 {
+private:
+    int id = 0;
 public:
     IdPtr<Player> player;
+    int value_int = 0;
+    float value_float = 0.0f;
+    Text value_text;
+    Blob value_blob;
+
+    int getId() const;
+    void setId(int id);
 
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
@@ -1525,8 +1719,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Setting;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -1564,8 +1762,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::String;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -1592,8 +1794,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Table;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 
@@ -1652,8 +1858,12 @@ public:
 private:
     friend class StorageImpl;
     template <typename T> friend struct IdPtr;
+    template <class T> friend class CTable;
 
 public:
+    static const EObjectType object_type = EObjectType::Weapon;
+    static const bool has_id = true;
+
     static const char *getSql();
 };
 

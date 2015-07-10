@@ -18,8 +18,8 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
-#include <string>
 
 #include <codecvt>
 #include <locale>
@@ -47,10 +47,12 @@ inline std::string to_string(std::wstring s)
 inline std::string to_string(const wchar_t *s)
 {
     return to_string(std::wstring(s));
-} 
+}
 
 namespace polygon4
 {
+
+typedef std::shared_ptr<uint8_t> Data;
 
 class String
 {
@@ -187,8 +189,8 @@ public:
         if (!data || !rhs.data)
             return false;
         if (multiplier == 1 && rhs.multiplier == 1)
-            return strcmp(data.get(), rhs.data.get()) == 0;
-        return wcscmp((wchar_t *)data.get(), (wchar_t *)rhs.data.get()) == 0;
+            return strcmp((const char *)data.get(), (const char *)rhs.data.get()) == 0;
+        return wcscmp((const wchar_t *)data.get(), (const wchar_t *)rhs.data.get()) == 0;
     }
     bool operator!=(const String &rhs) const
     {
@@ -228,8 +230,11 @@ public:
         return *this;
     }
 
+    Data getData() const { return data; }
+    size_t getLength() const { return length; }
+
 private:
-    std::shared_ptr<char> data;
+    Data data;
     size_t length = 0;
     int multiplier = 1;
     
@@ -241,12 +246,14 @@ private:
             this->data.reset();
             return;
         }
-        auto s = new char[length];
+        auto s = new uint8_t[length];
         memcpy(s, data, length);
-        this->data = std::shared_ptr<char>(s, [](char *s){ delete[] s; });
+        this->data = Data(s, [](uint8_t *s){ delete[] s; });
         this->length = length;
         this->multiplier = multiplier;
     }
+
+    friend struct StringHash;
 };
 
 inline std::string to_string(const String &s)
@@ -258,5 +265,92 @@ inline std::wstring to_wstring(const String &s)
 {
     return s.wstring();
 }
+
+struct StringHash
+{
+    std::size_t operator()(const polygon4::String &s) const
+    {
+        if (s.multiplier == 1)
+            return std::hash<std::string>()(s.string());
+        if (s.multiplier == 2)
+            return std::hash<std::wstring>()(s.wstring());
+    }
+};
+
+class Blob
+{
+public:
+    Blob()
+    {
+    }
+    Blob(const void *data, size_t length)
+    {
+        copy(data, length);
+    }
+    Blob(const Blob &rhs)
+    {
+        data = rhs.data;
+        length = rhs.length;
+    }
+
+    ~Blob()
+    {
+    }
+    
+    Blob &operator=(const Blob &rhs)
+    {
+        data = rhs.data;
+        length = rhs.length;
+        return *this;
+    }
+    Blob &operator=(const String &s)
+    {
+        data = s.getData();
+        length = s.getLength();
+        return *this;
+    }
+
+    bool empty() const
+    {
+        return length == 0;
+    }
+
+    bool operator==(const Blob &rhs) const
+    {
+        if (data == rhs.data)
+            return true;
+        if (!data || !rhs.data)
+            return false;
+        if (length != rhs.length)
+            return false;
+        return memcmp(data.get(), rhs.data.get(), length) == 0;
+    }
+    bool operator!=(const Blob &rhs) const
+    {
+        return !operator==(rhs);
+    }
+
+    void clear()
+    {
+        data.reset();
+        length = 0;
+    }
+
+    Data getData() const { return data; }
+    Data::element_type *getRawData() const { return data.get(); }
+    size_t getLength() const { return length; }
+
+private:
+    Data data;
+    size_t length = 0;
+    
+    void copy(const void *data, size_t length)
+    {
+        auto s = new uint8_t[length];
+        memcpy(s, data, length);
+        this->data = std::shared_ptr<uint8_t>(s, [](uint8_t *s){ delete[] s; });
+        this->length = length;
+    }
+};
 
 }
