@@ -146,6 +146,10 @@ private:
 public:
     Text text_id;
     Text resource;
+    float scale = 1;
+    float scale_x = 1;
+    float scale_y = 1;
+    float scale_z = 1;
 
     int getId() const;
     void setId(int id);
@@ -965,6 +969,10 @@ public:
     IdPtr<String> name;
     float h_min = 0.0f;
     float h_max = 0.0f;
+    float kx = 0.0f;
+    float bx = 0.0f;
+    float ky = 0.0f;
+    float by = 0.0f;
 
     CTable<MapBuilding> buildings;
     CTable<MapGood> goods;
@@ -1260,6 +1268,10 @@ public:
     Text resource;
     IdPtr<String> name;
     int type = 0;
+    float scale = 1;
+    float scale_x = 1;
+    float scale_y = 1;
+    float scale_z = 1;
 
     int getId() const;
     void setId(int id);

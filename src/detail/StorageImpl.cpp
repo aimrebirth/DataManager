@@ -13,6 +13,10 @@ void StorageImpl::_loadBuildings()
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
+        v->scale = sqlite3_column_double(stmt, 3);
+        v->scale_x = sqlite3_column_double(stmt, 4);
+        v->scale_y = sqlite3_column_double(stmt, 5);
+        v->scale_z = sqlite3_column_double(stmt, 6);
         buildings.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -30,7 +34,7 @@ void StorageImpl::_saveBuildings() const
 {
     db->execute("BEGIN;");
     db->execute("delete from Buildings;");
-    const std::string query = "insert into Buildings values (?, ?, ?);";
+    const std::string query = "insert into Buildings values (?, ?, ?, ?, ?, ?, ?);";
     int ret = 0;
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
@@ -41,6 +45,10 @@ void StorageImpl::_saveBuildings() const
         ret = sqlite3_bind_int(stmt, 1, v->id);
         ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
         ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_double(stmt, 4, v->scale);
+        ret = sqlite3_bind_double(stmt, 5, v->scale_x);
+        ret = sqlite3_bind_double(stmt, 6, v->scale_y);
+        ret = sqlite3_bind_double(stmt, 7, v->scale_z);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -201,10 +209,10 @@ void StorageImpl::_loadClansArrays()
     {
         for (auto &clanMechanoid : clanMechanoids)
             if (clan.first == clanMechanoid->clan.id)
-                clan->mechanoids.push_back(clanMechanoid);
+                clan->mechanoids.insert(clanMechanoid);
         for (auto &clanReputation : clanReputations)
             if (clan.first == clanReputation->clan.id)
-                clan->reputations.push_back(clanReputation);
+                clan->reputations.insert(clanReputation);
     }
 }
 
@@ -496,16 +504,16 @@ void StorageImpl::_loadConfigurationsArrays()
     {
         for (auto &configurationEquipment : configurationEquipments)
             if (configuration.first == configurationEquipment->configuration.id)
-                configuration->equipments.push_back(configurationEquipment);
+                configuration->equipments.insert(configurationEquipment);
         for (auto &configurationGood : configurationGoods)
             if (configuration.first == configurationGood->configuration.id)
-                configuration->goods.push_back(configurationGood);
+                configuration->goods.insert(configurationGood);
         for (auto &configurationProjectile : configurationProjectiles)
             if (configuration.first == configurationProjectile->configuration.id)
-                configuration->projectiles.push_back(configurationProjectile);
+                configuration->projectiles.insert(configurationProjectile);
         for (auto &configurationWeapon : configurationWeapons)
             if (configuration.first == configurationWeapon->configuration.id)
-                configuration->weapons.push_back(configurationWeapon);
+                configuration->weapons.insert(configurationWeapon);
     }
 }
 
@@ -849,7 +857,7 @@ void StorageImpl::_loadGroupsArrays()
     {
         for (auto &groupMechanoid : groupMechanoids)
             if (group.first == groupMechanoid->group.id)
-                group->mechanoids.push_back(groupMechanoid);
+                group->mechanoids.insert(groupMechanoid);
     }
 }
 
@@ -1255,22 +1263,22 @@ void StorageImpl::_loadMapBuildingsArrays()
     {
         for (auto &mapBuildingEquipment : mapBuildingEquipments)
             if (mapBuilding.first == mapBuildingEquipment->mapBuilding.id)
-                mapBuilding->equipments.push_back(mapBuildingEquipment);
+                mapBuilding->equipments.insert(mapBuildingEquipment);
         for (auto &mapBuildingGlider : mapBuildingGliders)
             if (mapBuilding.first == mapBuildingGlider->mapBuilding.id)
-                mapBuilding->gliders.push_back(mapBuildingGlider);
+                mapBuilding->gliders.insert(mapBuildingGlider);
         for (auto &mapBuildingGood : mapBuildingGoods)
             if (mapBuilding.first == mapBuildingGood->mapBuilding.id)
-                mapBuilding->goods.push_back(mapBuildingGood);
+                mapBuilding->goods.insert(mapBuildingGood);
         for (auto &mapBuildingModificator : mapBuildingModificators)
             if (mapBuilding.first == mapBuildingModificator->mapBuilding.id)
-                mapBuilding->modificators.push_back(mapBuildingModificator);
+                mapBuilding->modificators.insert(mapBuildingModificator);
         for (auto &mapBuildingProjectile : mapBuildingProjectiles)
             if (mapBuilding.first == mapBuildingProjectile->mapBuilding.id)
-                mapBuilding->projectiles.push_back(mapBuildingProjectile);
+                mapBuilding->projectiles.insert(mapBuildingProjectile);
         for (auto &mapBuildingWeapon : mapBuildingWeapons)
             if (mapBuilding.first == mapBuildingWeapon->mapBuilding.id)
-                mapBuilding->weapons.push_back(mapBuildingWeapon);
+                mapBuilding->weapons.insert(mapBuildingWeapon);
     }
 }
 
@@ -1479,6 +1487,10 @@ void StorageImpl::_loadMaps()
         v->name.id = sqlite3_column_int(stmt, 3);
         v->h_min = sqlite3_column_double(stmt, 4);
         v->h_max = sqlite3_column_double(stmt, 5);
+        v->kx = sqlite3_column_double(stmt, 6);
+        v->bx = sqlite3_column_double(stmt, 7);
+        v->ky = sqlite3_column_double(stmt, 8);
+        v->by = sqlite3_column_double(stmt, 9);
         maps.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -1499,13 +1511,13 @@ void StorageImpl::_loadMapsArrays()
     {
         for (auto &mapBuilding : mapBuildings)
             if (map.first == mapBuilding->map.id)
-                map->buildings.push_back(mapBuilding);
+                map->buildings.insert(mapBuilding);
         for (auto &mapGood : mapGoods)
             if (map.first == mapGood->map.id)
-                map->goods.push_back(mapGood);
+                map->goods.insert(mapGood);
         for (auto &mapObject : mapObjects)
             if (map.first == mapObject->map.id)
-                map->objects.push_back(mapObject);
+                map->objects.insert(mapObject);
     }
 }
 
@@ -1513,7 +1525,7 @@ void StorageImpl::_saveMaps() const
 {
     db->execute("BEGIN;");
     db->execute("delete from Maps;");
-    const std::string query = "insert into Maps values (?, ?, ?, ?, ?, ?);";
+    const std::string query = "insert into Maps values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     int ret = 0;
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
@@ -1527,6 +1539,10 @@ void StorageImpl::_saveMaps() const
         ret = sqlite3_bind_int(stmt, 4, v->name.id);
         ret = sqlite3_bind_double(stmt, 5, v->h_min);
         ret = sqlite3_bind_double(stmt, 6, v->h_max);
+        ret = sqlite3_bind_double(stmt, 7, v->kx);
+        ret = sqlite3_bind_double(stmt, 8, v->bx);
+        ret = sqlite3_bind_double(stmt, 9, v->ky);
+        ret = sqlite3_bind_double(stmt, 10, v->by);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -1649,7 +1665,7 @@ void StorageImpl::_loadMechanoidsArrays()
     {
         for (auto &mechanoidQuest : mechanoidQuests)
             if (mechanoid.first == mechanoidQuest->mechanoid.id)
-                mechanoid->quests.push_back(mechanoidQuest);
+                mechanoid->quests.insert(mechanoidQuest);
     }
 }
 
@@ -1897,13 +1913,13 @@ void StorageImpl::_loadModificationsArrays()
     {
         for (auto &modificationClan : modificationClans)
             if (modification.first == modificationClan->modification.id)
-                modification->clans.push_back(modificationClan);
+                modification->clans.insert(modificationClan);
         for (auto &modificationMap : modificationMaps)
             if (modification.first == modificationMap->modification.id)
-                modification->maps.push_back(modificationMap);
+                modification->maps.insert(modificationMap);
         for (auto &modificationMechanoid : modificationMechanoids)
             if (modification.first == modificationMechanoid->modification.id)
-                modification->mechanoids.push_back(modificationMechanoid);
+                modification->mechanoids.insert(modificationMechanoid);
     }
 }
 
@@ -2022,6 +2038,10 @@ void StorageImpl::_loadObjects()
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
         v->name.id = sqlite3_column_int(stmt, 3);
         v->type = sqlite3_column_int(stmt, 4);
+        v->scale = sqlite3_column_double(stmt, 5);
+        v->scale_x = sqlite3_column_double(stmt, 6);
+        v->scale_y = sqlite3_column_double(stmt, 7);
+        v->scale_z = sqlite3_column_double(stmt, 8);
         objects.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -2044,7 +2064,7 @@ void StorageImpl::_saveObjects() const
 {
     db->execute("BEGIN;");
     db->execute("delete from Objects;");
-    const std::string query = "insert into Objects values (?, ?, ?, ?, ?);";
+    const std::string query = "insert into Objects values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
     int ret = 0;
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
@@ -2057,6 +2077,10 @@ void StorageImpl::_saveObjects() const
         ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
         ret = sqlite3_bind_int(stmt, 4, v->name.id);
         ret = sqlite3_bind_int(stmt, 5, v->type);
+        ret = sqlite3_bind_double(stmt, 6, v->scale);
+        ret = sqlite3_bind_double(stmt, 7, v->scale_x);
+        ret = sqlite3_bind_double(stmt, 8, v->scale_y);
+        ret = sqlite3_bind_double(stmt, 9, v->scale_z);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -2620,25 +2644,25 @@ void StorageImpl::_loadQuestRewardsArrays()
     {
         for (auto &questRewardEquipment : questRewardEquipments)
             if (questReward.first == questRewardEquipment->questReward.id)
-                questReward->equipments.push_back(questRewardEquipment);
+                questReward->equipments.insert(questRewardEquipment);
         for (auto &questRewardGlider : questRewardGliders)
             if (questReward.first == questRewardGlider->questReward.id)
-                questReward->gliders.push_back(questRewardGlider);
+                questReward->gliders.insert(questRewardGlider);
         for (auto &questRewardGood : questRewardGoods)
             if (questReward.first == questRewardGood->questReward.id)
-                questReward->goods.push_back(questRewardGood);
+                questReward->goods.insert(questRewardGood);
         for (auto &questRewardModificator : questRewardModificators)
             if (questReward.first == questRewardModificator->questReward.id)
-                questReward->modificators.push_back(questRewardModificator);
+                questReward->modificators.insert(questRewardModificator);
         for (auto &questRewardProjectile : questRewardProjectiles)
             if (questReward.first == questRewardProjectile->questReward.id)
-                questReward->projectiles.push_back(questRewardProjectile);
+                questReward->projectiles.insert(questRewardProjectile);
         for (auto &questRewardReputation : questRewardReputations)
             if (questReward.first == questRewardReputation->questReward.id)
-                questReward->reputations.push_back(questRewardReputation);
+                questReward->reputations.insert(questRewardReputation);
         for (auto &questRewardWeapon : questRewardWeapons)
             if (questReward.first == questRewardWeapon->questReward.id)
-                questReward->weapons.push_back(questRewardWeapon);
+                questReward->weapons.insert(questRewardWeapon);
     }
 }
 
@@ -2706,7 +2730,7 @@ void StorageImpl::_loadQuestsArrays()
     {
         for (auto &questReward : questRewards)
             if (quest.first == questReward->quest.id)
-                quest->rewards.push_back(questReward);
+                quest->rewards.insert(questReward);
     }
 }
 
@@ -3578,7 +3602,7 @@ Ptr<ClanMechanoid> StorageImpl::addClanMechanoid(IObject *parent)
 {
     auto v = clanMechanoids.createAtEnd();
     Clan *clan = (Clan *)parent;
-    clan->mechanoids.push_back(v);
+    clan->mechanoids.insert(v);
     v->clan = clans[clan->id];
     return v;
 }
@@ -3592,7 +3616,7 @@ Ptr<ClanReputation> StorageImpl::addClanReputation(IObject *parent)
 {
     auto v = clanReputations.createAtEnd();
     Clan *clan = (Clan *)parent;
-    clan->reputations.push_back(v);
+    clan->reputations.insert(v);
     v->clan = clans[clan->id];
     return v;
 }
@@ -3616,7 +3640,7 @@ Ptr<ConfigurationEquipment> StorageImpl::addConfigurationEquipment(IObject *pare
 {
     auto v = configurationEquipments.createAtEnd();
     Configuration *configuration = (Configuration *)parent;
-    configuration->equipments.push_back(v);
+    configuration->equipments.insert(v);
     v->configuration = configurations[configuration->id];
     return v;
 }
@@ -3630,7 +3654,7 @@ Ptr<ConfigurationGood> StorageImpl::addConfigurationGood(IObject *parent)
 {
     auto v = configurationGoods.createAtEnd();
     Configuration *configuration = (Configuration *)parent;
-    configuration->goods.push_back(v);
+    configuration->goods.insert(v);
     v->configuration = configurations[configuration->id];
     return v;
 }
@@ -3644,7 +3668,7 @@ Ptr<ConfigurationProjectile> StorageImpl::addConfigurationProjectile(IObject *pa
 {
     auto v = configurationProjectiles.createAtEnd();
     Configuration *configuration = (Configuration *)parent;
-    configuration->projectiles.push_back(v);
+    configuration->projectiles.insert(v);
     v->configuration = configurations[configuration->id];
     return v;
 }
@@ -3658,7 +3682,7 @@ Ptr<ConfigurationWeapon> StorageImpl::addConfigurationWeapon(IObject *parent)
 {
     auto v = configurationWeapons.createAtEnd();
     Configuration *configuration = (Configuration *)parent;
-    configuration->weapons.push_back(v);
+    configuration->weapons.insert(v);
     v->configuration = configurations[configuration->id];
     return v;
 }
@@ -3712,7 +3736,7 @@ Ptr<GroupMechanoid> StorageImpl::addGroupMechanoid(IObject *parent)
 {
     auto v = groupMechanoids.createAtEnd();
     Group *group = (Group *)parent;
-    group->mechanoids.push_back(v);
+    group->mechanoids.insert(v);
     v->group = groups[group->id];
     return v;
 }
@@ -3736,7 +3760,7 @@ Ptr<MapBuildingEquipment> StorageImpl::addMapBuildingEquipment(IObject *parent)
 {
     auto v = mapBuildingEquipments.createAtEnd();
     MapBuilding *mapBuilding = (MapBuilding *)parent;
-    mapBuilding->equipments.push_back(v);
+    mapBuilding->equipments.insert(v);
     v->mapBuilding = mapBuildings[mapBuilding->id];
     return v;
 }
@@ -3750,7 +3774,7 @@ Ptr<MapBuildingGlider> StorageImpl::addMapBuildingGlider(IObject *parent)
 {
     auto v = mapBuildingGliders.createAtEnd();
     MapBuilding *mapBuilding = (MapBuilding *)parent;
-    mapBuilding->gliders.push_back(v);
+    mapBuilding->gliders.insert(v);
     v->mapBuilding = mapBuildings[mapBuilding->id];
     return v;
 }
@@ -3764,7 +3788,7 @@ Ptr<MapBuildingGood> StorageImpl::addMapBuildingGood(IObject *parent)
 {
     auto v = mapBuildingGoods.createAtEnd();
     MapBuilding *mapBuilding = (MapBuilding *)parent;
-    mapBuilding->goods.push_back(v);
+    mapBuilding->goods.insert(v);
     v->mapBuilding = mapBuildings[mapBuilding->id];
     return v;
 }
@@ -3778,7 +3802,7 @@ Ptr<MapBuildingModificator> StorageImpl::addMapBuildingModificator(IObject *pare
 {
     auto v = mapBuildingModificators.createAtEnd();
     MapBuilding *mapBuilding = (MapBuilding *)parent;
-    mapBuilding->modificators.push_back(v);
+    mapBuilding->modificators.insert(v);
     v->mapBuilding = mapBuildings[mapBuilding->id];
     return v;
 }
@@ -3792,7 +3816,7 @@ Ptr<MapBuildingProjectile> StorageImpl::addMapBuildingProjectile(IObject *parent
 {
     auto v = mapBuildingProjectiles.createAtEnd();
     MapBuilding *mapBuilding = (MapBuilding *)parent;
-    mapBuilding->projectiles.push_back(v);
+    mapBuilding->projectiles.insert(v);
     v->mapBuilding = mapBuildings[mapBuilding->id];
     return v;
 }
@@ -3806,7 +3830,7 @@ Ptr<MapBuildingWeapon> StorageImpl::addMapBuildingWeapon(IObject *parent)
 {
     auto v = mapBuildingWeapons.createAtEnd();
     MapBuilding *mapBuilding = (MapBuilding *)parent;
-    mapBuilding->weapons.push_back(v);
+    mapBuilding->weapons.insert(v);
     v->mapBuilding = mapBuildings[mapBuilding->id];
     return v;
 }
@@ -3820,7 +3844,7 @@ Ptr<MapBuilding> StorageImpl::addMapBuilding(IObject *parent)
 {
     auto v = mapBuildings.createAtEnd();
     Map *map = (Map *)parent;
-    map->buildings.push_back(v);
+    map->buildings.insert(v);
     v->map = maps[map->id];
     return v;
 }
@@ -3834,7 +3858,7 @@ Ptr<MapGood> StorageImpl::addMapGood(IObject *parent)
 {
     auto v = mapGoods.createAtEnd();
     Map *map = (Map *)parent;
-    map->goods.push_back(v);
+    map->goods.insert(v);
     v->map = maps[map->id];
     return v;
 }
@@ -3848,7 +3872,7 @@ Ptr<MapObject> StorageImpl::addMapObject(IObject *parent)
 {
     auto v = mapObjects.createAtEnd();
     Map *map = (Map *)parent;
-    map->objects.push_back(v);
+    map->objects.insert(v);
     v->map = maps[map->id];
     return v;
 }
@@ -3872,7 +3896,7 @@ Ptr<MechanoidQuest> StorageImpl::addMechanoidQuest(IObject *parent)
 {
     auto v = mechanoidQuests.createAtEnd();
     Mechanoid *mechanoid = (Mechanoid *)parent;
-    mechanoid->quests.push_back(v);
+    mechanoid->quests.insert(v);
     v->mechanoid = mechanoids[mechanoid->id];
     return v;
 }
@@ -3896,7 +3920,7 @@ Ptr<ModificationClan> StorageImpl::addModificationClan(IObject *parent)
 {
     auto v = modificationClans.createAtEnd();
     Modification *modification = (Modification *)parent;
-    modification->clans.push_back(v);
+    modification->clans.insert(v);
     v->modification = modifications[modification->id];
     return v;
 }
@@ -3910,7 +3934,7 @@ Ptr<ModificationMap> StorageImpl::addModificationMap(IObject *parent)
 {
     auto v = modificationMaps.createAtEnd();
     Modification *modification = (Modification *)parent;
-    modification->maps.push_back(v);
+    modification->maps.insert(v);
     v->modification = modifications[modification->id];
     return v;
 }
@@ -3924,7 +3948,7 @@ Ptr<ModificationMechanoid> StorageImpl::addModificationMechanoid(IObject *parent
 {
     auto v = modificationMechanoids.createAtEnd();
     Modification *modification = (Modification *)parent;
-    modification->mechanoids.push_back(v);
+    modification->mechanoids.insert(v);
     v->modification = modifications[modification->id];
     return v;
 }
@@ -3988,7 +4012,7 @@ Ptr<QuestRewardEquipment> StorageImpl::addQuestRewardEquipment(IObject *parent)
 {
     auto v = questRewardEquipments.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
-    questReward->equipments.push_back(v);
+    questReward->equipments.insert(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
@@ -4002,7 +4026,7 @@ Ptr<QuestRewardGlider> StorageImpl::addQuestRewardGlider(IObject *parent)
 {
     auto v = questRewardGliders.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
-    questReward->gliders.push_back(v);
+    questReward->gliders.insert(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
@@ -4016,7 +4040,7 @@ Ptr<QuestRewardGood> StorageImpl::addQuestRewardGood(IObject *parent)
 {
     auto v = questRewardGoods.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
-    questReward->goods.push_back(v);
+    questReward->goods.insert(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
@@ -4030,7 +4054,7 @@ Ptr<QuestRewardModificator> StorageImpl::addQuestRewardModificator(IObject *pare
 {
     auto v = questRewardModificators.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
-    questReward->modificators.push_back(v);
+    questReward->modificators.insert(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
@@ -4044,7 +4068,7 @@ Ptr<QuestRewardProjectile> StorageImpl::addQuestRewardProjectile(IObject *parent
 {
     auto v = questRewardProjectiles.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
-    questReward->projectiles.push_back(v);
+    questReward->projectiles.insert(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
@@ -4058,7 +4082,7 @@ Ptr<QuestRewardReputation> StorageImpl::addQuestRewardReputation(IObject *parent
 {
     auto v = questRewardReputations.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
-    questReward->reputations.push_back(v);
+    questReward->reputations.insert(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }
@@ -4072,7 +4096,7 @@ Ptr<QuestRewardWeapon> StorageImpl::addQuestRewardWeapon(IObject *parent)
 {
     auto v = questRewardWeapons.createAtEnd();
     QuestReward *questReward = (QuestReward *)parent;
-    questReward->weapons.push_back(v);
+    questReward->weapons.insert(v);
     v->questReward = questRewards[questReward->id];
     return v;
 }

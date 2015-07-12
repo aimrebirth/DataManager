@@ -30,6 +30,14 @@ Text Building::getVariableString(int columnId) const
         return to_string(text_id);
     case 2:
         return to_string(resource);
+    case 3:
+        return to_string(scale);
+    case 4:
+        return to_string(scale_x);
+    case 5:
+        return to_string(scale_y);
+    case 6:
+        return to_string(scale_z);
     default:
         return "";
     }
@@ -48,6 +56,18 @@ void Building::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         break;
     case 2:
         resource = text.string();
+        break;
+    case 3:
+        scale = std::stof(text.string());
+        break;
+    case 4:
+        scale_x = std::stof(text.string());
+        break;
+    case 5:
+        scale_y = std::stof(text.string());
+        break;
+    case 6:
+        scale_z = std::stof(text.string());
         break;
     default:
         break;
@@ -77,6 +97,10 @@ bool Building::operator==(const Building &rhs) const
 {
     return
         resource == rhs.resource &&
+        scale == rhs.scale &&
+        scale_x == rhs.scale_x &&
+        scale_y == rhs.scale_y &&
+        scale_z == rhs.scale_z &&
         text_id == rhs.text_id &&
         1;
 }
@@ -89,6 +113,10 @@ create table \"Buildings\" ( \
 \"id\" INTEGER NOT NULL, \
 \"text_id\" TEXT, \
 \"resource\" TEXT, \
+\"scale\" REAL DEFAULT 1, \
+\"scale_x\" REAL DEFAULT 1, \
+\"scale_y\" REAL DEFAULT 1, \
+\"scale_z\" REAL DEFAULT 1, \
 PRIMARY KEY (\"id\") \
 ); \
     ";
@@ -2771,6 +2799,14 @@ Text Map::getVariableString(int columnId) const
         return to_string(h_min);
     case 5:
         return to_string(h_max);
+    case 6:
+        return to_string(kx);
+    case 7:
+        return to_string(bx);
+    case 8:
+        return to_string(ky);
+    case 9:
+        return to_string(by);
     default:
         return "";
     }
@@ -2798,6 +2834,18 @@ void Map::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         break;
     case 5:
         h_max = std::stof(text.string());
+        break;
+    case 6:
+        kx = std::stof(text.string());
+        break;
+    case 7:
+        bx = std::stof(text.string());
+        break;
+    case 8:
+        ky = std::stof(text.string());
+        break;
+    case 9:
+        by = std::stof(text.string());
         break;
     default:
         break;
@@ -2853,8 +2901,12 @@ Text Map::getName() const
 bool Map::operator==(const Map &rhs) const
 {
     return
+        bx == rhs.bx &&
+        by == rhs.by &&
         h_max == rhs.h_max &&
         h_min == rhs.h_min &&
+        kx == rhs.kx &&
+        ky == rhs.ky &&
         name == rhs.name &&
         resource == rhs.resource &&
         text_id == rhs.text_id &&
@@ -2872,6 +2924,10 @@ create table \"Maps\" ( \
 \"name_id\" INTEGER, \
 \"h_min\" REAL, \
 \"h_max\" REAL, \
+\"kx\" REAL, \
+\"bx\" REAL, \
+\"ky\" REAL, \
+\"by\" REAL, \
 PRIMARY KEY (\"id\"), \
 FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
 ); \
@@ -3793,6 +3849,14 @@ Text Object::getVariableString(int columnId) const
         return to_string(name);
     case 4:
         return to_string(type);
+    case 5:
+        return to_string(scale);
+    case 6:
+        return to_string(scale_x);
+    case 7:
+        return to_string(scale_y);
+    case 8:
+        return to_string(scale_z);
     default:
         return "";
     }
@@ -3817,6 +3881,18 @@ void Object::setVariableString(int columnId, Text text, Ptr<IObject> ptr)
         break;
     case 4:
         type = std::stoi(text.string());
+        break;
+    case 5:
+        scale = std::stof(text.string());
+        break;
+    case 6:
+        scale_x = std::stof(text.string());
+        break;
+    case 7:
+        scale_y = std::stof(text.string());
+        break;
+    case 8:
+        scale_z = std::stof(text.string());
         break;
     default:
         break;
@@ -3850,6 +3926,10 @@ bool Object::operator==(const Object &rhs) const
     return
         name == rhs.name &&
         resource == rhs.resource &&
+        scale == rhs.scale &&
+        scale_x == rhs.scale_x &&
+        scale_y == rhs.scale_y &&
+        scale_z == rhs.scale_z &&
         text_id == rhs.text_id &&
         type == rhs.type &&
         1;
@@ -3865,6 +3945,10 @@ create table \"Objects\" ( \
 \"resource\" TEXT, \
 \"name_id\" INTEGER, \
 \"type\" INTEGER, \
+\"scale\" REAL DEFAULT 1, \
+\"scale_x\" REAL DEFAULT 1, \
+\"scale_y\" REAL DEFAULT 1, \
+\"scale_z\" REAL DEFAULT 1, \
 PRIMARY KEY (\"id\"), \
 FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") \
 ); \

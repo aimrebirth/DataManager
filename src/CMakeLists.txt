@@ -12,6 +12,9 @@ set(db_src
 
 add_library                 (DatabaseManager ${db_src} ${db_inc})
 target_link_libraries       (DatabaseManager sqlite3)
+if (MSVC)
+target_compile_options      (DatabaseManager PUBLIC /bigobj)
+endif()
 if (Qt5Core_FOUND)
     set_target_properties   (DatabaseManager PROPERTIES AUTOMOC True)
 endif()

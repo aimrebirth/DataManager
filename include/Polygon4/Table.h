@@ -53,6 +53,15 @@ struct TablePair : public std::pair<T1, T2>
         }
         return second;
     }
+
+    operator T2&()
+    {
+        return second;
+    }
+    operator const T2&() const
+    {
+        return second;
+    }
 };
 
 template <class T>
@@ -68,18 +77,14 @@ public:
     typedef TablePair<const key_type, ptr_type> value_type;
 
     typedef std::unordered_map<key_type, ptr_type> container;
-
+    
     template <class T, class ParentType>
-    class iterator_base : public std::iterator<std::random_access_iterator_tag, T>
+    class iterator_base : public std::iterator<std::bidirectional_iterator_tag, T>
     {
-        typedef typename ParentType parent_iterator;
-        
     public:
-        parent_iterator i;
+        iterator_base(const ParentType& iter) : i(iter) {}
 
-        iterator_base(const parent_iterator& it) : i(it) {}
-
-        iterator_base& operator++() { ++i; return *this; }
+        iterator_base &operator++() { ++i; return *this; }
         iterator_base operator++(int) { iterator_base tmp(*this); operator++(); return tmp; }
 
         template <class T>
@@ -87,14 +92,15 @@ public:
         template <class T>
         bool operator!=(const T &rhs) const {return i != rhs.i;}
 
-        reference operator*() { return (T &)*i; }
+        T &operator*() { return (T &)*i; }
         T &operator->() { return (T &)*i; }
+
+        // parent iterator
+        ParentType i;
     };
 
     typedef typename iterator_base<value_type, typename container::iterator> iterator;
     typedef typename iterator_base<value_type, typename container::const_iterator> const_iterator;
-    typedef typename iterator_base<value_type, typename container::reverse_iterator> reverse_iterator;
-    typedef typename iterator_base<value_type, typename container::const_reverse_iterator> const_reverse_iterator;
     
 private:
     template <class T>
@@ -122,6 +128,7 @@ public:
     {
         return std::make_shared<mapped_type>();
     }
+
     // create value and append it to the end of container
     ptr_type createAtEnd()
     {
@@ -129,8 +136,8 @@ public:
         idHandler.setKey(v, maxId);
         return data[maxId++] = v;
     }
+
     // here we insert element with checking its id
-    // map mode
     ptr_type insert(const ptr_type &v)
     {
         auto key = idHandler.getKey(v, maxId);
@@ -157,17 +164,15 @@ public:
         }
         return v;
     }
-    // vector mode
-    void push_back(ptr_type &v)
+    ptr_type insertAtEnd(const ptr_type &v)
     {
-        insert(v);
+        idHandler.setKey(v, maxId);
+        data[maxId++] = v;
+        return v;
     }
-    void push_back(value_type &v)
-    {
-        insert(v.second);
-    }
+
     // get by key
-    ptr_type operator[](const key_type &i) const // do not changes the container
+    ptr_type operator[](const key_type &i) const // does not change the container
     {
         auto v = data.find(i);
         if (v == data.end())
@@ -182,10 +187,6 @@ public: // container interface
     iterator end() { return data.end(); }
     const_iterator begin() const { return data.begin(); }
     const_iterator end() const { return data.end(); }
-    reverse_iterator rbegin() { return data.rbegin(); }
-    reverse_iterator rend() { return data.rend(); }
-    const_reverse_iterator rbegin() const { return data.rbegin(); }
-    const_reverse_iterator rend() const { return data.rend(); }
 
     iterator find() { return data.find(key); }
     const_iterator find(key_type key) const { return data.find(key); }
