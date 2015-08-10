@@ -29,7 +29,7 @@
 #include <qstring.h>
 #endif
 
-inline std::wstring to_wstring(std::string s)
+inline std::wstring to_wstring(const std::string &s)
 {
     static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     return converter.from_bytes(s.c_str());
@@ -39,7 +39,7 @@ inline std::wstring to_wstring(const char *s)
     return to_wstring(std::string(s));
 }
 
-inline std::string to_string(std::wstring s)
+inline std::string to_string(const std::wstring &s)
 {
     static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     return converter.to_bytes(s.c_str());
