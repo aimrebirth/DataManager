@@ -238,19 +238,19 @@ private:
     size_t length = 0;
     int multiplier = 1;
     
-    void copy(const void *data, size_t length, size_t multiplier = 1)
+    void copy(const void *bytes, size_t len, size_t mult = 1)
     {
-        length *= multiplier;
-        if (length == multiplier)
+        len *= mult;
+        if (length == mult)
         {
             this->data.reset();
             return;
         }
-        auto s = new uint8_t[length];
-        memcpy(s, data, length);
-        this->data = Data(s, [](uint8_t *s){ delete[] s; });
-        this->length = length;
-        this->multiplier = multiplier;
+        auto s = new uint8_t[len];
+        memcpy(s, bytes, len);
+        data = Data(s, [](uint8_t *s){ delete[] s; });
+        length = len;
+        multiplier = mult;
     }
 
     friend struct StringHash;
@@ -344,12 +344,12 @@ private:
     Data data;
     size_t length = 0;
     
-    void copy(const void *data, size_t length)
+    void copy(const void *bytes, size_t len)
     {
-        auto s = new uint8_t[length];
-        memcpy(s, data, length);
-        this->data = std::shared_ptr<uint8_t>(s, [](uint8_t *s){ delete[] s; });
-        this->length = length;
+        auto s = new uint8_t[len];
+        memcpy(s, bytes, len);
+        data = std::shared_ptr<uint8_t>(s, [](uint8_t *s){ delete[] s; });
+        length = len;
     }
 };
 
