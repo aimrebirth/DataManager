@@ -55,7 +55,7 @@ EObjectType getTableType(const std::string &table)
         { "AnyTable", EObjectType::Any },
     };
     return types[table];
-};
+}
 
 std::string getTableNameByType(EObjectType type)
 {
@@ -112,7 +112,7 @@ std::string getTableNameByType(EObjectType type)
         { EObjectType::Any, "AnyTable" },
     };
     return tables[type];
-};
+}
 
 #ifdef USE_QT
 typedef std::map<std::string, QString> FieldNames;
@@ -267,12 +267,12 @@ void retranslateFieldNames()
         { "z", QCoreApplication::translate("DB", "z") },
     };
     fieldNames = names;
-};
+}
 
 QString getFieldName(const std::string &name)
 {
     return fieldNames[name];
-};
+}
 
 typedef std::map<std::string, QString> TableNames;
 
@@ -333,10 +333,11 @@ void retranslateTableNames()
         { "AnyTable", QCoreApplication::translate("DB", "Any Table") },
     };
     tableNames = names;
-};
+}
 
 QString getTableName(const std::string &name)
 {
     return tableNames[name];
-};
+}
+
 #endif

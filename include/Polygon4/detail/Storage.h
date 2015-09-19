@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "../Table.h"
+
 class Storage
 {
 public:
@@ -171,4 +173,3 @@ public:
     virtual Ptr<IObject> addRecord(IObject *parent = 0) = 0;
     virtual void deleteRecord(IObject *data) = 0;
 };
-

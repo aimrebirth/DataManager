@@ -27,6 +27,8 @@
 #include "Exception.h"
 #include "String.h"
 
+#include "detail/ObjectTypes.h"
+
 #ifdef USE_QT
 #include <qobject.h>
 
@@ -50,13 +52,12 @@ typedef uint8_t EnumType;
 
 template <typename T>
 using Ptr = std::shared_ptr<T>;
-
 template <typename T>
 using CVector = std::vector<Ptr<T>>;
+using OrderedObjectMap = std::multimap<Text, Ptr<class IObject>>;
+using ProgressCallback = std::function<void(double)>;
 
-typedef std::multimap<Text, Ptr<class IObject>> OrderedObjectMap;
-
-template <typename T>
+template <class T>
 struct IdPtr
 {
     int id = 0;
@@ -106,7 +107,31 @@ inline Text to_string(IdPtr<T> ptr)
     return Text();
 }
 
-typedef std::function<void(double)> ProgressCallback;
+class IObject
+{
+public:
+    virtual ~IObject() {}
+
+    virtual EObjectType getType() const = 0;
+    virtual Text getVariableString(int columnId) const = 0;
+    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>()) = 0;
+    virtual Text getName() const
+    {
+        return POLYGON4_NONAME;
+    }
+#ifdef USE_QT
+    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const = 0;
+#endif
+
+    bool operator<(const IObject &rhs) const
+    {
+        return getName() < rhs.getName();
+    }
+
+private:
+    friend class StorageImpl;
+    template <class T> friend struct IdPtr;
+};
 
 } // namespace detail
 

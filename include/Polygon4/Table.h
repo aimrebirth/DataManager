@@ -67,8 +67,8 @@ struct TablePair : public std::pair<T1, T2>
 template <class T>
 class CTable
 {
-    friend class Storage;
-    friend class StorageImpl;
+    friend class Storage; // ?
+    friend class StorageImpl; // ?
 
 public:
     typedef int key_type;

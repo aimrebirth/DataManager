@@ -4668,7 +4668,7 @@ QTreeWidgetItem *StorageImpl::addRecord(QTreeWidgetItem *item)
 
 void StorageImpl::deleteRecord(QTreeWidgetItem *item)
 {
-    IObject *data = (IObject *)item->data(0, Qt::UserRole).toULongLong(); 
+    IObject *data = (IObject *)item->data(0, Qt::UserRole).toULongLong();
     EObjectType type = data->getType();
     switch (type)
     {
@@ -4927,3 +4927,4 @@ OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type, std::function<bool
         return OrderedObjectMap();
     }
 }
+

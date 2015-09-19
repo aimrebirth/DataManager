@@ -3,7 +3,6 @@
 #pragma once
 
 #include "../Table.h"
-
 #include "../Types.h"
 
 namespace polygon4
@@ -11,62 +10,6 @@ namespace polygon4
 
 namespace detail
 {
-
-enum class EObjectType : int
-{
-    None,
-
-    Building,
-    ClanMechanoid,
-    ClanReputation,
-    Clan,
-    ConfigurationEquipment,
-    ConfigurationGood,
-    ConfigurationProjectile,
-    ConfigurationWeapon,
-    Configuration,
-    Equipment,
-    Glider,
-    Good,
-    GroupMechanoid,
-    Group,
-    MapBuildingEquipment,
-    MapBuildingGlider,
-    MapBuildingGood,
-    MapBuildingModificator,
-    MapBuildingProjectile,
-    MapBuildingWeapon,
-    MapBuilding,
-    MapGood,
-    MapObject,
-    Map,
-    MechanoidQuest,
-    Mechanoid,
-    ModificationClan,
-    ModificationMap,
-    ModificationMechanoid,
-    Modification,
-    Modificator,
-    Object,
-    Player,
-    Projectile,
-    QuestRewardEquipment,
-    QuestRewardGlider,
-    QuestRewardGood,
-    QuestRewardModificator,
-    QuestRewardProjectile,
-    QuestRewardReputation,
-    QuestRewardWeapon,
-    QuestReward,
-    Quest,
-    ScriptVariable,
-    Setting,
-    String,
-    Table,
-    Weapon,
-
-    Any,
-};
 
 class Building;
 class ClanMechanoid;
@@ -117,30 +60,9 @@ class String;
 class Table;
 class Weapon;
 
-class IObject
-{
-    friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
-
-public:
-    virtual ~IObject(){}
-
-    virtual EObjectType getType() const = 0;
-    virtual Text getVariableString(int columnId) const = 0;
-    virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>()) = 0;
-    virtual Text getName() const;
-#ifdef USE_QT
-    virtual QTreeWidgetItem *printQtTreeView(QTreeWidgetItem *parent) const = 0;
-#endif
-
-    bool operator<(const IObject &rhs) const
-    {
-        return getName() < rhs.getName();
-    }
-};
-
 class Building : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -151,6 +73,8 @@ public:
     float scale_y = 1;
     float scale_z = 1;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -166,7 +90,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -178,10 +102,13 @@ public:
 
 class ClanMechanoid : public IObject
 {
+    // data
 public:
     IdPtr<Clan> clan;
     IdPtr<Mechanoid> mechanoid;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -195,7 +122,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -207,11 +134,14 @@ public:
 
 class ClanReputation : public IObject
 {
+    // data
 public:
     IdPtr<Clan> clan;
     IdPtr<Clan> clan2;
     float reputation = 0.0f;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -224,7 +154,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -236,6 +166,7 @@ public:
 
 class Clan : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -255,6 +186,8 @@ public:
     CTable<ClanMechanoid> mechanoids;
     CTable<ClanReputation> reputations;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -270,7 +203,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -282,11 +215,14 @@ public:
 
 class ConfigurationEquipment : public IObject
 {
+    // data
 public:
     IdPtr<Configuration> configuration;
     IdPtr<Equipment> equipment;
     int quantity = 1;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -300,7 +236,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -312,11 +248,14 @@ public:
 
 class ConfigurationGood : public IObject
 {
+    // data
 public:
     IdPtr<Configuration> configuration;
     IdPtr<Good> good;
     int quantity = 1;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -330,7 +269,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -342,11 +281,14 @@ public:
 
 class ConfigurationProjectile : public IObject
 {
+    // data
 public:
     IdPtr<Configuration> configuration;
     IdPtr<Projectile> projectile;
     int quantity = 1;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -360,7 +302,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -372,11 +314,14 @@ public:
 
 class ConfigurationWeapon : public IObject
 {
+    // data
 public:
     IdPtr<Configuration> configuration;
     IdPtr<Weapon> weapon;
     int quantity = 1;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -390,7 +335,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -402,6 +347,7 @@ public:
 
 class Configuration : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -414,6 +360,8 @@ public:
     CTable<ConfigurationProjectile> projectiles;
     CTable<ConfigurationWeapon> weapons;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -429,7 +377,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -441,6 +389,7 @@ public:
 
 class Equipment : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -459,6 +408,8 @@ public:
     float price = 0.0f;
     int notrade = 0;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -474,7 +425,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -486,6 +437,7 @@ public:
 
 class Glider : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -510,6 +462,8 @@ public:
     float delta_t = 0.0f;
     float turbulence = 0.0f;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -525,7 +479,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -537,6 +491,7 @@ public:
 
 class Good : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -549,6 +504,8 @@ public:
     int notrade = 0;
     int type = 0;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -564,7 +521,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -576,10 +533,13 @@ public:
 
 class GroupMechanoid : public IObject
 {
+    // data
 public:
     IdPtr<Group> group;
     IdPtr<Mechanoid> mechanoid;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -593,7 +553,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -605,6 +565,7 @@ public:
 
 class Group : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -613,6 +574,8 @@ public:
 
     CTable<GroupMechanoid> mechanoids;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -628,7 +591,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -640,11 +603,14 @@ public:
 
 class MapBuildingEquipment : public IObject
 {
+    // data
 public:
     IdPtr<MapBuilding> mapBuilding;
     IdPtr<Equipment> equipment;
     int quantity = 0;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -658,7 +624,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -670,11 +636,14 @@ public:
 
 class MapBuildingGlider : public IObject
 {
+    // data
 public:
     IdPtr<MapBuilding> mapBuilding;
     IdPtr<Glider> glider;
     int quantity = 0;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -688,7 +657,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -700,11 +669,14 @@ public:
 
 class MapBuildingGood : public IObject
 {
+    // data
 public:
     IdPtr<MapBuilding> mapBuilding;
     IdPtr<Good> good;
     int quantity = 0;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -718,7 +690,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -730,11 +702,14 @@ public:
 
 class MapBuildingModificator : public IObject
 {
+    // data
 public:
     IdPtr<MapBuilding> mapBuilding;
     IdPtr<Modificator> modificator;
     int quantity = 0;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -748,7 +723,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -760,11 +735,14 @@ public:
 
 class MapBuildingProjectile : public IObject
 {
+    // data
 public:
     IdPtr<MapBuilding> mapBuilding;
     IdPtr<Projectile> projectile;
     int quantity = 0;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -778,7 +756,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -790,11 +768,14 @@ public:
 
 class MapBuildingWeapon : public IObject
 {
+    // data
 public:
     IdPtr<MapBuilding> mapBuilding;
     IdPtr<Weapon> weapon;
     int quantity = 0;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -808,7 +789,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -820,6 +801,7 @@ public:
 
 class MapBuilding : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -846,6 +828,8 @@ public:
     CTable<MapBuildingProjectile> projectiles;
     CTable<MapBuildingWeapon> weapons;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -861,7 +845,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -873,6 +857,7 @@ public:
 
 class MapGood : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -890,6 +875,8 @@ public:
     float scale_y = 0.0f;
     float scale_z = 0.0f;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -905,7 +892,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -917,6 +904,7 @@ public:
 
 class MapObject : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -934,6 +922,8 @@ public:
     float scale_y = 1;
     float scale_z = 1;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -949,7 +939,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -961,6 +951,7 @@ public:
 
 class Map : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -978,6 +969,8 @@ public:
     CTable<MapGood> goods;
     CTable<MapObject> objects;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -993,7 +986,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1005,11 +998,14 @@ public:
 
 class MechanoidQuest : public IObject
 {
+    // data
 public:
     IdPtr<Mechanoid> mechanoid;
     IdPtr<Quest> quest;
     int state = 0;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1023,7 +1019,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1035,6 +1031,7 @@ public:
 
 class Mechanoid : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -1060,6 +1057,8 @@ public:
 
     CTable<MechanoidQuest> quests;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1075,7 +1074,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1087,10 +1086,13 @@ public:
 
 class ModificationClan : public IObject
 {
+    // data
 public:
     IdPtr<Modification> modification;
     IdPtr<Clan> clan;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1104,7 +1106,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1116,10 +1118,13 @@ public:
 
 class ModificationMap : public IObject
 {
+    // data
 public:
     IdPtr<Modification> modification;
     IdPtr<Map> map;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1133,7 +1138,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1145,10 +1150,13 @@ public:
 
 class ModificationMechanoid : public IObject
 {
+    // data
 public:
     IdPtr<Modification> modification;
     IdPtr<Mechanoid> mechanoid;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1162,7 +1170,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1174,6 +1182,7 @@ public:
 
 class Modification : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -1193,6 +1202,8 @@ public:
     CTable<ModificationMap> maps;
     CTable<ModificationMechanoid> mechanoids;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1208,7 +1219,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1220,6 +1231,7 @@ public:
 
 class Modificator : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -1234,6 +1246,8 @@ public:
     int unicum_id = 0;
     int mask = 0;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1249,7 +1263,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1261,6 +1275,7 @@ public:
 
 class Object : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -1273,6 +1288,8 @@ public:
     float scale_y = 1;
     float scale_z = 1;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1288,7 +1305,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1300,11 +1317,14 @@ public:
 
 class Player : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
     IdPtr<Mechanoid> mechanoid;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1320,7 +1340,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1332,6 +1352,7 @@ public:
 
 class Projectile : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -1354,6 +1375,8 @@ public:
     float price = 0.0f;
     int notrade = 0;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1369,7 +1392,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1381,11 +1404,14 @@ public:
 
 class QuestRewardEquipment : public IObject
 {
+    // data
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Equipment> equipment;
     int quantity = 1;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1399,7 +1425,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1411,11 +1437,14 @@ public:
 
 class QuestRewardGlider : public IObject
 {
+    // data
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Glider> glider;
     int quantity = 1;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1429,7 +1458,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1441,11 +1470,14 @@ public:
 
 class QuestRewardGood : public IObject
 {
+    // data
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Good> good;
     int quantity = 1;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1459,7 +1491,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1471,11 +1503,14 @@ public:
 
 class QuestRewardModificator : public IObject
 {
+    // data
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Modificator> modificator;
     int quantity = 1;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1489,7 +1524,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1501,11 +1536,14 @@ public:
 
 class QuestRewardProjectile : public IObject
 {
+    // data
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Projectile> projectile;
     int quantity = 1;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1519,7 +1557,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1531,11 +1569,14 @@ public:
 
 class QuestRewardReputation : public IObject
 {
+    // data
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Clan> clan;
     float reputation = 1;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1548,7 +1589,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1560,11 +1601,14 @@ public:
 
 class QuestRewardWeapon : public IObject
 {
+    // data
 public:
     IdPtr<QuestReward> questReward;
     IdPtr<Weapon> weapon;
     int quantity = 1;
 
+    // functions
+public:
     virtual EObjectType getType() const;
     virtual Text getVariableString(int columnId) const;
     virtual void setVariableString(int columnId, Text text, Ptr<IObject> ptr = Ptr<IObject>());
@@ -1578,7 +1622,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1590,6 +1634,7 @@ public:
 
 class QuestReward : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -1606,6 +1651,8 @@ public:
     CTable<QuestRewardReputation> reputations;
     CTable<QuestRewardWeapon> weapons;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1621,7 +1668,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1633,6 +1680,7 @@ public:
 
 class Quest : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -1644,6 +1692,8 @@ public:
 
     CTable<QuestReward> rewards;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1659,7 +1709,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1671,6 +1721,7 @@ public:
 
 class ScriptVariable : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -1679,6 +1730,8 @@ public:
     float value_float = 0.0f;
     Text value_text;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1694,7 +1747,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1706,6 +1759,7 @@ public:
 
 class Setting : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -1715,6 +1769,8 @@ public:
     Text value_text;
     Blob value_blob;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1730,7 +1786,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1745,11 +1801,12 @@ enum class LocalizationType : EnumType
     ru,
     en,
 
-    max
+    max,
 };
 
 class String : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -1758,6 +1815,8 @@ public:
     Text ru;
     Text en;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1773,7 +1832,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1785,11 +1844,14 @@ public:
 
 class Table : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
     Text text_id;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1805,7 +1867,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1817,6 +1879,7 @@ public:
 
 class Weapon : public IObject
 {
+    // data
 private:
     int id = 0;
 public:
@@ -1854,6 +1917,8 @@ public:
     float inside_z = 0.0f;
     int notrade = 0;
 
+    // functions
+public:
     int getId() const;
     void setId(int id);
 
@@ -1869,7 +1934,7 @@ public:
 
 private:
     friend class StorageImpl;
-    template <typename T> friend struct IdPtr;
+    template <class T> friend struct IdPtr;
     template <class T> friend class CTable;
 
 public:
@@ -1879,7 +1944,6 @@ public:
     static const char *getSql();
 };
 
-}
+} // namespace detail
 
-}
-
+} // namespace polygon4

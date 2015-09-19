@@ -370,4 +370,3 @@ public:
 
     virtual OrderedObjectMap getOrderedMap(EObjectType type, std::function<bool(Ptr<IObject>)> f = std::function<bool(Ptr<IObject>)>()) const;
 };
-
