@@ -18,20 +18,29 @@
 
 #pragma once
 
-#ifdef USE_QT
-#include <qcoreapplication.h>
-#endif
+#include <memory>
+#include <string>
 
-#include "Storage.h"
+#include "dll.h"
+#include "Types.h"
+#include "Table.h"
 
 namespace polygon4
 {
 
 namespace detail
 {
-
-#include "detail/StorageImpl.h"
+    
+#include "detail/Storage.h"
 
 } // namespace detail
+
+using detail::Storage;
+class Database;
+
+DLL_EXPORT
+std::shared_ptr<Storage> initStorage(std::string filename);
+DLL_EXPORT
+std::shared_ptr<Storage> initStorage(std::shared_ptr<Database> db);
 
 } // namespace polygon4

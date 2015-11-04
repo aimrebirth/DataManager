@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Polygon4/Helpers.h>
+#include <Polygon4/DataManager/Helpers.h>
 
 #ifdef USE_QT
 #include <qcoreapplication.h>

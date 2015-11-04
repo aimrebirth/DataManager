@@ -43,120 +43,12 @@ void StorageImpl::_saveBuildings() const
     {
         auto &v = building.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, std::to_string(v->resource).c_str(), -1, SQLITE_TRANSIENT);
         ret = sqlite3_bind_double(stmt, 4, v->scale);
         ret = sqlite3_bind_double(stmt, 5, v->scale_x);
         ret = sqlite3_bind_double(stmt, 6, v->scale_y);
         ret = sqlite3_bind_double(stmt, 7, v->scale_z);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadClanMechanoids()
-{
-    int ret = 0;
-    const std::string query = "select * from ClanMechanoids;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = clanMechanoids.create();
-        v->clan.id = sqlite3_column_int(stmt, 0);
-        v->mechanoid.id = sqlite3_column_int(stmt, 1);
-        clanMechanoids.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadClanMechanoidsPtrs()
-{
-    for (auto &clanMechanoid : clanMechanoids)
-    {
-        if (clans.find(clanMechanoid->clan.id) != clans.end())
-            clanMechanoid->clan.ptr = clans[clanMechanoid->clan.id];
-        if (mechanoids.find(clanMechanoid->mechanoid.id) != mechanoids.end())
-            clanMechanoid->mechanoid.ptr = mechanoids[clanMechanoid->mechanoid.id];
-    }
-}
-
-void StorageImpl::_loadClanMechanoidsArrays()
-{
-}
-
-void StorageImpl::_saveClanMechanoids() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from ClanMechanoids;");
-    const std::string query = "insert into ClanMechanoids values (?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &clanMechanoid : clanMechanoids)
-    {
-        auto &v = clanMechanoid;
-        ret = sqlite3_bind_int(stmt, 1, v->clan.id);
-        ret = sqlite3_bind_int(stmt, 2, v->mechanoid.id);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadClanReputations()
-{
-    int ret = 0;
-    const std::string query = "select * from ClanReputations;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = clanReputations.create();
-        v->clan.id = sqlite3_column_int(stmt, 0);
-        v->clan2.id = sqlite3_column_int(stmt, 1);
-        v->reputation = (float)sqlite3_column_double(stmt, 2);
-        clanReputations.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadClanReputationsPtrs()
-{
-    for (auto &clanReputation : clanReputations)
-    {
-        if (clans.find(clanReputation->clan.id) != clans.end())
-            clanReputation->clan.ptr = clans[clanReputation->clan.id];
-        if (clans.find(clanReputation->clan2.id) != clans.end())
-            clanReputation->clan2.ptr = clans[clanReputation->clan2.id];
-    }
-}
-
-void StorageImpl::_loadClanReputationsArrays()
-{
-}
-
-void StorageImpl::_saveClanReputations() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from ClanReputations;");
-    const std::string query = "insert into ClanReputations values (?, ?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &clanReputation : clanReputations)
-    {
-        auto &v = clanReputation;
-        ret = sqlite3_bind_int(stmt, 1, v->clan.id);
-        ret = sqlite3_bind_int(stmt, 2, v->clan2.id);
-        ret = sqlite3_bind_double(stmt, 3, v->reputation);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -177,16 +69,17 @@ void StorageImpl::_loadClans()
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
-        v->name.id = sqlite3_column_int(stmt, 3);
-        v->member_name.id = sqlite3_column_int(stmt, 4);
-        v->bonusexp = sqlite3_column_int(stmt, 5);
-        v->bonusrepair = sqlite3_column_int(stmt, 6);
-        v->bonustrade = sqlite3_column_int(stmt, 7);
-        v->helpness = sqlite3_column_int(stmt, 8);
-        v->Volatile = (float)sqlite3_column_double(stmt, 9);
-        v->noblivion = (float)sqlite3_column_double(stmt, 10);
-        v->playereffect = (float)sqlite3_column_double(stmt, 11);
-        v->color = sqlite3_column_int(stmt, 12);
+        v->name->id = (stmt, 3);
+        v->member_name->id = (stmt, 4);
+        v->modification->id = (stmt, 5);
+        v->bonusexp = sqlite3_column_int(stmt, 6);
+        v->bonusrepair = sqlite3_column_int(stmt, 7);
+        v->bonustrade = sqlite3_column_int(stmt, 8);
+        v->helpness = sqlite3_column_int(stmt, 9);
+        v->Volatile = (float)sqlite3_column_double(stmt, 10);
+        v->noblivion = (float)sqlite3_column_double(stmt, 11);
+        v->playereffect = (float)sqlite3_column_double(stmt, 12);
+        v->color = sqlite3_column_int(stmt, 13);
         clans.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -196,10 +89,12 @@ void StorageImpl::_loadClansPtrs()
 {
     for (auto &clan : clans)
     {
-        if (strings.find(clan.second->name.id) != strings.end())
-            clan.second->name.ptr = strings[clan.second->name.id];
-        if (strings.find(clan.second->member_name.id) != strings.end())
-            clan.second->member_name.ptr = strings[clan.second->member_name.id];
+        if (strings.find(clan->name->id) != strings.end())
+            clan->name = strings[clan->name->id];
+        if (strings.find(clan->member_name->id) != strings.end())
+            clan->member_name = strings[clan->member_name->id];
+        if (modifications.find(clan->modification->id) != modifications.end())
+            clan->modification = modifications[clan->modification->id];
     }
 }
 
@@ -207,12 +102,12 @@ void StorageImpl::_loadClansArrays()
 {
     for (auto &clan : clans)
     {
-        for (auto &clanMechanoid : clanMechanoids)
-            if (clan.first == clanMechanoid->clan.id)
-                clan->mechanoids.insert(clanMechanoid);
+        for (auto &mechanoid : mechanoids)
+            if (clan->id == mechanoid->clan->id)
+                clan->mechanoids->insert(mechanoid);
         for (auto &clanReputation : clanReputations)
-            if (clan.first == clanReputation->clan.id)
-                clan->reputations.insert(clanReputation);
+            if (clan->id == clanReputation->clan1->id)
+                clan->reputations->insert(clanReputation);
     }
 }
 
@@ -220,7 +115,7 @@ void StorageImpl::_saveClans() const
 {
     db->execute("BEGIN;");
     db->execute("delete from Clans;");
-    const std::string query = "insert into Clans values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    const std::string query = "insert into Clans values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     int ret = 0;
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
@@ -229,18 +124,19 @@ void StorageImpl::_saveClans() const
     {
         auto &v = clan.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 4, v->name.id);
-        ret = sqlite3_bind_int(stmt, 5, v->member_name.id);
-        ret = sqlite3_bind_int(stmt, 6, v->bonusexp);
-        ret = sqlite3_bind_int(stmt, 7, v->bonusrepair);
-        ret = sqlite3_bind_int(stmt, 8, v->bonustrade);
-        ret = sqlite3_bind_int(stmt, 9, v->helpness);
-        ret = sqlite3_bind_double(stmt, 10, v->Volatile);
-        ret = sqlite3_bind_double(stmt, 11, v->noblivion);
-        ret = sqlite3_bind_double(stmt, 12, v->playereffect);
-        ret = sqlite3_bind_int(stmt, 13, v->color);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, std::to_string(v->resource).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name->id);
+        ret = sqlite3_bind_int(stmt, 5, v->member_name->id);
+        ret = sqlite3_bind_int(stmt, 6, v->modification->id);
+        ret = sqlite3_bind_int(stmt, 7, v->bonusexp);
+        ret = sqlite3_bind_int(stmt, 8, v->bonusrepair);
+        ret = sqlite3_bind_int(stmt, 9, v->bonustrade);
+        ret = sqlite3_bind_int(stmt, 10, v->helpness);
+        ret = sqlite3_bind_double(stmt, 11, v->Volatile);
+        ret = sqlite3_bind_double(stmt, 12, v->noblivion);
+        ret = sqlite3_bind_double(stmt, 13, v->playereffect);
+        ret = sqlite3_bind_int(stmt, 14, v->color);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -248,219 +144,54 @@ void StorageImpl::_saveClans() const
     db->execute("COMMIT;");
 }
 
-void StorageImpl::_loadConfigurationEquipments()
+void StorageImpl::_loadClanReputations()
 {
     int ret = 0;
-    const std::string query = "select * from ConfigurationEquipments;";
+    const std::string query = "select * from ClanReputations;";
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = configurationEquipments.create();
-        v->configuration.id = sqlite3_column_int(stmt, 0);
-        v->equipment.id = sqlite3_column_int(stmt, 1);
-        v->quantity = sqlite3_column_int(stmt, 2);
-        configurationEquipments.insert(v);
+        auto v = clanReputations.create();
+        v->clan1->id = (stmt, 0);
+        v->clan2->id = (stmt, 1);
+        v->reputation = (float)sqlite3_column_double(stmt, 2);
+        clanReputations.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
 
-void StorageImpl::_loadConfigurationEquipmentsPtrs()
+void StorageImpl::_loadClanReputationsPtrs()
 {
-    for (auto &configurationEquipment : configurationEquipments)
+    for (auto &clanReputation : clanReputations)
     {
-        if (configurations.find(configurationEquipment->configuration.id) != configurations.end())
-            configurationEquipment->configuration.ptr = configurations[configurationEquipment->configuration.id];
-        if (equipments.find(configurationEquipment->equipment.id) != equipments.end())
-            configurationEquipment->equipment.ptr = equipments[configurationEquipment->equipment.id];
+        if (clans.find(clanReputation->clan1->id) != clans.end())
+            clanReputation->clan1 = clans[clanReputation->clan1->id];
+        if (clans.find(clanReputation->clan2->id) != clans.end())
+            clanReputation->clan2 = clans[clanReputation->clan2->id];
     }
 }
 
-void StorageImpl::_loadConfigurationEquipmentsArrays()
+void StorageImpl::_loadClanReputationsArrays()
 {
 }
 
-void StorageImpl::_saveConfigurationEquipments() const
+void StorageImpl::_saveClanReputations() const
 {
     db->execute("BEGIN;");
-    db->execute("delete from ConfigurationEquipments;");
-    const std::string query = "insert into ConfigurationEquipments values (?, ?, ?);";
+    db->execute("delete from ClanReputations;");
+    const std::string query = "insert into ClanReputations values (?, ?, ?);";
     int ret = 0;
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &configurationEquipment : configurationEquipments)
+    for (auto &clanReputation : clanReputations)
     {
-        auto &v = configurationEquipment;
-        ret = sqlite3_bind_int(stmt, 1, v->configuration.id);
-        ret = sqlite3_bind_int(stmt, 2, v->equipment.id);
-        ret = sqlite3_bind_int(stmt, 3, v->quantity);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadConfigurationGoods()
-{
-    int ret = 0;
-    const std::string query = "select * from ConfigurationGoods;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = configurationGoods.create();
-        v->configuration.id = sqlite3_column_int(stmt, 0);
-        v->good.id = sqlite3_column_int(stmt, 1);
-        v->quantity = sqlite3_column_int(stmt, 2);
-        configurationGoods.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadConfigurationGoodsPtrs()
-{
-    for (auto &configurationGood : configurationGoods)
-    {
-        if (configurations.find(configurationGood->configuration.id) != configurations.end())
-            configurationGood->configuration.ptr = configurations[configurationGood->configuration.id];
-        if (goods.find(configurationGood->good.id) != goods.end())
-            configurationGood->good.ptr = goods[configurationGood->good.id];
-    }
-}
-
-void StorageImpl::_loadConfigurationGoodsArrays()
-{
-}
-
-void StorageImpl::_saveConfigurationGoods() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from ConfigurationGoods;");
-    const std::string query = "insert into ConfigurationGoods values (?, ?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &configurationGood : configurationGoods)
-    {
-        auto &v = configurationGood;
-        ret = sqlite3_bind_int(stmt, 1, v->configuration.id);
-        ret = sqlite3_bind_int(stmt, 2, v->good.id);
-        ret = sqlite3_bind_int(stmt, 3, v->quantity);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadConfigurationProjectiles()
-{
-    int ret = 0;
-    const std::string query = "select * from ConfigurationProjectiles;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = configurationProjectiles.create();
-        v->configuration.id = sqlite3_column_int(stmt, 0);
-        v->projectile.id = sqlite3_column_int(stmt, 1);
-        v->quantity = sqlite3_column_int(stmt, 2);
-        configurationProjectiles.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadConfigurationProjectilesPtrs()
-{
-    for (auto &configurationProjectile : configurationProjectiles)
-    {
-        if (configurations.find(configurationProjectile->configuration.id) != configurations.end())
-            configurationProjectile->configuration.ptr = configurations[configurationProjectile->configuration.id];
-        if (projectiles.find(configurationProjectile->projectile.id) != projectiles.end())
-            configurationProjectile->projectile.ptr = projectiles[configurationProjectile->projectile.id];
-    }
-}
-
-void StorageImpl::_loadConfigurationProjectilesArrays()
-{
-}
-
-void StorageImpl::_saveConfigurationProjectiles() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from ConfigurationProjectiles;");
-    const std::string query = "insert into ConfigurationProjectiles values (?, ?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &configurationProjectile : configurationProjectiles)
-    {
-        auto &v = configurationProjectile;
-        ret = sqlite3_bind_int(stmt, 1, v->configuration.id);
-        ret = sqlite3_bind_int(stmt, 2, v->projectile.id);
-        ret = sqlite3_bind_int(stmt, 3, v->quantity);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadConfigurationWeapons()
-{
-    int ret = 0;
-    const std::string query = "select * from ConfigurationWeapons;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = configurationWeapons.create();
-        v->configuration.id = sqlite3_column_int(stmt, 0);
-        v->weapon.id = sqlite3_column_int(stmt, 1);
-        v->quantity = sqlite3_column_int(stmt, 2);
-        configurationWeapons.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadConfigurationWeaponsPtrs()
-{
-    for (auto &configurationWeapon : configurationWeapons)
-    {
-        if (configurations.find(configurationWeapon->configuration.id) != configurations.end())
-            configurationWeapon->configuration.ptr = configurations[configurationWeapon->configuration.id];
-        if (weapons.find(configurationWeapon->weapon.id) != weapons.end())
-            configurationWeapon->weapon.ptr = weapons[configurationWeapon->weapon.id];
-    }
-}
-
-void StorageImpl::_loadConfigurationWeaponsArrays()
-{
-}
-
-void StorageImpl::_saveConfigurationWeapons() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from ConfigurationWeapons;");
-    const std::string query = "insert into ConfigurationWeapons values (?, ?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &configurationWeapon : configurationWeapons)
-    {
-        auto &v = configurationWeapon;
-        ret = sqlite3_bind_int(stmt, 1, v->configuration.id);
-        ret = sqlite3_bind_int(stmt, 2, v->weapon.id);
-        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        auto &v = clanReputation;
+        ret = sqlite3_bind_int(stmt, 1, v->clan1->id);
+        ret = sqlite3_bind_int(stmt, 2, v->clan2->id);
+        ret = sqlite3_bind_double(stmt, 3, v->reputation);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -480,8 +211,8 @@ void StorageImpl::_loadConfigurations()
         auto v = configurations.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
-        v->name.id = sqlite3_column_int(stmt, 2);
-        v->glider.id = sqlite3_column_int(stmt, 3);
+        v->name->id = (stmt, 2);
+        v->glider->id = (stmt, 3);
         configurations.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -491,10 +222,10 @@ void StorageImpl::_loadConfigurationsPtrs()
 {
     for (auto &configuration : configurations)
     {
-        if (strings.find(configuration.second->name.id) != strings.end())
-            configuration.second->name.ptr = strings[configuration.second->name.id];
-        if (gliders.find(configuration.second->glider.id) != gliders.end())
-            configuration.second->glider.ptr = gliders[configuration.second->glider.id];
+        if (strings.find(configuration->name->id) != strings.end())
+            configuration->name = strings[configuration->name->id];
+        if (gliders.find(configuration->glider->id) != gliders.end())
+            configuration->glider = gliders[configuration->glider->id];
     }
 }
 
@@ -503,17 +234,17 @@ void StorageImpl::_loadConfigurationsArrays()
     for (auto &configuration : configurations)
     {
         for (auto &configurationEquipment : configurationEquipments)
-            if (configuration.first == configurationEquipment->configuration.id)
-                configuration->equipments.insert(configurationEquipment);
+            if (configuration->id == configurationEquipment->configuration->id)
+                configuration->equipments->insert(configurationEquipment);
         for (auto &configurationGood : configurationGoods)
-            if (configuration.first == configurationGood->configuration.id)
-                configuration->goods.insert(configurationGood);
+            if (configuration->id == configurationGood->configuration->id)
+                configuration->goods->insert(configurationGood);
         for (auto &configurationProjectile : configurationProjectiles)
-            if (configuration.first == configurationProjectile->configuration.id)
-                configuration->projectiles.insert(configurationProjectile);
+            if (configuration->id == configurationProjectile->configuration->id)
+                configuration->projectiles->insert(configurationProjectile);
         for (auto &configurationWeapon : configurationWeapons)
-            if (configuration.first == configurationWeapon->configuration.id)
-                configuration->weapons.insert(configurationWeapon);
+            if (configuration->id == configurationWeapon->configuration->id)
+                configuration->weapons->insert(configurationWeapon);
     }
 }
 
@@ -530,9 +261,229 @@ void StorageImpl::_saveConfigurations() const
     {
         auto &v = configuration.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 3, v->name.id);
-        ret = sqlite3_bind_int(stmt, 4, v->glider.id);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->name->id);
+        ret = sqlite3_bind_int(stmt, 4, v->glider->id);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadConfigurationEquipments()
+{
+    int ret = 0;
+    const std::string query = "select * from ConfigurationEquipments;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = configurationEquipments.create();
+        v->configuration->id = (stmt, 0);
+        v->equipment->id = (stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        configurationEquipments.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadConfigurationEquipmentsPtrs()
+{
+    for (auto &configurationEquipment : configurationEquipments)
+    {
+        if (configurations.find(configurationEquipment->configuration->id) != configurations.end())
+            configurationEquipment->configuration = configurations[configurationEquipment->configuration->id];
+        if (equipments.find(configurationEquipment->equipment->id) != equipments.end())
+            configurationEquipment->equipment = equipments[configurationEquipment->equipment->id];
+    }
+}
+
+void StorageImpl::_loadConfigurationEquipmentsArrays()
+{
+}
+
+void StorageImpl::_saveConfigurationEquipments() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from ConfigurationEquipments;");
+    const std::string query = "insert into ConfigurationEquipments values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &configurationEquipment : configurationEquipments)
+    {
+        auto &v = configurationEquipment;
+        ret = sqlite3_bind_int(stmt, 1, v->configuration->id);
+        ret = sqlite3_bind_int(stmt, 2, v->equipment->id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadConfigurationGoods()
+{
+    int ret = 0;
+    const std::string query = "select * from ConfigurationGoods;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = configurationGoods.create();
+        v->configuration->id = (stmt, 0);
+        v->good->id = (stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        configurationGoods.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadConfigurationGoodsPtrs()
+{
+    for (auto &configurationGood : configurationGoods)
+    {
+        if (configurations.find(configurationGood->configuration->id) != configurations.end())
+            configurationGood->configuration = configurations[configurationGood->configuration->id];
+        if (goods.find(configurationGood->good->id) != goods.end())
+            configurationGood->good = goods[configurationGood->good->id];
+    }
+}
+
+void StorageImpl::_loadConfigurationGoodsArrays()
+{
+}
+
+void StorageImpl::_saveConfigurationGoods() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from ConfigurationGoods;");
+    const std::string query = "insert into ConfigurationGoods values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &configurationGood : configurationGoods)
+    {
+        auto &v = configurationGood;
+        ret = sqlite3_bind_int(stmt, 1, v->configuration->id);
+        ret = sqlite3_bind_int(stmt, 2, v->good->id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadConfigurationProjectiles()
+{
+    int ret = 0;
+    const std::string query = "select * from ConfigurationProjectiles;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = configurationProjectiles.create();
+        v->configuration->id = (stmt, 0);
+        v->projectile->id = (stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        configurationProjectiles.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadConfigurationProjectilesPtrs()
+{
+    for (auto &configurationProjectile : configurationProjectiles)
+    {
+        if (configurations.find(configurationProjectile->configuration->id) != configurations.end())
+            configurationProjectile->configuration = configurations[configurationProjectile->configuration->id];
+        if (projectiles.find(configurationProjectile->projectile->id) != projectiles.end())
+            configurationProjectile->projectile = projectiles[configurationProjectile->projectile->id];
+    }
+}
+
+void StorageImpl::_loadConfigurationProjectilesArrays()
+{
+}
+
+void StorageImpl::_saveConfigurationProjectiles() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from ConfigurationProjectiles;");
+    const std::string query = "insert into ConfigurationProjectiles values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &configurationProjectile : configurationProjectiles)
+    {
+        auto &v = configurationProjectile;
+        ret = sqlite3_bind_int(stmt, 1, v->configuration->id);
+        ret = sqlite3_bind_int(stmt, 2, v->projectile->id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadConfigurationWeapons()
+{
+    int ret = 0;
+    const std::string query = "select * from ConfigurationWeapons;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = configurationWeapons.create();
+        v->configuration->id = (stmt, 0);
+        v->weapon->id = (stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        configurationWeapons.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadConfigurationWeaponsPtrs()
+{
+    for (auto &configurationWeapon : configurationWeapons)
+    {
+        if (configurations.find(configurationWeapon->configuration->id) != configurations.end())
+            configurationWeapon->configuration = configurations[configurationWeapon->configuration->id];
+        if (weapons.find(configurationWeapon->weapon->id) != weapons.end())
+            configurationWeapon->weapon = weapons[configurationWeapon->weapon->id];
+    }
+}
+
+void StorageImpl::_loadConfigurationWeaponsArrays()
+{
+}
+
+void StorageImpl::_saveConfigurationWeapons() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from ConfigurationWeapons;");
+    const std::string query = "insert into ConfigurationWeapons values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &configurationWeapon : configurationWeapons)
+    {
+        auto &v = configurationWeapon;
+        ret = sqlite3_bind_int(stmt, 1, v->configuration->id);
+        ret = sqlite3_bind_int(stmt, 2, v->weapon->id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -553,7 +504,7 @@ void StorageImpl::_loadEquipments()
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
-        v->name.id = sqlite3_column_int(stmt, 3);
+        v->name->id = (stmt, 3);
         v->type = sqlite3_column_int(stmt, 4);
         v->standard = sqlite3_column_int(stmt, 5);
         v->weight = (float)sqlite3_column_double(stmt, 6);
@@ -574,8 +525,8 @@ void StorageImpl::_loadEquipmentsPtrs()
 {
     for (auto &equipment : equipments)
     {
-        if (strings.find(equipment.second->name.id) != strings.end())
-            equipment.second->name.ptr = strings[equipment.second->name.id];
+        if (strings.find(equipment->name->id) != strings.end())
+            equipment->name = strings[equipment->name->id];
     }
 }
 
@@ -596,9 +547,9 @@ void StorageImpl::_saveEquipments() const
     {
         auto &v = equipment.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, std::to_string(v->resource).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name->id);
         ret = sqlite3_bind_int(stmt, 5, v->type);
         ret = sqlite3_bind_int(stmt, 6, v->standard);
         ret = sqlite3_bind_double(stmt, 7, v->weight);
@@ -630,18 +581,18 @@ void StorageImpl::_loadGliders()
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
-        v->name.id = sqlite3_column_int(stmt, 3);
+        v->name->id = (stmt, 3);
         v->standard = sqlite3_column_int(stmt, 4);
         v->weight = (float)sqlite3_column_double(stmt, 5);
         v->maxweight = (float)sqlite3_column_double(stmt, 6);
         v->armor = (float)sqlite3_column_double(stmt, 7);
-        v->price = sqlite3_column_int(stmt, 8);
+        v->price = (float)sqlite3_column_double(stmt, 8);
         v->restore = (float)sqlite3_column_double(stmt, 9);
         v->power = (float)sqlite3_column_double(stmt, 10);
         v->special = sqlite3_column_int(stmt, 11);
         v->rotatespeed = (float)sqlite3_column_double(stmt, 12);
         v->resfront = (float)sqlite3_column_double(stmt, 13);
-        v->restop = (float)sqlite3_column_double(stmt, 14);
+        v->resstop = (float)sqlite3_column_double(stmt, 14);
         v->resside = (float)sqlite3_column_double(stmt, 15);
         v->stabfront = (float)sqlite3_column_double(stmt, 16);
         v->stabside = (float)sqlite3_column_double(stmt, 17);
@@ -657,8 +608,8 @@ void StorageImpl::_loadGlidersPtrs()
 {
     for (auto &glider : gliders)
     {
-        if (strings.find(glider.second->name.id) != strings.end())
-            glider.second->name.ptr = strings[glider.second->name.id];
+        if (strings.find(glider->name->id) != strings.end())
+            glider->name = strings[glider->name->id];
     }
 }
 
@@ -679,20 +630,20 @@ void StorageImpl::_saveGliders() const
     {
         auto &v = glider.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, std::to_string(v->resource).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name->id);
         ret = sqlite3_bind_int(stmt, 5, v->standard);
         ret = sqlite3_bind_double(stmt, 6, v->weight);
         ret = sqlite3_bind_double(stmt, 7, v->maxweight);
         ret = sqlite3_bind_double(stmt, 8, v->armor);
-        ret = sqlite3_bind_int(stmt, 9, v->price);
+        ret = sqlite3_bind_double(stmt, 9, v->price);
         ret = sqlite3_bind_double(stmt, 10, v->restore);
         ret = sqlite3_bind_double(stmt, 11, v->power);
         ret = sqlite3_bind_int(stmt, 12, v->special);
         ret = sqlite3_bind_double(stmt, 13, v->rotatespeed);
         ret = sqlite3_bind_double(stmt, 14, v->resfront);
-        ret = sqlite3_bind_double(stmt, 15, v->restop);
+        ret = sqlite3_bind_double(stmt, 15, v->resstop);
         ret = sqlite3_bind_double(stmt, 16, v->resside);
         ret = sqlite3_bind_double(stmt, 17, v->stabfront);
         ret = sqlite3_bind_double(stmt, 18, v->stabside);
@@ -720,8 +671,8 @@ void StorageImpl::_loadGoods()
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
         v->resource_drop = (const char *)sqlite3_column_text(stmt, 3);
-        v->name.id = sqlite3_column_int(stmt, 4);
-        v->price = sqlite3_column_int(stmt, 5);
+        v->name->id = (stmt, 4);
+        v->price = (float)sqlite3_column_double(stmt, 5);
         v->weight = (float)sqlite3_column_double(stmt, 6);
         v->notrade = sqlite3_column_int(stmt, 7);
         v->type = sqlite3_column_int(stmt, 8);
@@ -734,8 +685,8 @@ void StorageImpl::_loadGoodsPtrs()
 {
     for (auto &good : goods)
     {
-        if (strings.find(good.second->name.id) != strings.end())
-            good.second->name.ptr = strings[good.second->name.id];
+        if (strings.find(good->name->id) != strings.end())
+            good->name = strings[good->name->id];
     }
 }
 
@@ -756,67 +707,14 @@ void StorageImpl::_saveGoods() const
     {
         auto &v = good.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 4, v->resource_drop.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 5, v->name.id);
-        ret = sqlite3_bind_int(stmt, 6, v->price);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, std::to_string(v->resource).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 4, std::to_string(v->resource_drop).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 5, v->name->id);
+        ret = sqlite3_bind_double(stmt, 6, v->price);
         ret = sqlite3_bind_double(stmt, 7, v->weight);
         ret = sqlite3_bind_int(stmt, 8, v->notrade);
         ret = sqlite3_bind_int(stmt, 9, v->type);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadGroupMechanoids()
-{
-    int ret = 0;
-    const std::string query = "select * from GroupMechanoids;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = groupMechanoids.create();
-        v->group.id = sqlite3_column_int(stmt, 0);
-        v->mechanoid.id = sqlite3_column_int(stmt, 1);
-        groupMechanoids.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadGroupMechanoidsPtrs()
-{
-    for (auto &groupMechanoid : groupMechanoids)
-    {
-        if (groups.find(groupMechanoid->group.id) != groups.end())
-            groupMechanoid->group.ptr = groups[groupMechanoid->group.id];
-        if (mechanoids.find(groupMechanoid->mechanoid.id) != mechanoids.end())
-            groupMechanoid->mechanoid.ptr = mechanoids[groupMechanoid->mechanoid.id];
-    }
-}
-
-void StorageImpl::_loadGroupMechanoidsArrays()
-{
-}
-
-void StorageImpl::_saveGroupMechanoids() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from GroupMechanoids;");
-    const std::string query = "insert into GroupMechanoids values (?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &groupMechanoid : groupMechanoids)
-    {
-        auto &v = groupMechanoid;
-        ret = sqlite3_bind_int(stmt, 1, v->group.id);
-        ret = sqlite3_bind_int(stmt, 2, v->mechanoid.id);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -836,7 +734,7 @@ void StorageImpl::_loadGroups()
         auto v = groups.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
-        v->name.id = sqlite3_column_int(stmt, 2);
+        v->name->id = (stmt, 2);
         groups.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -846,8 +744,8 @@ void StorageImpl::_loadGroupsPtrs()
 {
     for (auto &group : groups)
     {
-        if (strings.find(group.second->name.id) != strings.end())
-            group.second->name.ptr = strings[group.second->name.id];
+        if (strings.find(group->name->id) != strings.end())
+            group->name = strings[group->name->id];
     }
 }
 
@@ -856,8 +754,8 @@ void StorageImpl::_loadGroupsArrays()
     for (auto &group : groups)
     {
         for (auto &groupMechanoid : groupMechanoids)
-            if (group.first == groupMechanoid->group.id)
-                group->mechanoids.insert(groupMechanoid);
+            if (group->id == groupMechanoid->group->id)
+                group->mechanoids->insert(groupMechanoid);
     }
 }
 
@@ -874,8 +772,8 @@ void StorageImpl::_saveGroups() const
     {
         auto &v = group.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 3, v->name.id);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->name->id);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -883,54 +781,52 @@ void StorageImpl::_saveGroups() const
     db->execute("COMMIT;");
 }
 
-void StorageImpl::_loadMapBuildingEquipments()
+void StorageImpl::_loadGroupMechanoids()
 {
     int ret = 0;
-    const std::string query = "select * from MapBuildingEquipments;";
+    const std::string query = "select * from GroupMechanoids;";
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = mapBuildingEquipments.create();
-        v->mapBuilding.id = sqlite3_column_int(stmt, 0);
-        v->equipment.id = sqlite3_column_int(stmt, 1);
-        v->quantity = sqlite3_column_int(stmt, 2);
-        mapBuildingEquipments.insert(v);
+        auto v = groupMechanoids.create();
+        v->group->id = (stmt, 0);
+        v->mechanoid->id = (stmt, 1);
+        groupMechanoids.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
 
-void StorageImpl::_loadMapBuildingEquipmentsPtrs()
+void StorageImpl::_loadGroupMechanoidsPtrs()
 {
-    for (auto &mapBuildingEquipment : mapBuildingEquipments)
+    for (auto &groupMechanoid : groupMechanoids)
     {
-        if (mapBuildings.find(mapBuildingEquipment->mapBuilding.id) != mapBuildings.end())
-            mapBuildingEquipment->mapBuilding.ptr = mapBuildings[mapBuildingEquipment->mapBuilding.id];
-        if (equipments.find(mapBuildingEquipment->equipment.id) != equipments.end())
-            mapBuildingEquipment->equipment.ptr = equipments[mapBuildingEquipment->equipment.id];
+        if (groups.find(groupMechanoid->group->id) != groups.end())
+            groupMechanoid->group = groups[groupMechanoid->group->id];
+        if (mechanoids.find(groupMechanoid->mechanoid->id) != mechanoids.end())
+            groupMechanoid->mechanoid = mechanoids[groupMechanoid->mechanoid->id];
     }
 }
 
-void StorageImpl::_loadMapBuildingEquipmentsArrays()
+void StorageImpl::_loadGroupMechanoidsArrays()
 {
 }
 
-void StorageImpl::_saveMapBuildingEquipments() const
+void StorageImpl::_saveGroupMechanoids() const
 {
     db->execute("BEGIN;");
-    db->execute("delete from MapBuildingEquipments;");
-    const std::string query = "insert into MapBuildingEquipments values (?, ?, ?);";
+    db->execute("delete from GroupMechanoids;");
+    const std::string query = "insert into GroupMechanoids values (?, ?);";
     int ret = 0;
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &mapBuildingEquipment : mapBuildingEquipments)
+    for (auto &groupMechanoid : groupMechanoids)
     {
-        auto &v = mapBuildingEquipment;
-        ret = sqlite3_bind_int(stmt, 1, v->mapBuilding.id);
-        ret = sqlite3_bind_int(stmt, 2, v->equipment.id);
-        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        auto &v = groupMechanoid;
+        ret = sqlite3_bind_int(stmt, 1, v->group->id);
+        ret = sqlite3_bind_int(stmt, 2, v->mechanoid->id);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -938,274 +834,78 @@ void StorageImpl::_saveMapBuildingEquipments() const
     db->execute("COMMIT;");
 }
 
-void StorageImpl::_loadMapBuildingGliders()
+void StorageImpl::_loadMaps()
 {
     int ret = 0;
-    const std::string query = "select * from MapBuildingGliders;";
+    const std::string query = "select * from Maps;";
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = mapBuildingGliders.create();
-        v->mapBuilding.id = sqlite3_column_int(stmt, 0);
-        v->glider.id = sqlite3_column_int(stmt, 1);
-        v->quantity = sqlite3_column_int(stmt, 2);
-        mapBuildingGliders.insert(v);
+        auto v = maps.create();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->resource = (const char *)sqlite3_column_text(stmt, 2);
+        v->name->id = (stmt, 3);
+        v->h_min = (float)sqlite3_column_double(stmt, 4);
+        v->h_max = (float)sqlite3_column_double(stmt, 5);
+        v->kx = (float)sqlite3_column_double(stmt, 6);
+        v->bx = (float)sqlite3_column_double(stmt, 7);
+        v->ky = (float)sqlite3_column_double(stmt, 8);
+        v->by = (float)sqlite3_column_double(stmt, 9);
+        maps.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
 
-void StorageImpl::_loadMapBuildingGlidersPtrs()
+void StorageImpl::_loadMapsPtrs()
 {
-    for (auto &mapBuildingGlider : mapBuildingGliders)
+    for (auto &map : maps)
     {
-        if (mapBuildings.find(mapBuildingGlider->mapBuilding.id) != mapBuildings.end())
-            mapBuildingGlider->mapBuilding.ptr = mapBuildings[mapBuildingGlider->mapBuilding.id];
-        if (gliders.find(mapBuildingGlider->glider.id) != gliders.end())
-            mapBuildingGlider->glider.ptr = gliders[mapBuildingGlider->glider.id];
+        if (strings.find(map->name->id) != strings.end())
+            map->name = strings[map->name->id];
     }
 }
 
-void StorageImpl::_loadMapBuildingGlidersArrays()
+void StorageImpl::_loadMapsArrays()
 {
+    for (auto &map : maps)
+    {
+        for (auto &mapBuilding : mapBuildings)
+            if (map->id == mapBuilding->map->id)
+                map->buildings->insert(mapBuilding);
+        for (auto &mapGood : mapGoods)
+            if (map->id == mapGood->map->id)
+                map->goods->insert(mapGood);
+        for (auto &mapObject : mapObjects)
+            if (map->id == mapObject->map->id)
+                map->objects->insert(mapObject);
+    }
 }
 
-void StorageImpl::_saveMapBuildingGliders() const
+void StorageImpl::_saveMaps() const
 {
     db->execute("BEGIN;");
-    db->execute("delete from MapBuildingGliders;");
-    const std::string query = "insert into MapBuildingGliders values (?, ?, ?);";
+    db->execute("delete from Maps;");
+    const std::string query = "insert into Maps values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     int ret = 0;
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &mapBuildingGlider : mapBuildingGliders)
+    for (auto &map : maps)
     {
-        auto &v = mapBuildingGlider;
-        ret = sqlite3_bind_int(stmt, 1, v->mapBuilding.id);
-        ret = sqlite3_bind_int(stmt, 2, v->glider.id);
-        ret = sqlite3_bind_int(stmt, 3, v->quantity);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadMapBuildingGoods()
-{
-    int ret = 0;
-    const std::string query = "select * from MapBuildingGoods;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = mapBuildingGoods.create();
-        v->mapBuilding.id = sqlite3_column_int(stmt, 0);
-        v->good.id = sqlite3_column_int(stmt, 1);
-        v->quantity = sqlite3_column_int(stmt, 2);
-        mapBuildingGoods.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadMapBuildingGoodsPtrs()
-{
-    for (auto &mapBuildingGood : mapBuildingGoods)
-    {
-        if (mapBuildings.find(mapBuildingGood->mapBuilding.id) != mapBuildings.end())
-            mapBuildingGood->mapBuilding.ptr = mapBuildings[mapBuildingGood->mapBuilding.id];
-        if (goods.find(mapBuildingGood->good.id) != goods.end())
-            mapBuildingGood->good.ptr = goods[mapBuildingGood->good.id];
-    }
-}
-
-void StorageImpl::_loadMapBuildingGoodsArrays()
-{
-}
-
-void StorageImpl::_saveMapBuildingGoods() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from MapBuildingGoods;");
-    const std::string query = "insert into MapBuildingGoods values (?, ?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &mapBuildingGood : mapBuildingGoods)
-    {
-        auto &v = mapBuildingGood;
-        ret = sqlite3_bind_int(stmt, 1, v->mapBuilding.id);
-        ret = sqlite3_bind_int(stmt, 2, v->good.id);
-        ret = sqlite3_bind_int(stmt, 3, v->quantity);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadMapBuildingModificators()
-{
-    int ret = 0;
-    const std::string query = "select * from MapBuildingModificators;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = mapBuildingModificators.create();
-        v->mapBuilding.id = sqlite3_column_int(stmt, 0);
-        v->modificator.id = sqlite3_column_int(stmt, 1);
-        v->quantity = sqlite3_column_int(stmt, 2);
-        mapBuildingModificators.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadMapBuildingModificatorsPtrs()
-{
-    for (auto &mapBuildingModificator : mapBuildingModificators)
-    {
-        if (mapBuildings.find(mapBuildingModificator->mapBuilding.id) != mapBuildings.end())
-            mapBuildingModificator->mapBuilding.ptr = mapBuildings[mapBuildingModificator->mapBuilding.id];
-        if (modificators.find(mapBuildingModificator->modificator.id) != modificators.end())
-            mapBuildingModificator->modificator.ptr = modificators[mapBuildingModificator->modificator.id];
-    }
-}
-
-void StorageImpl::_loadMapBuildingModificatorsArrays()
-{
-}
-
-void StorageImpl::_saveMapBuildingModificators() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from MapBuildingModificators;");
-    const std::string query = "insert into MapBuildingModificators values (?, ?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &mapBuildingModificator : mapBuildingModificators)
-    {
-        auto &v = mapBuildingModificator;
-        ret = sqlite3_bind_int(stmt, 1, v->mapBuilding.id);
-        ret = sqlite3_bind_int(stmt, 2, v->modificator.id);
-        ret = sqlite3_bind_int(stmt, 3, v->quantity);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadMapBuildingProjectiles()
-{
-    int ret = 0;
-    const std::string query = "select * from MapBuildingProjectiles;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = mapBuildingProjectiles.create();
-        v->mapBuilding.id = sqlite3_column_int(stmt, 0);
-        v->projectile.id = sqlite3_column_int(stmt, 1);
-        v->quantity = sqlite3_column_int(stmt, 2);
-        mapBuildingProjectiles.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadMapBuildingProjectilesPtrs()
-{
-    for (auto &mapBuildingProjectile : mapBuildingProjectiles)
-    {
-        if (mapBuildings.find(mapBuildingProjectile->mapBuilding.id) != mapBuildings.end())
-            mapBuildingProjectile->mapBuilding.ptr = mapBuildings[mapBuildingProjectile->mapBuilding.id];
-        if (projectiles.find(mapBuildingProjectile->projectile.id) != projectiles.end())
-            mapBuildingProjectile->projectile.ptr = projectiles[mapBuildingProjectile->projectile.id];
-    }
-}
-
-void StorageImpl::_loadMapBuildingProjectilesArrays()
-{
-}
-
-void StorageImpl::_saveMapBuildingProjectiles() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from MapBuildingProjectiles;");
-    const std::string query = "insert into MapBuildingProjectiles values (?, ?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &mapBuildingProjectile : mapBuildingProjectiles)
-    {
-        auto &v = mapBuildingProjectile;
-        ret = sqlite3_bind_int(stmt, 1, v->mapBuilding.id);
-        ret = sqlite3_bind_int(stmt, 2, v->projectile.id);
-        ret = sqlite3_bind_int(stmt, 3, v->quantity);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadMapBuildingWeapons()
-{
-    int ret = 0;
-    const std::string query = "select * from MapBuildingWeapons;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = mapBuildingWeapons.create();
-        v->mapBuilding.id = sqlite3_column_int(stmt, 0);
-        v->weapon.id = sqlite3_column_int(stmt, 1);
-        v->quantity = sqlite3_column_int(stmt, 2);
-        mapBuildingWeapons.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadMapBuildingWeaponsPtrs()
-{
-    for (auto &mapBuildingWeapon : mapBuildingWeapons)
-    {
-        if (mapBuildings.find(mapBuildingWeapon->mapBuilding.id) != mapBuildings.end())
-            mapBuildingWeapon->mapBuilding.ptr = mapBuildings[mapBuildingWeapon->mapBuilding.id];
-        if (weapons.find(mapBuildingWeapon->weapon.id) != weapons.end())
-            mapBuildingWeapon->weapon.ptr = weapons[mapBuildingWeapon->weapon.id];
-    }
-}
-
-void StorageImpl::_loadMapBuildingWeaponsArrays()
-{
-}
-
-void StorageImpl::_saveMapBuildingWeapons() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from MapBuildingWeapons;");
-    const std::string query = "insert into MapBuildingWeapons values (?, ?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &mapBuildingWeapon : mapBuildingWeapons)
-    {
-        auto &v = mapBuildingWeapon;
-        ret = sqlite3_bind_int(stmt, 1, v->mapBuilding.id);
-        ret = sqlite3_bind_int(stmt, 2, v->weapon.id);
-        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        auto &v = map.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, std::to_string(v->resource).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name->id);
+        ret = sqlite3_bind_double(stmt, 5, v->h_min);
+        ret = sqlite3_bind_double(stmt, 6, v->h_max);
+        ret = sqlite3_bind_double(stmt, 7, v->kx);
+        ret = sqlite3_bind_double(stmt, 8, v->bx);
+        ret = sqlite3_bind_double(stmt, 9, v->ky);
+        ret = sqlite3_bind_double(stmt, 10, v->by);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -1225,20 +925,20 @@ void StorageImpl::_loadMapBuildings()
         auto v = mapBuildings.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
-        v->map.id = sqlite3_column_int(stmt, 2);
-        v->building.id = sqlite3_column_int(stmt, 3);
-        v->name.id = sqlite3_column_int(stmt, 4);
-        v->interactive = sqlite3_column_int(stmt, 5);
-        v->x = (float)sqlite3_column_double(stmt, 6);
-        v->y = (float)sqlite3_column_double(stmt, 7);
-        v->z = (float)sqlite3_column_double(stmt, 8);
-        v->roll = (float)sqlite3_column_double(stmt, 9);
-        v->pitch = (float)sqlite3_column_double(stmt, 10);
-        v->yaw = (float)sqlite3_column_double(stmt, 11);
-        v->scale = (float)sqlite3_column_double(stmt, 12);
-        v->scale_x = (float)sqlite3_column_double(stmt, 13);
-        v->scale_y = (float)sqlite3_column_double(stmt, 14);
-        v->scale_z = (float)sqlite3_column_double(stmt, 15);
+        v->name->id = (stmt, 2);
+        v->map->id = (stmt, 3);
+        v->building->id = (stmt, 4);
+        v->x = (float)sqlite3_column_double(stmt, 5);
+        v->y = (float)sqlite3_column_double(stmt, 6);
+        v->z = (float)sqlite3_column_double(stmt, 7);
+        v->roll = (float)sqlite3_column_double(stmt, 8);
+        v->pitch = (float)sqlite3_column_double(stmt, 9);
+        v->yaw = (float)sqlite3_column_double(stmt, 10);
+        v->scale = (float)sqlite3_column_double(stmt, 11);
+        v->scale_x = (float)sqlite3_column_double(stmt, 12);
+        v->scale_y = (float)sqlite3_column_double(stmt, 13);
+        v->scale_z = (float)sqlite3_column_double(stmt, 14);
+        v->interactive = sqlite3_column_int(stmt, 15);
         mapBuildings.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -1248,12 +948,12 @@ void StorageImpl::_loadMapBuildingsPtrs()
 {
     for (auto &mapBuilding : mapBuildings)
     {
-        if (maps.find(mapBuilding.second->map.id) != maps.end())
-            mapBuilding.second->map.ptr = maps[mapBuilding.second->map.id];
-        if (buildings.find(mapBuilding.second->building.id) != buildings.end())
-            mapBuilding.second->building.ptr = buildings[mapBuilding.second->building.id];
-        if (strings.find(mapBuilding.second->name.id) != strings.end())
-            mapBuilding.second->name.ptr = strings[mapBuilding.second->name.id];
+        if (strings.find(mapBuilding->name->id) != strings.end())
+            mapBuilding->name = strings[mapBuilding->name->id];
+        if (maps.find(mapBuilding->map->id) != maps.end())
+            mapBuilding->map = maps[mapBuilding->map->id];
+        if (buildings.find(mapBuilding->building->id) != buildings.end())
+            mapBuilding->building = buildings[mapBuilding->building->id];
     }
 }
 
@@ -1262,23 +962,23 @@ void StorageImpl::_loadMapBuildingsArrays()
     for (auto &mapBuilding : mapBuildings)
     {
         for (auto &mapBuildingEquipment : mapBuildingEquipments)
-            if (mapBuilding.first == mapBuildingEquipment->mapBuilding.id)
-                mapBuilding->equipments.insert(mapBuildingEquipment);
+            if (mapBuilding->id == mapBuildingEquipment->map_building->id)
+                mapBuilding->equipments->insert(mapBuildingEquipment);
         for (auto &mapBuildingGlider : mapBuildingGliders)
-            if (mapBuilding.first == mapBuildingGlider->mapBuilding.id)
-                mapBuilding->gliders.insert(mapBuildingGlider);
+            if (mapBuilding->id == mapBuildingGlider->map_building->id)
+                mapBuilding->gliders->insert(mapBuildingGlider);
         for (auto &mapBuildingGood : mapBuildingGoods)
-            if (mapBuilding.first == mapBuildingGood->mapBuilding.id)
-                mapBuilding->goods.insert(mapBuildingGood);
+            if (mapBuilding->id == mapBuildingGood->map_building->id)
+                mapBuilding->goods->insert(mapBuildingGood);
         for (auto &mapBuildingModificator : mapBuildingModificators)
-            if (mapBuilding.first == mapBuildingModificator->mapBuilding.id)
-                mapBuilding->modificators.insert(mapBuildingModificator);
+            if (mapBuilding->id == mapBuildingModificator->map_building->id)
+                mapBuilding->modificators->insert(mapBuildingModificator);
         for (auto &mapBuildingProjectile : mapBuildingProjectiles)
-            if (mapBuilding.first == mapBuildingProjectile->mapBuilding.id)
-                mapBuilding->projectiles.insert(mapBuildingProjectile);
+            if (mapBuilding->id == mapBuildingProjectile->map_building->id)
+                mapBuilding->projectiles->insert(mapBuildingProjectile);
         for (auto &mapBuildingWeapon : mapBuildingWeapons)
-            if (mapBuilding.first == mapBuildingWeapon->mapBuilding.id)
-                mapBuilding->weapons.insert(mapBuildingWeapon);
+            if (mapBuilding->id == mapBuildingWeapon->map_building->id)
+                mapBuilding->weapons->insert(mapBuildingWeapon);
     }
 }
 
@@ -1295,21 +995,351 @@ void StorageImpl::_saveMapBuildings() const
     {
         auto &v = mapBuilding.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 3, v->map.id);
-        ret = sqlite3_bind_int(stmt, 4, v->building.id);
-        ret = sqlite3_bind_int(stmt, 5, v->name.id);
-        ret = sqlite3_bind_int(stmt, 6, v->interactive);
-        ret = sqlite3_bind_double(stmt, 7, v->x);
-        ret = sqlite3_bind_double(stmt, 8, v->y);
-        ret = sqlite3_bind_double(stmt, 9, v->z);
-        ret = sqlite3_bind_double(stmt, 10, v->roll);
-        ret = sqlite3_bind_double(stmt, 11, v->pitch);
-        ret = sqlite3_bind_double(stmt, 12, v->yaw);
-        ret = sqlite3_bind_double(stmt, 13, v->scale);
-        ret = sqlite3_bind_double(stmt, 14, v->scale_x);
-        ret = sqlite3_bind_double(stmt, 15, v->scale_y);
-        ret = sqlite3_bind_double(stmt, 16, v->scale_z);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->name->id);
+        ret = sqlite3_bind_int(stmt, 4, v->map->id);
+        ret = sqlite3_bind_int(stmt, 5, v->building->id);
+        ret = sqlite3_bind_double(stmt, 6, v->x);
+        ret = sqlite3_bind_double(stmt, 7, v->y);
+        ret = sqlite3_bind_double(stmt, 8, v->z);
+        ret = sqlite3_bind_double(stmt, 9, v->roll);
+        ret = sqlite3_bind_double(stmt, 10, v->pitch);
+        ret = sqlite3_bind_double(stmt, 11, v->yaw);
+        ret = sqlite3_bind_double(stmt, 12, v->scale);
+        ret = sqlite3_bind_double(stmt, 13, v->scale_x);
+        ret = sqlite3_bind_double(stmt, 14, v->scale_y);
+        ret = sqlite3_bind_double(stmt, 15, v->scale_z);
+        ret = sqlite3_bind_int(stmt, 16, v->interactive);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadMapBuildingEquipments()
+{
+    int ret = 0;
+    const std::string query = "select * from MapBuildingEquipments;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = mapBuildingEquipments.create();
+        v->map_building->id = (stmt, 0);
+        v->equipment->id = (stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        mapBuildingEquipments.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadMapBuildingEquipmentsPtrs()
+{
+    for (auto &mapBuildingEquipment : mapBuildingEquipments)
+    {
+        if (mapBuildings.find(mapBuildingEquipment->map_building->id) != mapBuildings.end())
+            mapBuildingEquipment->map_building = mapBuildings[mapBuildingEquipment->map_building->id];
+        if (equipments.find(mapBuildingEquipment->equipment->id) != equipments.end())
+            mapBuildingEquipment->equipment = equipments[mapBuildingEquipment->equipment->id];
+    }
+}
+
+void StorageImpl::_loadMapBuildingEquipmentsArrays()
+{
+}
+
+void StorageImpl::_saveMapBuildingEquipments() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildingEquipments;");
+    const std::string query = "insert into MapBuildingEquipments values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &mapBuildingEquipment : mapBuildingEquipments)
+    {
+        auto &v = mapBuildingEquipment;
+        ret = sqlite3_bind_int(stmt, 1, v->map_building->id);
+        ret = sqlite3_bind_int(stmt, 2, v->equipment->id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadMapBuildingGliders()
+{
+    int ret = 0;
+    const std::string query = "select * from MapBuildingGliders;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = mapBuildingGliders.create();
+        v->map_building->id = (stmt, 0);
+        v->glider->id = (stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        mapBuildingGliders.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadMapBuildingGlidersPtrs()
+{
+    for (auto &mapBuildingGlider : mapBuildingGliders)
+    {
+        if (mapBuildings.find(mapBuildingGlider->map_building->id) != mapBuildings.end())
+            mapBuildingGlider->map_building = mapBuildings[mapBuildingGlider->map_building->id];
+        if (gliders.find(mapBuildingGlider->glider->id) != gliders.end())
+            mapBuildingGlider->glider = gliders[mapBuildingGlider->glider->id];
+    }
+}
+
+void StorageImpl::_loadMapBuildingGlidersArrays()
+{
+}
+
+void StorageImpl::_saveMapBuildingGliders() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildingGliders;");
+    const std::string query = "insert into MapBuildingGliders values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &mapBuildingGlider : mapBuildingGliders)
+    {
+        auto &v = mapBuildingGlider;
+        ret = sqlite3_bind_int(stmt, 1, v->map_building->id);
+        ret = sqlite3_bind_int(stmt, 2, v->glider->id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadMapBuildingGoods()
+{
+    int ret = 0;
+    const std::string query = "select * from MapBuildingGoods;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = mapBuildingGoods.create();
+        v->map_building->id = (stmt, 0);
+        v->good->id = (stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        mapBuildingGoods.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadMapBuildingGoodsPtrs()
+{
+    for (auto &mapBuildingGood : mapBuildingGoods)
+    {
+        if (mapBuildings.find(mapBuildingGood->map_building->id) != mapBuildings.end())
+            mapBuildingGood->map_building = mapBuildings[mapBuildingGood->map_building->id];
+        if (goods.find(mapBuildingGood->good->id) != goods.end())
+            mapBuildingGood->good = goods[mapBuildingGood->good->id];
+    }
+}
+
+void StorageImpl::_loadMapBuildingGoodsArrays()
+{
+}
+
+void StorageImpl::_saveMapBuildingGoods() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildingGoods;");
+    const std::string query = "insert into MapBuildingGoods values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &mapBuildingGood : mapBuildingGoods)
+    {
+        auto &v = mapBuildingGood;
+        ret = sqlite3_bind_int(stmt, 1, v->map_building->id);
+        ret = sqlite3_bind_int(stmt, 2, v->good->id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadMapBuildingModificators()
+{
+    int ret = 0;
+    const std::string query = "select * from MapBuildingModificators;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = mapBuildingModificators.create();
+        v->map_building->id = (stmt, 0);
+        v->modificator->id = (stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        mapBuildingModificators.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadMapBuildingModificatorsPtrs()
+{
+    for (auto &mapBuildingModificator : mapBuildingModificators)
+    {
+        if (mapBuildings.find(mapBuildingModificator->map_building->id) != mapBuildings.end())
+            mapBuildingModificator->map_building = mapBuildings[mapBuildingModificator->map_building->id];
+        if (modificators.find(mapBuildingModificator->modificator->id) != modificators.end())
+            mapBuildingModificator->modificator = modificators[mapBuildingModificator->modificator->id];
+    }
+}
+
+void StorageImpl::_loadMapBuildingModificatorsArrays()
+{
+}
+
+void StorageImpl::_saveMapBuildingModificators() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildingModificators;");
+    const std::string query = "insert into MapBuildingModificators values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &mapBuildingModificator : mapBuildingModificators)
+    {
+        auto &v = mapBuildingModificator;
+        ret = sqlite3_bind_int(stmt, 1, v->map_building->id);
+        ret = sqlite3_bind_int(stmt, 2, v->modificator->id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadMapBuildingProjectiles()
+{
+    int ret = 0;
+    const std::string query = "select * from MapBuildingProjectiles;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = mapBuildingProjectiles.create();
+        v->map_building->id = (stmt, 0);
+        v->projectile->id = (stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        mapBuildingProjectiles.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadMapBuildingProjectilesPtrs()
+{
+    for (auto &mapBuildingProjectile : mapBuildingProjectiles)
+    {
+        if (mapBuildings.find(mapBuildingProjectile->map_building->id) != mapBuildings.end())
+            mapBuildingProjectile->map_building = mapBuildings[mapBuildingProjectile->map_building->id];
+        if (projectiles.find(mapBuildingProjectile->projectile->id) != projectiles.end())
+            mapBuildingProjectile->projectile = projectiles[mapBuildingProjectile->projectile->id];
+    }
+}
+
+void StorageImpl::_loadMapBuildingProjectilesArrays()
+{
+}
+
+void StorageImpl::_saveMapBuildingProjectiles() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildingProjectiles;");
+    const std::string query = "insert into MapBuildingProjectiles values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &mapBuildingProjectile : mapBuildingProjectiles)
+    {
+        auto &v = mapBuildingProjectile;
+        ret = sqlite3_bind_int(stmt, 1, v->map_building->id);
+        ret = sqlite3_bind_int(stmt, 2, v->projectile->id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadMapBuildingWeapons()
+{
+    int ret = 0;
+    const std::string query = "select * from MapBuildingWeapons;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = mapBuildingWeapons.create();
+        v->map_building->id = (stmt, 0);
+        v->weapon->id = (stmt, 1);
+        v->quantity = sqlite3_column_int(stmt, 2);
+        mapBuildingWeapons.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadMapBuildingWeaponsPtrs()
+{
+    for (auto &mapBuildingWeapon : mapBuildingWeapons)
+    {
+        if (mapBuildings.find(mapBuildingWeapon->map_building->id) != mapBuildings.end())
+            mapBuildingWeapon->map_building = mapBuildings[mapBuildingWeapon->map_building->id];
+        if (weapons.find(mapBuildingWeapon->weapon->id) != weapons.end())
+            mapBuildingWeapon->weapon = weapons[mapBuildingWeapon->weapon->id];
+    }
+}
+
+void StorageImpl::_loadMapBuildingWeaponsArrays()
+{
+}
+
+void StorageImpl::_saveMapBuildingWeapons() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from MapBuildingWeapons;");
+    const std::string query = "insert into MapBuildingWeapons values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &mapBuildingWeapon : mapBuildingWeapons)
+    {
+        auto &v = mapBuildingWeapon;
+        ret = sqlite3_bind_int(stmt, 1, v->map_building->id);
+        ret = sqlite3_bind_int(stmt, 2, v->weapon->id);
+        ret = sqlite3_bind_int(stmt, 3, v->quantity);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -1328,9 +1358,9 @@ void StorageImpl::_loadMapGoods()
     {
         auto v = mapGoods.create();
         v->id = sqlite3_column_int(stmt, 0);
-        v->text_id = sqlite3_column_int(stmt, 1);
-        v->map.id = sqlite3_column_int(stmt, 2);
-        v->good.id = sqlite3_column_int(stmt, 3);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->map->id = (stmt, 2);
+        v->good->id = (stmt, 3);
         v->x = (float)sqlite3_column_double(stmt, 4);
         v->y = (float)sqlite3_column_double(stmt, 5);
         v->z = (float)sqlite3_column_double(stmt, 6);
@@ -1350,10 +1380,10 @@ void StorageImpl::_loadMapGoodsPtrs()
 {
     for (auto &mapGood : mapGoods)
     {
-        if (maps.find(mapGood.second->map.id) != maps.end())
-            mapGood.second->map.ptr = maps[mapGood.second->map.id];
-        if (goods.find(mapGood.second->good.id) != goods.end())
-            mapGood.second->good.ptr = goods[mapGood.second->good.id];
+        if (maps.find(mapGood->map->id) != maps.end())
+            mapGood->map = maps[mapGood->map->id];
+        if (goods.find(mapGood->good->id) != goods.end())
+            mapGood->good = goods[mapGood->good->id];
     }
 }
 
@@ -1374,9 +1404,9 @@ void StorageImpl::_saveMapGoods() const
     {
         auto &v = mapGood.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_int(stmt, 2, v->text_id);
-        ret = sqlite3_bind_int(stmt, 3, v->map.id);
-        ret = sqlite3_bind_int(stmt, 4, v->good.id);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->map->id);
+        ret = sqlite3_bind_int(stmt, 4, v->good->id);
         ret = sqlite3_bind_double(stmt, 5, v->x);
         ret = sqlite3_bind_double(stmt, 6, v->y);
         ret = sqlite3_bind_double(stmt, 7, v->z);
@@ -1406,8 +1436,8 @@ void StorageImpl::_loadMapObjects()
         auto v = mapObjects.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
-        v->map.id = sqlite3_column_int(stmt, 2);
-        v->object.id = sqlite3_column_int(stmt, 3);
+        v->map->id = (stmt, 2);
+        v->object->id = (stmt, 3);
         v->x = (float)sqlite3_column_double(stmt, 4);
         v->y = (float)sqlite3_column_double(stmt, 5);
         v->z = (float)sqlite3_column_double(stmt, 6);
@@ -1427,10 +1457,10 @@ void StorageImpl::_loadMapObjectsPtrs()
 {
     for (auto &mapObject : mapObjects)
     {
-        if (maps.find(mapObject.second->map.id) != maps.end())
-            mapObject.second->map.ptr = maps[mapObject.second->map.id];
-        if (objects.find(mapObject.second->object.id) != objects.end())
-            mapObject.second->object.ptr = objects[mapObject.second->object.id];
+        if (maps.find(mapObject->map->id) != maps.end())
+            mapObject->map = maps[mapObject->map->id];
+        if (objects.find(mapObject->object->id) != objects.end())
+            mapObject->object = objects[mapObject->object->id];
     }
 }
 
@@ -1451,9 +1481,9 @@ void StorageImpl::_saveMapObjects() const
     {
         auto &v = mapObject.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 3, v->map.id);
-        ret = sqlite3_bind_int(stmt, 4, v->object.id);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->map->id);
+        ret = sqlite3_bind_int(stmt, 4, v->object->id);
         ret = sqlite3_bind_double(stmt, 5, v->x);
         ret = sqlite3_bind_double(stmt, 6, v->y);
         ret = sqlite3_bind_double(stmt, 7, v->z);
@@ -1464,140 +1494,6 @@ void StorageImpl::_saveMapObjects() const
         ret = sqlite3_bind_double(stmt, 12, v->scale_x);
         ret = sqlite3_bind_double(stmt, 13, v->scale_y);
         ret = sqlite3_bind_double(stmt, 14, v->scale_z);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadMaps()
-{
-    int ret = 0;
-    const std::string query = "select * from Maps;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = maps.create();
-        v->id = sqlite3_column_int(stmt, 0);
-        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
-        v->resource = (const char *)sqlite3_column_text(stmt, 2);
-        v->name.id = sqlite3_column_int(stmt, 3);
-        v->h_min = (float)sqlite3_column_double(stmt, 4);
-        v->h_max = (float)sqlite3_column_double(stmt, 5);
-        v->kx = (float)sqlite3_column_double(stmt, 6);
-        v->bx = (float)sqlite3_column_double(stmt, 7);
-        v->ky = (float)sqlite3_column_double(stmt, 8);
-        v->by = (float)sqlite3_column_double(stmt, 9);
-        maps.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadMapsPtrs()
-{
-    for (auto &map : maps)
-    {
-        if (strings.find(map.second->name.id) != strings.end())
-            map.second->name.ptr = strings[map.second->name.id];
-    }
-}
-
-void StorageImpl::_loadMapsArrays()
-{
-    for (auto &map : maps)
-    {
-        for (auto &mapBuilding : mapBuildings)
-            if (map.first == mapBuilding->map.id)
-                map->buildings.insert(mapBuilding);
-        for (auto &mapGood : mapGoods)
-            if (map.first == mapGood->map.id)
-                map->goods.insert(mapGood);
-        for (auto &mapObject : mapObjects)
-            if (map.first == mapObject->map.id)
-                map->objects.insert(mapObject);
-    }
-}
-
-void StorageImpl::_saveMaps() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from Maps;");
-    const std::string query = "insert into Maps values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &map : maps)
-    {
-        auto &v = map.second;
-        ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 4, v->name.id);
-        ret = sqlite3_bind_double(stmt, 5, v->h_min);
-        ret = sqlite3_bind_double(stmt, 6, v->h_max);
-        ret = sqlite3_bind_double(stmt, 7, v->kx);
-        ret = sqlite3_bind_double(stmt, 8, v->bx);
-        ret = sqlite3_bind_double(stmt, 9, v->ky);
-        ret = sqlite3_bind_double(stmt, 10, v->by);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadMechanoidQuests()
-{
-    int ret = 0;
-    const std::string query = "select * from MechanoidQuests;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = mechanoidQuests.create();
-        v->mechanoid.id = sqlite3_column_int(stmt, 0);
-        v->quest.id = sqlite3_column_int(stmt, 1);
-        v->state = sqlite3_column_int(stmt, 2);
-        mechanoidQuests.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadMechanoidQuestsPtrs()
-{
-    for (auto &mechanoidQuest : mechanoidQuests)
-    {
-        if (mechanoids.find(mechanoidQuest->mechanoid.id) != mechanoids.end())
-            mechanoidQuest->mechanoid.ptr = mechanoids[mechanoidQuest->mechanoid.id];
-        if (quests.find(mechanoidQuest->quest.id) != quests.end())
-            mechanoidQuest->quest.ptr = quests[mechanoidQuest->quest.id];
-    }
-}
-
-void StorageImpl::_loadMechanoidQuestsArrays()
-{
-}
-
-void StorageImpl::_saveMechanoidQuests() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from MechanoidQuests;");
-    const std::string query = "insert into MechanoidQuests values (?, ?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &mechanoidQuest : mechanoidQuests)
-    {
-        auto &v = mechanoidQuest;
-        ret = sqlite3_bind_int(stmt, 1, v->mechanoid.id);
-        ret = sqlite3_bind_int(stmt, 2, v->quest.id);
-        ret = sqlite3_bind_int(stmt, 3, v->state);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -1617,24 +1513,25 @@ void StorageImpl::_loadMechanoids()
         auto v = mechanoids.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
-        v->name.id = sqlite3_column_int(stmt, 2);
-        v->generation = sqlite3_column_int(stmt, 3);
-        v->rating = (float)sqlite3_column_double(stmt, 4);
-        v->money = (float)sqlite3_column_double(stmt, 5);
-        v->configuration.id = sqlite3_column_int(stmt, 6);
-        v->group.id = sqlite3_column_int(stmt, 7);
-        v->clan.id = sqlite3_column_int(stmt, 8);
-        v->rating_fight = (float)sqlite3_column_double(stmt, 9);
-        v->rating_courier = (float)sqlite3_column_double(stmt, 10);
-        v->rating_trade = (float)sqlite3_column_double(stmt, 11);
-        v->map.id = sqlite3_column_int(stmt, 12);
-        v->mapBuilding.id = sqlite3_column_int(stmt, 13);
-        v->x = (float)sqlite3_column_double(stmt, 14);
-        v->y = (float)sqlite3_column_double(stmt, 15);
-        v->z = (float)sqlite3_column_double(stmt, 16);
-        v->roll = (float)sqlite3_column_double(stmt, 17);
-        v->pitch = (float)sqlite3_column_double(stmt, 18);
-        v->yaw = (float)sqlite3_column_double(stmt, 19);
+        v->name->id = (stmt, 2);
+        v->modification->id = (stmt, 3);
+        v->map->id = (stmt, 4);
+        v->clan->id = (stmt, 5);
+        v->building->id = (stmt, 6);
+        v->configuration->id = (stmt, 7);
+        v->group->id = (stmt, 8);
+        v->generation = sqlite3_column_int(stmt, 9);
+        v->money = (float)sqlite3_column_double(stmt, 10);
+        v->rating = (float)sqlite3_column_double(stmt, 11);
+        v->rating_fight = (float)sqlite3_column_double(stmt, 12);
+        v->rating_courier = (float)sqlite3_column_double(stmt, 13);
+        v->rating_trade = (float)sqlite3_column_double(stmt, 14);
+        v->x = (float)sqlite3_column_double(stmt, 15);
+        v->y = (float)sqlite3_column_double(stmt, 16);
+        v->z = (float)sqlite3_column_double(stmt, 17);
+        v->roll = (float)sqlite3_column_double(stmt, 18);
+        v->pitch = (float)sqlite3_column_double(stmt, 19);
+        v->yaw = (float)sqlite3_column_double(stmt, 20);
         mechanoids.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -1644,18 +1541,20 @@ void StorageImpl::_loadMechanoidsPtrs()
 {
     for (auto &mechanoid : mechanoids)
     {
-        if (strings.find(mechanoid.second->name.id) != strings.end())
-            mechanoid.second->name.ptr = strings[mechanoid.second->name.id];
-        if (configurations.find(mechanoid.second->configuration.id) != configurations.end())
-            mechanoid.second->configuration.ptr = configurations[mechanoid.second->configuration.id];
-        if (groups.find(mechanoid.second->group.id) != groups.end())
-            mechanoid.second->group.ptr = groups[mechanoid.second->group.id];
-        if (clans.find(mechanoid.second->clan.id) != clans.end())
-            mechanoid.second->clan.ptr = clans[mechanoid.second->clan.id];
-        if (maps.find(mechanoid.second->map.id) != maps.end())
-            mechanoid.second->map.ptr = maps[mechanoid.second->map.id];
-        if (mapBuildings.find(mechanoid.second->mapBuilding.id) != mapBuildings.end())
-            mechanoid.second->mapBuilding.ptr = mapBuildings[mechanoid.second->mapBuilding.id];
+        if (strings.find(mechanoid->name->id) != strings.end())
+            mechanoid->name = strings[mechanoid->name->id];
+        if (modifications.find(mechanoid->modification->id) != modifications.end())
+            mechanoid->modification = modifications[mechanoid->modification->id];
+        if (modificationMaps.find(mechanoid->map->id) != modificationMaps.end())
+            mechanoid->map = modificationMaps[mechanoid->map->id];
+        if (clans.find(mechanoid->clan->id) != clans.end())
+            mechanoid->clan = clans[mechanoid->clan->id];
+        if (mapBuildings.find(mechanoid->building->id) != mapBuildings.end())
+            mechanoid->building = mapBuildings[mechanoid->building->id];
+        if (configurations.find(mechanoid->configuration->id) != configurations.end())
+            mechanoid->configuration = configurations[mechanoid->configuration->id];
+        if (groups.find(mechanoid->group->id) != groups.end())
+            mechanoid->group = groups[mechanoid->group->id];
     }
 }
 
@@ -1664,8 +1563,8 @@ void StorageImpl::_loadMechanoidsArrays()
     for (auto &mechanoid : mechanoids)
     {
         for (auto &mechanoidQuest : mechanoidQuests)
-            if (mechanoid.first == mechanoidQuest->mechanoid.id)
-                mechanoid->quests.insert(mechanoidQuest);
+            if (mechanoid->id == mechanoidQuest->mechanoid->id)
+                mechanoid->quests->insert(mechanoidQuest);
     }
 }
 
@@ -1673,7 +1572,7 @@ void StorageImpl::_saveMechanoids() const
 {
     db->execute("BEGIN;");
     db->execute("delete from Mechanoids;");
-    const std::string query = "insert into Mechanoids values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    const std::string query = "insert into Mechanoids values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     int ret = 0;
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
@@ -1682,25 +1581,26 @@ void StorageImpl::_saveMechanoids() const
     {
         auto &v = mechanoid.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 3, v->name.id);
-        ret = sqlite3_bind_int(stmt, 4, v->generation);
-        ret = sqlite3_bind_double(stmt, 5, v->rating);
-        ret = sqlite3_bind_double(stmt, 6, v->money);
-        ret = sqlite3_bind_int(stmt, 7, v->configuration.id);
-        ret = sqlite3_bind_int(stmt, 8, v->group.id);
-        ret = sqlite3_bind_int(stmt, 9, v->clan.id);
-        ret = sqlite3_bind_double(stmt, 10, v->rating_fight);
-        ret = sqlite3_bind_double(stmt, 11, v->rating_courier);
-        ret = sqlite3_bind_double(stmt, 12, v->rating_trade);
-        ret = sqlite3_bind_int(stmt, 13, v->map.id);
-        ret = sqlite3_bind_int(stmt, 14, v->mapBuilding.id);
-        ret = sqlite3_bind_double(stmt, 15, v->x);
-        ret = sqlite3_bind_double(stmt, 16, v->y);
-        ret = sqlite3_bind_double(stmt, 17, v->z);
-        ret = sqlite3_bind_double(stmt, 18, v->roll);
-        ret = sqlite3_bind_double(stmt, 19, v->pitch);
-        ret = sqlite3_bind_double(stmt, 20, v->yaw);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->name->id);
+        ret = sqlite3_bind_int(stmt, 4, v->modification->id);
+        ret = sqlite3_bind_int(stmt, 5, v->map->id);
+        ret = sqlite3_bind_int(stmt, 6, v->clan->id);
+        ret = sqlite3_bind_int(stmt, 7, v->building->id);
+        ret = sqlite3_bind_int(stmt, 8, v->configuration->id);
+        ret = sqlite3_bind_int(stmt, 9, v->group->id);
+        ret = sqlite3_bind_int(stmt, 10, v->generation);
+        ret = sqlite3_bind_double(stmt, 11, v->money);
+        ret = sqlite3_bind_double(stmt, 12, v->rating);
+        ret = sqlite3_bind_double(stmt, 13, v->rating_fight);
+        ret = sqlite3_bind_double(stmt, 14, v->rating_courier);
+        ret = sqlite3_bind_double(stmt, 15, v->rating_trade);
+        ret = sqlite3_bind_double(stmt, 16, v->x);
+        ret = sqlite3_bind_double(stmt, 17, v->y);
+        ret = sqlite3_bind_double(stmt, 18, v->z);
+        ret = sqlite3_bind_double(stmt, 19, v->roll);
+        ret = sqlite3_bind_double(stmt, 20, v->pitch);
+        ret = sqlite3_bind_double(stmt, 21, v->yaw);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -1708,158 +1608,54 @@ void StorageImpl::_saveMechanoids() const
     db->execute("COMMIT;");
 }
 
-void StorageImpl::_loadModificationClans()
+void StorageImpl::_loadMechanoidQuests()
 {
     int ret = 0;
-    const std::string query = "select * from ModificationClans;";
+    const std::string query = "select * from MechanoidQuests;";
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        auto v = modificationClans.create();
-        v->modification.id = sqlite3_column_int(stmt, 0);
-        v->clan.id = sqlite3_column_int(stmt, 1);
-        modificationClans.insert(v);
+        auto v = mechanoidQuests.create();
+        v->mechanoid->id = (stmt, 0);
+        v->quest->id = (stmt, 1);
+        v->state = sqlite3_column_int(stmt, 2);
+        mechanoidQuests.insert(v);
     }
     ret = sqlite3_finalize(stmt);
 }
 
-void StorageImpl::_loadModificationClansPtrs()
+void StorageImpl::_loadMechanoidQuestsPtrs()
 {
-    for (auto &modificationClan : modificationClans)
+    for (auto &mechanoidQuest : mechanoidQuests)
     {
-        if (modifications.find(modificationClan->modification.id) != modifications.end())
-            modificationClan->modification.ptr = modifications[modificationClan->modification.id];
-        if (clans.find(modificationClan->clan.id) != clans.end())
-            modificationClan->clan.ptr = clans[modificationClan->clan.id];
+        if (mechanoids.find(mechanoidQuest->mechanoid->id) != mechanoids.end())
+            mechanoidQuest->mechanoid = mechanoids[mechanoidQuest->mechanoid->id];
+        if (quests.find(mechanoidQuest->quest->id) != quests.end())
+            mechanoidQuest->quest = quests[mechanoidQuest->quest->id];
     }
 }
 
-void StorageImpl::_loadModificationClansArrays()
+void StorageImpl::_loadMechanoidQuestsArrays()
 {
 }
 
-void StorageImpl::_saveModificationClans() const
+void StorageImpl::_saveMechanoidQuests() const
 {
     db->execute("BEGIN;");
-    db->execute("delete from ModificationClans;");
-    const std::string query = "insert into ModificationClans values (?, ?);";
+    db->execute("delete from MechanoidQuests;");
+    const std::string query = "insert into MechanoidQuests values (?, ?, ?);";
     int ret = 0;
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
     ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &modificationClan : modificationClans)
+    for (auto &mechanoidQuest : mechanoidQuests)
     {
-        auto &v = modificationClan;
-        ret = sqlite3_bind_int(stmt, 1, v->modification.id);
-        ret = sqlite3_bind_int(stmt, 2, v->clan.id);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadModificationMaps()
-{
-    int ret = 0;
-    const std::string query = "select * from ModificationMaps;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = modificationMaps.create();
-        v->modification.id = sqlite3_column_int(stmt, 0);
-        v->map.id = sqlite3_column_int(stmt, 1);
-        modificationMaps.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadModificationMapsPtrs()
-{
-    for (auto &modificationMap : modificationMaps)
-    {
-        if (modifications.find(modificationMap->modification.id) != modifications.end())
-            modificationMap->modification.ptr = modifications[modificationMap->modification.id];
-        if (maps.find(modificationMap->map.id) != maps.end())
-            modificationMap->map.ptr = maps[modificationMap->map.id];
-    }
-}
-
-void StorageImpl::_loadModificationMapsArrays()
-{
-}
-
-void StorageImpl::_saveModificationMaps() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from ModificationMaps;");
-    const std::string query = "insert into ModificationMaps values (?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &modificationMap : modificationMaps)
-    {
-        auto &v = modificationMap;
-        ret = sqlite3_bind_int(stmt, 1, v->modification.id);
-        ret = sqlite3_bind_int(stmt, 2, v->map.id);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadModificationMechanoids()
-{
-    int ret = 0;
-    const std::string query = "select * from ModificationMechanoids;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = modificationMechanoids.create();
-        v->modification.id = sqlite3_column_int(stmt, 0);
-        v->mechanoid.id = sqlite3_column_int(stmt, 1);
-        modificationMechanoids.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadModificationMechanoidsPtrs()
-{
-    for (auto &modificationMechanoid : modificationMechanoids)
-    {
-        if (modifications.find(modificationMechanoid->modification.id) != modifications.end())
-            modificationMechanoid->modification.ptr = modifications[modificationMechanoid->modification.id];
-        if (mechanoids.find(modificationMechanoid->mechanoid.id) != mechanoids.end())
-            modificationMechanoid->mechanoid.ptr = mechanoids[modificationMechanoid->mechanoid.id];
-    }
-}
-
-void StorageImpl::_loadModificationMechanoidsArrays()
-{
-}
-
-void StorageImpl::_saveModificationMechanoids() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from ModificationMechanoids;");
-    const std::string query = "insert into ModificationMechanoids values (?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &modificationMechanoid : modificationMechanoids)
-    {
-        auto &v = modificationMechanoid;
-        ret = sqlite3_bind_int(stmt, 1, v->modification.id);
-        ret = sqlite3_bind_int(stmt, 2, v->mechanoid.id);
+        auto &v = mechanoidQuest;
+        ret = sqlite3_bind_int(stmt, 1, v->mechanoid->id);
+        ret = sqlite3_bind_int(stmt, 2, v->quest->id);
+        ret = sqlite3_bind_int(stmt, 3, v->state);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -1878,7 +1674,7 @@ void StorageImpl::_loadModifications()
     {
         auto v = modifications.create();
         v->id = sqlite3_column_int(stmt, 0);
-        v->name.id = sqlite3_column_int(stmt, 1);
+        v->name->id = (stmt, 1);
         v->directory = (const char *)sqlite3_column_text(stmt, 2);
         v->author = (const char *)sqlite3_column_text(stmt, 3);
         v->date_created = (const char *)sqlite3_column_text(stmt, 4);
@@ -1887,8 +1683,8 @@ void StorageImpl::_loadModifications()
         v->version = (const char *)sqlite3_column_text(stmt, 7);
         v->script_language = (const char *)sqlite3_column_text(stmt, 8);
         v->script_main = (const char *)sqlite3_column_text(stmt, 9);
-        v->player_mechanoid.id = sqlite3_column_int(stmt, 10);
-        v->cooperative_player_configuration.id = sqlite3_column_int(stmt, 11);
+        v->player_mechanoid->id = (stmt, 10);
+        v->cooperative_player_configuration->id = (stmt, 11);
         modifications.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -1898,12 +1694,12 @@ void StorageImpl::_loadModificationsPtrs()
 {
     for (auto &modification : modifications)
     {
-        if (strings.find(modification.second->name.id) != strings.end())
-            modification.second->name.ptr = strings[modification.second->name.id];
-        if (mechanoids.find(modification.second->player_mechanoid.id) != mechanoids.end())
-            modification.second->player_mechanoid.ptr = mechanoids[modification.second->player_mechanoid.id];
-        if (configurations.find(modification.second->cooperative_player_configuration.id) != configurations.end())
-            modification.second->cooperative_player_configuration.ptr = configurations[modification.second->cooperative_player_configuration.id];
+        if (strings.find(modification->name->id) != strings.end())
+            modification->name = strings[modification->name->id];
+        if (mechanoids.find(modification->player_mechanoid->id) != mechanoids.end())
+            modification->player_mechanoid = mechanoids[modification->player_mechanoid->id];
+        if (configurations.find(modification->cooperative_player_configuration->id) != configurations.end())
+            modification->cooperative_player_configuration = configurations[modification->cooperative_player_configuration->id];
     }
 }
 
@@ -1911,15 +1707,15 @@ void StorageImpl::_loadModificationsArrays()
 {
     for (auto &modification : modifications)
     {
-        for (auto &modificationClan : modificationClans)
-            if (modification.first == modificationClan->modification.id)
-                modification->clans.insert(modificationClan);
         for (auto &modificationMap : modificationMaps)
-            if (modification.first == modificationMap->modification.id)
-                modification->maps.insert(modificationMap);
-        for (auto &modificationMechanoid : modificationMechanoids)
-            if (modification.first == modificationMechanoid->modification.id)
-                modification->mechanoids.insert(modificationMechanoid);
+            if (modification->id == modificationMap->modification->id)
+                modification->maps->insert(modificationMap);
+        for (auto &clan : clans)
+            if (modification->id == clan->modification->id)
+                modification->clans->insert(clan);
+        for (auto &mechanoid : mechanoids)
+            if (modification->id == mechanoid->modification->id)
+                modification->mechanoids->insert(mechanoid);
     }
 }
 
@@ -1936,17 +1732,72 @@ void StorageImpl::_saveModifications() const
     {
         auto &v = modification.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_int(stmt, 2, v->name.id);
-        ret = sqlite3_bind_text(stmt, 3, v->directory.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 4, v->author.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 5, v->date_created.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 6, v->date_modified.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 7, v->comment.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 8, v->version.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 9, v->script_language.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 10, v->script_main.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 11, v->player_mechanoid.id);
-        ret = sqlite3_bind_int(stmt, 12, v->cooperative_player_configuration.id);
+        ret = sqlite3_bind_int(stmt, 2, v->name->id);
+        ret = sqlite3_bind_text(stmt, 3, std::to_string(v->directory).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 4, std::to_string(v->author).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 5, std::to_string(v->date_created).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 6, std::to_string(v->date_modified).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 7, std::to_string(v->comment).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 8, std::to_string(v->version).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 9, std::to_string(v->script_language).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 10, std::to_string(v->script_main).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 11, v->player_mechanoid->id);
+        ret = sqlite3_bind_int(stmt, 12, v->cooperative_player_configuration->id);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadModificationMaps()
+{
+    int ret = 0;
+    const std::string query = "select * from ModificationMaps;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = modificationMaps.create();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->modification->id = (stmt, 1);
+        v->map->id = (stmt, 2);
+        modificationMaps.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadModificationMapsPtrs()
+{
+    for (auto &modificationMap : modificationMaps)
+    {
+        if (modifications.find(modificationMap->modification->id) != modifications.end())
+            modificationMap->modification = modifications[modificationMap->modification->id];
+        if (maps.find(modificationMap->map->id) != maps.end())
+            modificationMap->map = maps[modificationMap->map->id];
+    }
+}
+
+void StorageImpl::_loadModificationMapsArrays()
+{
+}
+
+void StorageImpl::_saveModificationMaps() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from ModificationMaps;");
+    const std::string query = "insert into ModificationMaps values (?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &modificationMap : modificationMaps)
+    {
+        auto &v = modificationMap.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_int(stmt, 2, v->modification->id);
+        ret = sqlite3_bind_int(stmt, 3, v->map->id);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -1967,7 +1818,7 @@ void StorageImpl::_loadModificators()
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
-        v->name.id = sqlite3_column_int(stmt, 3);
+        v->name->id = (stmt, 3);
         v->probability = (float)sqlite3_column_double(stmt, 4);
         v->price = (float)sqlite3_column_double(stmt, 5);
         v->k_price = (float)sqlite3_column_double(stmt, 6);
@@ -1984,8 +1835,8 @@ void StorageImpl::_loadModificatorsPtrs()
 {
     for (auto &modificator : modificators)
     {
-        if (strings.find(modificator.second->name.id) != strings.end())
-            modificator.second->name.ptr = strings[modificator.second->name.id];
+        if (strings.find(modificator->name->id) != strings.end())
+            modificator->name = strings[modificator->name->id];
     }
 }
 
@@ -2006,9 +1857,9 @@ void StorageImpl::_saveModificators() const
     {
         auto &v = modificator.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, std::to_string(v->resource).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name->id);
         ret = sqlite3_bind_double(stmt, 5, v->probability);
         ret = sqlite3_bind_double(stmt, 6, v->price);
         ret = sqlite3_bind_double(stmt, 7, v->k_price);
@@ -2036,7 +1887,7 @@ void StorageImpl::_loadObjects()
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
-        v->name.id = sqlite3_column_int(stmt, 3);
+        v->name->id = (stmt, 3);
         v->type = sqlite3_column_int(stmt, 4);
         v->scale = (float)sqlite3_column_double(stmt, 5);
         v->scale_x = (float)sqlite3_column_double(stmt, 6);
@@ -2051,8 +1902,8 @@ void StorageImpl::_loadObjectsPtrs()
 {
     for (auto &object : objects)
     {
-        if (strings.find(object.second->name.id) != strings.end())
-            object.second->name.ptr = strings[object.second->name.id];
+        if (strings.find(object->name->id) != strings.end())
+            object->name = strings[object->name->id];
     }
 }
 
@@ -2073,9 +1924,9 @@ void StorageImpl::_saveObjects() const
     {
         auto &v = object.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, std::to_string(v->resource).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name->id);
         ret = sqlite3_bind_int(stmt, 5, v->type);
         ret = sqlite3_bind_double(stmt, 6, v->scale);
         ret = sqlite3_bind_double(stmt, 7, v->scale_x);
@@ -2099,7 +1950,7 @@ void StorageImpl::_loadPlayers()
     {
         auto v = players.create();
         v->id = sqlite3_column_int(stmt, 0);
-        v->mechanoid.id = sqlite3_column_int(stmt, 1);
+        v->mechanoid->id = (stmt, 1);
         players.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -2109,8 +1960,8 @@ void StorageImpl::_loadPlayersPtrs()
 {
     for (auto &player : players)
     {
-        if (mechanoids.find(player.second->mechanoid.id) != mechanoids.end())
-            player.second->mechanoid.ptr = mechanoids[player.second->mechanoid.id];
+        if (mechanoids.find(player->mechanoid->id) != mechanoids.end())
+            player->mechanoid = mechanoids[player->mechanoid->id];
     }
 }
 
@@ -2131,7 +1982,7 @@ void StorageImpl::_savePlayers() const
     {
         auto &v = player.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_int(stmt, 2, v->mechanoid.id);
+        ret = sqlite3_bind_int(stmt, 2, v->mechanoid->id);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -2152,16 +2003,16 @@ void StorageImpl::_loadProjectiles()
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
-        v->name.id = sqlite3_column_int(stmt, 3);
+        v->name->id = (stmt, 3);
         v->type = sqlite3_column_int(stmt, 4);
-        v->weight = (float)sqlite3_column_double(stmt, 5);
-        v->damage = (float)sqlite3_column_double(stmt, 6);
-        v->T = (const char *)sqlite3_column_text(stmt, 7);
-        v->speed = (float)sqlite3_column_double(stmt, 8);
-        v->scale = (float)sqlite3_column_double(stmt, 9);
-        v->numstate = sqlite3_column_int(stmt, 10);
-        v->rotate = (float)sqlite3_column_double(stmt, 11);
-        v->subtype = sqlite3_column_int(stmt, 12);
+        v->subtype = sqlite3_column_int(stmt, 5);
+        v->weight = (float)sqlite3_column_double(stmt, 6);
+        v->damage = (float)sqlite3_column_double(stmt, 7);
+        v->T = (float)sqlite3_column_double(stmt, 8);
+        v->speed = (float)sqlite3_column_double(stmt, 9);
+        v->scale = (float)sqlite3_column_double(stmt, 10);
+        v->numstate = sqlite3_column_int(stmt, 11);
+        v->rotate = (float)sqlite3_column_double(stmt, 12);
         v->life_time = (float)sqlite3_column_double(stmt, 13);
         v->detonation_delay = (float)sqlite3_column_double(stmt, 14);
         v->distance_detonation = (float)sqlite3_column_double(stmt, 15);
@@ -2177,8 +2028,8 @@ void StorageImpl::_loadProjectilesPtrs()
 {
     for (auto &projectile : projectiles)
     {
-        if (strings.find(projectile.second->name.id) != strings.end())
-            projectile.second->name.ptr = strings[projectile.second->name.id];
+        if (strings.find(projectile->name->id) != strings.end())
+            projectile->name = strings[projectile->name->id];
     }
 }
 
@@ -2199,24 +2050,172 @@ void StorageImpl::_saveProjectiles() const
     {
         auto &v = projectile.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 4, v->name.id);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, std::to_string(v->resource).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name->id);
         ret = sqlite3_bind_int(stmt, 5, v->type);
-        ret = sqlite3_bind_double(stmt, 6, v->weight);
-        ret = sqlite3_bind_double(stmt, 7, v->damage);
-        ret = sqlite3_bind_text(stmt, 8, v->T.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_double(stmt, 9, v->speed);
-        ret = sqlite3_bind_double(stmt, 10, v->scale);
-        ret = sqlite3_bind_int(stmt, 11, v->numstate);
-        ret = sqlite3_bind_double(stmt, 12, v->rotate);
-        ret = sqlite3_bind_int(stmt, 13, v->subtype);
+        ret = sqlite3_bind_int(stmt, 6, v->subtype);
+        ret = sqlite3_bind_double(stmt, 7, v->weight);
+        ret = sqlite3_bind_double(stmt, 8, v->damage);
+        ret = sqlite3_bind_double(stmt, 9, v->T);
+        ret = sqlite3_bind_double(stmt, 10, v->speed);
+        ret = sqlite3_bind_double(stmt, 11, v->scale);
+        ret = sqlite3_bind_int(stmt, 12, v->numstate);
+        ret = sqlite3_bind_double(stmt, 13, v->rotate);
         ret = sqlite3_bind_double(stmt, 14, v->life_time);
         ret = sqlite3_bind_double(stmt, 15, v->detonation_delay);
         ret = sqlite3_bind_double(stmt, 16, v->distance_detonation);
         ret = sqlite3_bind_double(stmt, 17, v->strength);
         ret = sqlite3_bind_double(stmt, 18, v->price);
         ret = sqlite3_bind_int(stmt, 19, v->notrade);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadQuests()
+{
+    int ret = 0;
+    const std::string query = "select * from Quests;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = quests.create();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->name->id = (stmt, 1);
+        v->title->id = (stmt, 2);
+        v->description->id = (stmt, 3);
+        v->time = sqlite3_column_int(stmt, 4);
+        quests.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadQuestsPtrs()
+{
+    for (auto &quest : quests)
+    {
+        if (strings.find(quest->name->id) != strings.end())
+            quest->name = strings[quest->name->id];
+        if (strings.find(quest->title->id) != strings.end())
+            quest->title = strings[quest->title->id];
+        if (strings.find(quest->description->id) != strings.end())
+            quest->description = strings[quest->description->id];
+    }
+}
+
+void StorageImpl::_loadQuestsArrays()
+{
+    for (auto &quest : quests)
+    {
+        for (auto &questReward : questRewards)
+            if (quest->id == questReward->quest->id)
+                quest->rewards->insert(questReward);
+    }
+}
+
+void StorageImpl::_saveQuests() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from Quests;");
+    const std::string query = "insert into Quests values (?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &quest : quests)
+    {
+        auto &v = quest.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_int(stmt, 2, v->name->id);
+        ret = sqlite3_bind_int(stmt, 3, v->title->id);
+        ret = sqlite3_bind_int(stmt, 4, v->description->id);
+        ret = sqlite3_bind_int(stmt, 5, v->time);
+        ret = sqlite3_step(stmt);
+        ret = sqlite3_reset(stmt);
+    }
+    ret = sqlite3_finalize(stmt);
+    db->execute("COMMIT;");
+}
+
+void StorageImpl::_loadQuestRewards()
+{
+    int ret = 0;
+    const std::string query = "select * from QuestRewards;";
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        auto v = questRewards.create();
+        v->id = sqlite3_column_int(stmt, 0);
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->quest->id = (stmt, 2);
+        v->money = (float)sqlite3_column_double(stmt, 3);
+        v->rating = (float)sqlite3_column_double(stmt, 4);
+        questRewards.insert(v);
+    }
+    ret = sqlite3_finalize(stmt);
+}
+
+void StorageImpl::_loadQuestRewardsPtrs()
+{
+    for (auto &questReward : questRewards)
+    {
+        if (quests.find(questReward->quest->id) != quests.end())
+            questReward->quest = quests[questReward->quest->id];
+    }
+}
+
+void StorageImpl::_loadQuestRewardsArrays()
+{
+    for (auto &questReward : questRewards)
+    {
+        for (auto &questRewardEquipment : questRewardEquipments)
+            if (questReward->id == questRewardEquipment->quest_reward->id)
+                questReward->equipments->insert(questRewardEquipment);
+        for (auto &questRewardGlider : questRewardGliders)
+            if (questReward->id == questRewardGlider->quest_reward->id)
+                questReward->gliders->insert(questRewardGlider);
+        for (auto &questRewardGood : questRewardGoods)
+            if (questReward->id == questRewardGood->quest_reward->id)
+                questReward->goods->insert(questRewardGood);
+        for (auto &questRewardModificator : questRewardModificators)
+            if (questReward->id == questRewardModificator->quest_reward->id)
+                questReward->modificators->insert(questRewardModificator);
+        for (auto &questRewardProjectile : questRewardProjectiles)
+            if (questReward->id == questRewardProjectile->quest_reward->id)
+                questReward->projectiles->insert(questRewardProjectile);
+        for (auto &questRewardReputation : questRewardReputations)
+            if (questReward->id == questRewardReputation->quest_reward->id)
+                questReward->reputations->insert(questRewardReputation);
+        for (auto &questRewardWeapon : questRewardWeapons)
+            if (questReward->id == questRewardWeapon->quest_reward->id)
+                questReward->weapons->insert(questRewardWeapon);
+    }
+}
+
+void StorageImpl::_saveQuestRewards() const
+{
+    db->execute("BEGIN;");
+    db->execute("delete from QuestRewards;");
+    const std::string query = "insert into QuestRewards values (?, ?, ?, ?, ?);";
+    int ret = 0;
+    auto db3 = db->getDb();
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
+    for (auto &questReward : questRewards)
+    {
+        auto &v = questReward.second;
+        ret = sqlite3_bind_int(stmt, 1, v->id);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->quest->id);
+        ret = sqlite3_bind_double(stmt, 4, v->money);
+        ret = sqlite3_bind_double(stmt, 5, v->rating);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -2234,8 +2233,8 @@ void StorageImpl::_loadQuestRewardEquipments()
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         auto v = questRewardEquipments.create();
-        v->questReward.id = sqlite3_column_int(stmt, 0);
-        v->equipment.id = sqlite3_column_int(stmt, 1);
+        v->quest_reward->id = (stmt, 0);
+        v->equipment->id = (stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
         questRewardEquipments.insert(v);
     }
@@ -2246,10 +2245,10 @@ void StorageImpl::_loadQuestRewardEquipmentsPtrs()
 {
     for (auto &questRewardEquipment : questRewardEquipments)
     {
-        if (questRewards.find(questRewardEquipment->questReward.id) != questRewards.end())
-            questRewardEquipment->questReward.ptr = questRewards[questRewardEquipment->questReward.id];
-        if (equipments.find(questRewardEquipment->equipment.id) != equipments.end())
-            questRewardEquipment->equipment.ptr = equipments[questRewardEquipment->equipment.id];
+        if (questRewards.find(questRewardEquipment->quest_reward->id) != questRewards.end())
+            questRewardEquipment->quest_reward = questRewards[questRewardEquipment->quest_reward->id];
+        if (equipments.find(questRewardEquipment->equipment->id) != equipments.end())
+            questRewardEquipment->equipment = equipments[questRewardEquipment->equipment->id];
     }
 }
 
@@ -2269,8 +2268,8 @@ void StorageImpl::_saveQuestRewardEquipments() const
     for (auto &questRewardEquipment : questRewardEquipments)
     {
         auto &v = questRewardEquipment;
-        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
-        ret = sqlite3_bind_int(stmt, 2, v->equipment.id);
+        ret = sqlite3_bind_int(stmt, 1, v->quest_reward->id);
+        ret = sqlite3_bind_int(stmt, 2, v->equipment->id);
         ret = sqlite3_bind_int(stmt, 3, v->quantity);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
@@ -2289,8 +2288,8 @@ void StorageImpl::_loadQuestRewardGliders()
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         auto v = questRewardGliders.create();
-        v->questReward.id = sqlite3_column_int(stmt, 0);
-        v->glider.id = sqlite3_column_int(stmt, 1);
+        v->quest_reward->id = (stmt, 0);
+        v->glider->id = (stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
         questRewardGliders.insert(v);
     }
@@ -2301,10 +2300,10 @@ void StorageImpl::_loadQuestRewardGlidersPtrs()
 {
     for (auto &questRewardGlider : questRewardGliders)
     {
-        if (questRewards.find(questRewardGlider->questReward.id) != questRewards.end())
-            questRewardGlider->questReward.ptr = questRewards[questRewardGlider->questReward.id];
-        if (gliders.find(questRewardGlider->glider.id) != gliders.end())
-            questRewardGlider->glider.ptr = gliders[questRewardGlider->glider.id];
+        if (questRewards.find(questRewardGlider->quest_reward->id) != questRewards.end())
+            questRewardGlider->quest_reward = questRewards[questRewardGlider->quest_reward->id];
+        if (gliders.find(questRewardGlider->glider->id) != gliders.end())
+            questRewardGlider->glider = gliders[questRewardGlider->glider->id];
     }
 }
 
@@ -2324,8 +2323,8 @@ void StorageImpl::_saveQuestRewardGliders() const
     for (auto &questRewardGlider : questRewardGliders)
     {
         auto &v = questRewardGlider;
-        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
-        ret = sqlite3_bind_int(stmt, 2, v->glider.id);
+        ret = sqlite3_bind_int(stmt, 1, v->quest_reward->id);
+        ret = sqlite3_bind_int(stmt, 2, v->glider->id);
         ret = sqlite3_bind_int(stmt, 3, v->quantity);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
@@ -2344,8 +2343,8 @@ void StorageImpl::_loadQuestRewardGoods()
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         auto v = questRewardGoods.create();
-        v->questReward.id = sqlite3_column_int(stmt, 0);
-        v->good.id = sqlite3_column_int(stmt, 1);
+        v->quest_reward->id = (stmt, 0);
+        v->good->id = (stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
         questRewardGoods.insert(v);
     }
@@ -2356,10 +2355,10 @@ void StorageImpl::_loadQuestRewardGoodsPtrs()
 {
     for (auto &questRewardGood : questRewardGoods)
     {
-        if (questRewards.find(questRewardGood->questReward.id) != questRewards.end())
-            questRewardGood->questReward.ptr = questRewards[questRewardGood->questReward.id];
-        if (goods.find(questRewardGood->good.id) != goods.end())
-            questRewardGood->good.ptr = goods[questRewardGood->good.id];
+        if (questRewards.find(questRewardGood->quest_reward->id) != questRewards.end())
+            questRewardGood->quest_reward = questRewards[questRewardGood->quest_reward->id];
+        if (goods.find(questRewardGood->good->id) != goods.end())
+            questRewardGood->good = goods[questRewardGood->good->id];
     }
 }
 
@@ -2379,8 +2378,8 @@ void StorageImpl::_saveQuestRewardGoods() const
     for (auto &questRewardGood : questRewardGoods)
     {
         auto &v = questRewardGood;
-        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
-        ret = sqlite3_bind_int(stmt, 2, v->good.id);
+        ret = sqlite3_bind_int(stmt, 1, v->quest_reward->id);
+        ret = sqlite3_bind_int(stmt, 2, v->good->id);
         ret = sqlite3_bind_int(stmt, 3, v->quantity);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
@@ -2399,8 +2398,8 @@ void StorageImpl::_loadQuestRewardModificators()
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         auto v = questRewardModificators.create();
-        v->questReward.id = sqlite3_column_int(stmt, 0);
-        v->modificator.id = sqlite3_column_int(stmt, 1);
+        v->quest_reward->id = (stmt, 0);
+        v->modificator->id = (stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
         questRewardModificators.insert(v);
     }
@@ -2411,10 +2410,10 @@ void StorageImpl::_loadQuestRewardModificatorsPtrs()
 {
     for (auto &questRewardModificator : questRewardModificators)
     {
-        if (questRewards.find(questRewardModificator->questReward.id) != questRewards.end())
-            questRewardModificator->questReward.ptr = questRewards[questRewardModificator->questReward.id];
-        if (modificators.find(questRewardModificator->modificator.id) != modificators.end())
-            questRewardModificator->modificator.ptr = modificators[questRewardModificator->modificator.id];
+        if (questRewards.find(questRewardModificator->quest_reward->id) != questRewards.end())
+            questRewardModificator->quest_reward = questRewards[questRewardModificator->quest_reward->id];
+        if (modificators.find(questRewardModificator->modificator->id) != modificators.end())
+            questRewardModificator->modificator = modificators[questRewardModificator->modificator->id];
     }
 }
 
@@ -2434,8 +2433,8 @@ void StorageImpl::_saveQuestRewardModificators() const
     for (auto &questRewardModificator : questRewardModificators)
     {
         auto &v = questRewardModificator;
-        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
-        ret = sqlite3_bind_int(stmt, 2, v->modificator.id);
+        ret = sqlite3_bind_int(stmt, 1, v->quest_reward->id);
+        ret = sqlite3_bind_int(stmt, 2, v->modificator->id);
         ret = sqlite3_bind_int(stmt, 3, v->quantity);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
@@ -2454,8 +2453,8 @@ void StorageImpl::_loadQuestRewardProjectiles()
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         auto v = questRewardProjectiles.create();
-        v->questReward.id = sqlite3_column_int(stmt, 0);
-        v->projectile.id = sqlite3_column_int(stmt, 1);
+        v->quest_reward->id = (stmt, 0);
+        v->projectile->id = (stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
         questRewardProjectiles.insert(v);
     }
@@ -2466,10 +2465,10 @@ void StorageImpl::_loadQuestRewardProjectilesPtrs()
 {
     for (auto &questRewardProjectile : questRewardProjectiles)
     {
-        if (questRewards.find(questRewardProjectile->questReward.id) != questRewards.end())
-            questRewardProjectile->questReward.ptr = questRewards[questRewardProjectile->questReward.id];
-        if (projectiles.find(questRewardProjectile->projectile.id) != projectiles.end())
-            questRewardProjectile->projectile.ptr = projectiles[questRewardProjectile->projectile.id];
+        if (questRewards.find(questRewardProjectile->quest_reward->id) != questRewards.end())
+            questRewardProjectile->quest_reward = questRewards[questRewardProjectile->quest_reward->id];
+        if (projectiles.find(questRewardProjectile->projectile->id) != projectiles.end())
+            questRewardProjectile->projectile = projectiles[questRewardProjectile->projectile->id];
     }
 }
 
@@ -2489,8 +2488,8 @@ void StorageImpl::_saveQuestRewardProjectiles() const
     for (auto &questRewardProjectile : questRewardProjectiles)
     {
         auto &v = questRewardProjectile;
-        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
-        ret = sqlite3_bind_int(stmt, 2, v->projectile.id);
+        ret = sqlite3_bind_int(stmt, 1, v->quest_reward->id);
+        ret = sqlite3_bind_int(stmt, 2, v->projectile->id);
         ret = sqlite3_bind_int(stmt, 3, v->quantity);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
@@ -2509,9 +2508,9 @@ void StorageImpl::_loadQuestRewardReputations()
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         auto v = questRewardReputations.create();
-        v->questReward.id = sqlite3_column_int(stmt, 0);
-        v->clan.id = sqlite3_column_int(stmt, 1);
-        v->reputation = (float)sqlite3_column_double(stmt, 2);
+        v->quest_reward->id = (stmt, 0);
+        v->clan->id = (stmt, 1);
+        v->quantity = (float)sqlite3_column_double(stmt, 2);
         questRewardReputations.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -2521,10 +2520,10 @@ void StorageImpl::_loadQuestRewardReputationsPtrs()
 {
     for (auto &questRewardReputation : questRewardReputations)
     {
-        if (questRewards.find(questRewardReputation->questReward.id) != questRewards.end())
-            questRewardReputation->questReward.ptr = questRewards[questRewardReputation->questReward.id];
-        if (clans.find(questRewardReputation->clan.id) != clans.end())
-            questRewardReputation->clan.ptr = clans[questRewardReputation->clan.id];
+        if (questRewards.find(questRewardReputation->quest_reward->id) != questRewards.end())
+            questRewardReputation->quest_reward = questRewards[questRewardReputation->quest_reward->id];
+        if (clans.find(questRewardReputation->clan->id) != clans.end())
+            questRewardReputation->clan = clans[questRewardReputation->clan->id];
     }
 }
 
@@ -2544,9 +2543,9 @@ void StorageImpl::_saveQuestRewardReputations() const
     for (auto &questRewardReputation : questRewardReputations)
     {
         auto &v = questRewardReputation;
-        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
-        ret = sqlite3_bind_int(stmt, 2, v->clan.id);
-        ret = sqlite3_bind_double(stmt, 3, v->reputation);
+        ret = sqlite3_bind_int(stmt, 1, v->quest_reward->id);
+        ret = sqlite3_bind_int(stmt, 2, v->clan->id);
+        ret = sqlite3_bind_double(stmt, 3, v->quantity);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -2564,8 +2563,8 @@ void StorageImpl::_loadQuestRewardWeapons()
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         auto v = questRewardWeapons.create();
-        v->questReward.id = sqlite3_column_int(stmt, 0);
-        v->weapon.id = sqlite3_column_int(stmt, 1);
+        v->quest_reward->id = (stmt, 0);
+        v->weapon->id = (stmt, 1);
         v->quantity = sqlite3_column_int(stmt, 2);
         questRewardWeapons.insert(v);
     }
@@ -2576,10 +2575,10 @@ void StorageImpl::_loadQuestRewardWeaponsPtrs()
 {
     for (auto &questRewardWeapon : questRewardWeapons)
     {
-        if (questRewards.find(questRewardWeapon->questReward.id) != questRewards.end())
-            questRewardWeapon->questReward.ptr = questRewards[questRewardWeapon->questReward.id];
-        if (weapons.find(questRewardWeapon->weapon.id) != weapons.end())
-            questRewardWeapon->weapon.ptr = weapons[questRewardWeapon->weapon.id];
+        if (questRewards.find(questRewardWeapon->quest_reward->id) != questRewards.end())
+            questRewardWeapon->quest_reward = questRewards[questRewardWeapon->quest_reward->id];
+        if (weapons.find(questRewardWeapon->weapon->id) != weapons.end())
+            questRewardWeapon->weapon = weapons[questRewardWeapon->weapon->id];
     }
 }
 
@@ -2599,159 +2598,9 @@ void StorageImpl::_saveQuestRewardWeapons() const
     for (auto &questRewardWeapon : questRewardWeapons)
     {
         auto &v = questRewardWeapon;
-        ret = sqlite3_bind_int(stmt, 1, v->questReward.id);
-        ret = sqlite3_bind_int(stmt, 2, v->weapon.id);
+        ret = sqlite3_bind_int(stmt, 1, v->quest_reward->id);
+        ret = sqlite3_bind_int(stmt, 2, v->weapon->id);
         ret = sqlite3_bind_int(stmt, 3, v->quantity);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadQuestRewards()
-{
-    int ret = 0;
-    const std::string query = "select * from QuestRewards;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = questRewards.create();
-        v->id = sqlite3_column_int(stmt, 0);
-        v->quest.id = sqlite3_column_int(stmt, 1);
-        v->text_id = (const char *)sqlite3_column_text(stmt, 2);
-        v->money = sqlite3_column_int(stmt, 3);
-        v->rating = (float)sqlite3_column_double(stmt, 4);
-        questRewards.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadQuestRewardsPtrs()
-{
-    for (auto &questReward : questRewards)
-    {
-        if (quests.find(questReward.second->quest.id) != quests.end())
-            questReward.second->quest.ptr = quests[questReward.second->quest.id];
-    }
-}
-
-void StorageImpl::_loadQuestRewardsArrays()
-{
-    for (auto &questReward : questRewards)
-    {
-        for (auto &questRewardEquipment : questRewardEquipments)
-            if (questReward.first == questRewardEquipment->questReward.id)
-                questReward->equipments.insert(questRewardEquipment);
-        for (auto &questRewardGlider : questRewardGliders)
-            if (questReward.first == questRewardGlider->questReward.id)
-                questReward->gliders.insert(questRewardGlider);
-        for (auto &questRewardGood : questRewardGoods)
-            if (questReward.first == questRewardGood->questReward.id)
-                questReward->goods.insert(questRewardGood);
-        for (auto &questRewardModificator : questRewardModificators)
-            if (questReward.first == questRewardModificator->questReward.id)
-                questReward->modificators.insert(questRewardModificator);
-        for (auto &questRewardProjectile : questRewardProjectiles)
-            if (questReward.first == questRewardProjectile->questReward.id)
-                questReward->projectiles.insert(questRewardProjectile);
-        for (auto &questRewardReputation : questRewardReputations)
-            if (questReward.first == questRewardReputation->questReward.id)
-                questReward->reputations.insert(questRewardReputation);
-        for (auto &questRewardWeapon : questRewardWeapons)
-            if (questReward.first == questRewardWeapon->questReward.id)
-                questReward->weapons.insert(questRewardWeapon);
-    }
-}
-
-void StorageImpl::_saveQuestRewards() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from QuestRewards;");
-    const std::string query = "insert into QuestRewards values (?, ?, ?, ?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &questReward : questRewards)
-    {
-        auto &v = questReward.second;
-        ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_int(stmt, 2, v->quest.id);
-        ret = sqlite3_bind_text(stmt, 3, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 4, v->money);
-        ret = sqlite3_bind_double(stmt, 5, v->rating);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_reset(stmt);
-    }
-    ret = sqlite3_finalize(stmt);
-    db->execute("COMMIT;");
-}
-
-void StorageImpl::_loadQuests()
-{
-    int ret = 0;
-    const std::string query = "select * from Quests;";
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        auto v = quests.create();
-        v->id = sqlite3_column_int(stmt, 0);
-        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
-        v->name.id = sqlite3_column_int(stmt, 2);
-        v->title.id = sqlite3_column_int(stmt, 3);
-        v->description.id = sqlite3_column_int(stmt, 4);
-        v->time = sqlite3_column_int(stmt, 5);
-        quests.insert(v);
-    }
-    ret = sqlite3_finalize(stmt);
-}
-
-void StorageImpl::_loadQuestsPtrs()
-{
-    for (auto &quest : quests)
-    {
-        if (strings.find(quest.second->name.id) != strings.end())
-            quest.second->name.ptr = strings[quest.second->name.id];
-        if (strings.find(quest.second->title.id) != strings.end())
-            quest.second->title.ptr = strings[quest.second->title.id];
-        if (strings.find(quest.second->description.id) != strings.end())
-            quest.second->description.ptr = strings[quest.second->description.id];
-    }
-}
-
-void StorageImpl::_loadQuestsArrays()
-{
-    for (auto &quest : quests)
-    {
-        for (auto &questReward : questRewards)
-            if (quest.first == questReward->quest.id)
-                quest->rewards.insert(questReward);
-    }
-}
-
-void StorageImpl::_saveQuests() const
-{
-    db->execute("BEGIN;");
-    db->execute("delete from Quests;");
-    const std::string query = "insert into Quests values (?, ?, ?, ?, ?, ?);";
-    int ret = 0;
-    auto db3 = db->getDb();
-    sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);
-    for (auto &quest : quests)
-    {
-        auto &v = quest.second;
-        ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 3, v->name.id);
-        ret = sqlite3_bind_int(stmt, 4, v->title.id);
-        ret = sqlite3_bind_int(stmt, 5, v->description.id);
-        ret = sqlite3_bind_int(stmt, 6, v->time);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -2800,10 +2649,10 @@ void StorageImpl::_saveScriptVariables() const
     {
         auto &v = scriptVariable.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->variable.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->variable).c_str(), -1, SQLITE_TRANSIENT);
         ret = sqlite3_bind_int(stmt, 3, v->value_int);
         ret = sqlite3_bind_double(stmt, 4, v->value_float);
-        ret = sqlite3_bind_text(stmt, 5, v->value_text.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 5, std::to_string(v->value_text).c_str(), -1, SQLITE_TRANSIENT);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -2822,11 +2671,12 @@ void StorageImpl::_loadSettings()
     {
         auto v = settings.create();
         v->id = sqlite3_column_int(stmt, 0);
-        v->player.id = sqlite3_column_int(stmt, 1);
-        v->value_int = sqlite3_column_int(stmt, 2);
-        v->value_float = (float)sqlite3_column_double(stmt, 3);
-        v->value_text = (const char *)sqlite3_column_text(stmt, 4);
-        v->value_blob = Blob(sqlite3_column_blob(stmt, 5), sqlite3_column_bytes(stmt, 5));
+        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->player->id = (stmt, 2);
+        v->value_int = sqlite3_column_int(stmt, 3);
+        v->value_float = (float)sqlite3_column_double(stmt, 4);
+        v->value_text = (const char *)sqlite3_column_text(stmt, 5);
+        v->value_blob = Blob(sqlite3_column_blob(stmt, 6), sqlite3_column_bytes(stmt, 6));
         settings.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -2836,8 +2686,8 @@ void StorageImpl::_loadSettingsPtrs()
 {
     for (auto &setting : settings)
     {
-        if (players.find(setting.second->player.id) != players.end())
-            setting.second->player.ptr = players[setting.second->player.id];
+        if (players.find(setting->player->id) != players.end())
+            setting->player = players[setting->player->id];
     }
 }
 
@@ -2849,7 +2699,7 @@ void StorageImpl::_saveSettings() const
 {
     db->execute("BEGIN;");
     db->execute("delete from Settings;");
-    const std::string query = "insert into Settings values (?, ?, ?, ?, ?, ?);";
+    const std::string query = "insert into Settings values (?, ?, ?, ?, ?, ?, ?);";
     int ret = 0;
     auto db3 = db->getDb();
     sqlite3_stmt *stmt;
@@ -2858,11 +2708,12 @@ void StorageImpl::_saveSettings() const
     {
         auto &v = setting.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_int(stmt, 2, v->player.id);
-        ret = sqlite3_bind_int(stmt, 3, v->value_int);
-        ret = sqlite3_bind_double(stmt, 4, v->value_float);
-        ret = sqlite3_bind_text(stmt, 5, v->value_text.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_blob(stmt, 6, v->value_blob.getRawData(), v->value_blob.getLength(), SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->player->id);
+        ret = sqlite3_bind_int(stmt, 4, v->value_int);
+        ret = sqlite3_bind_double(stmt, 5, v->value_float);
+        ret = sqlite3_bind_text(stmt, 6, std::to_string(v->value_text).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_blob(stmt, 7, v->value_blob.getRawData(), v->value_blob.getLength(), SQLITE_TRANSIENT);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -2882,7 +2733,7 @@ void StorageImpl::_loadStrings()
         auto v = strings.create();
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
-        v->table.id = sqlite3_column_int(stmt, 2);
+        v->table->id = (stmt, 2);
         v->ru = (const char *)sqlite3_column_text(stmt, 3);
         v->en = (const char *)sqlite3_column_text(stmt, 4);
         strings.insert(v);
@@ -2894,8 +2745,8 @@ void StorageImpl::_loadStringsPtrs()
 {
     for (auto &string : strings)
     {
-        if (tables.find(string.second->table.id) != tables.end())
-            string.second->table.ptr = tables[string.second->table.id];
+        if (tables.find(string->table->id) != tables.end())
+            string->table = tables[string->table->id];
     }
 }
 
@@ -2916,10 +2767,10 @@ void StorageImpl::_saveStrings() const
     {
         auto &v = string.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 3, v->table.id);
-        ret = sqlite3_bind_text(stmt, 4, v->ru.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 5, v->en.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 3, v->table->id);
+        ret = sqlite3_bind_text(stmt, 4, std::to_string(v->ru).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 5, std::to_string(v->en).c_str(), -1, SQLITE_TRANSIENT);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -2938,7 +2789,7 @@ void StorageImpl::_loadTables()
     {
         auto v = tables.create();
         v->id = sqlite3_column_int(stmt, 0);
-        v->text_id = (const char *)sqlite3_column_text(stmt, 1);
+        v->text = (const char *)sqlite3_column_text(stmt, 1);
         tables.insert(v);
     }
     ret = sqlite3_finalize(stmt);
@@ -2965,7 +2816,7 @@ void StorageImpl::_saveTables() const
     {
         auto &v = table.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text).c_str(), -1, SQLITE_TRANSIENT);
         ret = sqlite3_step(stmt);
         ret = sqlite3_reset(stmt);
     }
@@ -2986,8 +2837,8 @@ void StorageImpl::_loadWeapons()
         v->id = sqlite3_column_int(stmt, 0);
         v->text_id = (const char *)sqlite3_column_text(stmt, 1);
         v->resource = (const char *)sqlite3_column_text(stmt, 2);
-        v->name.id = sqlite3_column_int(stmt, 3);
-        v->projectile.id = sqlite3_column_int(stmt, 4);
+        v->name->id = (stmt, 3);
+        v->projectile->id = (stmt, 4);
         v->type = sqlite3_column_int(stmt, 5);
         v->standard = sqlite3_column_int(stmt, 6);
         v->weight = (float)sqlite3_column_double(stmt, 7);
@@ -3026,10 +2877,10 @@ void StorageImpl::_loadWeaponsPtrs()
 {
     for (auto &weapon : weapons)
     {
-        if (strings.find(weapon.second->name.id) != strings.end())
-            weapon.second->name.ptr = strings[weapon.second->name.id];
-        if (projectiles.find(weapon.second->projectile.id) != projectiles.end())
-            weapon.second->projectile.ptr = projectiles[weapon.second->projectile.id];
+        if (strings.find(weapon->name->id) != strings.end())
+            weapon->name = strings[weapon->name->id];
+        if (projectiles.find(weapon->projectile->id) != projectiles.end())
+            weapon->projectile = projectiles[weapon->projectile->id];
     }
 }
 
@@ -3050,10 +2901,10 @@ void StorageImpl::_saveWeapons() const
     {
         auto &v = weapon.second;
         ret = sqlite3_bind_int(stmt, 1, v->id);
-        ret = sqlite3_bind_text(stmt, 2, v->text_id.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_text(stmt, 3, v->resource.string().c_str(), -1, SQLITE_TRANSIENT);
-        ret = sqlite3_bind_int(stmt, 4, v->name.id);
-        ret = sqlite3_bind_int(stmt, 5, v->projectile.id);
+        ret = sqlite3_bind_text(stmt, 2, std::to_string(v->text_id).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_text(stmt, 3, std::to_string(v->resource).c_str(), -1, SQLITE_TRANSIENT);
+        ret = sqlite3_bind_int(stmt, 4, v->name->id);
+        ret = sqlite3_bind_int(stmt, 5, v->projectile->id);
         ret = sqlite3_bind_int(stmt, 6, v->type);
         ret = sqlite3_bind_int(stmt, 7, v->standard);
         ret = sqlite3_bind_double(stmt, 8, v->weight);
@@ -3093,39 +2944,38 @@ void StorageImpl::_saveWeapons() const
 void StorageImpl::create() const
 {
     db->execute(Building::getSql());
-    db->execute(ClanMechanoid::getSql());
-    db->execute(ClanReputation::getSql());
     db->execute(Clan::getSql());
+    db->execute(ClanReputation::getSql());
+    db->execute(Configuration::getSql());
     db->execute(ConfigurationEquipment::getSql());
     db->execute(ConfigurationGood::getSql());
     db->execute(ConfigurationProjectile::getSql());
     db->execute(ConfigurationWeapon::getSql());
-    db->execute(Configuration::getSql());
     db->execute(Equipment::getSql());
     db->execute(Glider::getSql());
     db->execute(Good::getSql());
-    db->execute(GroupMechanoid::getSql());
     db->execute(Group::getSql());
+    db->execute(GroupMechanoid::getSql());
+    db->execute(Map::getSql());
+    db->execute(MapBuilding::getSql());
     db->execute(MapBuildingEquipment::getSql());
     db->execute(MapBuildingGlider::getSql());
     db->execute(MapBuildingGood::getSql());
     db->execute(MapBuildingModificator::getSql());
     db->execute(MapBuildingProjectile::getSql());
     db->execute(MapBuildingWeapon::getSql());
-    db->execute(MapBuilding::getSql());
     db->execute(MapGood::getSql());
     db->execute(MapObject::getSql());
-    db->execute(Map::getSql());
-    db->execute(MechanoidQuest::getSql());
     db->execute(Mechanoid::getSql());
-    db->execute(ModificationClan::getSql());
-    db->execute(ModificationMap::getSql());
-    db->execute(ModificationMechanoid::getSql());
+    db->execute(MechanoidQuest::getSql());
     db->execute(Modification::getSql());
+    db->execute(ModificationMap::getSql());
     db->execute(Modificator::getSql());
     db->execute(Object::getSql());
     db->execute(Player::getSql());
     db->execute(Projectile::getSql());
+    db->execute(Quest::getSql());
+    db->execute(QuestReward::getSql());
     db->execute(QuestRewardEquipment::getSql());
     db->execute(QuestRewardGlider::getSql());
     db->execute(QuestRewardGood::getSql());
@@ -3133,8 +2983,6 @@ void StorageImpl::create() const
     db->execute(QuestRewardProjectile::getSql());
     db->execute(QuestRewardReputation::getSql());
     db->execute(QuestRewardWeapon::getSql());
-    db->execute(QuestReward::getSql());
-    db->execute(Quest::getSql());
     db->execute(ScriptVariable::getSql());
     db->execute(Setting::getSql());
     db->execute(String::getSql());
@@ -3145,39 +2993,38 @@ void StorageImpl::create() const
 void StorageImpl::clear()
 {
     buildings.clear();
-    clanMechanoids.clear();
-    clanReputations.clear();
     clans.clear();
+    clanReputations.clear();
+    configurations.clear();
     configurationEquipments.clear();
     configurationGoods.clear();
     configurationProjectiles.clear();
     configurationWeapons.clear();
-    configurations.clear();
     equipments.clear();
     gliders.clear();
     goods.clear();
-    groupMechanoids.clear();
     groups.clear();
+    groupMechanoids.clear();
+    maps.clear();
+    mapBuildings.clear();
     mapBuildingEquipments.clear();
     mapBuildingGliders.clear();
     mapBuildingGoods.clear();
     mapBuildingModificators.clear();
     mapBuildingProjectiles.clear();
     mapBuildingWeapons.clear();
-    mapBuildings.clear();
     mapGoods.clear();
     mapObjects.clear();
-    maps.clear();
-    mechanoidQuests.clear();
     mechanoids.clear();
-    modificationClans.clear();
-    modificationMaps.clear();
-    modificationMechanoids.clear();
+    mechanoidQuests.clear();
     modifications.clear();
+    modificationMaps.clear();
     modificators.clear();
     objects.clear();
     players.clear();
     projectiles.clear();
+    quests.clear();
+    questRewards.clear();
     questRewardEquipments.clear();
     questRewardGliders.clear();
     questRewardGoods.clear();
@@ -3185,8 +3032,6 @@ void StorageImpl::clear()
     questRewardProjectiles.clear();
     questRewardReputations.clear();
     questRewardWeapons.clear();
-    questRewards.clear();
-    quests.clear();
     scriptVariables.clear();
     settings.clear();
     strings.clear();
@@ -3197,293 +3042,275 @@ void StorageImpl::clear()
 void StorageImpl::load(ProgressCallback callback)
 {
     _loadBuildings();
-    PROGRESS_CALLBACK(0.694444);
-    _loadClanMechanoids();
-    PROGRESS_CALLBACK(1.388889);
-    _loadClanReputations();
-    PROGRESS_CALLBACK(2.083333);
+    PROGRESS_CALLBACK(0.740741);
     _loadClans();
-    PROGRESS_CALLBACK(2.777778);
-    _loadConfigurationEquipments();
-    PROGRESS_CALLBACK(3.472222);
-    _loadConfigurationGoods();
-    PROGRESS_CALLBACK(4.166667);
-    _loadConfigurationProjectiles();
-    PROGRESS_CALLBACK(4.861111);
-    _loadConfigurationWeapons();
-    PROGRESS_CALLBACK(5.555556);
+    PROGRESS_CALLBACK(1.481481);
+    _loadClanReputations();
+    PROGRESS_CALLBACK(2.222222);
     _loadConfigurations();
-    PROGRESS_CALLBACK(6.250000);
+    PROGRESS_CALLBACK(2.962963);
+    _loadConfigurationEquipments();
+    PROGRESS_CALLBACK(3.703704);
+    _loadConfigurationGoods();
+    PROGRESS_CALLBACK(4.444444);
+    _loadConfigurationProjectiles();
+    PROGRESS_CALLBACK(5.185185);
+    _loadConfigurationWeapons();
+    PROGRESS_CALLBACK(5.925926);
     _loadEquipments();
-    PROGRESS_CALLBACK(6.944444);
+    PROGRESS_CALLBACK(6.666667);
     _loadGliders();
-    PROGRESS_CALLBACK(7.638889);
+    PROGRESS_CALLBACK(7.407407);
     _loadGoods();
-    PROGRESS_CALLBACK(8.333333);
-    _loadGroupMechanoids();
-    PROGRESS_CALLBACK(9.027778);
+    PROGRESS_CALLBACK(8.148148);
     _loadGroups();
-    PROGRESS_CALLBACK(9.722222);
-    _loadMapBuildingEquipments();
-    PROGRESS_CALLBACK(10.416667);
-    _loadMapBuildingGliders();
-    PROGRESS_CALLBACK(11.111111);
-    _loadMapBuildingGoods();
-    PROGRESS_CALLBACK(11.805556);
-    _loadMapBuildingModificators();
-    PROGRESS_CALLBACK(12.500000);
-    _loadMapBuildingProjectiles();
-    PROGRESS_CALLBACK(13.194444);
-    _loadMapBuildingWeapons();
-    PROGRESS_CALLBACK(13.888889);
-    _loadMapBuildings();
-    PROGRESS_CALLBACK(14.583333);
-    _loadMapGoods();
-    PROGRESS_CALLBACK(15.277778);
-    _loadMapObjects();
-    PROGRESS_CALLBACK(15.972222);
+    PROGRESS_CALLBACK(8.888889);
+    _loadGroupMechanoids();
+    PROGRESS_CALLBACK(9.629630);
     _loadMaps();
-    PROGRESS_CALLBACK(16.666667);
-    _loadMechanoidQuests();
-    PROGRESS_CALLBACK(17.361111);
+    PROGRESS_CALLBACK(10.370370);
+    _loadMapBuildings();
+    PROGRESS_CALLBACK(11.111111);
+    _loadMapBuildingEquipments();
+    PROGRESS_CALLBACK(11.851852);
+    _loadMapBuildingGliders();
+    PROGRESS_CALLBACK(12.592593);
+    _loadMapBuildingGoods();
+    PROGRESS_CALLBACK(13.333333);
+    _loadMapBuildingModificators();
+    PROGRESS_CALLBACK(14.074074);
+    _loadMapBuildingProjectiles();
+    PROGRESS_CALLBACK(14.814815);
+    _loadMapBuildingWeapons();
+    PROGRESS_CALLBACK(15.555556);
+    _loadMapGoods();
+    PROGRESS_CALLBACK(16.296296);
+    _loadMapObjects();
+    PROGRESS_CALLBACK(17.037037);
     _loadMechanoids();
-    PROGRESS_CALLBACK(18.055556);
-    _loadModificationClans();
-    PROGRESS_CALLBACK(18.750000);
-    _loadModificationMaps();
-    PROGRESS_CALLBACK(19.444444);
-    _loadModificationMechanoids();
-    PROGRESS_CALLBACK(20.138889);
+    PROGRESS_CALLBACK(17.777778);
+    _loadMechanoidQuests();
+    PROGRESS_CALLBACK(18.518519);
     _loadModifications();
-    PROGRESS_CALLBACK(20.833333);
+    PROGRESS_CALLBACK(19.259259);
+    _loadModificationMaps();
+    PROGRESS_CALLBACK(20.000000);
     _loadModificators();
-    PROGRESS_CALLBACK(21.527778);
+    PROGRESS_CALLBACK(20.740741);
     _loadObjects();
-    PROGRESS_CALLBACK(22.222222);
+    PROGRESS_CALLBACK(21.481481);
     _loadPlayers();
-    PROGRESS_CALLBACK(22.916667);
+    PROGRESS_CALLBACK(22.222222);
     _loadProjectiles();
-    PROGRESS_CALLBACK(23.611111);
-    _loadQuestRewardEquipments();
-    PROGRESS_CALLBACK(24.305556);
-    _loadQuestRewardGliders();
-    PROGRESS_CALLBACK(25.000000);
-    _loadQuestRewardGoods();
-    PROGRESS_CALLBACK(25.694444);
-    _loadQuestRewardModificators();
-    PROGRESS_CALLBACK(26.388889);
-    _loadQuestRewardProjectiles();
-    PROGRESS_CALLBACK(27.083333);
-    _loadQuestRewardReputations();
-    PROGRESS_CALLBACK(27.777778);
-    _loadQuestRewardWeapons();
-    PROGRESS_CALLBACK(28.472222);
-    _loadQuestRewards();
-    PROGRESS_CALLBACK(29.166667);
+    PROGRESS_CALLBACK(22.962963);
     _loadQuests();
-    PROGRESS_CALLBACK(29.861111);
+    PROGRESS_CALLBACK(23.703704);
+    _loadQuestRewards();
+    PROGRESS_CALLBACK(24.444444);
+    _loadQuestRewardEquipments();
+    PROGRESS_CALLBACK(25.185185);
+    _loadQuestRewardGliders();
+    PROGRESS_CALLBACK(25.925926);
+    _loadQuestRewardGoods();
+    PROGRESS_CALLBACK(26.666667);
+    _loadQuestRewardModificators();
+    PROGRESS_CALLBACK(27.407407);
+    _loadQuestRewardProjectiles();
+    PROGRESS_CALLBACK(28.148148);
+    _loadQuestRewardReputations();
+    PROGRESS_CALLBACK(28.888889);
+    _loadQuestRewardWeapons();
+    PROGRESS_CALLBACK(29.629630);
     _loadScriptVariables();
-    PROGRESS_CALLBACK(30.555556);
+    PROGRESS_CALLBACK(30.370370);
     _loadSettings();
-    PROGRESS_CALLBACK(31.250000);
+    PROGRESS_CALLBACK(31.111111);
     _loadStrings();
-    PROGRESS_CALLBACK(31.944444);
+    PROGRESS_CALLBACK(31.851852);
     _loadTables();
-    PROGRESS_CALLBACK(32.638889);
+    PROGRESS_CALLBACK(32.592593);
     _loadWeapons();
     PROGRESS_CALLBACK(33.333333);
 
     _loadBuildingsPtrs();
-    PROGRESS_CALLBACK(34.027778);
-    _loadClanMechanoidsPtrs();
-    PROGRESS_CALLBACK(34.722222);
-    _loadClanReputationsPtrs();
-    PROGRESS_CALLBACK(35.416667);
+    PROGRESS_CALLBACK(34.074074);
     _loadClansPtrs();
-    PROGRESS_CALLBACK(36.111111);
-    _loadConfigurationEquipmentsPtrs();
-    PROGRESS_CALLBACK(36.805556);
-    _loadConfigurationGoodsPtrs();
-    PROGRESS_CALLBACK(37.500000);
-    _loadConfigurationProjectilesPtrs();
-    PROGRESS_CALLBACK(38.194444);
-    _loadConfigurationWeaponsPtrs();
-    PROGRESS_CALLBACK(38.888889);
+    PROGRESS_CALLBACK(34.814815);
+    _loadClanReputationsPtrs();
+    PROGRESS_CALLBACK(35.555556);
     _loadConfigurationsPtrs();
-    PROGRESS_CALLBACK(39.583333);
+    PROGRESS_CALLBACK(36.296296);
+    _loadConfigurationEquipmentsPtrs();
+    PROGRESS_CALLBACK(37.037037);
+    _loadConfigurationGoodsPtrs();
+    PROGRESS_CALLBACK(37.777778);
+    _loadConfigurationProjectilesPtrs();
+    PROGRESS_CALLBACK(38.518519);
+    _loadConfigurationWeaponsPtrs();
+    PROGRESS_CALLBACK(39.259259);
     _loadEquipmentsPtrs();
-    PROGRESS_CALLBACK(40.277778);
+    PROGRESS_CALLBACK(40.000000);
     _loadGlidersPtrs();
-    PROGRESS_CALLBACK(40.972222);
+    PROGRESS_CALLBACK(40.740741);
     _loadGoodsPtrs();
-    PROGRESS_CALLBACK(41.666667);
-    _loadGroupMechanoidsPtrs();
-    PROGRESS_CALLBACK(42.361111);
+    PROGRESS_CALLBACK(41.481481);
     _loadGroupsPtrs();
-    PROGRESS_CALLBACK(43.055556);
-    _loadMapBuildingEquipmentsPtrs();
-    PROGRESS_CALLBACK(43.750000);
-    _loadMapBuildingGlidersPtrs();
-    PROGRESS_CALLBACK(44.444444);
-    _loadMapBuildingGoodsPtrs();
-    PROGRESS_CALLBACK(45.138889);
-    _loadMapBuildingModificatorsPtrs();
-    PROGRESS_CALLBACK(45.833333);
-    _loadMapBuildingProjectilesPtrs();
-    PROGRESS_CALLBACK(46.527778);
-    _loadMapBuildingWeaponsPtrs();
-    PROGRESS_CALLBACK(47.222222);
-    _loadMapBuildingsPtrs();
-    PROGRESS_CALLBACK(47.916667);
-    _loadMapGoodsPtrs();
-    PROGRESS_CALLBACK(48.611111);
-    _loadMapObjectsPtrs();
-    PROGRESS_CALLBACK(49.305556);
+    PROGRESS_CALLBACK(42.222222);
+    _loadGroupMechanoidsPtrs();
+    PROGRESS_CALLBACK(42.962963);
     _loadMapsPtrs();
-    PROGRESS_CALLBACK(50.000000);
-    _loadMechanoidQuestsPtrs();
-    PROGRESS_CALLBACK(50.694444);
+    PROGRESS_CALLBACK(43.703704);
+    _loadMapBuildingsPtrs();
+    PROGRESS_CALLBACK(44.444444);
+    _loadMapBuildingEquipmentsPtrs();
+    PROGRESS_CALLBACK(45.185185);
+    _loadMapBuildingGlidersPtrs();
+    PROGRESS_CALLBACK(45.925926);
+    _loadMapBuildingGoodsPtrs();
+    PROGRESS_CALLBACK(46.666667);
+    _loadMapBuildingModificatorsPtrs();
+    PROGRESS_CALLBACK(47.407407);
+    _loadMapBuildingProjectilesPtrs();
+    PROGRESS_CALLBACK(48.148148);
+    _loadMapBuildingWeaponsPtrs();
+    PROGRESS_CALLBACK(48.888889);
+    _loadMapGoodsPtrs();
+    PROGRESS_CALLBACK(49.629630);
+    _loadMapObjectsPtrs();
+    PROGRESS_CALLBACK(50.370370);
     _loadMechanoidsPtrs();
-    PROGRESS_CALLBACK(51.388889);
-    _loadModificationClansPtrs();
-    PROGRESS_CALLBACK(52.083333);
-    _loadModificationMapsPtrs();
-    PROGRESS_CALLBACK(52.777778);
-    _loadModificationMechanoidsPtrs();
-    PROGRESS_CALLBACK(53.472222);
+    PROGRESS_CALLBACK(51.111111);
+    _loadMechanoidQuestsPtrs();
+    PROGRESS_CALLBACK(51.851852);
     _loadModificationsPtrs();
-    PROGRESS_CALLBACK(54.166667);
+    PROGRESS_CALLBACK(52.592593);
+    _loadModificationMapsPtrs();
+    PROGRESS_CALLBACK(53.333333);
     _loadModificatorsPtrs();
-    PROGRESS_CALLBACK(54.861111);
+    PROGRESS_CALLBACK(54.074074);
     _loadObjectsPtrs();
-    PROGRESS_CALLBACK(55.555556);
+    PROGRESS_CALLBACK(54.814815);
     _loadPlayersPtrs();
-    PROGRESS_CALLBACK(56.250000);
+    PROGRESS_CALLBACK(55.555556);
     _loadProjectilesPtrs();
-    PROGRESS_CALLBACK(56.944444);
-    _loadQuestRewardEquipmentsPtrs();
-    PROGRESS_CALLBACK(57.638889);
-    _loadQuestRewardGlidersPtrs();
-    PROGRESS_CALLBACK(58.333333);
-    _loadQuestRewardGoodsPtrs();
-    PROGRESS_CALLBACK(59.027778);
-    _loadQuestRewardModificatorsPtrs();
-    PROGRESS_CALLBACK(59.722222);
-    _loadQuestRewardProjectilesPtrs();
-    PROGRESS_CALLBACK(60.416667);
-    _loadQuestRewardReputationsPtrs();
-    PROGRESS_CALLBACK(61.111111);
-    _loadQuestRewardWeaponsPtrs();
-    PROGRESS_CALLBACK(61.805556);
-    _loadQuestRewardsPtrs();
-    PROGRESS_CALLBACK(62.500000);
+    PROGRESS_CALLBACK(56.296296);
     _loadQuestsPtrs();
-    PROGRESS_CALLBACK(63.194444);
+    PROGRESS_CALLBACK(57.037037);
+    _loadQuestRewardsPtrs();
+    PROGRESS_CALLBACK(57.777778);
+    _loadQuestRewardEquipmentsPtrs();
+    PROGRESS_CALLBACK(58.518519);
+    _loadQuestRewardGlidersPtrs();
+    PROGRESS_CALLBACK(59.259259);
+    _loadQuestRewardGoodsPtrs();
+    PROGRESS_CALLBACK(60.000000);
+    _loadQuestRewardModificatorsPtrs();
+    PROGRESS_CALLBACK(60.740741);
+    _loadQuestRewardProjectilesPtrs();
+    PROGRESS_CALLBACK(61.481481);
+    _loadQuestRewardReputationsPtrs();
+    PROGRESS_CALLBACK(62.222222);
+    _loadQuestRewardWeaponsPtrs();
+    PROGRESS_CALLBACK(62.962963);
     _loadScriptVariablesPtrs();
-    PROGRESS_CALLBACK(63.888889);
+    PROGRESS_CALLBACK(63.703704);
     _loadSettingsPtrs();
-    PROGRESS_CALLBACK(64.583333);
+    PROGRESS_CALLBACK(64.444444);
     _loadStringsPtrs();
-    PROGRESS_CALLBACK(65.277778);
+    PROGRESS_CALLBACK(65.185185);
     _loadTablesPtrs();
-    PROGRESS_CALLBACK(65.972222);
+    PROGRESS_CALLBACK(65.925926);
     _loadWeaponsPtrs();
     PROGRESS_CALLBACK(66.666667);
 
     _loadBuildingsArrays();
-    PROGRESS_CALLBACK(67.361111);
-    _loadClanMechanoidsArrays();
-    PROGRESS_CALLBACK(68.055556);
-    _loadClanReputationsArrays();
-    PROGRESS_CALLBACK(68.750000);
+    PROGRESS_CALLBACK(67.407407);
     _loadClansArrays();
-    PROGRESS_CALLBACK(69.444444);
-    _loadConfigurationEquipmentsArrays();
-    PROGRESS_CALLBACK(70.138889);
-    _loadConfigurationGoodsArrays();
-    PROGRESS_CALLBACK(70.833333);
-    _loadConfigurationProjectilesArrays();
-    PROGRESS_CALLBACK(71.527778);
-    _loadConfigurationWeaponsArrays();
-    PROGRESS_CALLBACK(72.222222);
+    PROGRESS_CALLBACK(68.148148);
+    _loadClanReputationsArrays();
+    PROGRESS_CALLBACK(68.888889);
     _loadConfigurationsArrays();
-    PROGRESS_CALLBACK(72.916667);
+    PROGRESS_CALLBACK(69.629630);
+    _loadConfigurationEquipmentsArrays();
+    PROGRESS_CALLBACK(70.370370);
+    _loadConfigurationGoodsArrays();
+    PROGRESS_CALLBACK(71.111111);
+    _loadConfigurationProjectilesArrays();
+    PROGRESS_CALLBACK(71.851852);
+    _loadConfigurationWeaponsArrays();
+    PROGRESS_CALLBACK(72.592593);
     _loadEquipmentsArrays();
-    PROGRESS_CALLBACK(73.611111);
+    PROGRESS_CALLBACK(73.333333);
     _loadGlidersArrays();
-    PROGRESS_CALLBACK(74.305556);
+    PROGRESS_CALLBACK(74.074074);
     _loadGoodsArrays();
-    PROGRESS_CALLBACK(75.000000);
-    _loadGroupMechanoidsArrays();
-    PROGRESS_CALLBACK(75.694444);
+    PROGRESS_CALLBACK(74.814815);
     _loadGroupsArrays();
-    PROGRESS_CALLBACK(76.388889);
-    _loadMapBuildingEquipmentsArrays();
-    PROGRESS_CALLBACK(77.083333);
-    _loadMapBuildingGlidersArrays();
-    PROGRESS_CALLBACK(77.777778);
-    _loadMapBuildingGoodsArrays();
-    PROGRESS_CALLBACK(78.472222);
-    _loadMapBuildingModificatorsArrays();
-    PROGRESS_CALLBACK(79.166667);
-    _loadMapBuildingProjectilesArrays();
-    PROGRESS_CALLBACK(79.861111);
-    _loadMapBuildingWeaponsArrays();
-    PROGRESS_CALLBACK(80.555556);
-    _loadMapBuildingsArrays();
-    PROGRESS_CALLBACK(81.250000);
-    _loadMapGoodsArrays();
-    PROGRESS_CALLBACK(81.944444);
-    _loadMapObjectsArrays();
-    PROGRESS_CALLBACK(82.638889);
+    PROGRESS_CALLBACK(75.555556);
+    _loadGroupMechanoidsArrays();
+    PROGRESS_CALLBACK(76.296296);
     _loadMapsArrays();
-    PROGRESS_CALLBACK(83.333333);
-    _loadMechanoidQuestsArrays();
-    PROGRESS_CALLBACK(84.027778);
+    PROGRESS_CALLBACK(77.037037);
+    _loadMapBuildingsArrays();
+    PROGRESS_CALLBACK(77.777778);
+    _loadMapBuildingEquipmentsArrays();
+    PROGRESS_CALLBACK(78.518519);
+    _loadMapBuildingGlidersArrays();
+    PROGRESS_CALLBACK(79.259259);
+    _loadMapBuildingGoodsArrays();
+    PROGRESS_CALLBACK(80.000000);
+    _loadMapBuildingModificatorsArrays();
+    PROGRESS_CALLBACK(80.740741);
+    _loadMapBuildingProjectilesArrays();
+    PROGRESS_CALLBACK(81.481481);
+    _loadMapBuildingWeaponsArrays();
+    PROGRESS_CALLBACK(82.222222);
+    _loadMapGoodsArrays();
+    PROGRESS_CALLBACK(82.962963);
+    _loadMapObjectsArrays();
+    PROGRESS_CALLBACK(83.703704);
     _loadMechanoidsArrays();
-    PROGRESS_CALLBACK(84.722222);
-    _loadModificationClansArrays();
-    PROGRESS_CALLBACK(85.416667);
-    _loadModificationMapsArrays();
-    PROGRESS_CALLBACK(86.111111);
-    _loadModificationMechanoidsArrays();
-    PROGRESS_CALLBACK(86.805556);
+    PROGRESS_CALLBACK(84.444444);
+    _loadMechanoidQuestsArrays();
+    PROGRESS_CALLBACK(85.185185);
     _loadModificationsArrays();
-    PROGRESS_CALLBACK(87.500000);
+    PROGRESS_CALLBACK(85.925926);
+    _loadModificationMapsArrays();
+    PROGRESS_CALLBACK(86.666667);
     _loadModificatorsArrays();
-    PROGRESS_CALLBACK(88.194444);
+    PROGRESS_CALLBACK(87.407407);
     _loadObjectsArrays();
-    PROGRESS_CALLBACK(88.888889);
+    PROGRESS_CALLBACK(88.148148);
     _loadPlayersArrays();
-    PROGRESS_CALLBACK(89.583333);
+    PROGRESS_CALLBACK(88.888889);
     _loadProjectilesArrays();
-    PROGRESS_CALLBACK(90.277778);
-    _loadQuestRewardEquipmentsArrays();
-    PROGRESS_CALLBACK(90.972222);
-    _loadQuestRewardGlidersArrays();
-    PROGRESS_CALLBACK(91.666667);
-    _loadQuestRewardGoodsArrays();
-    PROGRESS_CALLBACK(92.361111);
-    _loadQuestRewardModificatorsArrays();
-    PROGRESS_CALLBACK(93.055556);
-    _loadQuestRewardProjectilesArrays();
-    PROGRESS_CALLBACK(93.750000);
-    _loadQuestRewardReputationsArrays();
-    PROGRESS_CALLBACK(94.444444);
-    _loadQuestRewardWeaponsArrays();
-    PROGRESS_CALLBACK(95.138889);
-    _loadQuestRewardsArrays();
-    PROGRESS_CALLBACK(95.833333);
+    PROGRESS_CALLBACK(89.629630);
     _loadQuestsArrays();
-    PROGRESS_CALLBACK(96.527778);
+    PROGRESS_CALLBACK(90.370370);
+    _loadQuestRewardsArrays();
+    PROGRESS_CALLBACK(91.111111);
+    _loadQuestRewardEquipmentsArrays();
+    PROGRESS_CALLBACK(91.851852);
+    _loadQuestRewardGlidersArrays();
+    PROGRESS_CALLBACK(92.592593);
+    _loadQuestRewardGoodsArrays();
+    PROGRESS_CALLBACK(93.333333);
+    _loadQuestRewardModificatorsArrays();
+    PROGRESS_CALLBACK(94.074074);
+    _loadQuestRewardProjectilesArrays();
+    PROGRESS_CALLBACK(94.814815);
+    _loadQuestRewardReputationsArrays();
+    PROGRESS_CALLBACK(95.555556);
+    _loadQuestRewardWeaponsArrays();
+    PROGRESS_CALLBACK(96.296296);
     _loadScriptVariablesArrays();
-    PROGRESS_CALLBACK(97.222222);
+    PROGRESS_CALLBACK(97.037037);
     _loadSettingsArrays();
-    PROGRESS_CALLBACK(97.916667);
+    PROGRESS_CALLBACK(97.777778);
     _loadStringsArrays();
-    PROGRESS_CALLBACK(98.611111);
+    PROGRESS_CALLBACK(98.518519);
     _loadTablesArrays();
-    PROGRESS_CALLBACK(99.305556);
+    PROGRESS_CALLBACK(99.259259);
     _loadWeaponsArrays();
     PROGRESS_CALLBACK(100.000000);
 }
@@ -3491,99 +3318,93 @@ void StorageImpl::load(ProgressCallback callback)
 void StorageImpl::save(ProgressCallback callback) const
 {
     _saveBuildings();
-    PROGRESS_CALLBACK(2.083333);
-    _saveClanMechanoids();
-    PROGRESS_CALLBACK(4.166667);
-    _saveClanReputations();
-    PROGRESS_CALLBACK(6.250000);
+    PROGRESS_CALLBACK(2.222222);
     _saveClans();
-    PROGRESS_CALLBACK(8.333333);
-    _saveConfigurationEquipments();
-    PROGRESS_CALLBACK(10.416667);
-    _saveConfigurationGoods();
-    PROGRESS_CALLBACK(12.500000);
-    _saveConfigurationProjectiles();
-    PROGRESS_CALLBACK(14.583333);
-    _saveConfigurationWeapons();
-    PROGRESS_CALLBACK(16.666667);
+    PROGRESS_CALLBACK(4.444444);
+    _saveClanReputations();
+    PROGRESS_CALLBACK(6.666667);
     _saveConfigurations();
-    PROGRESS_CALLBACK(18.750000);
+    PROGRESS_CALLBACK(8.888889);
+    _saveConfigurationEquipments();
+    PROGRESS_CALLBACK(11.111111);
+    _saveConfigurationGoods();
+    PROGRESS_CALLBACK(13.333333);
+    _saveConfigurationProjectiles();
+    PROGRESS_CALLBACK(15.555556);
+    _saveConfigurationWeapons();
+    PROGRESS_CALLBACK(17.777778);
     _saveEquipments();
-    PROGRESS_CALLBACK(20.833333);
+    PROGRESS_CALLBACK(20.000000);
     _saveGliders();
-    PROGRESS_CALLBACK(22.916667);
+    PROGRESS_CALLBACK(22.222222);
     _saveGoods();
-    PROGRESS_CALLBACK(25.000000);
-    _saveGroupMechanoids();
-    PROGRESS_CALLBACK(27.083333);
+    PROGRESS_CALLBACK(24.444444);
     _saveGroups();
-    PROGRESS_CALLBACK(29.166667);
-    _saveMapBuildingEquipments();
-    PROGRESS_CALLBACK(31.250000);
-    _saveMapBuildingGliders();
-    PROGRESS_CALLBACK(33.333333);
-    _saveMapBuildingGoods();
-    PROGRESS_CALLBACK(35.416667);
-    _saveMapBuildingModificators();
-    PROGRESS_CALLBACK(37.500000);
-    _saveMapBuildingProjectiles();
-    PROGRESS_CALLBACK(39.583333);
-    _saveMapBuildingWeapons();
-    PROGRESS_CALLBACK(41.666667);
-    _saveMapBuildings();
-    PROGRESS_CALLBACK(43.750000);
-    _saveMapGoods();
-    PROGRESS_CALLBACK(45.833333);
-    _saveMapObjects();
-    PROGRESS_CALLBACK(47.916667);
+    PROGRESS_CALLBACK(26.666667);
+    _saveGroupMechanoids();
+    PROGRESS_CALLBACK(28.888889);
     _saveMaps();
-    PROGRESS_CALLBACK(50.000000);
-    _saveMechanoidQuests();
-    PROGRESS_CALLBACK(52.083333);
+    PROGRESS_CALLBACK(31.111111);
+    _saveMapBuildings();
+    PROGRESS_CALLBACK(33.333333);
+    _saveMapBuildingEquipments();
+    PROGRESS_CALLBACK(35.555556);
+    _saveMapBuildingGliders();
+    PROGRESS_CALLBACK(37.777778);
+    _saveMapBuildingGoods();
+    PROGRESS_CALLBACK(40.000000);
+    _saveMapBuildingModificators();
+    PROGRESS_CALLBACK(42.222222);
+    _saveMapBuildingProjectiles();
+    PROGRESS_CALLBACK(44.444444);
+    _saveMapBuildingWeapons();
+    PROGRESS_CALLBACK(46.666667);
+    _saveMapGoods();
+    PROGRESS_CALLBACK(48.888889);
+    _saveMapObjects();
+    PROGRESS_CALLBACK(51.111111);
     _saveMechanoids();
-    PROGRESS_CALLBACK(54.166667);
-    _saveModificationClans();
-    PROGRESS_CALLBACK(56.250000);
-    _saveModificationMaps();
-    PROGRESS_CALLBACK(58.333333);
-    _saveModificationMechanoids();
-    PROGRESS_CALLBACK(60.416667);
+    PROGRESS_CALLBACK(53.333333);
+    _saveMechanoidQuests();
+    PROGRESS_CALLBACK(55.555556);
     _saveModifications();
-    PROGRESS_CALLBACK(62.500000);
+    PROGRESS_CALLBACK(57.777778);
+    _saveModificationMaps();
+    PROGRESS_CALLBACK(60.000000);
     _saveModificators();
-    PROGRESS_CALLBACK(64.583333);
+    PROGRESS_CALLBACK(62.222222);
     _saveObjects();
-    PROGRESS_CALLBACK(66.666667);
+    PROGRESS_CALLBACK(64.444444);
     _savePlayers();
-    PROGRESS_CALLBACK(68.750000);
+    PROGRESS_CALLBACK(66.666667);
     _saveProjectiles();
-    PROGRESS_CALLBACK(70.833333);
-    _saveQuestRewardEquipments();
-    PROGRESS_CALLBACK(72.916667);
-    _saveQuestRewardGliders();
-    PROGRESS_CALLBACK(75.000000);
-    _saveQuestRewardGoods();
-    PROGRESS_CALLBACK(77.083333);
-    _saveQuestRewardModificators();
-    PROGRESS_CALLBACK(79.166667);
-    _saveQuestRewardProjectiles();
-    PROGRESS_CALLBACK(81.250000);
-    _saveQuestRewardReputations();
-    PROGRESS_CALLBACK(83.333333);
-    _saveQuestRewardWeapons();
-    PROGRESS_CALLBACK(85.416667);
-    _saveQuestRewards();
-    PROGRESS_CALLBACK(87.500000);
+    PROGRESS_CALLBACK(68.888889);
     _saveQuests();
-    PROGRESS_CALLBACK(89.583333);
+    PROGRESS_CALLBACK(71.111111);
+    _saveQuestRewards();
+    PROGRESS_CALLBACK(73.333333);
+    _saveQuestRewardEquipments();
+    PROGRESS_CALLBACK(75.555556);
+    _saveQuestRewardGliders();
+    PROGRESS_CALLBACK(77.777778);
+    _saveQuestRewardGoods();
+    PROGRESS_CALLBACK(80.000000);
+    _saveQuestRewardModificators();
+    PROGRESS_CALLBACK(82.222222);
+    _saveQuestRewardProjectiles();
+    PROGRESS_CALLBACK(84.444444);
+    _saveQuestRewardReputations();
+    PROGRESS_CALLBACK(86.666667);
+    _saveQuestRewardWeapons();
+    PROGRESS_CALLBACK(88.888889);
     _saveScriptVariables();
-    PROGRESS_CALLBACK(91.666667);
+    PROGRESS_CALLBACK(91.111111);
     _saveSettings();
-    PROGRESS_CALLBACK(93.750000);
+    PROGRESS_CALLBACK(93.333333);
     _saveStrings();
-    PROGRESS_CALLBACK(95.833333);
+    PROGRESS_CALLBACK(95.555556);
     _saveTables();
-    PROGRESS_CALLBACK(97.916667);
+    PROGRESS_CALLBACK(97.777778);
     _saveWeapons();
     PROGRESS_CALLBACK(100.000000);
 }
@@ -3593,37 +3414,9 @@ Ptr<Building> StorageImpl::addBuilding()
     return buildings.createAtEnd();
 }
 
-void StorageImpl::deleteBuilding(Building *v)
+void StorageImpl::deleteBuilding(IObjectBase *v)
 {
     buildings.erase(v->id);
-}
-
-Ptr<ClanMechanoid> StorageImpl::addClanMechanoid(IObject *parent)
-{
-    auto v = clanMechanoids.createAtEnd();
-    Clan *clan = (Clan *)parent;
-    clan->mechanoids.insert(v);
-    v->clan = clans[clan->id];
-    return v;
-}
-
-void StorageImpl::deleteClanMechanoid(ClanMechanoid *v)
-{
-    clanMechanoids.erase(v);
-}
-
-Ptr<ClanReputation> StorageImpl::addClanReputation(IObject *parent)
-{
-    auto v = clanReputations.createAtEnd();
-    Clan *clan = (Clan *)parent;
-    clan->reputations.insert(v);
-    v->clan = clans[clan->id];
-    return v;
-}
-
-void StorageImpl::deleteClanReputation(ClanReputation *v)
-{
-    clanReputations.erase(v);
 }
 
 Ptr<Clan> StorageImpl::addClan()
@@ -3631,65 +3424,23 @@ Ptr<Clan> StorageImpl::addClan()
     return clans.createAtEnd();
 }
 
-void StorageImpl::deleteClan(Clan *v)
+void StorageImpl::deleteClan(IObjectBase *v)
 {
     clans.erase(v->id);
 }
 
-Ptr<ConfigurationEquipment> StorageImpl::addConfigurationEquipment(IObject *parent)
+Ptr<ClanReputation> StorageImpl::addClanReputation(IObjectBase *parent)
 {
-    auto v = configurationEquipments.createAtEnd();
-    Configuration *configuration = (Configuration *)parent;
-    configuration->equipments.insert(v);
-    v->configuration = configurations[configuration->id];
+    auto v = clanReputations.createAtEnd();
+    Clan *clan = (Clan *)parent;
+    clan->reputations->insert(v);
+    v->clan1 = clans[clan->id];
     return v;
 }
 
-void StorageImpl::deleteConfigurationEquipment(ConfigurationEquipment *v)
+void StorageImpl::deleteClanReputation(IObjectBase *v)
 {
-    configurationEquipments.erase(v);
-}
-
-Ptr<ConfigurationGood> StorageImpl::addConfigurationGood(IObject *parent)
-{
-    auto v = configurationGoods.createAtEnd();
-    Configuration *configuration = (Configuration *)parent;
-    configuration->goods.insert(v);
-    v->configuration = configurations[configuration->id];
-    return v;
-}
-
-void StorageImpl::deleteConfigurationGood(ConfigurationGood *v)
-{
-    configurationGoods.erase(v);
-}
-
-Ptr<ConfigurationProjectile> StorageImpl::addConfigurationProjectile(IObject *parent)
-{
-    auto v = configurationProjectiles.createAtEnd();
-    Configuration *configuration = (Configuration *)parent;
-    configuration->projectiles.insert(v);
-    v->configuration = configurations[configuration->id];
-    return v;
-}
-
-void StorageImpl::deleteConfigurationProjectile(ConfigurationProjectile *v)
-{
-    configurationProjectiles.erase(v);
-}
-
-Ptr<ConfigurationWeapon> StorageImpl::addConfigurationWeapon(IObject *parent)
-{
-    auto v = configurationWeapons.createAtEnd();
-    Configuration *configuration = (Configuration *)parent;
-    configuration->weapons.insert(v);
-    v->configuration = configurations[configuration->id];
-    return v;
-}
-
-void StorageImpl::deleteConfigurationWeapon(ConfigurationWeapon *v)
-{
-    configurationWeapons.erase(v);
+    clanReputations.erase(v->id);
 }
 
 Ptr<Configuration> StorageImpl::addConfiguration()
@@ -3697,9 +3448,65 @@ Ptr<Configuration> StorageImpl::addConfiguration()
     return configurations.createAtEnd();
 }
 
-void StorageImpl::deleteConfiguration(Configuration *v)
+void StorageImpl::deleteConfiguration(IObjectBase *v)
 {
     configurations.erase(v->id);
+}
+
+Ptr<ConfigurationEquipment> StorageImpl::addConfigurationEquipment(IObjectBase *parent)
+{
+    auto v = configurationEquipments.createAtEnd();
+    Configuration *configuration = (Configuration *)parent;
+    configuration->equipments->insert(v);
+    v->configuration = configurations[configuration->id];
+    return v;
+}
+
+void StorageImpl::deleteConfigurationEquipment(IObjectBase *v)
+{
+    configurationEquipments.erase(v->id);
+}
+
+Ptr<ConfigurationGood> StorageImpl::addConfigurationGood(IObjectBase *parent)
+{
+    auto v = configurationGoods.createAtEnd();
+    Configuration *configuration = (Configuration *)parent;
+    configuration->goods->insert(v);
+    v->configuration = configurations[configuration->id];
+    return v;
+}
+
+void StorageImpl::deleteConfigurationGood(IObjectBase *v)
+{
+    configurationGoods.erase(v->id);
+}
+
+Ptr<ConfigurationProjectile> StorageImpl::addConfigurationProjectile(IObjectBase *parent)
+{
+    auto v = configurationProjectiles.createAtEnd();
+    Configuration *configuration = (Configuration *)parent;
+    configuration->projectiles->insert(v);
+    v->configuration = configurations[configuration->id];
+    return v;
+}
+
+void StorageImpl::deleteConfigurationProjectile(IObjectBase *v)
+{
+    configurationProjectiles.erase(v->id);
+}
+
+Ptr<ConfigurationWeapon> StorageImpl::addConfigurationWeapon(IObjectBase *parent)
+{
+    auto v = configurationWeapons.createAtEnd();
+    Configuration *configuration = (Configuration *)parent;
+    configuration->weapons->insert(v);
+    v->configuration = configurations[configuration->id];
+    return v;
+}
+
+void StorageImpl::deleteConfigurationWeapon(IObjectBase *v)
+{
+    configurationWeapons.erase(v->id);
 }
 
 Ptr<Equipment> StorageImpl::addEquipment()
@@ -3707,7 +3514,7 @@ Ptr<Equipment> StorageImpl::addEquipment()
     return equipments.createAtEnd();
 }
 
-void StorageImpl::deleteEquipment(Equipment *v)
+void StorageImpl::deleteEquipment(IObjectBase *v)
 {
     equipments.erase(v->id);
 }
@@ -3717,7 +3524,7 @@ Ptr<Glider> StorageImpl::addGlider()
     return gliders.createAtEnd();
 }
 
-void StorageImpl::deleteGlider(Glider *v)
+void StorageImpl::deleteGlider(IObjectBase *v)
 {
     gliders.erase(v->id);
 }
@@ -3727,23 +3534,9 @@ Ptr<Good> StorageImpl::addGood()
     return goods.createAtEnd();
 }
 
-void StorageImpl::deleteGood(Good *v)
+void StorageImpl::deleteGood(IObjectBase *v)
 {
     goods.erase(v->id);
-}
-
-Ptr<GroupMechanoid> StorageImpl::addGroupMechanoid(IObject *parent)
-{
-    auto v = groupMechanoids.createAtEnd();
-    Group *group = (Group *)parent;
-    group->mechanoids.insert(v);
-    v->group = groups[group->id];
-    return v;
-}
-
-void StorageImpl::deleteGroupMechanoid(GroupMechanoid *v)
-{
-    groupMechanoids.erase(v);
 }
 
 Ptr<Group> StorageImpl::addGroup()
@@ -3751,135 +3544,23 @@ Ptr<Group> StorageImpl::addGroup()
     return groups.createAtEnd();
 }
 
-void StorageImpl::deleteGroup(Group *v)
+void StorageImpl::deleteGroup(IObjectBase *v)
 {
     groups.erase(v->id);
 }
 
-Ptr<MapBuildingEquipment> StorageImpl::addMapBuildingEquipment(IObject *parent)
+Ptr<GroupMechanoid> StorageImpl::addGroupMechanoid(IObjectBase *parent)
 {
-    auto v = mapBuildingEquipments.createAtEnd();
-    MapBuilding *mapBuilding = (MapBuilding *)parent;
-    mapBuilding->equipments.insert(v);
-    v->mapBuilding = mapBuildings[mapBuilding->id];
+    auto v = groupMechanoids.createAtEnd();
+    Group *group = (Group *)parent;
+    group->mechanoids->insert(v);
+    v->group = groups[group->id];
     return v;
 }
 
-void StorageImpl::deleteMapBuildingEquipment(MapBuildingEquipment *v)
+void StorageImpl::deleteGroupMechanoid(IObjectBase *v)
 {
-    mapBuildingEquipments.erase(v);
-}
-
-Ptr<MapBuildingGlider> StorageImpl::addMapBuildingGlider(IObject *parent)
-{
-    auto v = mapBuildingGliders.createAtEnd();
-    MapBuilding *mapBuilding = (MapBuilding *)parent;
-    mapBuilding->gliders.insert(v);
-    v->mapBuilding = mapBuildings[mapBuilding->id];
-    return v;
-}
-
-void StorageImpl::deleteMapBuildingGlider(MapBuildingGlider *v)
-{
-    mapBuildingGliders.erase(v);
-}
-
-Ptr<MapBuildingGood> StorageImpl::addMapBuildingGood(IObject *parent)
-{
-    auto v = mapBuildingGoods.createAtEnd();
-    MapBuilding *mapBuilding = (MapBuilding *)parent;
-    mapBuilding->goods.insert(v);
-    v->mapBuilding = mapBuildings[mapBuilding->id];
-    return v;
-}
-
-void StorageImpl::deleteMapBuildingGood(MapBuildingGood *v)
-{
-    mapBuildingGoods.erase(v);
-}
-
-Ptr<MapBuildingModificator> StorageImpl::addMapBuildingModificator(IObject *parent)
-{
-    auto v = mapBuildingModificators.createAtEnd();
-    MapBuilding *mapBuilding = (MapBuilding *)parent;
-    mapBuilding->modificators.insert(v);
-    v->mapBuilding = mapBuildings[mapBuilding->id];
-    return v;
-}
-
-void StorageImpl::deleteMapBuildingModificator(MapBuildingModificator *v)
-{
-    mapBuildingModificators.erase(v);
-}
-
-Ptr<MapBuildingProjectile> StorageImpl::addMapBuildingProjectile(IObject *parent)
-{
-    auto v = mapBuildingProjectiles.createAtEnd();
-    MapBuilding *mapBuilding = (MapBuilding *)parent;
-    mapBuilding->projectiles.insert(v);
-    v->mapBuilding = mapBuildings[mapBuilding->id];
-    return v;
-}
-
-void StorageImpl::deleteMapBuildingProjectile(MapBuildingProjectile *v)
-{
-    mapBuildingProjectiles.erase(v);
-}
-
-Ptr<MapBuildingWeapon> StorageImpl::addMapBuildingWeapon(IObject *parent)
-{
-    auto v = mapBuildingWeapons.createAtEnd();
-    MapBuilding *mapBuilding = (MapBuilding *)parent;
-    mapBuilding->weapons.insert(v);
-    v->mapBuilding = mapBuildings[mapBuilding->id];
-    return v;
-}
-
-void StorageImpl::deleteMapBuildingWeapon(MapBuildingWeapon *v)
-{
-    mapBuildingWeapons.erase(v);
-}
-
-Ptr<MapBuilding> StorageImpl::addMapBuilding(IObject *parent)
-{
-    auto v = mapBuildings.createAtEnd();
-    Map *map = (Map *)parent;
-    map->buildings.insert(v);
-    v->map = maps[map->id];
-    return v;
-}
-
-void StorageImpl::deleteMapBuilding(MapBuilding *v)
-{
-    mapBuildings.erase(v->id);
-}
-
-Ptr<MapGood> StorageImpl::addMapGood(IObject *parent)
-{
-    auto v = mapGoods.createAtEnd();
-    Map *map = (Map *)parent;
-    map->goods.insert(v);
-    v->map = maps[map->id];
-    return v;
-}
-
-void StorageImpl::deleteMapGood(MapGood *v)
-{
-    mapGoods.erase(v->id);
-}
-
-Ptr<MapObject> StorageImpl::addMapObject(IObject *parent)
-{
-    auto v = mapObjects.createAtEnd();
-    Map *map = (Map *)parent;
-    map->objects.insert(v);
-    v->map = maps[map->id];
-    return v;
-}
-
-void StorageImpl::deleteMapObject(MapObject *v)
-{
-    mapObjects.erase(v->id);
+    groupMechanoids.erase(v->id);
 }
 
 Ptr<Map> StorageImpl::addMap()
@@ -3887,23 +3568,123 @@ Ptr<Map> StorageImpl::addMap()
     return maps.createAtEnd();
 }
 
-void StorageImpl::deleteMap(Map *v)
+void StorageImpl::deleteMap(IObjectBase *v)
 {
     maps.erase(v->id);
 }
 
-Ptr<MechanoidQuest> StorageImpl::addMechanoidQuest(IObject *parent)
+Ptr<MapBuilding> StorageImpl::addMapBuilding(IObjectBase *parent)
 {
-    auto v = mechanoidQuests.createAtEnd();
-    Mechanoid *mechanoid = (Mechanoid *)parent;
-    mechanoid->quests.insert(v);
-    v->mechanoid = mechanoids[mechanoid->id];
+    return mapBuildings.createAtEnd();
+}
+
+void StorageImpl::deleteMapBuilding(IObjectBase *v)
+{
+    mapBuildings.erase(v->id);
+}
+
+Ptr<MapBuildingEquipment> StorageImpl::addMapBuildingEquipment(IObjectBase *parent)
+{
+    auto v = mapBuildingEquipments.createAtEnd();
+    MapBuilding *mapBuilding = (MapBuilding *)parent;
+    mapBuilding->equipments->insert(v);
+    v->map_building = mapBuildings[mapBuilding->id];
     return v;
 }
 
-void StorageImpl::deleteMechanoidQuest(MechanoidQuest *v)
+void StorageImpl::deleteMapBuildingEquipment(IObjectBase *v)
 {
-    mechanoidQuests.erase(v);
+    mapBuildingEquipments.erase(v->id);
+}
+
+Ptr<MapBuildingGlider> StorageImpl::addMapBuildingGlider(IObjectBase *parent)
+{
+    auto v = mapBuildingGliders.createAtEnd();
+    MapBuilding *mapBuilding = (MapBuilding *)parent;
+    mapBuilding->gliders->insert(v);
+    v->map_building = mapBuildings[mapBuilding->id];
+    return v;
+}
+
+void StorageImpl::deleteMapBuildingGlider(IObjectBase *v)
+{
+    mapBuildingGliders.erase(v->id);
+}
+
+Ptr<MapBuildingGood> StorageImpl::addMapBuildingGood(IObjectBase *parent)
+{
+    auto v = mapBuildingGoods.createAtEnd();
+    MapBuilding *mapBuilding = (MapBuilding *)parent;
+    mapBuilding->goods->insert(v);
+    v->map_building = mapBuildings[mapBuilding->id];
+    return v;
+}
+
+void StorageImpl::deleteMapBuildingGood(IObjectBase *v)
+{
+    mapBuildingGoods.erase(v->id);
+}
+
+Ptr<MapBuildingModificator> StorageImpl::addMapBuildingModificator(IObjectBase *parent)
+{
+    auto v = mapBuildingModificators.createAtEnd();
+    MapBuilding *mapBuilding = (MapBuilding *)parent;
+    mapBuilding->modificators->insert(v);
+    v->map_building = mapBuildings[mapBuilding->id];
+    return v;
+}
+
+void StorageImpl::deleteMapBuildingModificator(IObjectBase *v)
+{
+    mapBuildingModificators.erase(v->id);
+}
+
+Ptr<MapBuildingProjectile> StorageImpl::addMapBuildingProjectile(IObjectBase *parent)
+{
+    auto v = mapBuildingProjectiles.createAtEnd();
+    MapBuilding *mapBuilding = (MapBuilding *)parent;
+    mapBuilding->projectiles->insert(v);
+    v->map_building = mapBuildings[mapBuilding->id];
+    return v;
+}
+
+void StorageImpl::deleteMapBuildingProjectile(IObjectBase *v)
+{
+    mapBuildingProjectiles.erase(v->id);
+}
+
+Ptr<MapBuildingWeapon> StorageImpl::addMapBuildingWeapon(IObjectBase *parent)
+{
+    auto v = mapBuildingWeapons.createAtEnd();
+    MapBuilding *mapBuilding = (MapBuilding *)parent;
+    mapBuilding->weapons->insert(v);
+    v->map_building = mapBuildings[mapBuilding->id];
+    return v;
+}
+
+void StorageImpl::deleteMapBuildingWeapon(IObjectBase *v)
+{
+    mapBuildingWeapons.erase(v->id);
+}
+
+Ptr<MapGood> StorageImpl::addMapGood(IObjectBase *parent)
+{
+    return mapGoods.createAtEnd();
+}
+
+void StorageImpl::deleteMapGood(IObjectBase *v)
+{
+    mapGoods.erase(v->id);
+}
+
+Ptr<MapObject> StorageImpl::addMapObject(IObjectBase *parent)
+{
+    return mapObjects.createAtEnd();
+}
+
+void StorageImpl::deleteMapObject(IObjectBase *v)
+{
+    mapObjects.erase(v->id);
 }
 
 Ptr<Mechanoid> StorageImpl::addMechanoid()
@@ -3911,51 +3692,23 @@ Ptr<Mechanoid> StorageImpl::addMechanoid()
     return mechanoids.createAtEnd();
 }
 
-void StorageImpl::deleteMechanoid(Mechanoid *v)
+void StorageImpl::deleteMechanoid(IObjectBase *v)
 {
     mechanoids.erase(v->id);
 }
 
-Ptr<ModificationClan> StorageImpl::addModificationClan(IObject *parent)
+Ptr<MechanoidQuest> StorageImpl::addMechanoidQuest(IObjectBase *parent)
 {
-    auto v = modificationClans.createAtEnd();
-    Modification *modification = (Modification *)parent;
-    modification->clans.insert(v);
-    v->modification = modifications[modification->id];
+    auto v = mechanoidQuests.createAtEnd();
+    Mechanoid *mechanoid = (Mechanoid *)parent;
+    mechanoid->quests->insert(v);
+    v->mechanoid = mechanoids[mechanoid->id];
     return v;
 }
 
-void StorageImpl::deleteModificationClan(ModificationClan *v)
+void StorageImpl::deleteMechanoidQuest(IObjectBase *v)
 {
-    modificationClans.erase(v);
-}
-
-Ptr<ModificationMap> StorageImpl::addModificationMap(IObject *parent)
-{
-    auto v = modificationMaps.createAtEnd();
-    Modification *modification = (Modification *)parent;
-    modification->maps.insert(v);
-    v->modification = modifications[modification->id];
-    return v;
-}
-
-void StorageImpl::deleteModificationMap(ModificationMap *v)
-{
-    modificationMaps.erase(v);
-}
-
-Ptr<ModificationMechanoid> StorageImpl::addModificationMechanoid(IObject *parent)
-{
-    auto v = modificationMechanoids.createAtEnd();
-    Modification *modification = (Modification *)parent;
-    modification->mechanoids.insert(v);
-    v->modification = modifications[modification->id];
-    return v;
-}
-
-void StorageImpl::deleteModificationMechanoid(ModificationMechanoid *v)
-{
-    modificationMechanoids.erase(v);
+    mechanoidQuests.erase(v->id);
 }
 
 Ptr<Modification> StorageImpl::addModification()
@@ -3963,9 +3716,19 @@ Ptr<Modification> StorageImpl::addModification()
     return modifications.createAtEnd();
 }
 
-void StorageImpl::deleteModification(Modification *v)
+void StorageImpl::deleteModification(IObjectBase *v)
 {
     modifications.erase(v->id);
+}
+
+Ptr<ModificationMap> StorageImpl::addModificationMap(IObjectBase *parent)
+{
+    return modificationMaps.createAtEnd();
+}
+
+void StorageImpl::deleteModificationMap(IObjectBase *v)
+{
+    modificationMaps.erase(v->id);
 }
 
 Ptr<Modificator> StorageImpl::addModificator()
@@ -3973,7 +3736,7 @@ Ptr<Modificator> StorageImpl::addModificator()
     return modificators.createAtEnd();
 }
 
-void StorageImpl::deleteModificator(Modificator *v)
+void StorageImpl::deleteModificator(IObjectBase *v)
 {
     modificators.erase(v->id);
 }
@@ -3983,7 +3746,7 @@ Ptr<Object> StorageImpl::addObject()
     return objects.createAtEnd();
 }
 
-void StorageImpl::deleteObject(Object *v)
+void StorageImpl::deleteObject(IObjectBase *v)
 {
     objects.erase(v->id);
 }
@@ -3993,7 +3756,7 @@ Ptr<Player> StorageImpl::addPlayer()
     return players.createAtEnd();
 }
 
-void StorageImpl::deletePlayer(Player *v)
+void StorageImpl::deletePlayer(IObjectBase *v)
 {
     players.erase(v->id);
 }
@@ -4003,117 +3766,9 @@ Ptr<Projectile> StorageImpl::addProjectile()
     return projectiles.createAtEnd();
 }
 
-void StorageImpl::deleteProjectile(Projectile *v)
+void StorageImpl::deleteProjectile(IObjectBase *v)
 {
     projectiles.erase(v->id);
-}
-
-Ptr<QuestRewardEquipment> StorageImpl::addQuestRewardEquipment(IObject *parent)
-{
-    auto v = questRewardEquipments.createAtEnd();
-    QuestReward *questReward = (QuestReward *)parent;
-    questReward->equipments.insert(v);
-    v->questReward = questRewards[questReward->id];
-    return v;
-}
-
-void StorageImpl::deleteQuestRewardEquipment(QuestRewardEquipment *v)
-{
-    questRewardEquipments.erase(v);
-}
-
-Ptr<QuestRewardGlider> StorageImpl::addQuestRewardGlider(IObject *parent)
-{
-    auto v = questRewardGliders.createAtEnd();
-    QuestReward *questReward = (QuestReward *)parent;
-    questReward->gliders.insert(v);
-    v->questReward = questRewards[questReward->id];
-    return v;
-}
-
-void StorageImpl::deleteQuestRewardGlider(QuestRewardGlider *v)
-{
-    questRewardGliders.erase(v);
-}
-
-Ptr<QuestRewardGood> StorageImpl::addQuestRewardGood(IObject *parent)
-{
-    auto v = questRewardGoods.createAtEnd();
-    QuestReward *questReward = (QuestReward *)parent;
-    questReward->goods.insert(v);
-    v->questReward = questRewards[questReward->id];
-    return v;
-}
-
-void StorageImpl::deleteQuestRewardGood(QuestRewardGood *v)
-{
-    questRewardGoods.erase(v);
-}
-
-Ptr<QuestRewardModificator> StorageImpl::addQuestRewardModificator(IObject *parent)
-{
-    auto v = questRewardModificators.createAtEnd();
-    QuestReward *questReward = (QuestReward *)parent;
-    questReward->modificators.insert(v);
-    v->questReward = questRewards[questReward->id];
-    return v;
-}
-
-void StorageImpl::deleteQuestRewardModificator(QuestRewardModificator *v)
-{
-    questRewardModificators.erase(v);
-}
-
-Ptr<QuestRewardProjectile> StorageImpl::addQuestRewardProjectile(IObject *parent)
-{
-    auto v = questRewardProjectiles.createAtEnd();
-    QuestReward *questReward = (QuestReward *)parent;
-    questReward->projectiles.insert(v);
-    v->questReward = questRewards[questReward->id];
-    return v;
-}
-
-void StorageImpl::deleteQuestRewardProjectile(QuestRewardProjectile *v)
-{
-    questRewardProjectiles.erase(v);
-}
-
-Ptr<QuestRewardReputation> StorageImpl::addQuestRewardReputation(IObject *parent)
-{
-    auto v = questRewardReputations.createAtEnd();
-    QuestReward *questReward = (QuestReward *)parent;
-    questReward->reputations.insert(v);
-    v->questReward = questRewards[questReward->id];
-    return v;
-}
-
-void StorageImpl::deleteQuestRewardReputation(QuestRewardReputation *v)
-{
-    questRewardReputations.erase(v);
-}
-
-Ptr<QuestRewardWeapon> StorageImpl::addQuestRewardWeapon(IObject *parent)
-{
-    auto v = questRewardWeapons.createAtEnd();
-    QuestReward *questReward = (QuestReward *)parent;
-    questReward->weapons.insert(v);
-    v->questReward = questRewards[questReward->id];
-    return v;
-}
-
-void StorageImpl::deleteQuestRewardWeapon(QuestRewardWeapon *v)
-{
-    questRewardWeapons.erase(v);
-}
-
-Ptr<QuestReward> StorageImpl::addQuestReward(IObject *parent)
-{
-    return questRewards.createAtEnd();
-}
-
-void StorageImpl::deleteQuestReward(QuestReward *v)
-{
-    questRewards.erase(v->id);
 }
 
 Ptr<Quest> StorageImpl::addQuest()
@@ -4121,9 +3776,117 @@ Ptr<Quest> StorageImpl::addQuest()
     return quests.createAtEnd();
 }
 
-void StorageImpl::deleteQuest(Quest *v)
+void StorageImpl::deleteQuest(IObjectBase *v)
 {
     quests.erase(v->id);
+}
+
+Ptr<QuestReward> StorageImpl::addQuestReward(IObjectBase *parent)
+{
+    return questRewards.createAtEnd();
+}
+
+void StorageImpl::deleteQuestReward(IObjectBase *v)
+{
+    questRewards.erase(v->id);
+}
+
+Ptr<QuestRewardEquipment> StorageImpl::addQuestRewardEquipment(IObjectBase *parent)
+{
+    auto v = questRewardEquipments.createAtEnd();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->equipments->insert(v);
+    v->quest_reward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardEquipment(IObjectBase *v)
+{
+    questRewardEquipments.erase(v->id);
+}
+
+Ptr<QuestRewardGlider> StorageImpl::addQuestRewardGlider(IObjectBase *parent)
+{
+    auto v = questRewardGliders.createAtEnd();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->gliders->insert(v);
+    v->quest_reward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardGlider(IObjectBase *v)
+{
+    questRewardGliders.erase(v->id);
+}
+
+Ptr<QuestRewardGood> StorageImpl::addQuestRewardGood(IObjectBase *parent)
+{
+    auto v = questRewardGoods.createAtEnd();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->goods->insert(v);
+    v->quest_reward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardGood(IObjectBase *v)
+{
+    questRewardGoods.erase(v->id);
+}
+
+Ptr<QuestRewardModificator> StorageImpl::addQuestRewardModificator(IObjectBase *parent)
+{
+    auto v = questRewardModificators.createAtEnd();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->modificators->insert(v);
+    v->quest_reward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardModificator(IObjectBase *v)
+{
+    questRewardModificators.erase(v->id);
+}
+
+Ptr<QuestRewardProjectile> StorageImpl::addQuestRewardProjectile(IObjectBase *parent)
+{
+    auto v = questRewardProjectiles.createAtEnd();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->projectiles->insert(v);
+    v->quest_reward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardProjectile(IObjectBase *v)
+{
+    questRewardProjectiles.erase(v->id);
+}
+
+Ptr<QuestRewardReputation> StorageImpl::addQuestRewardReputation(IObjectBase *parent)
+{
+    auto v = questRewardReputations.createAtEnd();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->reputations->insert(v);
+    v->quest_reward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardReputation(IObjectBase *v)
+{
+    questRewardReputations.erase(v->id);
+}
+
+Ptr<QuestRewardWeapon> StorageImpl::addQuestRewardWeapon(IObjectBase *parent)
+{
+    auto v = questRewardWeapons.createAtEnd();
+    QuestReward *questReward = (QuestReward *)parent;
+    questReward->weapons->insert(v);
+    v->quest_reward = questRewards[questReward->id];
+    return v;
+}
+
+void StorageImpl::deleteQuestRewardWeapon(IObjectBase *v)
+{
+    questRewardWeapons.erase(v->id);
 }
 
 Ptr<ScriptVariable> StorageImpl::addScriptVariable()
@@ -4131,7 +3894,7 @@ Ptr<ScriptVariable> StorageImpl::addScriptVariable()
     return scriptVariables.createAtEnd();
 }
 
-void StorageImpl::deleteScriptVariable(ScriptVariable *v)
+void StorageImpl::deleteScriptVariable(IObjectBase *v)
 {
     scriptVariables.erase(v->id);
 }
@@ -4141,7 +3904,7 @@ Ptr<Setting> StorageImpl::addSetting()
     return settings.createAtEnd();
 }
 
-void StorageImpl::deleteSetting(Setting *v)
+void StorageImpl::deleteSetting(IObjectBase *v)
 {
     settings.erase(v->id);
 }
@@ -4151,7 +3914,7 @@ Ptr<String> StorageImpl::addString()
     return strings.createAtEnd();
 }
 
-void StorageImpl::deleteString(String *v)
+void StorageImpl::deleteString(IObjectBase *v)
 {
     strings.erase(v->id);
 }
@@ -4161,7 +3924,7 @@ Ptr<Table> StorageImpl::addTable()
     return tables.createAtEnd();
 }
 
-void StorageImpl::deleteTable(Table *v)
+void StorageImpl::deleteTable(IObjectBase *v)
 {
     tables.erase(v->id);
 }
@@ -4171,670 +3934,661 @@ Ptr<Weapon> StorageImpl::addWeapon()
     return weapons.createAtEnd();
 }
 
-void StorageImpl::deleteWeapon(Weapon *v)
+void StorageImpl::deleteWeapon(IObjectBase *v)
 {
     weapons.erase(v->id);
 }
 
-Ptr<IObject> StorageImpl::addRecord(IObject *parent)
+Ptr<IObjectBase> StorageImpl::addRecord(IObjectBase *parent)
 {
+    Ptr<IObjectBase> p;
     EObjectType type = parent->getType();
     switch (type)
     {
     case EObjectType::Building:
-        return addBuilding();
-    case EObjectType::ClanMechanoid:
-        return addClanMechanoid(parent);
-    case EObjectType::ClanReputation:
-        return addClanReputation(parent);
+        p = addBuilding();
+        break;
     case EObjectType::Clan:
-        return addClan();
-    case EObjectType::ConfigurationEquipment:
-        return addConfigurationEquipment(parent);
-    case EObjectType::ConfigurationGood:
-        return addConfigurationGood(parent);
-    case EObjectType::ConfigurationProjectile:
-        return addConfigurationProjectile(parent);
-    case EObjectType::ConfigurationWeapon:
-        return addConfigurationWeapon(parent);
+        p = addClan();
+        break;
+    case EObjectType::ClanReputation:
+        p = addClanReputation(parent);
+        break;
     case EObjectType::Configuration:
-        return addConfiguration();
+        p = addConfiguration();
+        break;
+    case EObjectType::ConfigurationEquipment:
+        p = addConfigurationEquipment(parent);
+        break;
+    case EObjectType::ConfigurationGood:
+        p = addConfigurationGood(parent);
+        break;
+    case EObjectType::ConfigurationProjectile:
+        p = addConfigurationProjectile(parent);
+        break;
+    case EObjectType::ConfigurationWeapon:
+        p = addConfigurationWeapon(parent);
+        break;
     case EObjectType::Equipment:
-        return addEquipment();
+        p = addEquipment();
+        break;
     case EObjectType::Glider:
-        return addGlider();
+        p = addGlider();
+        break;
     case EObjectType::Good:
-        return addGood();
-    case EObjectType::GroupMechanoid:
-        return addGroupMechanoid(parent);
+        p = addGood();
+        break;
     case EObjectType::Group:
-        return addGroup();
-    case EObjectType::MapBuildingEquipment:
-        return addMapBuildingEquipment(parent);
-    case EObjectType::MapBuildingGlider:
-        return addMapBuildingGlider(parent);
-    case EObjectType::MapBuildingGood:
-        return addMapBuildingGood(parent);
-    case EObjectType::MapBuildingModificator:
-        return addMapBuildingModificator(parent);
-    case EObjectType::MapBuildingProjectile:
-        return addMapBuildingProjectile(parent);
-    case EObjectType::MapBuildingWeapon:
-        return addMapBuildingWeapon(parent);
-    case EObjectType::MapBuilding:
-        return addMapBuilding(parent);
-    case EObjectType::MapGood:
-        return addMapGood(parent);
-    case EObjectType::MapObject:
-        return addMapObject(parent);
+        p = addGroup();
+        break;
+    case EObjectType::GroupMechanoid:
+        p = addGroupMechanoid(parent);
+        break;
     case EObjectType::Map:
-        return addMap();
-    case EObjectType::MechanoidQuest:
-        return addMechanoidQuest(parent);
+        p = addMap();
+        break;
+    case EObjectType::MapBuilding:
+        p = addMapBuilding(parent);
+        break;
+    case EObjectType::MapBuildingEquipment:
+        p = addMapBuildingEquipment(parent);
+        break;
+    case EObjectType::MapBuildingGlider:
+        p = addMapBuildingGlider(parent);
+        break;
+    case EObjectType::MapBuildingGood:
+        p = addMapBuildingGood(parent);
+        break;
+    case EObjectType::MapBuildingModificator:
+        p = addMapBuildingModificator(parent);
+        break;
+    case EObjectType::MapBuildingProjectile:
+        p = addMapBuildingProjectile(parent);
+        break;
+    case EObjectType::MapBuildingWeapon:
+        p = addMapBuildingWeapon(parent);
+        break;
+    case EObjectType::MapGood:
+        p = addMapGood(parent);
+        break;
+    case EObjectType::MapObject:
+        p = addMapObject(parent);
+        break;
     case EObjectType::Mechanoid:
-        return addMechanoid();
-    case EObjectType::ModificationClan:
-        return addModificationClan(parent);
-    case EObjectType::ModificationMap:
-        return addModificationMap(parent);
-    case EObjectType::ModificationMechanoid:
-        return addModificationMechanoid(parent);
+        p = addMechanoid();
+        break;
+    case EObjectType::MechanoidQuest:
+        p = addMechanoidQuest(parent);
+        break;
     case EObjectType::Modification:
-        return addModification();
+        p = addModification();
+        break;
+    case EObjectType::ModificationMap:
+        p = addModificationMap(parent);
+        break;
     case EObjectType::Modificator:
-        return addModificator();
+        p = addModificator();
+        break;
     case EObjectType::Object:
-        return addObject();
+        p = addObject();
+        break;
     case EObjectType::Player:
-        return addPlayer();
+        p = addPlayer();
+        break;
     case EObjectType::Projectile:
-        return addProjectile();
-    case EObjectType::QuestRewardEquipment:
-        return addQuestRewardEquipment(parent);
-    case EObjectType::QuestRewardGlider:
-        return addQuestRewardGlider(parent);
-    case EObjectType::QuestRewardGood:
-        return addQuestRewardGood(parent);
-    case EObjectType::QuestRewardModificator:
-        return addQuestRewardModificator(parent);
-    case EObjectType::QuestRewardProjectile:
-        return addQuestRewardProjectile(parent);
-    case EObjectType::QuestRewardReputation:
-        return addQuestRewardReputation(parent);
-    case EObjectType::QuestRewardWeapon:
-        return addQuestRewardWeapon(parent);
-    case EObjectType::QuestReward:
-        return addQuestReward(parent);
+        p = addProjectile();
+        break;
     case EObjectType::Quest:
-        return addQuest();
+        p = addQuest();
+        break;
+    case EObjectType::QuestReward:
+        p = addQuestReward(parent);
+        break;
+    case EObjectType::QuestRewardEquipment:
+        p = addQuestRewardEquipment(parent);
+        break;
+    case EObjectType::QuestRewardGlider:
+        p = addQuestRewardGlider(parent);
+        break;
+    case EObjectType::QuestRewardGood:
+        p = addQuestRewardGood(parent);
+        break;
+    case EObjectType::QuestRewardModificator:
+        p = addQuestRewardModificator(parent);
+        break;
+    case EObjectType::QuestRewardProjectile:
+        p = addQuestRewardProjectile(parent);
+        break;
+    case EObjectType::QuestRewardReputation:
+        p = addQuestRewardReputation(parent);
+        break;
+    case EObjectType::QuestRewardWeapon:
+        p = addQuestRewardWeapon(parent);
+        break;
     case EObjectType::ScriptVariable:
-        return addScriptVariable();
+        p = addScriptVariable();
+        break;
     case EObjectType::Setting:
-        return addSetting();
+        p = addSetting();
+        break;
     case EObjectType::String:
-        return addString();
+        p = addString();
+        break;
     case EObjectType::Table:
-        return addTable();
+        p = addTable();
+        break;
     case EObjectType::Weapon:
-        return addWeapon();
+        p = addWeapon();
+        break;
     default:
-        return Ptr<IObject>(0);
+        break;
     }
+    return p;
 }
 
-void StorageImpl::deleteRecord(IObject *data)
+void StorageImpl::deleteRecord(IObjectBase *data)
 {
     EObjectType type = data->getType();
     switch (type)
     {
     case EObjectType::Building:
-        deleteBuilding((Building *)data);
-        break;
-    case EObjectType::ClanMechanoid:
-        deleteClanMechanoid((ClanMechanoid *)data);
-        break;
-    case EObjectType::ClanReputation:
-        deleteClanReputation((ClanReputation *)data);
+        deleteBuilding(data);
         break;
     case EObjectType::Clan:
-        deleteClan((Clan *)data);
+        deleteClan(data);
         break;
-    case EObjectType::ConfigurationEquipment:
-        deleteConfigurationEquipment((ConfigurationEquipment *)data);
-        break;
-    case EObjectType::ConfigurationGood:
-        deleteConfigurationGood((ConfigurationGood *)data);
-        break;
-    case EObjectType::ConfigurationProjectile:
-        deleteConfigurationProjectile((ConfigurationProjectile *)data);
-        break;
-    case EObjectType::ConfigurationWeapon:
-        deleteConfigurationWeapon((ConfigurationWeapon *)data);
+    case EObjectType::ClanReputation:
+        deleteClanReputation(data);
         break;
     case EObjectType::Configuration:
-        deleteConfiguration((Configuration *)data);
+        deleteConfiguration(data);
+        break;
+    case EObjectType::ConfigurationEquipment:
+        deleteConfigurationEquipment(data);
+        break;
+    case EObjectType::ConfigurationGood:
+        deleteConfigurationGood(data);
+        break;
+    case EObjectType::ConfigurationProjectile:
+        deleteConfigurationProjectile(data);
+        break;
+    case EObjectType::ConfigurationWeapon:
+        deleteConfigurationWeapon(data);
         break;
     case EObjectType::Equipment:
-        deleteEquipment((Equipment *)data);
+        deleteEquipment(data);
         break;
     case EObjectType::Glider:
-        deleteGlider((Glider *)data);
+        deleteGlider(data);
         break;
     case EObjectType::Good:
-        deleteGood((Good *)data);
-        break;
-    case EObjectType::GroupMechanoid:
-        deleteGroupMechanoid((GroupMechanoid *)data);
+        deleteGood(data);
         break;
     case EObjectType::Group:
-        deleteGroup((Group *)data);
+        deleteGroup(data);
         break;
-    case EObjectType::MapBuildingEquipment:
-        deleteMapBuildingEquipment((MapBuildingEquipment *)data);
-        break;
-    case EObjectType::MapBuildingGlider:
-        deleteMapBuildingGlider((MapBuildingGlider *)data);
-        break;
-    case EObjectType::MapBuildingGood:
-        deleteMapBuildingGood((MapBuildingGood *)data);
-        break;
-    case EObjectType::MapBuildingModificator:
-        deleteMapBuildingModificator((MapBuildingModificator *)data);
-        break;
-    case EObjectType::MapBuildingProjectile:
-        deleteMapBuildingProjectile((MapBuildingProjectile *)data);
-        break;
-    case EObjectType::MapBuildingWeapon:
-        deleteMapBuildingWeapon((MapBuildingWeapon *)data);
-        break;
-    case EObjectType::MapBuilding:
-        deleteMapBuilding((MapBuilding *)data);
-        break;
-    case EObjectType::MapGood:
-        deleteMapGood((MapGood *)data);
-        break;
-    case EObjectType::MapObject:
-        deleteMapObject((MapObject *)data);
+    case EObjectType::GroupMechanoid:
+        deleteGroupMechanoid(data);
         break;
     case EObjectType::Map:
-        deleteMap((Map *)data);
+        deleteMap(data);
         break;
-    case EObjectType::MechanoidQuest:
-        deleteMechanoidQuest((MechanoidQuest *)data);
+    case EObjectType::MapBuilding:
+        deleteMapBuilding(data);
+        break;
+    case EObjectType::MapBuildingEquipment:
+        deleteMapBuildingEquipment(data);
+        break;
+    case EObjectType::MapBuildingGlider:
+        deleteMapBuildingGlider(data);
+        break;
+    case EObjectType::MapBuildingGood:
+        deleteMapBuildingGood(data);
+        break;
+    case EObjectType::MapBuildingModificator:
+        deleteMapBuildingModificator(data);
+        break;
+    case EObjectType::MapBuildingProjectile:
+        deleteMapBuildingProjectile(data);
+        break;
+    case EObjectType::MapBuildingWeapon:
+        deleteMapBuildingWeapon(data);
+        break;
+    case EObjectType::MapGood:
+        deleteMapGood(data);
+        break;
+    case EObjectType::MapObject:
+        deleteMapObject(data);
         break;
     case EObjectType::Mechanoid:
-        deleteMechanoid((Mechanoid *)data);
+        deleteMechanoid(data);
         break;
-    case EObjectType::ModificationClan:
-        deleteModificationClan((ModificationClan *)data);
-        break;
-    case EObjectType::ModificationMap:
-        deleteModificationMap((ModificationMap *)data);
-        break;
-    case EObjectType::ModificationMechanoid:
-        deleteModificationMechanoid((ModificationMechanoid *)data);
+    case EObjectType::MechanoidQuest:
+        deleteMechanoidQuest(data);
         break;
     case EObjectType::Modification:
-        deleteModification((Modification *)data);
+        deleteModification(data);
+        break;
+    case EObjectType::ModificationMap:
+        deleteModificationMap(data);
         break;
     case EObjectType::Modificator:
-        deleteModificator((Modificator *)data);
+        deleteModificator(data);
         break;
     case EObjectType::Object:
-        deleteObject((Object *)data);
+        deleteObject(data);
         break;
     case EObjectType::Player:
-        deletePlayer((Player *)data);
+        deletePlayer(data);
         break;
     case EObjectType::Projectile:
-        deleteProjectile((Projectile *)data);
-        break;
-    case EObjectType::QuestRewardEquipment:
-        deleteQuestRewardEquipment((QuestRewardEquipment *)data);
-        break;
-    case EObjectType::QuestRewardGlider:
-        deleteQuestRewardGlider((QuestRewardGlider *)data);
-        break;
-    case EObjectType::QuestRewardGood:
-        deleteQuestRewardGood((QuestRewardGood *)data);
-        break;
-    case EObjectType::QuestRewardModificator:
-        deleteQuestRewardModificator((QuestRewardModificator *)data);
-        break;
-    case EObjectType::QuestRewardProjectile:
-        deleteQuestRewardProjectile((QuestRewardProjectile *)data);
-        break;
-    case EObjectType::QuestRewardReputation:
-        deleteQuestRewardReputation((QuestRewardReputation *)data);
-        break;
-    case EObjectType::QuestRewardWeapon:
-        deleteQuestRewardWeapon((QuestRewardWeapon *)data);
-        break;
-    case EObjectType::QuestReward:
-        deleteQuestReward((QuestReward *)data);
+        deleteProjectile(data);
         break;
     case EObjectType::Quest:
-        deleteQuest((Quest *)data);
+        deleteQuest(data);
+        break;
+    case EObjectType::QuestReward:
+        deleteQuestReward(data);
+        break;
+    case EObjectType::QuestRewardEquipment:
+        deleteQuestRewardEquipment(data);
+        break;
+    case EObjectType::QuestRewardGlider:
+        deleteQuestRewardGlider(data);
+        break;
+    case EObjectType::QuestRewardGood:
+        deleteQuestRewardGood(data);
+        break;
+    case EObjectType::QuestRewardModificator:
+        deleteQuestRewardModificator(data);
+        break;
+    case EObjectType::QuestRewardProjectile:
+        deleteQuestRewardProjectile(data);
+        break;
+    case EObjectType::QuestRewardReputation:
+        deleteQuestRewardReputation(data);
+        break;
+    case EObjectType::QuestRewardWeapon:
+        deleteQuestRewardWeapon(data);
         break;
     case EObjectType::ScriptVariable:
-        deleteScriptVariable((ScriptVariable *)data);
+        deleteScriptVariable(data);
         break;
     case EObjectType::Setting:
-        deleteSetting((Setting *)data);
+        deleteSetting(data);
         break;
     case EObjectType::String:
-        deleteString((String *)data);
+        deleteString(data);
         break;
     case EObjectType::Table:
-        deleteTable((Table *)data);
+        deleteTable(data);
         break;
     case EObjectType::Weapon:
-        deleteWeapon((Weapon *)data);
+        deleteWeapon(data);
         break;
     default:
         break;
     }
 }
 
-#ifdef USE_QT
-void StorageImpl::printQtTreeView(QTreeWidgetItem *root) const
+Ptr<TreeItem> StorageImpl::printTree() const
 {
-    QTreeWidgetItem *item;
+    Ptr<TreeItem> root = std::make_shared<TreeItem>();
+    Ptr<TreeItem> item;
+    Ptr<TreeItem> tmp;
 
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Buildings")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Building));
-    auto buildings = getOrderedMap(EObjectType::Building);
-    for (auto &building : buildings)
-        building.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Clans")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Clan));
-    auto clans = getOrderedMap(EObjectType::Clan);
-    for (auto &clan : clans)
-        clan.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Configurations")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Configuration));
-    auto configurations = getOrderedMap(EObjectType::Configuration);
-    for (auto &configuration : configurations)
-        configuration.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Equipments")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Equipment));
-    auto equipments = getOrderedMap(EObjectType::Equipment);
-    for (auto &equipment : equipments)
-        equipment.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Gliders")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Glider));
-    auto gliders = getOrderedMap(EObjectType::Glider);
-    for (auto &glider : gliders)
-        glider.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Goods")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Good));
-    auto goods = getOrderedMap(EObjectType::Good);
-    for (auto &good : goods)
-        good.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Groups")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Group));
-    auto groups = getOrderedMap(EObjectType::Group);
-    for (auto &group : groups)
-        group.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Maps")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Map));
-    auto maps = getOrderedMap(EObjectType::Map);
-    for (auto &map : maps)
-        map.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Mechanoids")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Mechanoid));
-    auto mechanoids = getOrderedMap(EObjectType::Mechanoid);
-    for (auto &mechanoid : mechanoids)
-        mechanoid.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Modifications")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Modification));
-    auto modifications = getOrderedMap(EObjectType::Modification);
-    for (auto &modification : modifications)
-        modification.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Modificators")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Modificator));
-    auto modificators = getOrderedMap(EObjectType::Modificator);
-    for (auto &modificator : modificators)
-        modificator.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Objects")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Object));
-    auto objects = getOrderedMap(EObjectType::Object);
-    for (auto &object : objects)
-        object.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Players")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Player));
-    auto players = getOrderedMap(EObjectType::Player);
-    for (auto &player : players)
-        player.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Projectiles")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Projectile));
-    auto projectiles = getOrderedMap(EObjectType::Projectile);
-    for (auto &projectile : projectiles)
-        projectile.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Quests")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Quest));
-    auto quests = getOrderedMap(EObjectType::Quest);
-    for (auto &quest : quests)
-        quest.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Script Variables")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::ScriptVariable));
-    auto scriptVariables = getOrderedMap(EObjectType::ScriptVariable);
-    for (auto &scriptVariable : scriptVariables)
-        scriptVariable.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Settings")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Setting));
-    auto settings = getOrderedMap(EObjectType::Setting);
-    for (auto &setting : settings)
-        setting.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Strings")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::String));
-    auto strings = getOrderedMap(EObjectType::String);
-    for (auto &string : strings)
-        string.second->printQtTreeView(item);
-
-    item = new QTreeWidgetItem(root, QStringList(QCoreApplication::translate("DB", "Weapons")));
-    item->setData(0, Qt::UserRole, static_cast<int>(EObjectType::Weapon));
-    auto weapons = getOrderedMap(EObjectType::Weapon);
-    for (auto &weapon : weapons)
-        weapon.second->printQtTreeView(item);
+    return root;
 }
 
-QTreeWidgetItem *StorageImpl::addRecord(QTreeWidgetItem *item)
+Ptr<TreeItem> StorageImpl::addRecord(TreeItem *item)
 {
-    EObjectType type = static_cast<EObjectType>(item->data(0, Qt::UserRole).toInt());
-    IObject *parent = 0;
-    auto parentItem = item->parent();
-    if (parentItem)
-        parent = (IObject *)parentItem->data(0, Qt::UserRole).toULongLong();
-    switch (type)
+    Ptr<TreeItem> tmp;
+    switch (item->type)
     {
     case EObjectType::Building:
-        return addBuilding()->printQtTreeView(item);
-    case EObjectType::ClanMechanoid:
-        return addClanMechanoid(parent)->printQtTreeView(item);
-    case EObjectType::ClanReputation:
-        return addClanReputation(parent)->printQtTreeView(item);
+        item->children.push_back(tmp = addBuilding()->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Clan:
-        return addClan()->printQtTreeView(item);
-    case EObjectType::ConfigurationEquipment:
-        return addConfigurationEquipment(parent)->printQtTreeView(item);
-    case EObjectType::ConfigurationGood:
-        return addConfigurationGood(parent)->printQtTreeView(item);
-    case EObjectType::ConfigurationProjectile:
-        return addConfigurationProjectile(parent)->printQtTreeView(item);
-    case EObjectType::ConfigurationWeapon:
-        return addConfigurationWeapon(parent)->printQtTreeView(item);
+        item->children.push_back(tmp = addClan()->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::ClanReputation:
+        item->children.push_back(tmp = addClanReputation(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Configuration:
-        return addConfiguration()->printQtTreeView(item);
+        item->children.push_back(tmp = addConfiguration()->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::ConfigurationEquipment:
+        item->children.push_back(tmp = addConfigurationEquipment(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::ConfigurationGood:
+        item->children.push_back(tmp = addConfigurationGood(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::ConfigurationProjectile:
+        item->children.push_back(tmp = addConfigurationProjectile(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::ConfigurationWeapon:
+        item->children.push_back(tmp = addConfigurationWeapon(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Equipment:
-        return addEquipment()->printQtTreeView(item);
+        item->children.push_back(tmp = addEquipment()->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Glider:
-        return addGlider()->printQtTreeView(item);
+        item->children.push_back(tmp = addGlider()->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Good:
-        return addGood()->printQtTreeView(item);
-    case EObjectType::GroupMechanoid:
-        return addGroupMechanoid(parent)->printQtTreeView(item);
+        item->children.push_back(tmp = addGood()->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Group:
-        return addGroup()->printQtTreeView(item);
-    case EObjectType::MapBuildingEquipment:
-        return addMapBuildingEquipment(parent)->printQtTreeView(item);
-    case EObjectType::MapBuildingGlider:
-        return addMapBuildingGlider(parent)->printQtTreeView(item);
-    case EObjectType::MapBuildingGood:
-        return addMapBuildingGood(parent)->printQtTreeView(item);
-    case EObjectType::MapBuildingModificator:
-        return addMapBuildingModificator(parent)->printQtTreeView(item);
-    case EObjectType::MapBuildingProjectile:
-        return addMapBuildingProjectile(parent)->printQtTreeView(item);
-    case EObjectType::MapBuildingWeapon:
-        return addMapBuildingWeapon(parent)->printQtTreeView(item);
-    case EObjectType::MapBuilding:
-        return addMapBuilding(parent)->printQtTreeView(item);
-    case EObjectType::MapGood:
-        return addMapGood(parent)->printQtTreeView(item);
-    case EObjectType::MapObject:
-        return addMapObject(parent)->printQtTreeView(item);
+        item->children.push_back(tmp = addGroup()->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::GroupMechanoid:
+        item->children.push_back(tmp = addGroupMechanoid(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Map:
-        return addMap()->printQtTreeView(item);
-    case EObjectType::MechanoidQuest:
-        return addMechanoidQuest(parent)->printQtTreeView(item);
+        item->children.push_back(tmp = addMap()->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::MapBuilding:
+        item->children.push_back(tmp = addMapBuilding(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::MapBuildingEquipment:
+        item->children.push_back(tmp = addMapBuildingEquipment(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::MapBuildingGlider:
+        item->children.push_back(tmp = addMapBuildingGlider(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::MapBuildingGood:
+        item->children.push_back(tmp = addMapBuildingGood(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::MapBuildingModificator:
+        item->children.push_back(tmp = addMapBuildingModificator(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::MapBuildingProjectile:
+        item->children.push_back(tmp = addMapBuildingProjectile(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::MapBuildingWeapon:
+        item->children.push_back(tmp = addMapBuildingWeapon(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::MapGood:
+        item->children.push_back(tmp = addMapGood(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::MapObject:
+        item->children.push_back(tmp = addMapObject(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Mechanoid:
-        return addMechanoid()->printQtTreeView(item);
-    case EObjectType::ModificationClan:
-        return addModificationClan(parent)->printQtTreeView(item);
-    case EObjectType::ModificationMap:
-        return addModificationMap(parent)->printQtTreeView(item);
-    case EObjectType::ModificationMechanoid:
-        return addModificationMechanoid(parent)->printQtTreeView(item);
+        item->children.push_back(tmp = addMechanoid()->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::MechanoidQuest:
+        item->children.push_back(tmp = addMechanoidQuest(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Modification:
-        return addModification()->printQtTreeView(item);
+        item->children.push_back(tmp = addModification()->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::ModificationMap:
+        item->children.push_back(tmp = addModificationMap(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Modificator:
-        return addModificator()->printQtTreeView(item);
+        item->children.push_back(tmp = addModificator()->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Object:
-        return addObject()->printQtTreeView(item);
+        item->children.push_back(tmp = addObject()->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Player:
-        return addPlayer()->printQtTreeView(item);
+        item->children.push_back(tmp = addPlayer()->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Projectile:
-        return addProjectile()->printQtTreeView(item);
-    case EObjectType::QuestRewardEquipment:
-        return addQuestRewardEquipment(parent)->printQtTreeView(item);
-    case EObjectType::QuestRewardGlider:
-        return addQuestRewardGlider(parent)->printQtTreeView(item);
-    case EObjectType::QuestRewardGood:
-        return addQuestRewardGood(parent)->printQtTreeView(item);
-    case EObjectType::QuestRewardModificator:
-        return addQuestRewardModificator(parent)->printQtTreeView(item);
-    case EObjectType::QuestRewardProjectile:
-        return addQuestRewardProjectile(parent)->printQtTreeView(item);
-    case EObjectType::QuestRewardReputation:
-        return addQuestRewardReputation(parent)->printQtTreeView(item);
-    case EObjectType::QuestRewardWeapon:
-        return addQuestRewardWeapon(parent)->printQtTreeView(item);
-    case EObjectType::QuestReward:
-        return addQuestReward(parent)->printQtTreeView(item);
+        item->children.push_back(tmp = addProjectile()->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Quest:
-        return addQuest()->printQtTreeView(item);
+        item->children.push_back(tmp = addQuest()->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::QuestReward:
+        item->children.push_back(tmp = addQuestReward(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::QuestRewardEquipment:
+        item->children.push_back(tmp = addQuestRewardEquipment(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::QuestRewardGlider:
+        item->children.push_back(tmp = addQuestRewardGlider(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::QuestRewardGood:
+        item->children.push_back(tmp = addQuestRewardGood(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::QuestRewardModificator:
+        item->children.push_back(tmp = addQuestRewardModificator(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::QuestRewardProjectile:
+        item->children.push_back(tmp = addQuestRewardProjectile(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::QuestRewardReputation:
+        item->children.push_back(tmp = addQuestRewardReputation(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
+    case EObjectType::QuestRewardWeapon:
+        item->children.push_back(tmp = addQuestRewardWeapon(item->parent->object)->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::ScriptVariable:
-        return addScriptVariable()->printQtTreeView(item);
+        item->children.push_back(tmp = addScriptVariable()->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Setting:
-        return addSetting()->printQtTreeView(item);
+        item->children.push_back(tmp = addSetting()->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::String:
-        return addString()->printQtTreeView(item);
+        item->children.push_back(tmp = addString()->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Table:
-        return addTable()->printQtTreeView(item);
+        item->children.push_back(tmp = addTable()->printTree());
+        tmp->parent = item;
+        break;
     case EObjectType::Weapon:
-        return addWeapon()->printQtTreeView(item);
+        item->children.push_back(tmp = addWeapon()->printTree());
+        tmp->parent = item;
+        break;
     default:
-        return 0;
+        break;
     }
+    return tmp;
 }
 
-void StorageImpl::deleteRecord(QTreeWidgetItem *item)
+void StorageImpl::deleteRecord(TreeItem *item)
 {
-    IObject *data = (IObject *)item->data(0, Qt::UserRole).toULongLong();
-    EObjectType type = data->getType();
-    switch (type)
+    if (!item || !item->object)
+        return;
+    switch (item->type)
     {
     case EObjectType::Building:
-        deleteBuilding((Building *)data);
-        break;
-    case EObjectType::ClanMechanoid:
-        deleteClanMechanoid((ClanMechanoid *)data);
-        break;
-    case EObjectType::ClanReputation:
-        deleteClanReputation((ClanReputation *)data);
+        deleteBuilding(item->object);
         break;
     case EObjectType::Clan:
-        deleteClan((Clan *)data);
+        deleteClan(item->object);
         break;
-    case EObjectType::ConfigurationEquipment:
-        deleteConfigurationEquipment((ConfigurationEquipment *)data);
-        break;
-    case EObjectType::ConfigurationGood:
-        deleteConfigurationGood((ConfigurationGood *)data);
-        break;
-    case EObjectType::ConfigurationProjectile:
-        deleteConfigurationProjectile((ConfigurationProjectile *)data);
-        break;
-    case EObjectType::ConfigurationWeapon:
-        deleteConfigurationWeapon((ConfigurationWeapon *)data);
+    case EObjectType::ClanReputation:
+        deleteClanReputation(item->object);
         break;
     case EObjectType::Configuration:
-        deleteConfiguration((Configuration *)data);
+        deleteConfiguration(item->object);
+        break;
+    case EObjectType::ConfigurationEquipment:
+        deleteConfigurationEquipment(item->object);
+        break;
+    case EObjectType::ConfigurationGood:
+        deleteConfigurationGood(item->object);
+        break;
+    case EObjectType::ConfigurationProjectile:
+        deleteConfigurationProjectile(item->object);
+        break;
+    case EObjectType::ConfigurationWeapon:
+        deleteConfigurationWeapon(item->object);
         break;
     case EObjectType::Equipment:
-        deleteEquipment((Equipment *)data);
+        deleteEquipment(item->object);
         break;
     case EObjectType::Glider:
-        deleteGlider((Glider *)data);
+        deleteGlider(item->object);
         break;
     case EObjectType::Good:
-        deleteGood((Good *)data);
-        break;
-    case EObjectType::GroupMechanoid:
-        deleteGroupMechanoid((GroupMechanoid *)data);
+        deleteGood(item->object);
         break;
     case EObjectType::Group:
-        deleteGroup((Group *)data);
+        deleteGroup(item->object);
         break;
-    case EObjectType::MapBuildingEquipment:
-        deleteMapBuildingEquipment((MapBuildingEquipment *)data);
-        break;
-    case EObjectType::MapBuildingGlider:
-        deleteMapBuildingGlider((MapBuildingGlider *)data);
-        break;
-    case EObjectType::MapBuildingGood:
-        deleteMapBuildingGood((MapBuildingGood *)data);
-        break;
-    case EObjectType::MapBuildingModificator:
-        deleteMapBuildingModificator((MapBuildingModificator *)data);
-        break;
-    case EObjectType::MapBuildingProjectile:
-        deleteMapBuildingProjectile((MapBuildingProjectile *)data);
-        break;
-    case EObjectType::MapBuildingWeapon:
-        deleteMapBuildingWeapon((MapBuildingWeapon *)data);
-        break;
-    case EObjectType::MapBuilding:
-        deleteMapBuilding((MapBuilding *)data);
-        break;
-    case EObjectType::MapGood:
-        deleteMapGood((MapGood *)data);
-        break;
-    case EObjectType::MapObject:
-        deleteMapObject((MapObject *)data);
+    case EObjectType::GroupMechanoid:
+        deleteGroupMechanoid(item->object);
         break;
     case EObjectType::Map:
-        deleteMap((Map *)data);
+        deleteMap(item->object);
         break;
-    case EObjectType::MechanoidQuest:
-        deleteMechanoidQuest((MechanoidQuest *)data);
+    case EObjectType::MapBuilding:
+        deleteMapBuilding(item->object);
+        break;
+    case EObjectType::MapBuildingEquipment:
+        deleteMapBuildingEquipment(item->object);
+        break;
+    case EObjectType::MapBuildingGlider:
+        deleteMapBuildingGlider(item->object);
+        break;
+    case EObjectType::MapBuildingGood:
+        deleteMapBuildingGood(item->object);
+        break;
+    case EObjectType::MapBuildingModificator:
+        deleteMapBuildingModificator(item->object);
+        break;
+    case EObjectType::MapBuildingProjectile:
+        deleteMapBuildingProjectile(item->object);
+        break;
+    case EObjectType::MapBuildingWeapon:
+        deleteMapBuildingWeapon(item->object);
+        break;
+    case EObjectType::MapGood:
+        deleteMapGood(item->object);
+        break;
+    case EObjectType::MapObject:
+        deleteMapObject(item->object);
         break;
     case EObjectType::Mechanoid:
-        deleteMechanoid((Mechanoid *)data);
+        deleteMechanoid(item->object);
         break;
-    case EObjectType::ModificationClan:
-        deleteModificationClan((ModificationClan *)data);
-        break;
-    case EObjectType::ModificationMap:
-        deleteModificationMap((ModificationMap *)data);
-        break;
-    case EObjectType::ModificationMechanoid:
-        deleteModificationMechanoid((ModificationMechanoid *)data);
+    case EObjectType::MechanoidQuest:
+        deleteMechanoidQuest(item->object);
         break;
     case EObjectType::Modification:
-        deleteModification((Modification *)data);
+        deleteModification(item->object);
+        break;
+    case EObjectType::ModificationMap:
+        deleteModificationMap(item->object);
         break;
     case EObjectType::Modificator:
-        deleteModificator((Modificator *)data);
+        deleteModificator(item->object);
         break;
     case EObjectType::Object:
-        deleteObject((Object *)data);
+        deleteObject(item->object);
         break;
     case EObjectType::Player:
-        deletePlayer((Player *)data);
+        deletePlayer(item->object);
         break;
     case EObjectType::Projectile:
-        deleteProjectile((Projectile *)data);
-        break;
-    case EObjectType::QuestRewardEquipment:
-        deleteQuestRewardEquipment((QuestRewardEquipment *)data);
-        break;
-    case EObjectType::QuestRewardGlider:
-        deleteQuestRewardGlider((QuestRewardGlider *)data);
-        break;
-    case EObjectType::QuestRewardGood:
-        deleteQuestRewardGood((QuestRewardGood *)data);
-        break;
-    case EObjectType::QuestRewardModificator:
-        deleteQuestRewardModificator((QuestRewardModificator *)data);
-        break;
-    case EObjectType::QuestRewardProjectile:
-        deleteQuestRewardProjectile((QuestRewardProjectile *)data);
-        break;
-    case EObjectType::QuestRewardReputation:
-        deleteQuestRewardReputation((QuestRewardReputation *)data);
-        break;
-    case EObjectType::QuestRewardWeapon:
-        deleteQuestRewardWeapon((QuestRewardWeapon *)data);
-        break;
-    case EObjectType::QuestReward:
-        deleteQuestReward((QuestReward *)data);
+        deleteProjectile(item->object);
         break;
     case EObjectType::Quest:
-        deleteQuest((Quest *)data);
+        deleteQuest(item->object);
+        break;
+    case EObjectType::QuestReward:
+        deleteQuestReward(item->object);
+        break;
+    case EObjectType::QuestRewardEquipment:
+        deleteQuestRewardEquipment(item->object);
+        break;
+    case EObjectType::QuestRewardGlider:
+        deleteQuestRewardGlider(item->object);
+        break;
+    case EObjectType::QuestRewardGood:
+        deleteQuestRewardGood(item->object);
+        break;
+    case EObjectType::QuestRewardModificator:
+        deleteQuestRewardModificator(item->object);
+        break;
+    case EObjectType::QuestRewardProjectile:
+        deleteQuestRewardProjectile(item->object);
+        break;
+    case EObjectType::QuestRewardReputation:
+        deleteQuestRewardReputation(item->object);
+        break;
+    case EObjectType::QuestRewardWeapon:
+        deleteQuestRewardWeapon(item->object);
         break;
     case EObjectType::ScriptVariable:
-        deleteScriptVariable((ScriptVariable *)data);
+        deleteScriptVariable(item->object);
         break;
     case EObjectType::Setting:
-        deleteSetting((Setting *)data);
+        deleteSetting(item->object);
         break;
     case EObjectType::String:
-        deleteString((String *)data);
+        deleteString(item->object);
         break;
     case EObjectType::Table:
-        deleteTable((Table *)data);
+        deleteTable(item->object);
         break;
     case EObjectType::Weapon:
-        deleteWeapon((Weapon *)data);
+        deleteWeapon(item->object);
         break;
     default:
         break;
     }
-    item->parent()->removeChild(item);
 }
-#endif
 
-OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type, std::function<bool(Ptr<IObject>)> f) const
+OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type, std::function<bool(IObjectBase *)> f) const
 {
     switch (type)
     {
     case EObjectType::Building:
         return ::getOrderedMap(buildings, f);
-    case EObjectType::ClanMechanoid:
-        return ::getOrderedMap(clanMechanoids, f);
-    case EObjectType::ClanReputation:
-        return ::getOrderedMap(clanReputations, f);
     case EObjectType::Clan:
         return ::getOrderedMap(clans, f);
+    case EObjectType::ClanReputation:
+        return ::getOrderedMap(clanReputations, f);
+    case EObjectType::Configuration:
+        return ::getOrderedMap(configurations, f);
     case EObjectType::ConfigurationEquipment:
         return ::getOrderedMap(configurationEquipments, f);
     case EObjectType::ConfigurationGood:
@@ -4843,18 +4597,20 @@ OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type, std::function<bool
         return ::getOrderedMap(configurationProjectiles, f);
     case EObjectType::ConfigurationWeapon:
         return ::getOrderedMap(configurationWeapons, f);
-    case EObjectType::Configuration:
-        return ::getOrderedMap(configurations, f);
     case EObjectType::Equipment:
         return ::getOrderedMap(equipments, f);
     case EObjectType::Glider:
         return ::getOrderedMap(gliders, f);
     case EObjectType::Good:
         return ::getOrderedMap(goods, f);
-    case EObjectType::GroupMechanoid:
-        return ::getOrderedMap(groupMechanoids, f);
     case EObjectType::Group:
         return ::getOrderedMap(groups, f);
+    case EObjectType::GroupMechanoid:
+        return ::getOrderedMap(groupMechanoids, f);
+    case EObjectType::Map:
+        return ::getOrderedMap(maps, f);
+    case EObjectType::MapBuilding:
+        return ::getOrderedMap(mapBuildings, f);
     case EObjectType::MapBuildingEquipment:
         return ::getOrderedMap(mapBuildingEquipments, f);
     case EObjectType::MapBuildingGlider:
@@ -4867,26 +4623,18 @@ OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type, std::function<bool
         return ::getOrderedMap(mapBuildingProjectiles, f);
     case EObjectType::MapBuildingWeapon:
         return ::getOrderedMap(mapBuildingWeapons, f);
-    case EObjectType::MapBuilding:
-        return ::getOrderedMap(mapBuildings, f);
     case EObjectType::MapGood:
         return ::getOrderedMap(mapGoods, f);
     case EObjectType::MapObject:
         return ::getOrderedMap(mapObjects, f);
-    case EObjectType::Map:
-        return ::getOrderedMap(maps, f);
-    case EObjectType::MechanoidQuest:
-        return ::getOrderedMap(mechanoidQuests, f);
     case EObjectType::Mechanoid:
         return ::getOrderedMap(mechanoids, f);
-    case EObjectType::ModificationClan:
-        return ::getOrderedMap(modificationClans, f);
-    case EObjectType::ModificationMap:
-        return ::getOrderedMap(modificationMaps, f);
-    case EObjectType::ModificationMechanoid:
-        return ::getOrderedMap(modificationMechanoids, f);
+    case EObjectType::MechanoidQuest:
+        return ::getOrderedMap(mechanoidQuests, f);
     case EObjectType::Modification:
         return ::getOrderedMap(modifications, f);
+    case EObjectType::ModificationMap:
+        return ::getOrderedMap(modificationMaps, f);
     case EObjectType::Modificator:
         return ::getOrderedMap(modificators, f);
     case EObjectType::Object:
@@ -4895,6 +4643,10 @@ OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type, std::function<bool
         return ::getOrderedMap(players, f);
     case EObjectType::Projectile:
         return ::getOrderedMap(projectiles, f);
+    case EObjectType::Quest:
+        return ::getOrderedMap(quests, f);
+    case EObjectType::QuestReward:
+        return ::getOrderedMap(questRewards, f);
     case EObjectType::QuestRewardEquipment:
         return ::getOrderedMap(questRewardEquipments, f);
     case EObjectType::QuestRewardGlider:
@@ -4909,10 +4661,6 @@ OrderedObjectMap StorageImpl::getOrderedMap(EObjectType type, std::function<bool
         return ::getOrderedMap(questRewardReputations, f);
     case EObjectType::QuestRewardWeapon:
         return ::getOrderedMap(questRewardWeapons, f);
-    case EObjectType::QuestReward:
-        return ::getOrderedMap(questRewards, f);
-    case EObjectType::Quest:
-        return ::getOrderedMap(quests, f);
     case EObjectType::ScriptVariable:
         return ::getOrderedMap(scriptVariables, f);
     case EObjectType::Setting:

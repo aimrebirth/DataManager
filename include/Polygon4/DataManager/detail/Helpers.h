@@ -2,8 +2,9 @@
 
 #pragma once
 
-EObjectType getTableType(const std::string &table);
-std::string getTableNameByType(EObjectType type);
+DLL_EXPORT EObjectType getTableType(const std::string &table);
+DLL_EXPORT Text getTableNameByType(EObjectType type);
+
 #ifdef USE_QT
 void retranslateFieldNames();
 QString getFieldName(const std::string &name);

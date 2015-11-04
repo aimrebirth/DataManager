@@ -18,49 +18,16 @@
 
 #pragma once
 
-#include <map>
-#include <string>
-
-namespace polygon4
-{
-
-enum class ColumnType
-{
-    Integer,
-    Real,
-    Text,
-    Blob
-};
-ColumnType getColumnType(const std::string &s);
-
-struct ForeignKey
-{
-    std::string table_name;
-    std::string column_name;
-};
-typedef std::map<std::string, ForeignKey> ForeignKeys;
-
-struct Column
-{
-    int id;
-    std::string name;
-    ColumnType type;
-    ForeignKey *fk = 0;
-};
-typedef std::map<std::string, Column> Columns;
-
-struct Table
-{
-    int id;
-    std::string name;
-    Columns columns;
-};
-typedef std::map<std::string, Table> Tables;
-
-struct DatabaseSchema
-{
-    std::string name;
-    Tables tables;
-};
-
-}
+#ifdef WIN32
+# ifndef POLYGON4_STATIC
+#  ifdef POLYGON4_ENGINE
+#   define DLL_EXPORT __declspec(dllexport)
+#  else
+#   define DLL_EXPORT __declspec(dllimport)
+#  endif
+# else
+#  define DLL_EXPORT
+# endif
+#else
+# define DLL_EXPORT
+#endif

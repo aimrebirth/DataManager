@@ -20,48 +20,47 @@
 
 #include <map>
 #include <memory>
-#include <set>
-#include <stdint.h>
-#include <vector>
+#include <string>
 
 namespace polygon4
 {
 
-template <class T>
-class Vector
+enum class ColumnType
 {
-public:
-	Vector(){}
-	~Vector(){}
+    Integer,
+    Real,
+    Text,
+    Blob
+};
+ColumnType getColumnType(const std::string &s);
 
-	void push_back(const T &t)
-	{
-		if (size == capacity)
-		{
-			if (capacity == 0)
-				capacity = 1;
-			else
-				capacity *= 2;
-			std::shared_ptr<T*> data = std::shared_ptr<T*>(new T*[capacity], [](T **ptr){ delete[] ptr; });
-			for (size_t i = 0; i < size; i++)
-				data.get()[i] = this->data.get()[i];
-			this->data = data;
-		}
-		data.get()[size++] = new T(t);
-	}
-
-	std::set<T> set() const
-	{
-		std::set<T> s;
-		for (size_t i = 0; i < size; i++)
-			s.insert(*data.get()[i]);
-		return s;
-	}
-
-private:
-	std::shared_ptr<T*> data;
-	size_t size = 0;
-	size_t capacity = 0;
+struct ForeignKey
+{
+    std::string table_name;
+    std::string column_name;
 };
 
-} // namespace polygon4
+struct Column
+{
+    int id;
+    std::string name;
+    ColumnType type;
+    std::shared_ptr<ForeignKey> fk;
+};
+typedef std::map<std::string, Column> Columns;
+
+struct Table
+{
+    int id;
+    std::string name;
+    Columns columns;
+};
+typedef std::map<std::string, Table> Tables;
+
+struct DatabaseSchema
+{
+    std::string name;
+    Tables tables;
+};
+
+}

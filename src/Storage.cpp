@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Polygon4/Storage.h>
+#include <Polygon4/DataManager/Storage.h>
 
 namespace polygon4
 {

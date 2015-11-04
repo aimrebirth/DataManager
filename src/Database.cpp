@@ -16,16 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Polygon4/Database.h>
+#include <Polygon4/DataManager/Database.h>
 
 #include <algorithm>
 
 #include <sqlite3/sqlite3.h>
 
-#include <Polygon4/DatabaseSchema.h>
-#include <Polygon4/Storage.h>
-#include <Polygon4/StorageImpl.h>
-#include <Polygon4/Exception.h>
+#include <Polygon4/DataManager/DatabaseSchema.h>
+#include <Polygon4/DataManager/Storage.h>
+#include <Polygon4/DataManager/StorageImpl.h>
+#include <Polygon4/DataManager/Exception.h>
 
 #include "Logger.h"
 DECLARE_STATIC_LOGGER(logger, "db");
@@ -153,11 +153,9 @@ sqlite3 *Database::getDb() const
     return db;
 }
 
-void Database::getSchema(DatabaseSchema *schema) const
+std::shared_ptr<const DatabaseSchema> Database::getSchema() const
 {
-    if (schema == 0)
-        return;
-
+    std::shared_ptr<DatabaseSchema> schema(new DatabaseSchema(), [](auto p) { delete p; });
     auto callback = [](void *o, int ncols, char **cols, char **names)
     {
         DatabaseSchema *schema = (DatabaseSchema *)o;
@@ -167,7 +165,7 @@ void Database::getSchema(DatabaseSchema *schema) const
         schema->tables[table.name] = table;
         return 0;
     };
-    execute("SELECT * FROM sqlite_master WHERE type='table';", schema, callback);
+    execute("SELECT * FROM sqlite_master WHERE type='table';", schema.get(), callback);
     
     auto callback2 = [](void *o, int ncols, char **cols, char **names)
     {
@@ -186,13 +184,14 @@ void Database::getSchema(DatabaseSchema *schema) const
     {
         Table *table = (Table *)o;
         Column &column = table->columns[cols[3]];
-        column.fk = new ForeignKey;
+        column.fk = std::make_shared<ForeignKey>();
         column.fk->table_name = cols[2];
         column.fk->column_name = cols[4];
         return 0;
     };
     for (auto &tbl : schema->tables)
         execute("PRAGMA foreign_key_list(" + tbl.first + ");", &tbl.second, callback3);
+    return schema;
 }
 
 ColumnType getColumnType(const std::string &s)

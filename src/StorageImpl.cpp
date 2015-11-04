@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Polygon4/StorageImpl.h>
+#include <Polygon4/DataManager/StorageImpl.h>
 
 #include <algorithm>
 
@@ -26,57 +26,31 @@
 
 #include <sqlite3/sqlite3.h>
 
-#include <Polygon4/Database.h>
+#include <Polygon4/DataManager/Database.h>
 
 #define PROGRESS_CALLBACK(p) if (callback) callback(p)
 
-using polygon4::detail::Ptr;
-using polygon4::detail::CVector;
-using polygon4::detail::IObject;
-using polygon4::detail::OrderedObjectMap;
-
 template <class T>
-OrderedObjectMap getOrderedMap(const T &array)
+polygon4::detail::OrderedObjectMap getOrderedMap(const polygon4::detail::CTable<T> &array)
 {
-    OrderedObjectMap map;
+    polygon4::detail::OrderedObjectMap map;
     for (auto &v : array)
-        map.insert(std::make_pair(v.second->getName(), v.second));
+        map.insert(std::make_pair(v.second->getName(), v.second.get()));
     return map;
 }
 
 template <class T>
-OrderedObjectMap getOrderedMap(const CVector<T> &array)
-{
-    OrderedObjectMap map;
-    for (auto &v : array)
-        map.insert(std::make_pair(v->getName(), v));
-    return map;
-}
-
-template <class T>
-OrderedObjectMap getOrderedMap(const T &array, std::function<bool(Ptr<IObject>)> f)
+polygon4::detail::OrderedObjectMap getOrderedMap(const polygon4::detail::CTable<T> &array, std::function<bool(polygon4::detail::IObjectBase *)> f)
 {
     if (!f)
         return getOrderedMap(array);
     polygon4::detail::OrderedObjectMap map;
     for (auto &v : array)
     {
-        auto &value = v.second;
-        if (f(value))
-            map.insert(std::make_pair(value->getName(), value));
+        auto p = v.second.get();
+        if (f(p))
+            map.insert(std::make_pair(v->getName(), p));
     }
-    return map;
-}
-
-template <class T>
-polygon4::detail::OrderedObjectMap getOrderedMap(const polygon4::detail::CVector<T> &array, std::function<bool(Ptr<IObject>)> f)
-{
-    if (!f)
-        return getOrderedMap(array);
-    polygon4::detail::OrderedObjectMap map;
-    for (auto &v : array)
-        if (f(v))
-            map.insert(std::make_pair(v->getName(), v));
     return map;
 }
 

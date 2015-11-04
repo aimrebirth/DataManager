@@ -16,8 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Polygon4/Types.h>
+#include <Polygon4/DataManager/Types.h>
 
+#include <algorithm>
 #include <sstream>
 
 #ifdef USE_QT
@@ -29,6 +30,28 @@ namespace polygon4
 {
 
 int gCurrentLocalizationId = 0;
+
+namespace detail
+{
+
+void TreeItem::remove() const
+{
+    if (!parent)
+        return;
+    auto &v = parent->children;
+    v.erase(std::remove_if(v.begin(), v.end(), [this](const auto &c) { return c.get() == this; }), v.end());
+}
+
+void TreeItem::update()
+{
+    if (object)
+    {
+        name = object->getName();
+        type = object->getType();
+    }
+}
+
+} // namespace detail
 
 namespace detail
 {

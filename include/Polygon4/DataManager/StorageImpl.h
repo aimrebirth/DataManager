@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
+#ifdef USE_QT
+#include <qcoreapplication.h>
+#endif
 
-#include "Types.h"
-#include "Table.h"
+#include "Storage.h"
 
 namespace polygon4
 {
@@ -30,16 +30,28 @@ namespace polygon4
 namespace detail
 {
 
-typedef std::multimap<Text, Ptr<IObject>> OrderedObjectMap;
-    
-#include "detail/Storage.h"
+template <class MapObjectType, class ObjectType, typename Function>
+OrderedObjectMap getOrderedMapForObject(const std::shared_ptr<Storage> &storage, ObjectType *object, Function function)
+{
+    if (!object)
+        return OrderedObjectMap();
+    auto f = [object, function](auto o)
+    {
+        MapObjectType *mo = (MapObjectType *)o;
+        if (!mo)
+            return false;
+        return function(object, mo);
+    };
+    return storage->getOrderedMap(MapObjectType::object_type, f);
+}
 
 } // namespace detail
 
-using detail::Storage;
-class Database;
+namespace detail
+{
 
-std::shared_ptr<Storage> initStorage(std::string filename);
-std::shared_ptr<Storage> initStorage(std::shared_ptr<Database> db);
+#include "detail/StorageImpl.h"
+
+} // namespace detail
 
 } // namespace polygon4

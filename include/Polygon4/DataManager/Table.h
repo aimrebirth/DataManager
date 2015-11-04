@@ -35,15 +35,6 @@ namespace detail
 template <class T1, class T2>
 struct TablePair : public std::pair<T1, T2>
 {
-    T2 &operator->()
-    {
-        if (!second)
-        {
-            throw EXCEPTION("Trying to get empty object for id (" + std::to_string(first) + 
-                "). This should not happen. Check your database or source code");
-        }
-        return second;
-    }
     const T2 &operator->() const
     {
         if (!second)
@@ -51,11 +42,6 @@ struct TablePair : public std::pair<T1, T2>
             throw EXCEPTION("Trying to get empty object for id (" + std::to_string(first) + 
                 "). This should not happen. Check your database or source code");
         }
-        return second;
-    }
-
-    operator T2&()
-    {
         return second;
     }
     operator const T2&() const
@@ -67,16 +53,13 @@ struct TablePair : public std::pair<T1, T2>
 template <class T>
 class CTable
 {
-    friend class Storage; // ?
-    friend class StorageImpl; // ?
-
 public:
-    typedef int key_type;
-    typedef T mapped_type;
-    typedef Ptr<mapped_type> ptr_type;
-    typedef TablePair<const key_type, ptr_type> value_type;
+    using key_type = int;
+    using mapped_type = T;
+    using ptr_type = Ptr<T>;
+    using value_type = TablePair<const key_type, ptr_type>;
 
-    typedef std::unordered_map<key_type, ptr_type> container;
+    using container = std::unordered_map<key_type, ptr_type>;
     
     template <class T, class ParentType>
     class iterator_base : public std::iterator<std::bidirectional_iterator_tag, T>
@@ -99,15 +82,15 @@ public:
         ParentType i;
     };
 
-    typedef typename iterator_base<value_type, typename container::iterator> iterator;
-    typedef typename iterator_base<value_type, typename container::const_iterator> const_iterator;
+    using iterator = typename iterator_base<value_type, typename container::iterator>;
+    using const_iterator = typename iterator_base<value_type, typename container::const_iterator>;
     
 private:
     template <class T>
     struct IdHandler0
     {
         inline key_type getKey(const ptr_type &v, key_type key) const { return key; }
-        inline void setKey(ptr_type &v, key_type key) const {}
+        inline void setKey(ptr_type &v, key_type key) const { v->id = key; }
     };
     template <class T>
     struct IdHandler1
@@ -116,7 +99,7 @@ private:
         inline void setKey(ptr_type &v, key_type key) const { v->id = key; }
     };
 
-    typedef typename std::conditional<T::has_id, IdHandler1<T>, IdHandler0<T>>::type IdHandler;
+    using IdHandler = typename std::conditional<T::has_id, IdHandler1<T>, IdHandler0<T>>::type;
     
 public:
 	CTable(){}
@@ -126,13 +109,13 @@ public:
     // create value
     ptr_type create()
     {
-        return std::make_shared<mapped_type>();
+        return T::create<T>();
     }
 
     // create value and append it to the end of container
     ptr_type createAtEnd()
     {
-        auto v = std::make_shared<mapped_type>();
+        auto v = create();
         idHandler.setKey(v, maxId);
         return data[maxId++] = v;
     }
@@ -144,14 +127,14 @@ public:
         if (key < 1)
         {
             throw EXCEPTION("Bad id (" + std::to_string(key) + ") < 1 detected. Table: '" + name + "'" +
-                ", value: '" + v->getName().string() + "'");
+                ", value: '" + to_string(v->getName()) + "'");
         }
         auto old = data.find(key);
         if (old != data.end())
         {
             throw EXCEPTION("Duplicate key (" + std::to_string(key) + ") detected. Table '" + name + "'" +
-                ", old value: '" + old->second->getName().string() + "'" +
-                ", new value: '" + old->second->getName().string() + "'");
+                ", old value: '" + to_string(old->second->getName()) + "'" +
+                ", new value: '" + to_string(old->second->getName()) + "'");
         }
         if (key < maxId)
             data[key] = v;
@@ -193,13 +176,26 @@ public: // container interface
 
     bool empty() const { data.empty(); }
     void clear() { data.clear(); }
-    
+
+    size_t erase(const ptr_type &v)
+    {
+        size_t erased = 0;
+        while (1)
+        {
+            auto i = find_if(data.begin(), data.end(), [v](const auto &p) { return p.second == v; });
+            if (i == data.end())
+                break;
+            data.erase(i);
+            erased++;
+        }
+        return erased;
+    }
     size_t erase(const mapped_type *v)
     {
         size_t erased = 0;
         while (1)
         {
-            auto i = find_if(data.begin(), data.end(), [v](const value_type &p){ return p->get() == v; });
+            auto i = find_if(data.begin(), data.end(), [v](const auto &p){ return p.second.ptr.get() == v; });
             if (i == data.end())
                 break;
             data.erase(i);
@@ -211,10 +207,10 @@ public: // container interface
     {
         return data.erase(i);
     }
-    template <typename T>
-    iterator erase(const T &i)
+
+    void setName(const std::string &name)
     {
-        return data.erase((const container::iterator &)i);
+        this->name = name;
     }
 
 private:
