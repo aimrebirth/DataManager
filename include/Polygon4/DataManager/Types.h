@@ -23,10 +23,19 @@
 #include <memory>
 #include <stdint.h>
 #include <vector>
+#include <unordered_map>
 
 #include "Exception.h"
 #include "String.h"
 #include "Vector.h"
+
+namespace polygon4
+{
+    namespace detail
+    {
+        using EnumType = uint32_t;
+    }
+}
 
 #include "detail/ObjectTypes.h"
 
@@ -49,7 +58,6 @@ namespace detail
 using std::to_string;
 
 using Text = String;
-using EnumType = uint32_t;
 
 template <class T>
 using Ptr = std::shared_ptr<T>;
@@ -159,9 +167,58 @@ struct IdPtr
     int id = 0;
     IObjectBase *ptr = nullptr;
 
-    T *operator->()
+    IdPtr()
     {
+    }
+    IdPtr(IObjectBase *p)
+        : ptr(p)
+    {
+        if (ptr)
+            id = ptr->id;
+    }
+    IdPtr(const Ptr<T> &p)
+        : IdPtr(p.get())
+    {
+    }
+
+    IdPtr &operator=(int i)
+    {
+        id = i;
+        return *this;
+    }
+    template <class V>
+    IdPtr &operator=(const IdPtr<V> &rhs)
+    {
+        id = rhs.id;
+        return *this = rhs.ptr;
+    }
+    IdPtr &operator=(const Ptr<T> &rhs)
+    {
+        return *this = rhs.get();
+    }
+    IdPtr &operator=(IObjectBase *rhs)
+    {
+        ptr = rhs;
+        if (ptr)
+            id = ptr->id;
+        return *this;
+    }
+
+    T *operator->() const
+    {
+        if (ptr == nullptr)
+            throw EXCEPTION("Value is not present");
         return (T *)ptr;
+    }
+
+    bool operator==(const IdPtr &rhs) const
+    {
+        return id == rhs.id && ptr == rhs.ptr;
+    }
+
+    operator bool() const
+    {
+        return ptr != nullptr;
     }
 };
 
@@ -183,6 +240,24 @@ inline Text to_wstring(const Ptr<T> &ptr)
         return std::to_wstring(ptr->getName());
     return Text();
 }
+
+template<class T>
+inline Text to_string(const IdPtr<T> &ptr)
+{
+    if (ptr.ptr)
+        return std::to_string(ptr.ptr->getName());
+    return Text();
+}
+
+template<class T>
+inline Text to_wstring(const IdPtr<T> &ptr)
+{
+    if (ptr.ptr)
+        return std::to_wstring(ptr.ptr->getName());
+    return Text();
+}
+
+bool to_bool(const std::string &s);
 
 } // namespace detail
 

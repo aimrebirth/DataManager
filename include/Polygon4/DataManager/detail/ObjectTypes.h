@@ -8,7 +8,7 @@ namespace polygon4
 namespace detail
 {
 
-enum class EObjectType : int
+enum class EObjectType : EnumType
 {
     None,
     Building,

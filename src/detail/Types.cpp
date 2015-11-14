@@ -760,7 +760,7 @@ bool ConfigurationEquipment::operator==(const ConfigurationEquipment &rhs) const
         1;
 }
 
-Ptr<Configuration> ConfigurationEquipment::operator->() const
+IdPtr<Configuration> ConfigurationEquipment::operator->() const
 {
     if (configuration)
         return configuration;
@@ -878,7 +878,7 @@ bool ConfigurationGood::operator==(const ConfigurationGood &rhs) const
         1;
 }
 
-Ptr<Configuration> ConfigurationGood::operator->() const
+IdPtr<Configuration> ConfigurationGood::operator->() const
 {
     if (configuration)
         return configuration;
@@ -996,7 +996,7 @@ bool ConfigurationProjectile::operator==(const ConfigurationProjectile &rhs) con
         1;
 }
 
-Ptr<Configuration> ConfigurationProjectile::operator->() const
+IdPtr<Configuration> ConfigurationProjectile::operator->() const
 {
     if (configuration)
         return configuration;
@@ -1114,7 +1114,7 @@ bool ConfigurationWeapon::operator==(const ConfigurationWeapon &rhs) const
         1;
 }
 
-Ptr<Configuration> ConfigurationWeapon::operator->() const
+IdPtr<Configuration> ConfigurationWeapon::operator->() const
 {
     if (configuration)
         return configuration;
@@ -1244,13 +1244,13 @@ void Equipment::setVariableString(int columnId, const Text &text)
         this->value3 = std::stof(to_string(text));
         break;
     case 12:
-        this->manual = std::stoi(to_string(text));
+        this->manual = to_bool(to_string(text));
         break;
     case 13:
         this->price = std::stof(to_string(text));
         break;
     case 14:
-        this->notrade = std::stoi(to_string(text));
+        this->notrade = to_bool(to_string(text));
         break;
     default:
         break;
@@ -1462,7 +1462,7 @@ void Glider::setVariableString(int columnId, const Text &text)
         this->power = std::stof(to_string(text));
         break;
     case 11:
-        this->special = std::stoi(to_string(text));
+        this->special = to_bool(to_string(text));
         break;
     case 12:
         this->rotatespeed = std::stof(to_string(text));
@@ -1683,7 +1683,7 @@ void Good::setVariableString(int columnId, const Text &text)
         this->weight = std::stof(to_string(text));
         break;
     case 7:
-        this->notrade = std::stoi(to_string(text));
+        this->notrade = to_bool(to_string(text));
         break;
     case 8:
         this->type = std::stoi(to_string(text));
@@ -1985,7 +1985,7 @@ bool GroupMechanoid::operator==(const GroupMechanoid &rhs) const
         1;
 }
 
-Ptr<Group> GroupMechanoid::operator->() const
+IdPtr<Group> GroupMechanoid::operator->() const
 {
     if (group)
         return group;
@@ -2338,7 +2338,7 @@ void MapBuilding::setVariableString(int columnId, const Text &text)
         this->scale_z = std::stof(to_string(text));
         break;
     case 15:
-        this->interactive = std::stoi(to_string(text));
+        this->interactive = to_bool(to_string(text));
         break;
     default:
         break;
@@ -2442,13 +2442,13 @@ Ptr<TreeItem> MapBuilding::printTree() const
 Text MapBuilding::getName() const
 {
     Text s;
-    s = text_id;
+    s = to_string(building);
     if (!s.empty())
         return s;
     s = to_string(name);
     if (!s.empty())
         return s;
-    s = to_string(building);
+    s = text_id;
     if (!s.empty())
         return s;
     return IObjectBase::getName();
@@ -2621,7 +2621,7 @@ bool MapBuildingEquipment::operator==(const MapBuildingEquipment &rhs) const
         1;
 }
 
-Ptr<MapBuilding> MapBuildingEquipment::operator->() const
+IdPtr<MapBuilding> MapBuildingEquipment::operator->() const
 {
     if (map_building)
         return map_building;
@@ -2739,7 +2739,7 @@ bool MapBuildingGlider::operator==(const MapBuildingGlider &rhs) const
         1;
 }
 
-Ptr<MapBuilding> MapBuildingGlider::operator->() const
+IdPtr<MapBuilding> MapBuildingGlider::operator->() const
 {
     if (map_building)
         return map_building;
@@ -2857,7 +2857,7 @@ bool MapBuildingGood::operator==(const MapBuildingGood &rhs) const
         1;
 }
 
-Ptr<MapBuilding> MapBuildingGood::operator->() const
+IdPtr<MapBuilding> MapBuildingGood::operator->() const
 {
     if (map_building)
         return map_building;
@@ -2975,7 +2975,7 @@ bool MapBuildingModificator::operator==(const MapBuildingModificator &rhs) const
         1;
 }
 
-Ptr<MapBuilding> MapBuildingModificator::operator->() const
+IdPtr<MapBuilding> MapBuildingModificator::operator->() const
 {
     if (map_building)
         return map_building;
@@ -3093,7 +3093,7 @@ bool MapBuildingProjectile::operator==(const MapBuildingProjectile &rhs) const
         1;
 }
 
-Ptr<MapBuilding> MapBuildingProjectile::operator->() const
+IdPtr<MapBuilding> MapBuildingProjectile::operator->() const
 {
     if (map_building)
         return map_building;
@@ -3211,7 +3211,7 @@ bool MapBuildingWeapon::operator==(const MapBuildingWeapon &rhs) const
         1;
 }
 
-Ptr<MapBuilding> MapBuildingWeapon::operator->() const
+IdPtr<MapBuilding> MapBuildingWeapon::operator->() const
 {
     if (map_building)
         return map_building;
@@ -3369,10 +3369,10 @@ Ptr<TreeItem> MapGood::printTree() const
 Text MapGood::getName() const
 {
     Text s;
-    s = text_id;
+    s = to_string(good);
     if (!s.empty())
         return s;
-    s = to_string(good);
+    s = text_id;
     if (!s.empty())
         return s;
     return IObjectBase::getName();
@@ -3571,6 +3571,9 @@ Ptr<TreeItem> MapObject::printTree() const
 Text MapObject::getName() const
 {
     Text s;
+    s = to_string(object);
+    if (!s.empty())
+        return s;
     s = text_id;
     if (!s.empty())
         return s;
@@ -4012,7 +4015,7 @@ bool MechanoidQuest::operator==(const MechanoidQuest &rhs) const
         1;
 }
 
-Ptr<Mechanoid> MechanoidQuest::operator->() const
+IdPtr<Mechanoid> MechanoidQuest::operator->() const
 {
     if (mechanoid)
         return mechanoid;
@@ -4298,10 +4301,8 @@ Text ModificationMap::getVariableString(int columnId) const
     switch (columnId)
     {
     case 0:
-        return to_string(id);
-    case 1:
         return to_string(modification);
-    case 2:
+    case 1:
         return to_string(map);
     default:
         return "";
@@ -4313,9 +4314,6 @@ void ModificationMap::setVariableString(int columnId, const Text &text)
 {
     switch (columnId)
     {
-    case 0:
-        this->id = std::stoi(to_string(text));
-        break;
     default:
         break;
     };
@@ -4325,10 +4323,10 @@ void ModificationMap::setVariableString(int columnId, IObjectBase *ptr)
 {
     switch (columnId)
     {
-    case 1:
+    case 0:
         modification = std::static_pointer_cast<Modification>(std::shared_ptr<IObjectBase>(ptr, [](auto p){}));
         break;
-    case 2:
+    case 1:
         map = std::static_pointer_cast<Map>(std::shared_ptr<IObjectBase>(ptr, [](auto p){}));
         break;
     default:
@@ -4347,6 +4345,9 @@ Text ModificationMap::getName() const
     s = to_string(map);
     if (!s.empty())
         return s;
+    s = to_string(modification);
+    if (!s.empty())
+        return s;
     return IObjectBase::getName();
 }
 
@@ -4358,16 +4359,15 @@ bool ModificationMap::operator==(const ModificationMap &rhs) const
         1;
 }
 
-Ptr<Map> ModificationMap::operator->() const
+IdPtr<Modification> ModificationMap::operator->() const
 {
-    if (map)
-        return map;
+    if (modification)
+        return modification;
     throw EXCEPTION("Value is missing");
 }
 
 void ModificationMap::copyFrom(const ModificationMap &rhs)
 {
-    id = rhs.id;
     modification = rhs.modification;
     map = rhs.map;
 }
@@ -4377,10 +4377,9 @@ const char *ModificationMap::getSql()
     return
     " \
 create table \"ModificationMaps\" ( \
-\"id\" INTEGER, \
 \"modification_id\" INTEGER, \
 \"map_id\" INTEGER, \
-PRIMARY KEY (\"id\"), \
+PRIMARY KEY (\"modification_id\", \"map_id\"), \
 FOREIGN KEY (\"modification_id\") REFERENCES \"Modifications\" (\"id\"), \
 FOREIGN KEY (\"map_id\") REFERENCES \"Maps\" (\"id\") \
 ); \
@@ -4955,7 +4954,7 @@ void Projectile::setVariableString(int columnId, const Text &text)
         this->price = std::stof(to_string(text));
         break;
     case 18:
-        this->notrade = std::stoi(to_string(text));
+        this->notrade = to_bool(to_string(text));
         break;
     default:
         break;
@@ -5531,7 +5530,7 @@ bool QuestRewardEquipment::operator==(const QuestRewardEquipment &rhs) const
         1;
 }
 
-Ptr<QuestReward> QuestRewardEquipment::operator->() const
+IdPtr<QuestReward> QuestRewardEquipment::operator->() const
 {
     if (quest_reward)
         return quest_reward;
@@ -5649,7 +5648,7 @@ bool QuestRewardGlider::operator==(const QuestRewardGlider &rhs) const
         1;
 }
 
-Ptr<QuestReward> QuestRewardGlider::operator->() const
+IdPtr<QuestReward> QuestRewardGlider::operator->() const
 {
     if (quest_reward)
         return quest_reward;
@@ -5767,7 +5766,7 @@ bool QuestRewardGood::operator==(const QuestRewardGood &rhs) const
         1;
 }
 
-Ptr<QuestReward> QuestRewardGood::operator->() const
+IdPtr<QuestReward> QuestRewardGood::operator->() const
 {
     if (quest_reward)
         return quest_reward;
@@ -5885,7 +5884,7 @@ bool QuestRewardModificator::operator==(const QuestRewardModificator &rhs) const
         1;
 }
 
-Ptr<QuestReward> QuestRewardModificator::operator->() const
+IdPtr<QuestReward> QuestRewardModificator::operator->() const
 {
     if (quest_reward)
         return quest_reward;
@@ -6003,7 +6002,7 @@ bool QuestRewardProjectile::operator==(const QuestRewardProjectile &rhs) const
         1;
 }
 
-Ptr<QuestReward> QuestRewardProjectile::operator->() const
+IdPtr<QuestReward> QuestRewardProjectile::operator->() const
 {
     if (quest_reward)
         return quest_reward;
@@ -6121,7 +6120,7 @@ bool QuestRewardReputation::operator==(const QuestRewardReputation &rhs) const
         1;
 }
 
-Ptr<QuestReward> QuestRewardReputation::operator->() const
+IdPtr<QuestReward> QuestRewardReputation::operator->() const
 {
     if (quest_reward)
         return quest_reward;
@@ -6239,7 +6238,7 @@ bool QuestRewardWeapon::operator==(const QuestRewardWeapon &rhs) const
         1;
 }
 
-Ptr<QuestReward> QuestRewardWeapon::operator->() const
+IdPtr<QuestReward> QuestRewardWeapon::operator->() const
 {
     if (quest_reward)
         return quest_reward;
@@ -6970,7 +6969,7 @@ void Weapon::setVariableString(int columnId, const Text &text)
         this->inside_z = std::stof(to_string(text));
         break;
     case 33:
-        this->notrade = std::stoi(to_string(text));
+        this->notrade = to_bool(to_string(text));
         break;
     default:
         break;

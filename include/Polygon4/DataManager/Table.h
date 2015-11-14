@@ -58,7 +58,6 @@ public:
     using mapped_type = T;
     using ptr_type = Ptr<T>;
     using value_type = TablePair<const key_type, ptr_type>;
-
     using container = std::unordered_map<key_type, ptr_type>;
     
     template <class T, class ParentType>
@@ -100,10 +99,6 @@ private:
     };
 
     using IdHandler = typename std::conditional<T::has_id, IdHandler1<T>, IdHandler0<T>>::type;
-    
-public:
-	CTable(){}
-	~CTable(){}
 
 public:
     // create value
@@ -176,6 +171,7 @@ public: // container interface
 
     bool empty() const { data.empty(); }
     void clear() { data.clear(); }
+    size_t count(const key_type &k) const { return data.count(k); }
 
     size_t erase(const ptr_type &v)
     {

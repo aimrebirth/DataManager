@@ -108,9 +108,9 @@ class DLL_EXPORT Clan : public IClan
 public:
     Text text_id;
     Text resource;
-    Ptr<String> name;
-    Ptr<String> member_name;
-    Ptr<Modification> modification;
+    IdPtr<String> name;
+    IdPtr<String> member_name;
+    IdPtr<Modification> modification;
     int32_t bonusexp = 0;
     int32_t bonusrepair = 0;
     int32_t bonustrade = 0;
@@ -182,8 +182,8 @@ class DLL_EXPORT ClanReputation : public IClanReputation
 {
     // data
 public:
-    Ptr<Clan> clan1;
-    Ptr<Clan> clan2;
+    IdPtr<Clan> clan1;
+    IdPtr<Clan> clan2;
     float reputation = 0.0f;
 
     // constructors
@@ -225,8 +225,8 @@ class DLL_EXPORT Configuration : public IConfiguration
     // data
 public:
     Text text_id;
-    Ptr<String> name;
-    Ptr<Glider> glider;
+    IdPtr<String> name;
+    IdPtr<Glider> glider;
 
     Ptr<CTable<ConfigurationEquipment>> equipments;
     Ptr<CTable<ConfigurationGood>> goods;
@@ -312,8 +312,8 @@ class DLL_EXPORT ConfigurationEquipment : public IConfigurationEquipment
 {
     // data
 public:
-    Ptr<Configuration> configuration;
-    Ptr<Equipment> equipment;
+    IdPtr<Configuration> configuration;
+    IdPtr<Equipment> equipment;
     int32_t quantity = 0;
 
     // constructors
@@ -335,7 +335,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const ConfigurationEquipment &rhs) const;
-    Ptr<Configuration> operator->() const;
+    IdPtr<Configuration> operator->() const;
 
 private:
     void copyFrom(const ConfigurationEquipment &rhs);
@@ -355,8 +355,8 @@ class DLL_EXPORT ConfigurationGood : public IConfigurationGood
 {
     // data
 public:
-    Ptr<Configuration> configuration;
-    Ptr<Good> good;
+    IdPtr<Configuration> configuration;
+    IdPtr<Good> good;
     int32_t quantity = 0;
 
     // constructors
@@ -378,7 +378,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const ConfigurationGood &rhs) const;
-    Ptr<Configuration> operator->() const;
+    IdPtr<Configuration> operator->() const;
 
 private:
     void copyFrom(const ConfigurationGood &rhs);
@@ -398,8 +398,8 @@ class DLL_EXPORT ConfigurationProjectile : public IConfigurationProjectile
 {
     // data
 public:
-    Ptr<Configuration> configuration;
-    Ptr<Projectile> projectile;
+    IdPtr<Configuration> configuration;
+    IdPtr<Projectile> projectile;
     int32_t quantity = 0;
 
     // constructors
@@ -421,7 +421,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const ConfigurationProjectile &rhs) const;
-    Ptr<Configuration> operator->() const;
+    IdPtr<Configuration> operator->() const;
 
 private:
     void copyFrom(const ConfigurationProjectile &rhs);
@@ -441,8 +441,8 @@ class DLL_EXPORT ConfigurationWeapon : public IConfigurationWeapon
 {
     // data
 public:
-    Ptr<Configuration> configuration;
-    Ptr<Weapon> weapon;
+    IdPtr<Configuration> configuration;
+    IdPtr<Weapon> weapon;
     int32_t quantity = 0;
 
     // constructors
@@ -464,7 +464,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const ConfigurationWeapon &rhs) const;
-    Ptr<Configuration> operator->() const;
+    IdPtr<Configuration> operator->() const;
 
 private:
     void copyFrom(const ConfigurationWeapon &rhs);
@@ -486,7 +486,7 @@ class DLL_EXPORT Equipment : public IEquipment
 public:
     Text text_id;
     Text resource;
-    Ptr<String> name;
+    IdPtr<String> name;
     int32_t type = 0;
     int32_t standard = 0;
     float weight = 0.0f;
@@ -495,9 +495,9 @@ public:
     float value1 = 0.0f;
     float value2 = 0.0f;
     float value3 = 0.0f;
-    int32_t manual = 0;
+    bool manual;
     float price = 0.0f;
-    int32_t notrade = 0;
+    bool notrade;
 
     // constructors
 public:
@@ -539,7 +539,7 @@ class DLL_EXPORT Glider : public IGlider
 public:
     Text text_id;
     Text resource;
-    Ptr<String> name;
+    IdPtr<String> name;
     int32_t standard = 0;
     float weight = 0.0f;
     float maxweight = 0.0f;
@@ -547,7 +547,7 @@ public:
     float price = 0.0f;
     float restore = 0.0f;
     float power = 0.0f;
-    int32_t special = 0;
+    bool special;
     float rotatespeed = 0.0f;
     float resfront = 0.0f;
     float resstop = 0.0f;
@@ -599,10 +599,10 @@ public:
     Text text_id;
     Text resource;
     Text resource_drop;
-    Ptr<String> name;
+    IdPtr<String> name;
     float price = 0.0f;
     float weight = 0.0f;
-    int32_t notrade = 0;
+    bool notrade;
     int32_t type = 0;
 
     // constructors
@@ -644,7 +644,7 @@ class DLL_EXPORT Group : public IGroup
     // data
 public:
     Text text_id;
-    Ptr<String> name;
+    IdPtr<String> name;
 
     Ptr<CTable<GroupMechanoid>> mechanoids;
 
@@ -697,8 +697,8 @@ class DLL_EXPORT GroupMechanoid : public IGroupMechanoid
 {
     // data
 public:
-    Ptr<Group> group;
-    Ptr<Mechanoid> mechanoid;
+    IdPtr<Group> group;
+    IdPtr<Mechanoid> mechanoid;
 
     // constructors
 public:
@@ -719,7 +719,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const GroupMechanoid &rhs) const;
-    Ptr<Group> operator->() const;
+    IdPtr<Group> operator->() const;
 
 private:
     void copyFrom(const GroupMechanoid &rhs);
@@ -741,7 +741,7 @@ class DLL_EXPORT Map : public IMap
 public:
     Text text_id;
     Text resource;
-    Ptr<String> name;
+    IdPtr<String> name;
     float h_min = 0.0f;
     float h_max = 0.0f;
     float kx = 0.0f;
@@ -823,9 +823,9 @@ class DLL_EXPORT MapBuilding : public IMapBuilding
     // data
 public:
     Text text_id;
-    Ptr<String> name;
-    Ptr<Map> map;
-    Ptr<Building> building;
+    IdPtr<String> name;
+    IdPtr<Map> map;
+    IdPtr<Building> building;
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
@@ -836,7 +836,7 @@ public:
     float scale_x = 1;
     float scale_y = 1;
     float scale_z = 1;
-    int32_t interactive = 0;
+    bool interactive;
 
     Ptr<CTable<MapBuildingEquipment>> equipments;
     Ptr<CTable<MapBuildingGlider>> gliders;
@@ -944,8 +944,8 @@ class DLL_EXPORT MapBuildingEquipment : public IMapBuildingEquipment
 {
     // data
 public:
-    Ptr<MapBuilding> map_building;
-    Ptr<Equipment> equipment;
+    IdPtr<MapBuilding> map_building;
+    IdPtr<Equipment> equipment;
     int32_t quantity = 0;
 
     // constructors
@@ -967,7 +967,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const MapBuildingEquipment &rhs) const;
-    Ptr<MapBuilding> operator->() const;
+    IdPtr<MapBuilding> operator->() const;
 
 private:
     void copyFrom(const MapBuildingEquipment &rhs);
@@ -987,8 +987,8 @@ class DLL_EXPORT MapBuildingGlider : public IMapBuildingGlider
 {
     // data
 public:
-    Ptr<MapBuilding> map_building;
-    Ptr<Glider> glider;
+    IdPtr<MapBuilding> map_building;
+    IdPtr<Glider> glider;
     int32_t quantity = 0;
 
     // constructors
@@ -1010,7 +1010,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const MapBuildingGlider &rhs) const;
-    Ptr<MapBuilding> operator->() const;
+    IdPtr<MapBuilding> operator->() const;
 
 private:
     void copyFrom(const MapBuildingGlider &rhs);
@@ -1030,8 +1030,8 @@ class DLL_EXPORT MapBuildingGood : public IMapBuildingGood
 {
     // data
 public:
-    Ptr<MapBuilding> map_building;
-    Ptr<Good> good;
+    IdPtr<MapBuilding> map_building;
+    IdPtr<Good> good;
     int32_t quantity = 0;
 
     // constructors
@@ -1053,7 +1053,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const MapBuildingGood &rhs) const;
-    Ptr<MapBuilding> operator->() const;
+    IdPtr<MapBuilding> operator->() const;
 
 private:
     void copyFrom(const MapBuildingGood &rhs);
@@ -1073,8 +1073,8 @@ class DLL_EXPORT MapBuildingModificator : public IMapBuildingModificator
 {
     // data
 public:
-    Ptr<MapBuilding> map_building;
-    Ptr<Modificator> modificator;
+    IdPtr<MapBuilding> map_building;
+    IdPtr<Modificator> modificator;
     int32_t quantity = 0;
 
     // constructors
@@ -1096,7 +1096,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const MapBuildingModificator &rhs) const;
-    Ptr<MapBuilding> operator->() const;
+    IdPtr<MapBuilding> operator->() const;
 
 private:
     void copyFrom(const MapBuildingModificator &rhs);
@@ -1116,8 +1116,8 @@ class DLL_EXPORT MapBuildingProjectile : public IMapBuildingProjectile
 {
     // data
 public:
-    Ptr<MapBuilding> map_building;
-    Ptr<Projectile> projectile;
+    IdPtr<MapBuilding> map_building;
+    IdPtr<Projectile> projectile;
     int32_t quantity = 0;
 
     // constructors
@@ -1139,7 +1139,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const MapBuildingProjectile &rhs) const;
-    Ptr<MapBuilding> operator->() const;
+    IdPtr<MapBuilding> operator->() const;
 
 private:
     void copyFrom(const MapBuildingProjectile &rhs);
@@ -1159,8 +1159,8 @@ class DLL_EXPORT MapBuildingWeapon : public IMapBuildingWeapon
 {
     // data
 public:
-    Ptr<MapBuilding> map_building;
-    Ptr<Weapon> weapon;
+    IdPtr<MapBuilding> map_building;
+    IdPtr<Weapon> weapon;
     int32_t quantity = 0;
 
     // constructors
@@ -1182,7 +1182,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const MapBuildingWeapon &rhs) const;
-    Ptr<MapBuilding> operator->() const;
+    IdPtr<MapBuilding> operator->() const;
 
 private:
     void copyFrom(const MapBuildingWeapon &rhs);
@@ -1203,8 +1203,8 @@ class DLL_EXPORT MapGood : public IMapGood
     // data
 public:
     Text text_id;
-    Ptr<Map> map;
-    Ptr<Good> good;
+    IdPtr<Map> map;
+    IdPtr<Good> good;
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
@@ -1255,8 +1255,8 @@ class DLL_EXPORT MapObject : public IMapObject
     // data
 public:
     Text text_id;
-    Ptr<Map> map;
-    Ptr<Object> object;
+    IdPtr<Map> map;
+    IdPtr<Object> object;
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
@@ -1307,13 +1307,13 @@ class DLL_EXPORT Mechanoid : public IMechanoid
     // data
 public:
     Text text_id;
-    Ptr<String> name;
-    Ptr<Modification> modification;
-    Ptr<ModificationMap> map;
-    Ptr<Clan> clan;
-    Ptr<MapBuilding> building;
-    Ptr<Configuration> configuration;
-    Ptr<Group> group;
+    IdPtr<String> name;
+    IdPtr<Modification> modification;
+    IdPtr<ModificationMap> map;
+    IdPtr<Clan> clan;
+    IdPtr<MapBuilding> building;
+    IdPtr<Configuration> configuration;
+    IdPtr<Group> group;
     int32_t generation = 0;
     float money = 0.0f;
     float rating = 0.0f;
@@ -1378,8 +1378,8 @@ class DLL_EXPORT MechanoidQuest : public IMechanoidQuest
 {
     // data
 public:
-    Ptr<Mechanoid> mechanoid;
-    Ptr<Quest> quest;
+    IdPtr<Mechanoid> mechanoid;
+    IdPtr<Quest> quest;
     int32_t state = 0;
 
     // constructors
@@ -1401,7 +1401,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const MechanoidQuest &rhs) const;
-    Ptr<Mechanoid> operator->() const;
+    IdPtr<Mechanoid> operator->() const;
 
 private:
     void copyFrom(const MechanoidQuest &rhs);
@@ -1421,7 +1421,7 @@ class DLL_EXPORT Modification : public IModification
 {
     // data
 public:
-    Ptr<String> name;
+    IdPtr<String> name;
     Text directory;
     Text author;
     Text date_created;
@@ -1430,8 +1430,8 @@ public:
     Text version;
     Text script_language;
     Text script_main;
-    Ptr<Mechanoid> player_mechanoid;
-    Ptr<Configuration> cooperative_player_configuration;
+    IdPtr<Mechanoid> player_mechanoid;
+    IdPtr<Configuration> cooperative_player_configuration;
 
     Ptr<CTable<ModificationMap>> maps;
     Ptr<CTable<Clan>> clans;
@@ -1463,7 +1463,7 @@ protected:
     {
         for (auto &v : *maps)
         {
-            auto p = v->map.get();
+            auto p = v->modification.get();
             p->replace<T>(p, std::forward<Args>(args)...);
         }
     }
@@ -1506,8 +1506,8 @@ class DLL_EXPORT ModificationMap : public IModificationMap
 {
     // data
 public:
-    Ptr<Modification> modification;
-    Ptr<Map> map;
+    IdPtr<Modification> modification;
+    IdPtr<Map> map;
 
     // constructors
 public:
@@ -1528,7 +1528,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const ModificationMap &rhs) const;
-    Ptr<Map> operator->() const;
+    IdPtr<Modification> operator->() const;
 
 private:
     void copyFrom(const ModificationMap &rhs);
@@ -1539,7 +1539,7 @@ private:
 
 public:
     static const EObjectType object_type = EObjectType::ModificationMap;
-    static const bool has_id = true;
+    static const bool has_id = false;
 
     static const char *getSql();
 };
@@ -1550,7 +1550,7 @@ class DLL_EXPORT Modificator : public IModificator
 public:
     Text text_id;
     Text resource;
-    Ptr<String> name;
+    IdPtr<String> name;
     float probability = 0.0f;
     float price = 0.0f;
     float k_price = 0.0f;
@@ -1599,7 +1599,7 @@ class DLL_EXPORT Object : public IObject
 public:
     Text text_id;
     Text resource;
-    Ptr<String> name;
+    IdPtr<String> name;
     int32_t type = 0;
     float scale = 1;
     float scale_x = 1;
@@ -1644,7 +1644,7 @@ class DLL_EXPORT Player : public IPlayer
 {
     // data
 public:
-    Ptr<Mechanoid> mechanoid;
+    IdPtr<Mechanoid> mechanoid;
 
     // constructors
 public:
@@ -1686,7 +1686,7 @@ class DLL_EXPORT Projectile : public IProjectile
 public:
     Text text_id;
     Text resource;
-    Ptr<String> name;
+    IdPtr<String> name;
     int32_t type = 0;
     int32_t subtype = 0;
     float weight = 0.0f;
@@ -1701,7 +1701,7 @@ public:
     float distance_detonation = 0.0f;
     float strength = 0.0f;
     float price = 0.0f;
-    int32_t notrade = 0;
+    bool notrade;
 
     // constructors
 public:
@@ -1741,9 +1741,9 @@ class DLL_EXPORT Quest : public IQuest
 {
     // data
 public:
-    Ptr<String> name;
-    Ptr<String> title;
-    Ptr<String> description;
+    IdPtr<String> name;
+    IdPtr<String> title;
+    IdPtr<String> description;
     int32_t time = 0;
 
     Ptr<CTable<QuestReward>> rewards;
@@ -1798,7 +1798,7 @@ class DLL_EXPORT QuestReward : public IQuestReward
     // data
 public:
     Text text_id;
-    Ptr<Quest> quest;
+    IdPtr<Quest> quest;
     float money = 0.0f;
     float rating = 0.0f;
 
@@ -1919,8 +1919,8 @@ class DLL_EXPORT QuestRewardEquipment : public IQuestRewardEquipment
 {
     // data
 public:
-    Ptr<QuestReward> quest_reward;
-    Ptr<Equipment> equipment;
+    IdPtr<QuestReward> quest_reward;
+    IdPtr<Equipment> equipment;
     int32_t quantity = 0;
 
     // constructors
@@ -1942,7 +1942,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const QuestRewardEquipment &rhs) const;
-    Ptr<QuestReward> operator->() const;
+    IdPtr<QuestReward> operator->() const;
 
 private:
     void copyFrom(const QuestRewardEquipment &rhs);
@@ -1962,8 +1962,8 @@ class DLL_EXPORT QuestRewardGlider : public IQuestRewardGlider
 {
     // data
 public:
-    Ptr<QuestReward> quest_reward;
-    Ptr<Glider> glider;
+    IdPtr<QuestReward> quest_reward;
+    IdPtr<Glider> glider;
     int32_t quantity = 0;
 
     // constructors
@@ -1985,7 +1985,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const QuestRewardGlider &rhs) const;
-    Ptr<QuestReward> operator->() const;
+    IdPtr<QuestReward> operator->() const;
 
 private:
     void copyFrom(const QuestRewardGlider &rhs);
@@ -2005,8 +2005,8 @@ class DLL_EXPORT QuestRewardGood : public IQuestRewardGood
 {
     // data
 public:
-    Ptr<QuestReward> quest_reward;
-    Ptr<Good> good;
+    IdPtr<QuestReward> quest_reward;
+    IdPtr<Good> good;
     int32_t quantity = 0;
 
     // constructors
@@ -2028,7 +2028,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const QuestRewardGood &rhs) const;
-    Ptr<QuestReward> operator->() const;
+    IdPtr<QuestReward> operator->() const;
 
 private:
     void copyFrom(const QuestRewardGood &rhs);
@@ -2048,8 +2048,8 @@ class DLL_EXPORT QuestRewardModificator : public IQuestRewardModificator
 {
     // data
 public:
-    Ptr<QuestReward> quest_reward;
-    Ptr<Modificator> modificator;
+    IdPtr<QuestReward> quest_reward;
+    IdPtr<Modificator> modificator;
     int32_t quantity = 0;
 
     // constructors
@@ -2071,7 +2071,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const QuestRewardModificator &rhs) const;
-    Ptr<QuestReward> operator->() const;
+    IdPtr<QuestReward> operator->() const;
 
 private:
     void copyFrom(const QuestRewardModificator &rhs);
@@ -2091,8 +2091,8 @@ class DLL_EXPORT QuestRewardProjectile : public IQuestRewardProjectile
 {
     // data
 public:
-    Ptr<QuestReward> quest_reward;
-    Ptr<Projectile> projectile;
+    IdPtr<QuestReward> quest_reward;
+    IdPtr<Projectile> projectile;
     int32_t quantity = 0;
 
     // constructors
@@ -2114,7 +2114,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const QuestRewardProjectile &rhs) const;
-    Ptr<QuestReward> operator->() const;
+    IdPtr<QuestReward> operator->() const;
 
 private:
     void copyFrom(const QuestRewardProjectile &rhs);
@@ -2134,8 +2134,8 @@ class DLL_EXPORT QuestRewardReputation : public IQuestRewardReputation
 {
     // data
 public:
-    Ptr<QuestReward> quest_reward;
-    Ptr<Clan> clan;
+    IdPtr<QuestReward> quest_reward;
+    IdPtr<Clan> clan;
     float quantity = 0.0f;
 
     // constructors
@@ -2157,7 +2157,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const QuestRewardReputation &rhs) const;
-    Ptr<QuestReward> operator->() const;
+    IdPtr<QuestReward> operator->() const;
 
 private:
     void copyFrom(const QuestRewardReputation &rhs);
@@ -2177,8 +2177,8 @@ class DLL_EXPORT QuestRewardWeapon : public IQuestRewardWeapon
 {
     // data
 public:
-    Ptr<QuestReward> quest_reward;
-    Ptr<Weapon> weapon;
+    IdPtr<QuestReward> quest_reward;
+    IdPtr<Weapon> weapon;
     int32_t quantity = 0;
 
     // constructors
@@ -2200,7 +2200,7 @@ public:
     virtual Text getName() const override;
 
     bool operator==(const QuestRewardWeapon &rhs) const;
-    Ptr<QuestReward> operator->() const;
+    IdPtr<QuestReward> operator->() const;
 
 private:
     void copyFrom(const QuestRewardWeapon &rhs);
@@ -2264,7 +2264,7 @@ class DLL_EXPORT Setting : public ISetting
     // data
 public:
     Text text_id;
-    Ptr<Player> player;
+    IdPtr<Player> player;
     int32_t value_int = 0;
     float value_float = 0.0f;
     Text value_text;
@@ -2317,7 +2317,7 @@ class DLL_EXPORT String : public IString
     // data
 public:
     Text text_id;
-    Ptr<Table> table;
+    IdPtr<Table> table;
     Text ru;
     Text en;
 
@@ -2401,8 +2401,8 @@ class DLL_EXPORT Weapon : public IWeapon
 public:
     Text text_id;
     Text resource;
-    Ptr<String> name;
-    Ptr<Projectile> projectile;
+    IdPtr<String> name;
+    IdPtr<Projectile> projectile;
     int32_t type = 0;
     int32_t standard = 0;
     float weight = 0.0f;
@@ -2431,7 +2431,7 @@ public:
     float inside_x = 0.0f;
     float inside_y = 0.0f;
     float inside_z = 0.0f;
-    int32_t notrade = 0;
+    bool notrade;
 
     // constructors
 public:

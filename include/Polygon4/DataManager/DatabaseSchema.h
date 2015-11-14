@@ -27,6 +27,7 @@ namespace polygon4
 
 enum class ColumnType
 {
+    Bool,
     Integer,
     Real,
     Text,

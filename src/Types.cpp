@@ -51,6 +51,13 @@ void TreeItem::update()
     }
 }
 
+bool to_bool(const std::string &s)
+{
+    if (s.empty() || s == "0" || s == "false")
+        return false;
+    return true;
+}
+
 } // namespace detail
 
 namespace detail
