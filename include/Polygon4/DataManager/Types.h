@@ -37,7 +37,7 @@ namespace polygon4
     }
 }
 
-#include "detail/ObjectTypes.h"
+#include <detail/ObjectTypes.h>
 
 #ifdef USE_QT
 #include <qobject.h>
@@ -206,9 +206,13 @@ struct IdPtr
 
     T *operator->() const
     {
+        return (T *)&this->operator*();
+    }
+    T &operator*() const
+    {
         if (ptr == nullptr)
             throw EXCEPTION("Value is not present");
-        return (T *)ptr;
+        return (T &)*ptr;
     }
 
     bool operator==(const IdPtr &rhs) const
@@ -278,7 +282,8 @@ namespace polygon4
 } // namespace polygon4
 
 #define DECLARE_INTERFACE_STUB(n) class DLL_EXPORT I ## n : public detail::IObjectBase {}
-#include "detail/ObjectInterfaces.h"
+#include <detail/ObjectInterfaces.h>
 #undef DECLARE_INTERFACE_STUB
 
-#include "detail/Types.h"
+#include "Table.h"
+#include <detail/Types.h>

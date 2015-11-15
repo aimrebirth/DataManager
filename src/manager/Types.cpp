@@ -26,6 +26,8 @@
 #include <qtreewidget.h>
 #endif
 
+#include <Polygon4/DataManager/Table.h>
+
 namespace polygon4
 {
 
