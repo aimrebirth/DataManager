@@ -2,13 +2,12 @@
 
 #include <vector>
 
-class ParserMemoryManager
+class MemoryManager
 {
 public:
-    ~ParserMemoryManager()
+    ~MemoryManager()
     {
-        for (auto &v : m)
-            delete v;
+        clear();
     }
 
     template <class T, class ...Args>
@@ -17,6 +16,13 @@ public:
         auto p = new T(std::forward<Args>(args)...);
         m.push_back(p);
         return p;
+    }
+
+    void clear()
+    {
+        for (auto &v : m)
+            delete v;
+        m.clear();
     }
 
 private:

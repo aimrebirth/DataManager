@@ -7,7 +7,8 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "types.h"
+#include <Polygon4/DataManager/Common.h>
+#include <Polygon4/DataManager/Schema/Types.h>
 
 namespace ast
 {
@@ -20,6 +21,7 @@ struct Database
     Name name;
     Types types;
 };
+
 using Databases = std::vector<Database>;
 
 using Properties = std::unordered_map<Key, Value>;
@@ -66,6 +68,7 @@ struct Variable
         return name < rhs.name;
     }
 };
+
 using Variables = std::vector<Variable>;
 
 struct ClassSpecifier
@@ -73,6 +76,7 @@ struct ClassSpecifier
     std::string name;
     Specifiers specifiers;
 };
+
 using ClassSpecifiers = std::vector<ClassSpecifier>;
 
 struct Class
@@ -94,7 +98,7 @@ struct Class
                 break;
             }
         }
-        replaceAll<Value>(v, "\\\"", "\"");
+        replace_all<Value>(v, "\\\"", "\"");
         return v;
     }
 
@@ -131,6 +135,8 @@ struct Class
                 namesOrder.push_back(ObjectName::Custom);
             else if (n == "parent")
                 namesOrder.push_back(ObjectName::Parent);
+            else if (n == "none")
+                namesOrder.push_back(ObjectName::None);
         }
         return namesOrder;
     }
@@ -180,6 +186,7 @@ struct Class
         return name < rhs.name;
     }
 };
+
 using Classes = std::set<Class>;
 
 struct Schema

@@ -4,3 +4,4 @@
 
 add_subdirectory(generator)
 add_subdirectory(manager)
+add_subdirectory(schema)

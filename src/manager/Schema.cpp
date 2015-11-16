@@ -1,5 +1,5 @@
 /*
- * Polygon-4 Engine
+ * Polygon-4 Data Manager
  * Copyright (C) 2015 lzwdgc
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,52 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <Polygon4/DataManager/Schema.h>
 
-#include <map>
-#include <memory>
-#include <string>
+#include <Polygon4/DataManager/Schema/Parser.h>
 
 namespace polygon4
 {
 
-enum class ColumnType
+namespace detail
 {
-    Bool,
-    Integer,
-    Real,
-    Text,
-    Blob
-};
-ColumnType getColumnType(const std::string &s);
 
-struct ForeignKey
+#include "detail/schema/Tokens.cpp"
+
+Schema getSchema()
 {
-    std::string table_name;
-    std::string column_name;
-};
-
-struct Column
-{
-    int id;
-    std::string name;
-    ColumnType type;
-    std::shared_ptr<ForeignKey> fk;
-};
-typedef std::map<std::string, Column> Columns;
-
-struct Table
-{
-    int id;
-    std::string name;
-    Columns columns;
-};
-typedef std::map<std::string, Table> Tables;
-
-struct DatabaseSchema
-{
-    std::string name;
-    Tables tables;
-};
-
+    return parse(tokens);
 }
+
+} // namespace detail
+
+} // namespace polygon4

@@ -166,6 +166,7 @@ class String
     {
         create_enum;
         enum_name: "LocalizationType";
+        tree_view;
     }
 };
 
@@ -814,6 +815,7 @@ class ModificationMap
     {
         parent: Modification;
         object_name: "to_string(map)";
+        names_order: "custom none";
         proxy;
     }
 };

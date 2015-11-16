@@ -22,7 +22,6 @@
 
 #include <sqlite3/sqlite3.h>
 
-#include <Polygon4/DataManager/DatabaseSchema.h>
 #include <Polygon4/DataManager/Storage.h>
 #include <Polygon4/DataManager/StorageImpl.h>
 #include <Polygon4/DataManager/Exception.h>
@@ -151,60 +150,6 @@ std::string Database::getFullName() const
 sqlite3 *Database::getDb() const
 {
     return db;
-}
-
-std::shared_ptr<const DatabaseSchema> Database::getSchema() const
-{
-    std::shared_ptr<DatabaseSchema> schema(new DatabaseSchema(), [](auto p) { delete p; });
-    auto callback = [](void *o, int ncols, char **cols, char **names)
-    {
-        DatabaseSchema *schema = (DatabaseSchema *)o;
-        Table table;
-        table.id = schema->tables.size();
-        table.name = cols[1];
-        schema->tables[table.name] = table;
-        return 0;
-    };
-    execute("SELECT * FROM sqlite_master WHERE type='table';", schema.get(), callback);
-    
-    auto callback2 = [](void *o, int ncols, char **cols, char **names)
-    {
-        Table *table = (Table *)o;
-        Column column;
-        column.id = table->columns.size();
-        column.name = cols[1];
-        column.type = getColumnType(cols[2]);
-        table->columns[column.name] = column;
-        return 0;
-    };
-    for (auto &tbl : schema->tables)
-        execute("PRAGMA table_info(" + tbl.first + ");", &tbl.second, callback2);
-    
-    auto callback3 = [](void *o, int ncols, char **cols, char **names)
-    {
-        Table *table = (Table *)o;
-        Column &column = table->columns[cols[3]];
-        column.fk = std::make_shared<ForeignKey>();
-        column.fk->table_name = cols[2];
-        column.fk->column_name = cols[4];
-        return 0;
-    };
-    for (auto &tbl : schema->tables)
-        execute("PRAGMA foreign_key_list(" + tbl.first + ");", &tbl.second, callback3);
-    return schema;
-}
-
-ColumnType getColumnType(const std::string &s)
-{
-    if (s == "INTEGER")
-        return ColumnType::Integer;
-    else if (s == "REAL")
-        return ColumnType::Real;
-    else if (s == "TEXT")
-        return ColumnType::Text;
-    else if (s == "BLOB")
-        return ColumnType::Blob;
-    return ColumnType::Integer;
 }
 
 }

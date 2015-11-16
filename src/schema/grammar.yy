@@ -4,8 +4,9 @@
 #include <string>
 #include <type_traits>
 
-#include <parser_mm.h>
-#include <ast.h>
+#include <Polygon4/DataManager/MemoryManager.h>
+
+#include <Ast.h>
 
 using namespace ast;
 
@@ -17,10 +18,10 @@ using namespace ast;
 void yyerror(const YYLTYPE *yylloc, const std::string &msg);
 
 extern Schema *schema;
-extern ParserMemoryManager *mm;
+extern MemoryManager *parserMemoryManager;
 
-#define CREATE(type, ...) mm->create<type>(__VA_ARGS__)
-#define CREATE_IF_NULL(v, type, ...) if (v == nullptr) v = mm->create<type>(__VA_ARGS__)
+#define CREATE(type, ...) parserMemoryManager->create<type>(__VA_ARGS__)
+#define CREATE_IF_NULL(v, type, ...) if (v == nullptr) v = parserMemoryManager->create<type>(__VA_ARGS__)
 #define SET_NULL(v) v = nullptr
 #define RESET(v) v = decltype(v)()
 

@@ -5,8 +5,8 @@
 
 namespace fs = boost::filesystem;
 
-#include "data.h"
-#include "parser.h"
+#include <Polygon4/DataManager/Schema/Schema.h>
+#include <Polygon4/DataManager/Schema/Parser.h>
 
 int main(int argc, char *argv[])
 try
@@ -24,17 +24,19 @@ try
     auto header = p;// / "include" / "Polygon4" / "DataManager" / "detail";
     auto src = p;// / "src" / "detail";
 
-    fs::create_directories(header);
-    fs::create_directories(src);
-
-    auto printModule = [&header, &src](const std::string &name, const auto &module)
+    auto printModule = [&header, &src](const std::string &name, const auto &module, const fs::path &subdir = fs::path())
     {
-        auto t = module.hpp.getText();
-        if (!t.empty())
-            std::ofstream(fs::path(header / (name + ".h")).string()) << t;
-        t = module.cpp.getText();
-        if (!t.empty())
-            std::ofstream(fs::path(src / (name + ".cpp")).string()) << t;
+        auto save = [](const auto &path, const std::string &s)
+        {
+            if (s.empty())
+                return;
+            boost::system::error_code ec;
+            fs::create_directories(path.parent_path(), ec);
+            std::ofstream(path.string()) << s;
+        };
+
+        save(header / subdir / (name + ".h"  ), module.hpp.getText());
+        save(src    / subdir / (name + ".cpp"), module.cpp.getText());
     };
 
     printModule("ObjectTypes", schema.printObjectTypes());
@@ -43,7 +45,7 @@ try
     printModule("Storage", schema.printStorage());
     printModule("StorageImpl", schema.printStorageImplementation());
     printModule("Helpers", schema.printHelpers());
-    printModule("Tokens", print(ts));
+    printModule("Tokens", print(ts), "schema");
 
     return 0;
 }

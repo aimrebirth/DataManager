@@ -1,5 +1,5 @@
 /*
-* Polygon-4 Engine
+* Polygon-4 Data Manager
 * Copyright (C) 2015 lzwdgc
 *
 * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 */
 
 template <typename T>
-bool replaceAll(T &str, const T &from, const T &to)
+bool replace_all(T &str, const T &from, const T &to)
 {
     bool replaced = false;
     size_t start_pos = 0;
@@ -30,8 +30,13 @@ bool replaceAll(T &str, const T &from, const T &to)
     return replaced;
 }
 
-std::string removeId(std::string s)
+inline bool replace_all(std::string &str, const std::string &from, const std::string &to)
 {
-    replaceAll(s, std::string("_id"), std::string());
+    return replace_all<std::string>(str, from, to);
+}
+
+inline std::string remove_id(std::string s)
+{
+    replace_all(s, std::string("_id"), std::string());
     return s;
 }

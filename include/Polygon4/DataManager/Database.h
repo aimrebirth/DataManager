@@ -29,8 +29,6 @@ struct sqlite3;
 namespace polygon4
 {
 
-struct DatabaseSchema;
-
 class DLL_EXPORT Database
 {    
     typedef int(*Sqlite3Callback)(void*, int, char**, char**);
@@ -44,7 +42,6 @@ public:
     bool isLoaded() const;
     sqlite3 *getDb() const;
 
-    std::shared_ptr<const DatabaseSchema> getSchema() const;
     std::string getName() const;
     std::string getFullName() const;
 

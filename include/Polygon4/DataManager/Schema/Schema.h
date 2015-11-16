@@ -11,10 +11,15 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "context.h"
-#include "ast.h"
+#include "Context.h"
+#include "Types.h"
 
 DataType dataTypeFromName(const Name &name);
+
+namespace ast
+{
+    class Schema;
+}
 
 class Schema;
 
@@ -52,11 +57,14 @@ protected:
     ObjectFlags flags;
 };
 
-template <class Container>
+template <typename Container>
 class ObjectArray : public Container
 {
 public:
     using Parent = Container;
+
+    using value_type = typename Parent::value_type;
+    using iterator = typename Parent::iterator;
 
 public:
     template <class T>
@@ -110,14 +118,19 @@ public:
     }
 
     template <typename F>
-    static void sort(std::vector<typename Container::value_type> &v, F f)
+    static void sort(std::vector<value_type> &v, F f)
     {
         std::sort(v.begin(), v.end(), f);
     }
     template <typename F>
-    static void sort(std::list<typename Container::value_type> &v, F f)
+    static void sort(std::list<value_type> &v, F f)
     {
         v.sort(f);
+    }
+
+    iterator find(const Name &name)
+    {
+        return std::find_if(begin(), end(), [&name](const auto &v) { return name == v.getCppName(); });
     }
 };
 
@@ -201,12 +214,22 @@ public:
         return n;
     }
     const Type *getType() const { return type; }
+    DataType getDataType() const { return type->getDataType(); }
     int getId() const { return id; }
     void setId(int id) { this->id = id; }
     std::string getDefaultValue() const;
     std::string getRawDefaultValue() const { return defaultValue; }
 
-    bool isId() const { return name == "id"; }
+    bool isId() const
+    {
+        bool is_id = name == "id";
+        if (is_id)
+        {
+            assert(id == 0 && "Id should be on the first position in class!");
+            assert(type->getDataType() == DataType::Integer && "Id should have Integer type!");
+        }
+        return is_id;
+    }
     bool isFk() const { return type->isComplex(); }
 
     bool operator<(const Variable &rhs) const
@@ -289,7 +312,8 @@ private:
         ObjectName::Custom,
         ObjectName::Name,
         ObjectName::Text,
-        ObjectName::Parent
+        ObjectName::Parent,
+        ObjectName::None,
     };
     std::string objectName;
     Class *parent = nullptr;
@@ -306,8 +330,7 @@ class Schema
 public:
     Class &getClass(const Name &name)
     {
-        auto i = std::find_if(classes.begin(), classes.end(), [&name](auto &c)
-            { return name == c.getCppName(); });
+        auto i = classes.find(name);
         if (i == classes.end())
             throw std::runtime_error("No class with such name: " + name);
         return *i;
@@ -333,5 +356,3 @@ private:
 
     friend Schema convert(const ast::Schema &schema);
 };
-
-Schema convert(const ast::Schema &schema);

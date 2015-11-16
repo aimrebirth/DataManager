@@ -2,8 +2,9 @@
 #pragma warning(disable: 4005)
 #include <string>
 
-#include <parser_mm.h>
-#include <ast.h>
+#include <Polygon4/DataManager/MemoryManager.h>
+
+#include <Ast.h>
 
 #include "grammar.hpp"
 #define yyterminate() return EOQ 

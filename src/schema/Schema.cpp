@@ -1,6 +1,8 @@
-#include "data.h"
+#include <Polygon4/DataManager/Schema/Schema.h>
 
-#include "print.h"
+#include <Polygon4/DataManager/Schema/Print.h>
+
+#include "Ast.h"
 
 const std::string dll = "DLL_EXPORT";
 const std::string dataClassPtr = "IdPtr";
@@ -94,103 +96,6 @@ std::string dataTypeToSqlite3(DataType t)
     return s;
 }
 
-Schema convert(const ast::Schema &ast)
-{
-    Schema s;
-    std::unordered_map<Name, const ast::Class*> astClasses;
-
-    auto find_type = [ast](Name name)
-    {
-        while (1)
-        {
-            auto i = ast.types.find(name);
-            if (i == ast.types.end() || name == i->second)
-                break;
-            name = i->second;
-        }
-        return name;
-    };
-
-    //
-    s.version = ast.version;
-    for (auto &t : ast.types)
-    {
-        Type type;
-        type.name = find_type(t.second);
-        type.dataType = dataTypeFromName(type.name);
-        s.types.insert(type);
-    }
-    for (auto &c : ast.classes)
-    {
-        Class class_;
-        class_.name = c.name;
-        class_.humanName = c.getHumanName();
-        class_.enumName = c.getEnumName();
-        class_.dataType = dataTypeFromName(c.name);
-        auto no = c.getNamesOrder();
-        if (!no.empty())
-            class_.namesOrder = no;
-        class_.objectName = c.getObjectName();
-        class_.setFlags(c.flags());
-        s.classes.push_back(class_);
-    }
-    for (auto &d : ast.databases)
-    {
-        Database db;
-        db.name = d.name;
-        for (auto &t : d.types)
-        {
-            Type type;
-            type.name = find_type(t.second);
-            type.dataType = dataTypeFromName(type.name);
-            db.types.insert(type);
-        }
-        s.databases.push_back(db);
-    }
-
-    // create pointers
-    for (auto &t : ast.types)
-    {
-        auto i = std::find_if(s.types.begin(), s.types.end(), [n = find_type(t.second)](const auto &t)
-            { return t.name == n; });
-        s.typePtrs[t.second] = const_cast<Type *>(&*i);
-    }
-    for (auto &c : ast.classes)
-    {
-        s.typePtrs[c.name] = &s.getClass(c.name);
-        astClasses[c.name] = &c;
-    }
-
-    // init variables
-    for (auto &c : s.classes)
-    {
-        auto &ac = *astClasses[c.name];
-        auto pn = ac.getParentName();
-        if (!pn.empty())
-        {
-            auto i = s.typePtrs.find(pn);
-            assert(i != s.typePtrs.end());
-            c.parent = (Class *)i->second;
-            c.parent->children.push_back(&c);
-        }
-        for (auto &av : ac.variables)
-        {
-            Variable v;
-            v.id = av.id;
-            v.name = av.name;
-            v.defaultValue = av.defaultValue;
-            auto tn = find_type(av.type);
-            auto t = s.typePtrs.find(tn);
-            assert(t != s.typePtrs.end());
-            v.type = s.typePtrs[tn];
-            v.flags = av.flags();
-            c.addVariable(v);
-        }
-    }
-
-    return s;
-}
-
 ModuleContext Schema::printObjectTypes() const
 {
     ModuleContext mc;
@@ -229,7 +134,7 @@ ModuleContext Schema::printHelpers() const
         mc.cpp.addLine("std::map<std::string, EObjectType> types =");
         mc.cpp.beginBlock();
         for (auto &c : classes({ fInline }, true))
-            mc.cpp.addLine("{ \"" + c.getSqlName() + "\", EObjectType::" + c.getCppName() + " },");
+            mc.cpp.addLine("{ \"" + c.getCppName() + "\", EObjectType::" + c.getCppName() + " },");
         mc.cpp.endBlock(true);
         mc.cpp.addLine();
         mc.cpp.beginFunction("EObjectType getTableType(const std::string &table)");
@@ -244,7 +149,7 @@ ModuleContext Schema::printHelpers() const
         mc.cpp.addLine("std::map<EObjectType, Text> tables =");
         mc.cpp.beginBlock();
         for (auto &c : classes({ fInline }, true))
-            mc.cpp.addLine("{ EObjectType::" + c.getCppName() + ", \"" + c.getSqlName() + "\" },");
+            mc.cpp.addLine("{ EObjectType::" + c.getCppName() + ", \"" + c.getCppName() + "\" },");
         mc.cpp.endBlock(true);
         mc.cpp.addLine();
         mc.cpp.beginFunction("Text getTableNameByType(EObjectType type)");
@@ -945,6 +850,12 @@ ModuleContext Class::print() const
                         checkReturn();
                     }
                     break;
+                case ObjectName::None:
+                    mc.cpp.addLine("return " + iObject + "::getName()" + return_add + ";");
+                    break;
+                default:
+                    assert(false);
+                    break;
                 }
             }
             mc.cpp.addLine("return " + iObject + "::getName()" + return_add + ";");
@@ -1092,8 +1003,8 @@ ModuleContext Class::print() const
 
         mc.cpp.beginFunction("const char *" + getCppName() + "::getSql()");
         auto sql = printSql();
-        replaceAll(sql, "\n", " \\\n");
-        replaceAll(sql, "\"", "\\\"");
+        replace_all(sql, "\n", " \\\n");
+        replace_all(sql, "\"", "\\\"");
         mc.cpp.addLine("return");
         mc.cpp.addLine("\" \\");
         mc.cpp.decreaseIndent();
