@@ -130,7 +130,7 @@ public:
 
     iterator find(const Name &name)
     {
-        return std::find_if(begin(), end(), [&name](const auto &v) { return name == v.getCppName(); });
+        return std::find_if(Parent::begin(), Parent::end(), [&name](const auto &v) { return name == v.getCppName(); });
     }
 };
 

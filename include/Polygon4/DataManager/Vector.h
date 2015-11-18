@@ -31,11 +31,11 @@ class Vector
     using value_type = T;
 
 public:
-    template <class T>
-    class iterator_base : public std::iterator<std::random_access_iterator_tag, T>
+    template <class U>
+    class iterator_base : public std::iterator<std::random_access_iterator_tag, U>
     {
     public:
-        using base = std::iterator<std::random_access_iterator_tag, T>;
+        using base = std::iterator<std::random_access_iterator_tag, U>;
 
         using value_type = typename base::value_type;
         using difference_type = typename base::difference_type;
@@ -65,8 +65,8 @@ public:
         pointer p;
     };
 
-    using iterator = typename iterator_base<value_type>;
-    using const_iterator = typename iterator_base<const value_type>;
+    using iterator = iterator_base<value_type>;
+    using const_iterator = iterator_base<const value_type>;
 
 public:
     void push_back(const value_type &t)

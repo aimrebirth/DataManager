@@ -18,12 +18,6 @@
 
 #pragma once
 
-#include <map>
-#include <memory>
-#include <set>
-#include <stdint.h>
-#include <vector>
-
 #include "Types.h"
 
 namespace polygon4

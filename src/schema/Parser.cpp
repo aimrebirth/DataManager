@@ -186,7 +186,6 @@ Schema parse(const Tokens &tokens)
     int ret;
     YYSTYPE yylval = { 0 };
     YYLTYPE yylloc = { 0 };
-    yyscan_t scanner;
     yydebug = 0;
     yypstate *ps = yypstate_new();
     auto t = tokens.begin();

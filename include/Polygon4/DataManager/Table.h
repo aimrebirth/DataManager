@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <type_traits>
 #include <unordered_map>
+#include <utility>
 
 #include "Exception.h"
 #include "Types.h"
@@ -35,18 +36,34 @@ namespace detail
 template <class T1, class T2>
 struct TablePair : public std::pair<T1, T2>
 {
+    T2 &operator->()
+    {
+        if (!this->second)
+        {
+            throw EXCEPTION("Trying to get empty object for id (" + std::to_string(this->first) +
+                            "). This should not happen. Check your database or source code");
+        }
+        return this->second;
+    }
+
     const T2 &operator->() const
     {
-        if (!second)
+        if (!this->second)
         {
-            throw EXCEPTION("Trying to get empty object for id (" + std::to_string(first) + 
+            throw EXCEPTION("Trying to get empty object for id (" + std::to_string(this->first) +
                 "). This should not happen. Check your database or source code");
         }
-        return second;
+        return this->second;
     }
+
+    operator T2&()
+    {
+        return this->second;
+    }
+
     operator const T2&() const
     {
-        return second;
+        return this->second;
     }
 };
 
@@ -60,65 +77,54 @@ public:
     using value_type = TablePair<const key_type, ptr_type>;
     using container = std::unordered_map<key_type, ptr_type>;
     
-    template <class T, class ParentType>
-    class iterator_base : public std::iterator<std::bidirectional_iterator_tag, T>
+    template <class V, class ParentType>
+    class iterator_base : public std::iterator<std::bidirectional_iterator_tag, V>
     {
+        using base = std::iterator<std::bidirectional_iterator_tag, V>;
+
+        using value_type = typename base::value_type;
+        using reference = typename base::reference;
+        using pointer = typename base::pointer;
+
     public:
         iterator_base(const ParentType& iter) : i(iter) {}
 
         iterator_base &operator++() { ++i; return *this; }
         iterator_base operator++(int) { iterator_base tmp(*this); operator++(); return tmp; }
 
-        template <class T>
-        bool operator==(const T &rhs) const {return i == rhs.i;}
-        template <class T>
-        bool operator!=(const T &rhs) const {return i != rhs.i;}
+        bool operator==(const iterator_base &rhs) const { return i == rhs.i; }
+        bool operator!=(const iterator_base &rhs) const { return i != rhs.i; }
 
-        T &operator*() { return (T &)*i; }
-        T &operator->() { return (T &)*i; }
+        reference operator*() { return (reference)*i; }
+        reference operator->() { return (reference)*i; }
 
+    private:
         // parent iterator
         ParentType i;
     };
 
-    using iterator = typename iterator_base<value_type, typename container::iterator>;
-    using const_iterator = typename iterator_base<value_type, typename container::const_iterator>;
-    
-private:
-    template <class T>
-    struct IdHandler0
-    {
-        inline key_type getKey(const ptr_type &v, key_type key) const { return key; }
-        inline void setKey(ptr_type &v, key_type key) const { v->id = key; }
-    };
-    template <class T>
-    struct IdHandler1
-    {
-        inline key_type getKey(const ptr_type &v, key_type key) const { return v->id; }
-        inline void setKey(ptr_type &v, key_type key) const { v->id = key; }
-    };
-
-    using IdHandler = typename std::conditional<T::has_id, IdHandler1<T>, IdHandler0<T>>::type;
+    using iterator = iterator_base<value_type, typename container::iterator>;
+    using const_iterator = iterator_base<value_type, typename container::const_iterator>;
 
 public:
     // create value
     ptr_type create()
     {
-        return T::create<T>();
+        return T::template create<T>();
     }
 
     // create value and append it to the end of container
     ptr_type createAtEnd()
     {
         auto v = create();
-        idHandler.setKey(v, maxId);
+        v->id = maxId;
         return data[maxId++] = v;
     }
 
     // here we insert element with checking its id
     ptr_type insert(const ptr_type &v)
     {
-        auto key = idHandler.getKey(v, maxId);
+        auto key = v->id;
         if (key < 1)
         {
             throw EXCEPTION("Bad id (" + std::to_string(key) + ") < 1 detected. Table: '" + name + "'" +
@@ -134,17 +140,17 @@ public:
         if (key < maxId)
             data[key] = v;
         else if (key == maxId)
-            data[maxId++] = v;
+            insertAtEnd(v);
         else
         {
             maxId = key;
-            data[maxId++] = v;
+            insertAtEnd(v);
         }
         return v;
     }
     ptr_type insertAtEnd(const ptr_type &v)
     {
-        idHandler.setKey(v, maxId);
+        v->id = maxId;
         data[maxId++] = v;
         return v;
     }
@@ -165,8 +171,10 @@ public: // container interface
     iterator end() { return data.end(); }
     const_iterator begin() const { return data.begin(); }
     const_iterator end() const { return data.end(); }
+    const_iterator cbegin() const { return data.cbegin(); }
+    const_iterator cend() const { return data.cend(); }
 
-    iterator find() { return data.find(key); }
+    iterator find(key_type key) { return data.find(key); }
     const_iterator find(key_type key) const { return data.find(key); }
 
     bool empty() const { data.empty(); }
@@ -213,7 +221,6 @@ private:
     std::string name;
 	container data;
     key_type maxId = 1;
-    IdHandler idHandler;
 };
 
 } // namespace detail

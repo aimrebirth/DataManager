@@ -21,9 +21,8 @@
 #include <memory>
 #include <string>
 
-#include "dll.h"
+#include "Dll.h"
 #include "Types.h"
-#include "Table.h"
 
 namespace polygon4
 {

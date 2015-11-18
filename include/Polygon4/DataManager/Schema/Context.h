@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <stack>
 
@@ -22,23 +23,35 @@ public:
     void beginFunction(const std::string &s = "");
     void endFunction();
     void beginNamespace(const std::string &s);
-    void endNamespace();
+    void endNamespace(const std::string &s = std::string());
 
     void ifdef(const std::string &s);
     void endif();
 
     void trimEnd(size_t n);
 
-    std::string getText() const { return text; }
+    std::string getText() const;
 
-    Context &operator+=(const Context &rhs)
+    Context &before()
     {
-        text += rhs.text;
-        return *this;
+        if (!before_)
+            before_ = std::make_unique<Context>();
+        return *before_;
     }
+    Context &after()
+    {
+        if (!after_)
+            after_ = std::make_unique<Context>();
+        return *after_;
+    }
+
+    Context &operator+=(const Context &rhs);
 
 private:
     std::string text;
+    std::unique_ptr<Context> before_;
+    std::unique_ptr<Context> after_;
+
     std::string space;
     std::string indent;
     std::string newline;

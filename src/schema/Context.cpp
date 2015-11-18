@@ -75,10 +75,14 @@ void Context::beginNamespace(const std::string &s)
     namespaces.push(s);
 }
 
-void Context::endNamespace()
+void Context::endNamespace(const std::string &ns)
 {
-    auto s = namespaces.top();
-    namespaces.pop();
+    std::string s = ns;
+    if (!namespaces.empty() && ns.empty())
+    {
+        s = namespaces.top();
+        namespaces.pop();
+    }
     addLineNoSpace("} // namespace " + s);
 }
 
@@ -98,4 +102,35 @@ void Context::trimEnd(size_t n)
     if (n > sz)
         n = sz;
     text.resize(sz - n);
+}
+
+std::string Context::getText() const
+{
+    std::string s;
+    if (before_)
+        s += before_->getText();
+    s += text;
+    if (after_)
+        s += after_->getText();
+    return s;
+}
+
+Context &Context::operator+=(const Context &rhs)
+{
+    if (before_ && rhs.before_)
+        before_->text += rhs.before_->text;
+    else if (rhs.before_)
+    {
+        before().addLine();
+        before().addText(rhs.before_->text);
+    }
+    text += rhs.text;
+    if (after_ && rhs.after_)
+        after_->text += rhs.after_->text;
+    else if (rhs.after_)
+    {
+        //after().addLine();
+        after().addText(rhs.after_->text);
+    }
+    return *this;
 }

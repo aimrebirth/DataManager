@@ -47,6 +47,7 @@ set(schema_src ${schema_src}
 )
 
 add_library                 (schema ${schema_src} ${schema_inc})
+target_link_libraries       (schema ${Boost_LIBRARIES})
 if (SOLUTION_FOLDER)
     set_target_properties   (schema PROPERTIES FOLDER ${SOLUTION_FOLDER})
 endif()

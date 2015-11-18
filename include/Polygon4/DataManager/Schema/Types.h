@@ -58,4 +58,4 @@ enum class ObjectName
 
 #ifdef USE_QT
 QString getColumnTypeString(DataType type);
-#endif;
+#endif
