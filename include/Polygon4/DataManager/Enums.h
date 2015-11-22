@@ -1,5 +1,5 @@
 /*
- * Polygon-4 Engine
+ * Polygon-4 Data Manager
  * Copyright (C) 2015 lzwdgc
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Polygon4/DataManager/Helpers.h>
+#include <map>
 
-#ifdef USE_QT
-#include <qcoreapplication.h>
-#endif
+#include "Common.h"
+#include "String.h"
+
+#include "detail/Enums.h"
 
 namespace polygon4
 {
@@ -28,7 +29,9 @@ namespace polygon4
 namespace detail
 {
 
-#include "detail/Helpers.cpp"
+using EnumTable = std::map<String, int>;
+
+EnumTable getOrderedMap(const std::string &type_name);
 
 } // namespace detail
 

@@ -22,6 +22,7 @@
 #include <string>
 
 #include "Dll.h"
+#include "Schema.h"
 #include "Types.h"
 
 namespace polygon4

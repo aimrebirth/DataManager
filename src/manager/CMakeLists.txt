@@ -38,11 +38,11 @@ set(generated_src
     ${generated_dir}/Storage.cpp
     ${generated_dir}/StorageImpl.h
     ${generated_dir}/StorageImpl.cpp
-    ${generated_dir}/Helpers.h
-    ${generated_dir}/Helpers.cpp
     ${generated_dir}/schema/Tokens.cpp
     ${generated_dir}/ObjectTypes.h
     ${generated_dir}/ObjectInterfaces.h
+    ${generated_dir}/Enums.h
+    ${generated_dir}/Enums.cpp
 )
 set_source_files_properties(${generated_src} PROPERTIES
     GENERATED True
@@ -50,14 +50,14 @@ set_source_files_properties(${generated_src} PROPERTIES
 )
 
 add_custom_command(OUTPUT ${generated_src}
-    COMMAND generator ${PROJECT_SOURCE_DIR}/schema.txt ${CMAKE_CURRENT_BINARY_DIR}/detail
-    DEPENDS generator ${PROJECT_SOURCE_DIR}/schema.txt
+    COMMAND generator ${PROJECT_SOURCE_DIR}/data/schema.txt ${CMAKE_CURRENT_BINARY_DIR}/detail
+    DEPENDS generator ${PROJECT_SOURCE_DIR}/data/schema.txt
 )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 set(DATA_MANAGER_ADDITIONAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR} CACHE STRING "Data manager generated includes dir" FORCE)
 
-add_library                 (DataManager ${db_src} ${db_inc1} ${db_inc2} ${db_src_hdr} ${generated_src} ${PROJECT_SOURCE_DIR}/schema.txt)
+add_library                 (DataManager ${db_src} ${db_inc1} ${db_inc2} ${db_src_hdr} ${generated_src} ${PROJECT_SOURCE_DIR}/data/schema.txt)
 target_link_libraries       (DataManager sqlite3 schema)
 if (MSVC)
     target_compile_options  (DataManager PUBLIC /bigobj)

@@ -33,6 +33,8 @@ Schema getSchema()
     return parse(tokens);
 }
 
+const Schema *schema;
+
 } // namespace detail
 
 } // namespace polygon4

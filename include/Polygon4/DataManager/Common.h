@@ -16,6 +16,18 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
+#include <stdint.h>
+#include <string>
+
+namespace polygon4
+{
+
+using EnumType = uint32_t;
+
+}
+
 template <typename T>
 bool replace_all(T &str, const T &from, const T &to)
 {

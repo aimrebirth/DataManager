@@ -1,0 +1,542 @@
+{
+  "Maps": {
+    "fks": [
+      {
+        "from": "name_id",
+        "id": 0,
+        "match": "NONE",
+        "on_delete": "NO ACTION",
+        "on_update": "NO ACTION",
+        "seq": 0,
+        "table": "Strings",
+        "to": "id"
+      }
+    ],
+    "sql": "CREATE TABLE \"Maps\" ( \"id\" INTEGER NOT NULL, \"text_id\" TEXT NOT NULL, \"resource\" TEXT NOT NULL, \"name_id\" INTEGER, \"h_min\" REAL, \"h_max\" REAL, PRIMARY KEY (\"id\"), FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\") )",
+    "values": [
+      {
+        "h_max": 2988.28125,
+        "h_min": -459.532288,
+        "id": 1,
+        "name_id": 1,
+        "resource": "AIM/Maps/rocks/rocks",
+        "text_id": "m1.location1"
+      },
+      {
+        "h_max": 2489.658447,
+        "h_min": 204.572266,
+        "id": 2,
+        "name_id": 3,
+        "resource": "AIM/Maps/arctic/arctic",
+        "text_id": "m1.location2"
+      },
+      {
+        "h_max": 2693.620117,
+        "h_min": -1482.37085,
+        "id": 3,
+        "name_id": 2,
+        "resource": "AIM/Maps/tundra/tundra",
+        "text_id": "m1.location3"
+      },
+      {
+        "h_max": 1858.739746,
+        "h_min": -120.821022,
+        "id": 4,
+        "name_id": 4,
+        "resource": "AIM/Maps/volcano/volcano",
+        "text_id": "m1.location4"
+      },
+      {
+        "h_max": 3247.179688,
+        "h_min": 131.504181,
+        "id": 5,
+        "name_id": 5,
+        "resource": "AIM/Maps/desert/desert",
+        "text_id": "m1.location5"
+      },
+      {
+        "h_max": 1458.229004,
+        "h_min": -30.632965,
+        "id": 6,
+        "name_id": 6,
+        "resource": "AIM/Maps/hills/hills",
+        "text_id": "m1.location6"
+      },
+      {
+        "h_max": 1584.556763,
+        "h_min": -107.812225,
+        "id": 7,
+        "name_id": 7,
+        "resource": "AIM2/Maps/swamps/swamps",
+        "text_id": "m1.location7"
+      },
+      {
+        "h_max": 1992.187378,
+        "h_min": -93.040787,
+        "id": 8,
+        "name_id": 13,
+        "resource": "AIM/Maps/outworld/outworld",
+        "text_id": "m1.location8"
+      },
+      {
+        "h_max": 199.218735,
+        "h_min": 48.4375,
+        "id": 9,
+        "name_id": 9,
+        "resource": "AIM/Maps/arena/arena",
+        "text_id": "m1.arena"
+      },
+      {
+        "h_max": 215.07811,
+        "h_min": -22.910156,
+        "id": 10,
+        "name_id": 15,
+        "resource": "AIM/Maps/start/start",
+        "text_id": "m1.start"
+      },
+      {
+        "h_max": 199.218735,
+        "h_min": -739.257813,
+        "id": 11,
+        "name_id": 14,
+        "resource": "AIM/Maps/under/under",
+        "text_id": "m1.under"
+      },
+      {
+        "h_max": 2484.110107,
+        "h_min": 849.468384,
+        "id": 12,
+        "name_id": 16,
+        "resource": "",
+        "text_id": "m2.demo_map"
+      },
+      {
+        "h_max": 2988.28125,
+        "h_min": -459.532288,
+        "id": 13,
+        "name_id": 1,
+        "resource": "",
+        "text_id": "m2.location1"
+      },
+      {
+        "h_max": 2489.658447,
+        "h_min": 204.572266,
+        "id": 14,
+        "name_id": 3,
+        "resource": "",
+        "text_id": "m2.location2"
+      },
+      {
+        "h_max": 2693.620117,
+        "h_min": -795.098145,
+        "id": 15,
+        "name_id": 2,
+        "resource": "",
+        "text_id": "m2.location3"
+      },
+      {
+        "h_max": 4237.583984,
+        "h_min": 1091.375,
+        "id": 16,
+        "name_id": 5,
+        "resource": "AIM2/Maps/desert/desert",
+        "text_id": "m2.location5"
+      },
+      {
+        "h_max": 1458.229004,
+        "h_min": -30.632965,
+        "id": 17,
+        "name_id": 6,
+        "resource": "",
+        "text_id": "m2.location6"
+      },
+      {
+        "h_max": 199.92984,
+        "h_min": -135.29808,
+        "id": 18,
+        "name_id": 7,
+        "resource": "AIM2/Maps/swamps/swamps",
+        "text_id": "m2.location7"
+      },
+      {
+        "h_max": 2140.458252,
+        "h_min": 108.255524,
+        "id": 19,
+        "name_id": 12,
+        "resource": "",
+        "text_id": "m2.location9"
+      },
+      {
+        "h_max": 1906.696411,
+        "h_min": -371.420837,
+        "id": 20,
+        "name_id": 11,
+        "resource": "",
+        "text_id": "m2.location10"
+      },
+      {
+        "h_max": 1847.255859,
+        "h_min": 158.302277,
+        "id": 21,
+        "name_id": 13,
+        "resource": "",
+        "text_id": "m2.location11"
+      },
+      {
+        "h_max": 200.291245,
+        "h_min": -16.457268,
+        "id": 22,
+        "name_id": 10,
+        "resource": "",
+        "text_id": "m2.location12"
+      },
+      {
+        "h_max": 99.609375,
+        "h_min": -1381.367188,
+        "id": 23,
+        "name_id": 14,
+        "resource": "",
+        "text_id": "m2.location13"
+      },
+      {
+        "h_max": 14.765625,
+        "h_min": -29.882813,
+        "id": 24,
+        "name_id": 18,
+        "resource": "",
+        "text_id": "m2.station_01"
+      },
+      {
+        "h_max": 14.765625,
+        "h_min": -29.882813,
+        "id": 25,
+        "name_id": 19,
+        "resource": "",
+        "text_id": "m2.station_02"
+      },
+      {
+        "h_max": 14.765625,
+        "h_min": -29.882813,
+        "id": 26,
+        "name_id": 20,
+        "resource": "",
+        "text_id": "m2.station_03"
+      },
+      {
+        "h_max": 14.765625,
+        "h_min": -29.882813,
+        "id": 27,
+        "name_id": 21,
+        "resource": "",
+        "text_id": "m2.station_05"
+      },
+      {
+        "h_max": 14.765625,
+        "h_min": -29.882813,
+        "id": 28,
+        "name_id": 22,
+        "resource": "",
+        "text_id": "m2.station_06"
+      },
+      {
+        "h_max": 14.765625,
+        "h_min": -29.882813,
+        "id": 29,
+        "name_id": 23,
+        "resource": "",
+        "text_id": "m2.station_12"
+      },
+      {
+        "h_max": 0.246072,
+        "h_min": 0.0,
+        "id": 30,
+        "name_id": 24,
+        "resource": "",
+        "text_id": "m2.station_17"
+      },
+      {
+        "h_max": 14.765625,
+        "h_min": -29.882813,
+        "id": 31,
+        "name_id": 25,
+        "resource": "",
+        "text_id": "m2.station_21"
+      },
+      {
+        "h_max": 14.765625,
+        "h_min": -29.882813,
+        "id": 32,
+        "name_id": 26,
+        "resource": "",
+        "text_id": "m2.station_23"
+      },
+      {
+        "h_max": 14.765625,
+        "h_min": -29.882813,
+        "id": 33,
+        "name_id": 27,
+        "resource": "",
+        "text_id": "m2.station_32"
+      },
+      {
+        "h_max": 14.765625,
+        "h_min": -29.882813,
+        "id": 34,
+        "name_id": 28,
+        "resource": "",
+        "text_id": "m2.station_33"
+      },
+      {
+        "h_max": 14.765625,
+        "h_min": -29.882813,
+        "id": 35,
+        "name_id": 29,
+        "resource": "",
+        "text_id": "m2.station_35"
+      },
+      {
+        "h_max": 14.765625,
+        "h_min": -29.882813,
+        "id": 36,
+        "name_id": 30,
+        "resource": "",
+        "text_id": "m2.station_36"
+      },
+      {
+        "h_max": 553.539063,
+        "h_min": 0.0,
+        "id": 37,
+        "name_id": 17,
+        "resource": "AIM2/Maps/training/training",
+        "text_id": "m2.trainmap"
+      }
+    ]
+  },
+  "Strings": {
+    "fks": [
+      {
+        "from": "object",
+        "id": 0,
+        "match": "NONE",
+        "on_delete": "NO ACTION",
+        "on_update": "NO ACTION",
+        "seq": 0,
+        "table": "Tables",
+        "to": "id"
+      }
+    ],
+    "sql": "CREATE TABLE \"Strings\" ( \"id\" INTEGER NOT NULL, \"text_id\" TEXT, \"object\" INTEGER, \"ru\" TEXT, \"en\" TEXT, PRIMARY KEY (\"id\"), FOREIGN KEY (\"object\") REFERENCES \"Tables\" (\"id\") )",
+    "values": [
+      {
+        "en": "",
+        "id": 1,
+        "ru": "\u0421\u0435\u043a\u0442\u043e\u0440 \u0441\u043a\u0430\u043b",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 2,
+        "ru": "\u0421\u0435\u043a\u0442\u043e\u0440 \u0442\u0443\u043d\u0434\u0440\u044b",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 3,
+        "ru": "\u0421\u0435\u043a\u0442\u043e\u0440 \u0430\u0440\u043a\u0442\u0438\u043a\u0438",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 4,
+        "ru": "\u0421\u0435\u043a\u0442\u043e\u0440 \u0432\u0443\u043b\u043a\u0430\u043d\u043e\u0432",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 5,
+        "ru": "\u0421\u0435\u043a\u0442\u043e\u0440 \u043f\u0443\u0441\u0442\u044b\u043d\u0438",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 6,
+        "ru": "\u0421\u0435\u043a\u0442\u043e\u0440 \u0445\u043e\u043b\u043c\u043e\u0432",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 7,
+        "ru": "\u0421\u0435\u043a\u0442\u043e\u0440 \u0431\u043e\u043b\u043e\u0442",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 8,
+        "ru": "\u0412\u043d\u0435\u0448\u043d\u0438\u0439 \u043c\u0438\u0440",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 9,
+        "ru": "\u0410\u0440\u0435\u043d\u0430",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 10,
+        "ru": "\u041f\u043e\u0434\u0437\u0435\u043c\u043d\u044b\u0439 \u0441\u0435\u043a\u0442\u043e\u0440",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 11,
+        "ru": "\u0412\u044b\u0441\u043e\u0442\u043d\u044b\u0439 \u0441\u0435\u043a\u0442\u043e\u0440",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 12,
+        "ru": "\u0420\u0430\u0437\u0440\u0443\u0448\u0435\u043d\u043d\u044b\u0439 \u0441\u0435\u043a\u0442\u043e\u0440",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 13,
+        "ru": "\u0421\u0435\u043a\u0442\u043e\u0440 \u044f\u0434\u043e\u0432\u0438\u0442\u044b\u0445 \u0431\u043e\u043b\u043e\u0442",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 14,
+        "ru": "\u041f\u043e\u0434\u0437\u0435\u043c\u043d\u044b\u0439 \u0437\u0430\u0432\u043e\u0434",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 15,
+        "ru": "\u041c\u0435\u043d\u044e \u0441\u0435\u043a\u0442\u043e\u0440",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 16,
+        "ru": "\u0414\u0435\u043c\u043e \u0441\u0435\u043a\u0442\u043e\u0440",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 17,
+        "ru": "\u0422\u0440\u0435\u043d\u0438\u0440\u043e\u0432\u043e\u0447\u043d\u044b\u0439 \u0441\u0435\u043a\u0442\u043e\u0440",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 18,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 1",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 19,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 2",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 20,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 3",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 21,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 5",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 22,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 6",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 23,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 12",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 24,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 17",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 25,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 21",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 26,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 23",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 27,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 32",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 28,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 33",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 29,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 35",
+        "object": 24,
+        "text_id": ""
+      },
+      {
+        "en": "",
+        "id": 30,
+        "ru": "\u0421\u0442\u0430\u043d\u0446\u0438\u044f 36",
+        "object": 24,
+        "text_id": ""
+      }
+    ]
+  }
+}

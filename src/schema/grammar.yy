@@ -37,7 +37,10 @@ Specifier specifier;
 Specifiers specifiers;
 Class class_;
 Classes classes;
+Enum enum_;
+Enums enums;
 int variable_id = 0;
+int enum_var_id = 0;
 
 //
 // variables
@@ -69,10 +72,9 @@ int variable_id = 0;
 %token ERROR_SYMBOL
 %token  L_BRACKET R_BRACKET COMMA QUOTE SEMICOLON COLON POINT
         L_CURLY_BRACKET R_CURLY_BRACKET SHARP R_ARROW EQUAL
-%token GLOBALS CLASS FIELD TYPES PROPERTIES DATABASE
+%token GLOBALS CLASS FIELD TYPES PROPERTIES DATABASE ENUM
 %token <rawStrVal> STRING
 %token <intVal> INTEGER
-%token <doubleVal> FLOAT NUMBER
 
 %type <strVal> string name type key value specifier quoted_string any_value
 
@@ -83,11 +85,6 @@ file: file_contents EOQ
 
 file_contents: /* empty */
     | globals
-    | globals classes
-    {
-        schema->classes = classes;
-        RESET(classes);
-    }
     ;
 
 globals: global
@@ -104,6 +101,57 @@ global: GLOBALS L_CURLY_BRACKET globals1 R_CURLY_BRACKET SEMICOLON
     {
         schema->databases = databases;
         RESET(databases);
+    }
+    | classes
+    {
+        schema->classes = classes;
+        RESET(classes);
+    }
+    | enums
+    {
+        schema->enums = enums;
+        RESET(enums);
+    }
+    ;
+
+enums: enum
+    | enum enums
+    ;
+
+enum: ENUM string L_CURLY_BRACKET enum_vars R_CURLY_BRACKET SEMICOLON
+    {
+        enum_.name = *$2;
+        enums.push_back(enum_);
+        RESET(enum_var_id);
+        RESET(enum_);
+    }
+    ;
+
+enum_vars: enum_var
+    | enum_var enum_vars
+    ;
+
+enum_var: string COMMA
+    {
+        enum_.items.push_back({*$1, 0});
+    }
+    | string EQUAL INTEGER COMMA
+    {
+        enum_.items.push_back({*$1, $3});
+    }
+    | string specifiers_braced COMMA
+    {
+        EnumItem item = {*$1, 0};
+        item.specifiers = specifiers;
+        RESET(specifiers);
+        enum_.items.push_back(item);
+    }
+    | string EQUAL INTEGER specifiers_braced COMMA
+    {
+        EnumItem item = {*$1, $3};
+        item.specifiers = specifiers;
+        RESET(specifiers);
+        enum_.items.push_back(item);
     }
     ;
 
@@ -158,14 +206,6 @@ class_contents: class_content
     | class_content class_contents
     ;
 class_content: field
-    | specifier L_CURLY_BRACKET specifiers R_CURLY_BRACKET
-    {
-        ClassSpecifier v;
-        v.name = *$1;
-        v.specifiers = specifiers;
-        class_.classSpecifiers.push_back(v);
-        RESET(specifiers);
-    }
     ;
 
 field: FIELD L_CURLY_BRACKET field_contents R_CURLY_BRACKET
@@ -192,7 +232,7 @@ field: FIELD L_CURLY_BRACKET field_contents R_CURLY_BRACKET
         variable.defaultValue = *$4;
         class_.variables.push_back(variable);
     }
-    | type name L_CURLY_BRACKET properties R_CURLY_BRACKET SEMICOLON
+    | type name properties_braced SEMICOLON
     {
         Variable variable;
         variable.id = variable_id++;
@@ -202,7 +242,7 @@ field: FIELD L_CURLY_BRACKET field_contents R_CURLY_BRACKET
         RESET(properties);
         class_.variables.push_back(variable);
     }
-    | PROPERTIES L_CURLY_BRACKET properties R_CURLY_BRACKET
+    | PROPERTIES properties_braced
     {
         class_.properties.push_back(properties);
         RESET(properties);
@@ -212,6 +252,9 @@ field_contents: field_content
     | field_content field_contents
     ;
 field_content: key_value_pair SEMICOLON
+    ;
+
+properties_braced: L_CURLY_BRACKET properties R_CURLY_BRACKET
     ;
 
 properties: property
@@ -224,11 +267,11 @@ property: key SEMICOLON
     | key_value_pair SEMICOLON
     ;
 
-specifiers: /* empty */
-    | specifiers1
+specifiers_braced: L_CURLY_BRACKET specifiers R_CURLY_BRACKET
     ;
-specifiers1: specifier
-    | specifier specifiers1
+
+specifiers: specifier
+    | specifier specifiers
     ;
 
 key_value_pair: key COLON value
@@ -250,10 +293,6 @@ key: string
     ;
 any_value: value
     | INTEGER
-    {
-        $$ = CREATE(std::string, std::to_string($1));
-    }
-    | FLOAT
     {
         $$ = CREATE(std::string, std::to_string($1));
     }

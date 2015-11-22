@@ -26,6 +26,8 @@ namespace detail
 
 Schema getSchema();
 
+extern const Schema *schema;
+
 } // namespace detail
 
 } // namespace polygon4

@@ -117,14 +117,14 @@ public:
     ptr_type createAtEnd()
     {
         auto v = create();
-        v->id = maxId;
+        v->setId(maxId);
         return data[maxId++] = v;
     }
 
     // here we insert element with checking its id
     ptr_type insert(const ptr_type &v)
     {
-        auto key = v->id;
+        auto key = v->getId(maxId);
         if (key < 1)
         {
             throw EXCEPTION("Bad id (" + std::to_string(key) + ") < 1 detected. Table: '" + name + "'" +
@@ -150,7 +150,7 @@ public:
     }
     ptr_type insertAtEnd(const ptr_type &v)
     {
-        v->id = maxId;
+        v->setId(maxId);
         data[maxId++] = v;
         return v;
     }

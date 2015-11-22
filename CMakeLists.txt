@@ -41,7 +41,6 @@ project(DataManager C CXX)
 # libraries and dependencies
 if (WIN32)
     set(Boost_USE_STATIC_LIBS ON)
-    set(Boost_USE_STATIC_RUNTIME ON)
 else()
     ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK)
 endif(WIN32)

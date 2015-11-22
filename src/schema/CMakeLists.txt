@@ -43,7 +43,7 @@ set(schema_src ${schema_src}
     grammar.yy
     lexer.ll
     ${parser_src}
-    ${PROJECT_SOURCE_DIR}/schema.txt
+    ${PROJECT_SOURCE_DIR}/data/schema.txt
 )
 
 add_library                 (schema ${schema_src} ${schema_inc})

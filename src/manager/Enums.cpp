@@ -1,5 +1,5 @@
 /*
- * Polygon-4 Engine
+ * Polygon-4 Data Manager
  * Copyright (C) 2015 lzwdgc
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <Polygon4/DataManager/Enums.h>
 
-#include "Types.h"
+#include <Polygon4/DataManager/Localization.h>
+
+#include "detail/Enums.cpp"
+
+#define CREATE_TABLE(t) \
+    if (type_name == #t) \
+        for (auto &e : table_ ## t) \
+            et[tr(e.second + ending)] = static_cast<int>(e.first)
 
 namespace polygon4
 {
@@ -26,7 +33,14 @@ namespace polygon4
 namespace detail
 {
 
-#include "detail/Helpers.h"
+EnumTable getOrderedMap(const std::string &type_name)
+{
+    EnumTable et;
+    std::string ending;
+    ending = "s";
+    CREATE_TABLE(EObjectType);
+    return et;
+}
 
 } // namespace detail
 

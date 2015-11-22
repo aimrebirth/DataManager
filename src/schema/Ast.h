@@ -41,7 +41,7 @@ struct Variable
     {
         ObjectFlags f;
         f[fPrimaryKey] = hasProperty("pk");
-        f[fEnumItem] = hasProperty("enum");
+        f[fEnumItem] = hasProperty("enum_item");
         f[fContainer] = hasProperty("container");
         return f;
     }
@@ -98,7 +98,7 @@ struct Class
                 break;
             }
         }
-        replace_all<Value>(v, "\\\"", "\"");
+        replace_all(v, "\\\"", "\"");
         return v;
     }
 
@@ -163,6 +163,14 @@ struct Class
                 SET_PROPERTY("create_enum", fCreateEnum);
                 SET_PROPERTY("proxy", fProxy);
                 SET_PROPERTY("tree_view", fTreeView);
+                SET_PROPERTY("name", fName);
+                SET_PROPERTY("object_name", fObjectName);
+                SET_PROPERTY("parent", fParent);
+                SET_PROPERTY("enum_name", fEnumName);
+                SET_PROPERTY("prefixed", fPrefixed);
+                SET_PROPERTY("names_order", fNamesOrder);
+                else
+                    assert(false);
 #undef SET_PROPERTY
             }
         }
@@ -189,12 +197,44 @@ struct Class
 
 using Classes = std::set<Class>;
 
+struct EnumItem
+{
+    Name name;
+    int id;
+    Specifiers specifiers;
+
+    ObjectFlags flags() const
+    {
+        ObjectFlags f;
+        f[fNotInTable] = hasProperty("not_in_table");
+        return f;
+    }
+
+    bool hasProperty(const Key &key) const
+    {
+        if (specifiers.find(key) != specifiers.end())
+            return true;
+        return false;
+    }
+};
+
+using EnumItems = std::vector<EnumItem>;
+
+struct Enum
+{
+    std::string name;
+    EnumItems items;
+};
+
+using Enums = std::vector<Enum>;
+
 struct Schema
 {
     Version version;
     Types types;
     Databases databases;
     Classes classes;
+    Enums enums;
 };
 
 } // namespace ast

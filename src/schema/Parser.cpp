@@ -47,9 +47,6 @@ Token convert(BisonToken token, YYSTYPE &yylval)
     case INTEGER:
         t.value = yylval.intVal;
         break;
-    case FLOAT:
-        t.value = yylval.doubleVal;
-        break;
     case STRING:
         t.value = yylval.rawStrVal;
         break;
@@ -76,8 +73,10 @@ Schema convert(const ast::Schema &ast)
         return name;
     };
 
-    //
+    // COPY
     s.version = ast.version;
+
+    // types 
     for (auto &t : ast.types)
     {
         Type type;
@@ -85,6 +84,8 @@ Schema convert(const ast::Schema &ast)
         type.dataType = dataTypeFromName(type.name);
         s.types.insert(type);
     }
+
+    // classes
     for (auto &c : ast.classes)
     {
         Class class_;
@@ -107,6 +108,8 @@ Schema convert(const ast::Schema &ast)
         class_.setFlags(c.flags());
         s.classes.push_back(class_);
     }
+
+    // databases
     for (auto &d : ast.databases)
     {
         Database db;
@@ -121,6 +124,23 @@ Schema convert(const ast::Schema &ast)
         s.databases.push_back(db);
     }
 
+    // enums
+    for (auto &e : ast.enums)
+    {
+        Enum enum_;
+        enum_.name = e.name;
+        for (auto &i : e.items)
+        {
+            EnumItem ei;
+            ei.name = i.name;
+            ei.id = i.id;
+            ei.not_in_table = i.flags()[fNotInTable];
+            enum_.items.push_back(ei);
+        }
+        enum_.dataType = DataType::Enum;
+        s.enums.push_back(enum_);
+    }
+
     // create pointers
     for (auto &t : ast.types)
     {
@@ -130,8 +150,12 @@ Schema convert(const ast::Schema &ast)
     }
     for (auto &c : ast.classes)
     {
-        s.typePtrs[c.name] = &s.getClass(c.name);
+        s.typePtrs[c.name] = (Type *)&s.getClass(c.name);
         astClasses[c.name] = &c;
+    }
+    for (auto &e : s.enums)
+    {
+        s.typePtrs[e.name] = &e;
     }
 
     // init variables
@@ -185,7 +209,7 @@ Schema parse(const Tokens &tokens)
 
     int ret;
     YYSTYPE yylval = { 0 };
-    YYLTYPE yylloc = { 0 };
+    YYLTYPE yylloc = { 1,1,1,1 };
     yydebug = 0;
     yypstate *ps = yypstate_new();
     auto t = tokens.begin();
@@ -218,7 +242,7 @@ Schema parse_string(const std::string &s, Tokens *tokens)
 
     int ret;
     YYSTYPE yylval = { 0 };
-    YYLTYPE yylloc = { 0 };
+    YYLTYPE yylloc = { 1,1,1,1 };
     yyscan_t scanner;
     yylex_init(&scanner);
     yy_scan_string(s.c_str(), scanner);
@@ -233,6 +257,9 @@ Schema parse_string(const std::string &s, Tokens *tokens)
     } while (ret == YYPUSH_MORE);
     yypstate_delete(ps);
     yylex_destroy(scanner);
+
+    if (ret)
+        throw std::runtime_error("Error during parsing file");
 
     return convert(astSchema);
 }

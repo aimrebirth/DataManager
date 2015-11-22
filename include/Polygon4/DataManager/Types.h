@@ -25,32 +25,18 @@
 #include <vector>
 #include <unordered_map>
 
+#include "Common.h"
+#include "Enums.h"
 #include "Exception.h"
+#include "Localization.h"
+#include "Schema.h"
 #include "String.h"
 #include "Vector.h"
-
-namespace polygon4
-{
-    namespace detail
-    {
-        using EnumType = uint32_t;
-    }
-}
-
-#include <detail/ObjectTypes.h>
-
-#ifdef USE_QT
-#include <qobject.h>
-
-class QTreeWidgetItem;
-#endif
 
 #define POLYGON4_NONAME "NONAME"
 
 namespace polygon4
 {
-
-extern int gCurrentLocalizationId;
 
 namespace detail
 {
@@ -93,10 +79,11 @@ public:
 
     // custom functions
 public:
-    int getId() const { return id; }
-#ifdef POLYGON4_TOOLS
+    int getId(int defaultValue = 0) const { return hasId() ? id : defaultValue; }
     void setId(int id) { this->id = id; }
-#endif
+    virtual bool hasId() const { return false; }
+
+    virtual const Class &getClass() const = 0;
 
 protected:
     virtual void initChildren() {}
@@ -115,17 +102,17 @@ public:
     }
 
     template <class New, class Old, class... Args>
-    static void replace(Old *a, Args&&... args)
+    static void replace(Old *p, Args&&... args)
     {
         static_assert(
             sizeof(New) <= alloc_size &&
             sizeof(New) >= sizeof(Old),
             "Object size is greater than maximum alloc size. Increase limit.");
 
-        Old o = *a;
-        a->~Old();
-        new (a) New(o, std::forward<Args>(args)...);
-        a->initChildren();
+        Old o = *p;
+        p->~Old();
+        new (p) New(o, std::forward<Args>(args)...);
+        p->initChildren();
     }
 
     // generated functions
@@ -133,7 +120,9 @@ public:
     virtual EObjectType getType() const = 0;
     virtual Text getVariableString(int columnId) const = 0;
     virtual void setVariableString(int columnId, const Text &text) = 0;
-    virtual void setVariableString(int columnId, IObjectBase *ptr) = 0;
+    virtual void setVariableString(int columnId, IObjectBase *ptr) {}
+    virtual const IObjectBase *getVariable(int columnId) const { return nullptr; }
+    virtual EObjectType getVariableType(int columnId) const { return EObjectType::None; }
     virtual Ptr<TreeItem> printTree() const = 0;
     virtual Text getName() const { return POLYGON4_NONAME; }
 
@@ -154,7 +143,7 @@ protected:
         item->update();
         return item;
     }
-
+    
     // friends
 private:
     friend class StorageImpl;
@@ -164,6 +153,8 @@ private:
 template <typename T>
 struct IdPtr
 {
+    using value_type = T;
+
     int id = 0;
     IObjectBase *ptr = nullptr;
 
@@ -286,4 +277,5 @@ namespace polygon4
 #undef DECLARE_INTERFACE_STUB
 
 #include "Table.h"
+#include <detail/Enums.h>
 #include <detail/Types.h>

@@ -31,8 +31,6 @@
 namespace polygon4
 {
 
-int gCurrentLocalizationId = 0;
-
 namespace detail
 {
 

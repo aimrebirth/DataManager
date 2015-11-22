@@ -32,9 +32,7 @@
 
 DIGIT       [0-9]
 DIGITS      {DIGIT}{DIGIT}*
-INTEGER     [+-]?{DIGITS}
-FLOAT       [+-]?{DIGITS}*\.?{DIGITS}+
-NUMBER      {FLOAT}
+INTEGER     {DIGITS}
 
 STRING      [[:alpha:]_][[:alnum:]_]*
 
@@ -68,11 +66,12 @@ globals                 { return GLOBALS; }
 types                   { return TYPES; }
 class                   { return CLASS; }
 database                { return DATABASE; }
+enum                    { return ENUM; }
 
 field                   return FIELD;
 properties              return PROPERTIES;
 
-{NUMBER}                | { yylval.doubleVal = std::stoi(yytext); return FLOAT; }
+{INTEGER}               { yylval.intVal = std::stoi(yytext); return INTEGER; }
 {STRING}                { CREATE_STRING; return STRING;}
 
 \"                      { PUSH_STATE(user_string);  return QUOTE; }

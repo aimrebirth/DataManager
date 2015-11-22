@@ -2,10 +2,7 @@
 
 #include <bitset>
 #include <string>
-
-#ifdef USE_QT
-#include <qstring.h>
-#endif
+#include <vector>
 
 using Name = std::string;
 using Key = std::string;
@@ -24,11 +21,20 @@ enum ObjectFlag
     fInline,
     fProxy,
     fTreeView,
+    fName,
+    fObjectName,
+    fParent,
+    fEnumName,
+    fPrefixed,
+    fNamesOrder,
 
     // fields
     fPrimaryKey,
     fEnumItem,
     fContainer,
+
+    // enums
+    fNotInTable,
 
     fMaxFlag,
 };
@@ -39,12 +45,14 @@ using Version = std::string;
 
 enum class DataType
 {
+    None,
     Bool,
     Integer,
     Real,
     Text,
     Blob,
     Complex,
+    Enum,
 };
 
 enum class ObjectName
@@ -55,7 +63,3 @@ enum class ObjectName
     Parent,
     Custom,
 };
-
-#ifdef USE_QT
-QString getColumnTypeString(DataType type);
-#endif

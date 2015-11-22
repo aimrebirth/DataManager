@@ -39,12 +39,11 @@ try
         save(src    / subdir / (name + ".cpp"), module.cpp.getText());
     };
 
-    printModule("ObjectTypes", schema.printObjectTypes());
     printModule("ObjectInterfaces", schema.printObjectInterfaces());
     printModule("Types", schema.printTypes());
     printModule("Storage", schema.printStorage());
     printModule("StorageImpl", schema.printStorageImplementation());
-    printModule("Helpers", schema.printHelpers());
+    printModule("Enums", schema.printEnums());
     printModule("Tokens", print(ts), "schema");
 
     return 0;

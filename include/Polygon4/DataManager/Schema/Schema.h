@@ -65,6 +65,7 @@ public:
 
     using value_type = typename Parent::value_type;
     using iterator = typename Parent::iterator;
+    using const_iterator = typename Parent::const_iterator;
 
 public:
     template <class T>
@@ -129,6 +130,10 @@ public:
     }
 
     iterator find(const Name &name)
+    {
+        return std::find_if(Parent::begin(), Parent::end(), [&name](const auto &v) { return name == v.getCppName(); });
+    }
+    const_iterator find(const Name &name) const
     {
         return std::find_if(Parent::begin(), Parent::end(), [&name](const auto &v) { return name == v.getCppName(); });
     }
@@ -200,7 +205,10 @@ using Databases = std::vector<Database>;
 class Variable : public ObjectWithFlags
 {
 public:
-    Name getName() const { return name; }
+    Name getName() const
+    {
+        return name;
+    }
     Name getSqlName() const
     {
         if (type->getDataType() == DataType::Complex)
@@ -211,14 +219,30 @@ public:
     {
         auto n = name;
         n[0] = toupper(n[0]);
-        return n;
+        if (prefix.empty())
+            return n;
+        return prefix + "." + n;
     }
+    Name getPrefixOrName() const
+    {
+        if (prefix.empty())
+            return getName();
+        return prefix;
+    }
+    Name getPrefixedName() const
+    {
+        if (prefix.empty())
+            return getName();
+        return prefix + "." + getName();
+    }
+
     const Type *getType() const { return type; }
     DataType getDataType() const { return type->getDataType(); }
     int getId() const { return id; }
     void setId(int id) { this->id = id; }
     std::string getDefaultValue() const;
     std::string getRawDefaultValue() const { return defaultValue; }
+    void setPrefix(const Name &prefix) { this->prefix = prefix; }
 
     bool isId() const
     {
@@ -230,11 +254,11 @@ public:
         }
         return is_id;
     }
-    bool isFk() const { return type->isComplex(); }
+    bool isFk() const { return type->isComplex() && type->hasFlags({ fInline, fPrefixed }, true); }
 
     bool operator<(const Variable &rhs) const
     {
-        return name < rhs.name;
+        return getName() < rhs.getName();
     }
 
     std::string print() const;
@@ -246,6 +270,7 @@ public:
 private:
     int id;
     Name name;
+    Name prefix;
     Type *type;
     std::string defaultValue;
 
@@ -257,42 +282,37 @@ using Variables = ObjectArray<std::vector<Variable>>;
 class Class : public Type
 {
 public:
-    void addVariable(const Variable &v)
-    {
-        if (v.isId())
-            hasIdField = true;
-        variables.push_back(v);
-    }
-    
+    void addVariable(Variable v);    
     Variables getVariables(bool container = false) const;
     Name getEnumName() const { return enumName; }
     virtual Class *getParent() const override { return parent; }
     
-    const Variable *getVariable(const std::string &name) const
+    Variable getVariable(const std::string &name) const
     {
+        auto variables = getVariables();
         Variables::const_iterator i;
         i = find_if(variables.begin(), variables.end(), [name](const auto &p)
         {
             return p.getName() == name;
         });
         if (i != variables.end())
-            return &*i;
+            return *i;
         i = find_if(variables.begin(), variables.end(), [name](const auto &p)
         {
             return p.getName() == name + "_id";
         });
         if (i != variables.end())
-            return &*i;
+            return *i;
         i = find_if(variables.begin(), variables.end(), [name](const auto &p)
         {
             return p.getName().find(name) != -1;
         });
         if (i != variables.end())
-            return &*i;
-        return nullptr;
+            return *i;
+        return Variable();
     }
-    const Variable *getNameVariable() const { return getVariable("name"); }
-    const Variable *getTextVariable() const { return getVariable("text"); }
+    Variable getNameVariable() const { return getVariable("name"); }
+    Variable getTextVariable() const { return getVariable("text"); }
 
     virtual bool isSimple() const override { return false; }
 
@@ -319,16 +339,40 @@ private:
     Class *parent = nullptr;
     std::vector<Class *> children;
     bool hasIdField = false;
+    bool hasFks = false;
 
     friend Schema convert(const ast::Schema &schema);
 };
 
 using Classes = ObjectArray<std::list<Class>>;
 
+struct EnumItem
+{
+    Name name;
+    int id;
+    bool not_in_table;
+};
+
+using EnumItems = std::vector<EnumItem>;
+
+class Enum : public Type
+{
+public:
+    ModuleContext print() const;
+    ModuleContext printTableRecord() const;
+
+private:
+    EnumItems items;
+
+    friend Schema convert(const ast::Schema &schema);
+};
+
+using Enums = ObjectArray<std::list<Enum>>;
+
 class Schema
 {
 public:
-    Class &getClass(const Name &name)
+    const Class &getClass(const Name &name) const
     {
         auto i = classes.find(name);
         if (i == classes.end())
@@ -337,21 +381,22 @@ public:
     }
     Classes getClasses() const
     {
-        return classes({ fInline, fEnumOnly }, true);
+        return classes({ fService, fInline, fEnumOnly }, true);
     }
 
-    ModuleContext printObjectTypes() const;
-    ModuleContext printHelpers() const;
     ModuleContext printObjectInterfaces() const;
     ModuleContext printTypes() const;
     ModuleContext printStorage() const;
     ModuleContext printStorageImplementation() const;
+    ModuleContext printEnums() const;
 
 private:
     Version version;
     Types types;
     Classes classes;
     Databases databases;
+    Enums enums;
+
     std::unordered_map<Name, Type*> typePtrs;
 
     friend Schema convert(const ast::Schema &schema);

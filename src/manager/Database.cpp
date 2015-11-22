@@ -22,6 +22,7 @@
 
 #include <sqlite3/sqlite3.h>
 
+#include <Polygon4/DataManager/Schema.h>
 #include <Polygon4/DataManager/Storage.h>
 #include <Polygon4/DataManager/StorageImpl.h>
 #include <Polygon4/DataManager/Exception.h>
@@ -42,6 +43,8 @@ std::shared_ptr<Storage> initStorage(std::string filename)
 
 std::shared_ptr<Storage> initStorage(std::shared_ptr<Database> db)
 {
+    if (!detail::schema)
+        detail::schema = new Schema(detail::getSchema());
     return std::make_shared<detail::StorageImpl>(db);
 }
 
