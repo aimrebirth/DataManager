@@ -11,6 +11,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "../Dll.h"
+
 #include "Context.h"
 #include "Types.h"
 
@@ -139,7 +141,7 @@ public:
     }
 };
 
-class Type : public ObjectWithFlags
+class DLL_EXPORT Type : public ObjectWithFlags
 {
 public:
     Name getName() const
@@ -172,6 +174,7 @@ public:
     }
     Name getSqlName() const { return getCppArrayName(); }
     virtual Type *getParent() const { return nullptr; }
+    virtual Type *getChild() const { return nullptr; }
     DataType getDataType() const { return dataType; }
 
     virtual bool isSimple() const { return true; }
@@ -202,7 +205,7 @@ struct Database
 
 using Databases = std::vector<Database>;
 
-class Variable : public ObjectWithFlags
+class DLL_EXPORT Variable : public ObjectWithFlags
 {
 public:
     Name getName() const
@@ -279,13 +282,14 @@ private:
 
 using Variables = ObjectArray<std::vector<Variable>>;
 
-class Class : public Type
+class DLL_EXPORT Class : public Type
 {
 public:
     void addVariable(Variable v);    
     Variables getVariables(bool container = false) const;
     Name getEnumName() const { return enumName; }
     virtual Class *getParent() const override { return parent; }
+    virtual Class *getChild() const override { return child; }
     
     Variable getVariable(const std::string &name) const
     {
@@ -337,6 +341,7 @@ private:
     };
     std::string objectName;
     Class *parent = nullptr;
+    Class *child = nullptr;
     std::vector<Class *> children;
     bool hasIdField = false;
     bool hasFks = false;
@@ -369,7 +374,7 @@ private:
 
 using Enums = ObjectArray<std::list<Enum>>;
 
-class Schema
+class DLL_EXPORT Schema
 {
 public:
     const Class &getClass(const Name &name) const

@@ -1,4 +1,5 @@
 win*
 lib
 /build*
-
+/include/Polygon4/DataManager/detail
+/src/manager/detail

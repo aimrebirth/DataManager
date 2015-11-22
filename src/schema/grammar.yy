@@ -25,29 +25,9 @@ extern MemoryManager *parserMemoryManager;
 #define SET_NULL(v) v = nullptr
 #define RESET(v) v = decltype(v)()
 
-//
-// variables
-//
-
-Types types;
-Database database;
-Databases databases;
-Properties properties;
-Specifier specifier;
-Specifiers specifiers;
-Class class_;
-Classes classes;
-Enum enum_;
-Enums enums;
-int variable_id = 0;
-int enum_var_id = 0;
-
-//
-// variables
-//
 %}
 
-%require "2.3"
+%require "3.0.3"
 %debug
 %start file
 %locations
@@ -94,23 +74,23 @@ globals: global
 global: GLOBALS L_CURLY_BRACKET globals1 R_CURLY_BRACKET SEMICOLON
     | TYPES L_CURLY_BRACKET type_decls R_CURLY_BRACKET SEMICOLON
     {
-        schema->types = types;
-        RESET(types);
+        schema->types = pd->types;
+        RESET(pd->types);
     }
     | databases
     {
-        schema->databases = databases;
-        RESET(databases);
+        schema->databases = pd->databases;
+        RESET(pd->databases);
     }
     | classes
     {
-        schema->classes = classes;
-        RESET(classes);
+        schema->classes = pd->classes;
+        RESET(pd->classes);
     }
     | enums
     {
-        schema->enums = enums;
-        RESET(enums);
+        schema->enums = pd->enums;
+        RESET(pd->enums);
     }
     ;
 
@@ -120,10 +100,10 @@ enums: enum
 
 enum: ENUM string L_CURLY_BRACKET enum_vars R_CURLY_BRACKET SEMICOLON
     {
-        enum_.name = *$2;
-        enums.push_back(enum_);
-        RESET(enum_var_id);
-        RESET(enum_);
+        pd->enum_.name = *$2;
+        pd->enums.push_back(pd->enum_);
+        RESET(pd->enum_var_id);
+        RESET(pd->enum_);
     }
     ;
 
@@ -133,25 +113,25 @@ enum_vars: enum_var
 
 enum_var: string COMMA
     {
-        enum_.items.push_back({*$1, 0});
+        pd->enum_.items.push_back({*$1, 0});
     }
     | string EQUAL INTEGER COMMA
     {
-        enum_.items.push_back({*$1, $3});
+        pd->enum_.items.push_back({*$1, $3});
     }
     | string specifiers_braced COMMA
     {
         EnumItem item = {*$1, 0};
-        item.specifiers = specifiers;
-        RESET(specifiers);
-        enum_.items.push_back(item);
+        item.specifiers = pd->specifiers;
+        RESET(pd->specifiers);
+        pd->enum_.items.push_back(item);
     }
     | string EQUAL INTEGER specifiers_braced COMMA
     {
         EnumItem item = {*$1, $3};
-        item.specifiers = specifiers;
-        RESET(specifiers);
-        enum_.items.push_back(item);
+        item.specifiers = pd->specifiers;
+        RESET(pd->specifiers);
+        pd->enum_.items.push_back(item);
     }
     ;
 
@@ -166,9 +146,9 @@ databases: database
     ;
 database: DATABASE name L_CURLY_BRACKET database_contents R_CURLY_BRACKET SEMICOLON
     {
-        database.name = *$2;
-        databases.push_back(database);
-        RESET(database);
+        pd->database.name = *$2;
+        pd->databases.push_back(pd->database);
+        RESET(pd->database);
     }
     ;
 database_contents: database_content
@@ -176,8 +156,8 @@ database_contents: database_content
     ;
 database_content: TYPES L_CURLY_BRACKET type_decls R_CURLY_BRACKET
     {
-        database.types = types;
-        RESET(types);
+        pd->database.types = pd->types;
+        RESET(pd->types);
     }
     ;
 
@@ -186,7 +166,7 @@ type_decls: type_decl
     ;
 type_decl: key R_ARROW value SEMICOLON
     {
-        types.insert(Type(*$1, *$3));
+        pd->types.insert(Type(*$1, *$3));
     }
     ;
 
@@ -195,10 +175,10 @@ classes: class
     ;
 class: CLASS name L_CURLY_BRACKET class_contents R_CURLY_BRACKET SEMICOLON
     {
-        class_.name = *$2;
-        auto p = classes.insert(class_);
-        RESET(class_);
-        variable_id = 0;
+        pd->class_.name = *$2;
+        auto p = pd->classes.insert(pd->class_);
+        RESET(pd->class_);
+        pd->variable_id = 0;
         assert(p.second);
     }
     ;
@@ -211,41 +191,41 @@ class_content: field
 field: FIELD L_CURLY_BRACKET field_contents R_CURLY_BRACKET
     {
         Variable variable;
-        variable.properties = properties;
-        class_.variables.push_back(variable);
-        RESET(properties);
+        variable.properties = pd->properties;
+        pd->class_.variables.push_back(variable);
+        RESET(pd->properties);
     }
     | type name SEMICOLON
     {
         Variable variable;
-        variable.id = variable_id++;
+        variable.id = pd->variable_id++;
         variable.type = *$1;
         variable.name = *$2;
-        class_.variables.push_back(variable);
+        pd->class_.variables.push_back(variable);
     }
     | type name EQUAL any_value SEMICOLON
     {
         Variable variable;
-        variable.id = variable_id++;
+        variable.id = pd->variable_id++;
         variable.type = *$1;
         variable.name = *$2;
         variable.defaultValue = *$4;
-        class_.variables.push_back(variable);
+        pd->class_.variables.push_back(variable);
     }
     | type name properties_braced SEMICOLON
     {
         Variable variable;
-        variable.id = variable_id++;
+        variable.id = pd->variable_id++;
         variable.type = *$1;
         variable.name = *$2;
-        variable.properties = properties;
-        RESET(properties);
-        class_.variables.push_back(variable);
+        variable.properties = pd->properties;
+        RESET(pd->properties);
+        pd->class_.variables.push_back(variable);
     }
     | PROPERTIES properties_braced
     {
-        class_.properties.push_back(properties);
-        RESET(properties);
+        pd->class_.properties.push_back(pd->properties);
+        RESET(pd->properties);
     }
     ;
 field_contents: field_content
@@ -262,7 +242,7 @@ properties: property
     ;
 property: key SEMICOLON
     {
-        properties[*$1];
+        pd->properties[*$1];
     }
     | key_value_pair SEMICOLON
     ;
@@ -276,13 +256,13 @@ specifiers: specifier
 
 key_value_pair: key COLON value
     {
-        properties[*$1] = *$3;
+        pd->properties[*$1] = *$3;
     }
     ;
 
 specifier: string
     {
-        specifiers.insert(*$1);
+        pd->specifiers.insert(*$1);
     }
     ;
 name: string

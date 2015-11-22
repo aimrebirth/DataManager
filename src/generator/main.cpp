@@ -21,8 +21,8 @@ try
     auto schema = parse_file(argv[1], &ts);
 
     fs::path p = argv[2];
-    auto header = p;// / "include" / "Polygon4" / "DataManager" / "detail";
-    auto src = p;// / "src" / "detail";
+    auto header = p / "include" / "Polygon4" / "DataManager" / "detail";
+    auto src = p / "src" / "manager" / "detail";
 
     auto printModule = [&header, &src](const std::string &name, const auto &module, const fs::path &subdir = fs::path())
     {

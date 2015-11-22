@@ -24,6 +24,7 @@ enum ObjectFlag
     fName,
     fObjectName,
     fParent,
+    fChild,
     fEnumName,
     fPrefixed,
     fNamesOrder,

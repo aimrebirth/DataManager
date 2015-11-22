@@ -104,6 +104,14 @@ enum EObjectType
     Any = 1000,
 };
 
+enum QuestState
+{
+    None,
+    Started,
+    Completed,
+    Abandoned,
+};
+
 ################################################################################
 #
 # classes
@@ -604,11 +612,13 @@ class ConfigurationEquipment
 {
     Configuration configuration;
     Equipment equipment;
+
     Quantity quantity;
 
     properties
     {
         parent: Configuration;
+        child: Equipment;
         proxy;
     }
 };
@@ -617,11 +627,13 @@ class ConfigurationGood
 {
     Configuration configuration;
     Good good;
+
     Quantity quantity;
 
     properties
     {
         parent: Configuration;
+        child: Good;
         proxy;
     }
 };
@@ -630,11 +642,13 @@ class ConfigurationProjectile
 {
     Configuration configuration;
     Projectile projectile;
+
     Quantity quantity;
 
     properties
     {
         parent: Configuration;
+        child: Projectile;
         proxy;
     }
 };
@@ -643,11 +657,13 @@ class ConfigurationWeapon
 {
     Configuration configuration;
     Weapon weapon;
+
     Quantity quantity;
 
     properties
     {
         parent: Configuration;
+        child: Weapon;
         proxy;
     }
 };
@@ -701,11 +717,13 @@ class QuestRewardEquipment
 {
     QuestReward quest_reward;
     Equipment equipment;
+
     Quantity quantity;
 
     properties
     {
         parent: QuestReward;
+        child: Equipment;
         proxy;
     }
 };
@@ -714,11 +732,13 @@ class QuestRewardGlider
 {
     QuestReward quest_reward;
     Glider glider;
+
     Quantity quantity;
 
     properties
     {
         parent: QuestReward;
+        child: Glider;
         proxy;
     }
 };
@@ -727,11 +747,13 @@ class QuestRewardGood
 {
     QuestReward quest_reward;
     Good good;
+
     Quantity quantity;
 
     properties
     {
         parent: QuestReward;
+        child: Good;
         proxy;
     }
 };
@@ -740,11 +762,13 @@ class QuestRewardModificator
 {
     QuestReward quest_reward;
     Modificator modificator;
+
     Quantity quantity;
 
     properties
     {
         parent: QuestReward;
+        child: Modificator;
         proxy;
     }
 };
@@ -753,11 +777,13 @@ class QuestRewardProjectile
 {
     QuestReward quest_reward;
     Projectile projectile;
+
     Quantity quantity;
 
     properties
     {
         parent: QuestReward;
+        child: Projectile;
         proxy;
     }
 };
@@ -766,11 +792,14 @@ class QuestRewardReputation
 {
     QuestReward quest_reward;
     Clan clan;
+
     Reputation quantity;
 
     properties
     {
         parent: QuestReward;
+        child: Clan;
+
         proxy;
     }
 };
@@ -779,11 +808,13 @@ class QuestRewardWeapon
 {
     QuestReward quest_reward;
     Weapon weapon;
+
     Quantity quantity;
 
     properties
     {
         parent: QuestReward;
+        child: Weapon;
         proxy;
     }
 };
@@ -851,6 +882,7 @@ class GroupMechanoid
     properties
     {
         parent: Group;
+        child: Mechanoid;
         proxy;
     }
 };
@@ -865,6 +897,8 @@ class ModificationMap
     properties
     {
         parent: Modification;
+        child: Map;
+
         object_name: "to_string(map)";
         names_order: "custom none";
         proxy;
@@ -877,11 +911,13 @@ class MechanoidQuest
 {
     Mechanoid mechanoid;
     Quest quest;
-    i32 state;
+
+    QuestState state;
 
     properties
     {
         parent: Mechanoid;
+        child: Quest;
         proxy;
     }
 };
@@ -901,7 +937,6 @@ class MapObject
 
     properties
     {
-        #names_order: "text name custom parent";
         object_name: "to_string(object)";
         parent: Object;
     }
@@ -922,7 +957,6 @@ class MapGood
 
     properties
     {
-        #names_order: "text name custom parent";
         object_name: "to_string(good)";
         parent: Good;
     }
@@ -953,7 +987,6 @@ class MapBuilding
 
     properties
     {
-        #names_order: "text name custom parent";
         object_name: "to_string(building)";
         parent: Building;
     }
@@ -963,11 +996,13 @@ class MapBuildingEquipment
 {
     MapBuilding map_building;
     Equipment equipment;
+
     Quantity quantity;
 
     properties
     {
         parent: MapBuilding;
+        child: Equipment;
         proxy;
     }
 };
@@ -976,11 +1011,13 @@ class MapBuildingGlider
 {
     MapBuilding map_building;
     Glider glider;
+
     Quantity quantity;
 
     properties
     {
         parent: MapBuilding;
+        child: Glider;
         proxy;
     }
 };
@@ -989,11 +1026,13 @@ class MapBuildingGood
 {
     MapBuilding map_building;
     Good good;
+
     Quantity quantity;
 
     properties
     {
         parent: MapBuilding;
+        child: Good;
         proxy;
     }
 };
@@ -1002,11 +1041,13 @@ class MapBuildingModificator
 {
     MapBuilding map_building;
     Modificator modificator;
+
     Quantity quantity;
 
     properties
     {
         parent: MapBuilding;
+        child: Modificator;
         proxy;
     }
 };
@@ -1015,11 +1056,13 @@ class MapBuildingProjectile
 {
     MapBuilding map_building;
     Projectile projectile;
+
     Quantity quantity;
 
     properties
     {
         parent: MapBuilding;
+        child: Projectile;
         proxy;
     }
 };
@@ -1028,11 +1071,13 @@ class MapBuildingWeapon
 {
     MapBuilding map_building;
     Weapon weapon;
+
     Quantity quantity;
 
     properties
     {
         parent: MapBuilding;
+        child: Weapon;
         proxy;
     }
 };

@@ -157,7 +157,6 @@ ModuleContext Schema::printEnums() const
     mc.hpp.before().beginNamespace("detail");
     for (auto &e : enums)
         mc += e.print();
-    mc.hpp.addLine();
     mc.hpp.after().endNamespace("detail");
     mc.hpp.after().addLine();
     mc.hpp.after().endNamespace("polygon4");
@@ -892,20 +891,20 @@ ModuleContext Class::print() const
                 auto vclass = (Class *)v.getType();
                 if (vclass->getFlags()[fProxy])
                 {
-                    std::string var_name = vclass->getParent()->getCppVariableName();
+                    std::string var_name = vclass->getChild()->getCppVariableName();
                     for (auto &v2 : vclass->getVariables())
                     {
-                        if (vclass->getParent()->getName() == v2.getType()->getName())
+                        if (vclass->getChild()->getName() == v2.getType()->getName())
                         {
                             var_name = v2.getName();
                             break;
                         }
                     }
-                    c.addLine("auto p = v->" + var_name + ";");
+                    c.addLine("auto p = v->" + var_name + ".get();");
                 }
                 else
                     c.addLine("auto p = v.second.get();");
-                c.addLine("p->replace<T>(p, std::forward<Args>(args)...);");
+                c.addLine("replace<T>(p, std::forward<Args>(args)...);");
                 c.endBlock();
                 c.endFunction();
             }
@@ -1338,6 +1337,7 @@ ModuleContext Enum::print() const
         mc.hpp.addLine(i.name + ",");
 
     mc.hpp.endBlock(true);
+    mc.hpp.addLine();
     return mc;
 }
 

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Common.h"
+#include "Dll.h"
 #include "Enums.h"
 #include "String.h"
 
@@ -181,7 +182,9 @@ extern Translator translator;
 
 void initTranslator();
 
+DLL_EXPORT
 String tr(DataType type);
+DLL_EXPORT
 String tr(const std::string &key, const std::string &context = std::string());
 
 }

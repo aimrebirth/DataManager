@@ -14,8 +14,8 @@ set(H "${_H}$")
 
 set(H_CPP "(${H}|${CPP})")
 
-source_group("Source Files\\Detail" "${BSRC}/detail/${CPP}")
-source_group("Header Files\\Detail" "${BSRC}/detail/${H}")
+source_group("Source Files\\Detail" "${SSRC}/src/manager/detail/${CPP}")
+source_group("Header Files\\Detail" "${SSRC}/include/Polygon4/DataManager/detail/${H}")
 source_group("Header Files\\Interface" "${SSRC}/include/Polygon4/DataManager/Interface/${H_CPP}")
 source_group("MOC files" ".*automoc\\.cpp")
 
@@ -30,19 +30,21 @@ if (NOT POLYGON4_ENGINE)
     add_definitions(-DPOLYGON4_STATIC)
 endif()
 
-set(generated_dir ${CMAKE_CURRENT_BINARY_DIR}/detail)
+set(generated_dir ${PROJECT_SOURCE_DIR})
+set(generated_dir_inc ${generated_dir}/include/Polygon4/DataManager/detail)
+set(generated_dir_src ${generated_dir}/src/manager/detail)
 set(generated_src
-    ${generated_dir}/Types.h
-    ${generated_dir}/Types.cpp
-    ${generated_dir}/Storage.h
-    ${generated_dir}/Storage.cpp
-    ${generated_dir}/StorageImpl.h
-    ${generated_dir}/StorageImpl.cpp
-    ${generated_dir}/schema/Tokens.cpp
-    ${generated_dir}/ObjectTypes.h
-    ${generated_dir}/ObjectInterfaces.h
-    ${generated_dir}/Enums.h
-    ${generated_dir}/Enums.cpp
+    ${generated_dir_inc}/Types.h
+    ${generated_dir_src}/Types.cpp
+    ${generated_dir_inc}/Storage.h
+    ${generated_dir_src}/Storage.cpp
+    ${generated_dir_inc}/StorageImpl.h
+    ${generated_dir_src}/StorageImpl.cpp
+    ${generated_dir_src}/schema/Tokens.cpp
+    ${generated_dir_inc}/ObjectTypes.h
+    ${generated_dir_inc}/ObjectInterfaces.h
+    ${generated_dir_inc}/Enums.h
+    ${generated_dir_src}/Enums.cpp
 )
 set_source_files_properties(${generated_src} PROPERTIES
     GENERATED True
@@ -50,11 +52,10 @@ set_source_files_properties(${generated_src} PROPERTIES
 )
 
 add_custom_command(OUTPUT ${generated_src}
-    COMMAND generator ${PROJECT_SOURCE_DIR}/data/schema.txt ${CMAKE_CURRENT_BINARY_DIR}/detail
+    COMMAND generator ${PROJECT_SOURCE_DIR}/data/schema.txt ${PROJECT_SOURCE_DIR}
     DEPENDS generator ${PROJECT_SOURCE_DIR}/data/schema.txt
 )
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 set(DATA_MANAGER_ADDITIONAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR} CACHE STRING "Data manager generated includes dir" FORCE)
 
 add_library                 (DataManager ${db_src} ${db_inc1} ${db_inc2} ${db_src_hdr} ${generated_src} ${PROJECT_SOURCE_DIR}/data/schema.txt)

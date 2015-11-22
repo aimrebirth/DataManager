@@ -116,6 +116,10 @@ struct Class
     {
         return getProperty("parent");
     }
+    Name getChildName() const
+    {
+        return getProperty("child");
+    }
 
     std::vector<ObjectName> getNamesOrder() const
     {
@@ -169,6 +173,7 @@ struct Class
                 SET_PROPERTY("enum_name", fEnumName);
                 SET_PROPERTY("prefixed", fPrefixed);
                 SET_PROPERTY("names_order", fNamesOrder);
+                SET_PROPERTY("child", fChild);
                 else
                     assert(false);
 #undef SET_PROPERTY
@@ -236,5 +241,23 @@ struct Schema
     Classes classes;
     Enums enums;
 };
+
+struct parser_data
+{
+    Types types;
+    Database database;
+    Databases databases;
+    Properties properties;
+    Specifier specifier;
+    Specifiers specifiers;
+    Class class_;
+    Classes classes;
+    Enum enum_;
+    Enums enums;
+    int variable_id = 0;
+    int enum_var_id = 0;
+};
+
+extern parser_data *pd;
 
 } // namespace ast

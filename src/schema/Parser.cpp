@@ -15,6 +15,10 @@ extern int yylex(yyscan_t yyscanner, YYSTYPE &yylval, YYLTYPE &yylloc);
 
 #include "Ast.h"
 
+namespace ast
+{
+    parser_data *pd;
+}
 ast::Schema *schema;
 MemoryManager *parserMemoryManager;
 
@@ -170,6 +174,13 @@ Schema convert(const ast::Schema &ast)
             c.parent = (Class *)i->second;
             c.parent->children.push_back(&c);
         }
+        auto cn = ac.getChildName();
+        if (!cn.empty())
+        {
+            auto i = s.typePtrs.find(cn);
+            assert(i != s.typePtrs.end());
+            c.child = (Class *)i->second;
+        }
         for (auto &av : ac.variables)
         {
             Variable v;
@@ -212,12 +223,14 @@ Schema parse(const Tokens &tokens)
     YYLTYPE yylloc = { 1,1,1,1 };
     yydebug = 0;
     yypstate *ps = yypstate_new();
+    ast::pd = new ast::parser_data;
     auto t = tokens.begin();
     do {
         yylval = convert(*t);
         ret = yypush_parse(ps, t->token, &yylval, &yylloc);
         t++;
     } while (ret == YYPUSH_MORE);
+    delete ast::pd;
     yypstate_delete(ps);
 
     if (ret)
@@ -248,6 +261,7 @@ Schema parse_string(const std::string &s, Tokens *tokens)
     yy_scan_string(s.c_str(), scanner);
     yydebug = 0;
     yypstate *ps = yypstate_new();
+    ast::pd = new ast::parser_data;
     do
     {
         ret = yylex(scanner, yylval, yylloc);
@@ -255,6 +269,7 @@ Schema parse_string(const std::string &s, Tokens *tokens)
             tokens->push_back(convert(ret, yylval));
         ret = yypush_parse(ps, ret, &yylval, &yylloc);
     } while (ret == YYPUSH_MORE);
+    delete ast::pd;
     yypstate_delete(ps);
     yylex_destroy(scanner);
 

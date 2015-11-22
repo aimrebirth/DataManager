@@ -18,6 +18,21 @@
 
 #include <Polygon4/DataManager/String.h>
 
+#include <codecvt>
+#include <locale>
+
+static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+std::wstring string2wstring(const std::string &s)
+{
+    return converter.from_bytes(s.c_str());
+}
+
+std::string wstring2string(const std::wstring &s)
+{
+    return converter.to_bytes(s.c_str());
+}
+
 namespace polygon4
 {
 

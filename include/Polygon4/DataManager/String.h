@@ -20,27 +20,16 @@
 
 #include <functional>
 #include <memory>
+#include <string>
 
 #ifdef USE_QT
 #include <qstring.h>
 #endif
 
-#include "dll.h"
+#include "Dll.h"
 
-#include <codecvt>
-#include <locale>
-#include <string>
-
-inline std::wstring string2wstring(const std::string &s)
-{
-    static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    return converter.from_bytes(s.c_str());
-}
-inline std::string wstring2string(const std::wstring &s)
-{
-    static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    return converter.to_bytes(s.c_str());
-}
+DLL_EXPORT std::wstring string2wstring(const std::string &s);
+DLL_EXPORT std::string wstring2string(const std::wstring &s);
 
 namespace polygon4
 {
