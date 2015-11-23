@@ -7,7 +7,7 @@ namespace polygon4
 
 LocalizationType gCurrentLocalizationId = LocalizationType::ru;
 Translator translator;
-extern Translator::translator_type translator_data;
+extern const Translator::translator_type translator_data;
 
 }
 
@@ -46,7 +46,7 @@ String tr(const std::string &key, const std::string &context)
     return translator.tr(key, context);
 }
 
-Translator::translator_type translator_data =
+const Translator::translator_type translator_data =
 {
     { // pair < context, dict >
         "", // context
