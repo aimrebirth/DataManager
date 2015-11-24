@@ -50,10 +50,12 @@ using Ptr = std::shared_ptr<T>;
 
 class IObjectBase;
 
+using OrderedObjectMap = std::multimap<Text, IObjectBase *>;
+
 struct DLL_EXPORT TreeItem
 {
     Text name;
-    EObjectType type;
+    EObjectType type = EObjectType::None;
     IObjectBase *object = nullptr;
     TreeItem *parent = nullptr;
     Vector<Ptr<TreeItem>> children;
@@ -64,6 +66,8 @@ struct DLL_EXPORT TreeItem
 
 class DLL_EXPORT IObjectBase
 {
+public:
+
 private:
     using alloc_type = uint8_t;
     static const int alloc_size = 1024;
@@ -126,6 +130,8 @@ public:
     virtual Ptr<TreeItem> printTree() const = 0;
     virtual Text getName() const { return POLYGON4_NONAME; }
 
+    virtual std::tuple<bool, OrderedObjectMap> getOrderedObjectMap(int columnId, class Storage *storage = nullptr) const;
+
 #ifdef USE_UNREAL_EDITOR
     virtual UE4SPtrTreeViewItem printUE4TreeView() const = 0;
 #endif
@@ -136,9 +142,10 @@ public:
 protected:
     int id = 0;
 
-    Ptr<TreeItem> createTreeItem() const
+    Ptr<TreeItem> createTreeItem(TreeItem *parent = nullptr) const
     {
         auto item = std::make_shared<TreeItem>();
+        item->parent = parent;
         item->object = const_cast<IObjectBase*>(this);
         item->update();
         return item;
@@ -219,9 +226,14 @@ struct IdPtr
     {
         return ptr != nullptr;
     }
+
+    void clear()
+    {
+        id = 0;
+        ptr = nullptr;
+    }
 };
 
-using OrderedObjectMap = std::multimap<Text, IObjectBase *>;
 using ProgressCallback = std::function<void(double)>;
 
 template<class T>

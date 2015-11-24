@@ -35,19 +35,6 @@ DECLARE_STATIC_LOGGER(logger, "db");
 namespace polygon4
 {
 
-std::shared_ptr<Storage> initStorage(std::string filename)
-{
-    std::shared_ptr<Database> db = std::make_shared<Database>(filename);
-    return initStorage(db);
-}
-
-std::shared_ptr<Storage> initStorage(std::shared_ptr<Database> db)
-{
-    if (!detail::schema)
-        detail::schema = new Schema(detail::getSchema());
-    return std::make_shared<detail::StorageImpl>(db);
-}
-
 Database::Database(const std::string &dbname)
 {
     loadDatabase(dbname);

@@ -12,13 +12,13 @@
         "to": "id"
       },
       {
-        "from": "name_id",
+        "from": "configuration_id",
         "id": 1,
         "match": "NONE",
         "on_delete": "NO ACTION",
         "on_update": "NO ACTION",
         "seq": 0,
-        "table": "Strings",
+        "table": "Configurations",
         "to": "id"
       },
       {
@@ -32,18 +32,8 @@
         "to": "id"
       },
       {
-        "from": "map_id",
-        "id": 3,
-        "match": "NONE",
-        "on_delete": "NO ACTION",
-        "on_update": "NO ACTION",
-        "seq": 0,
-        "table": "Maps",
-        "to": "id"
-      },
-      {
         "from": "clan_id",
-        "id": 4,
+        "id": 3,
         "match": "NONE",
         "on_delete": "NO ACTION",
         "on_update": "NO ACTION",
@@ -52,17 +42,37 @@
         "to": "id"
       },
       {
-        "from": "configuration_id",
+        "from": "map_id",
+        "id": 4,
+        "match": "NONE",
+        "on_delete": "NO ACTION",
+        "on_update": "NO ACTION",
+        "seq": 0,
+        "table": "ModificationMaps",
+        "to": "id"
+      },
+      {
+        "from": "modification_id",
         "id": 5,
         "match": "NONE",
         "on_delete": "NO ACTION",
         "on_update": "NO ACTION",
         "seq": 0,
-        "table": "Configurations",
+        "table": "Modifications",
+        "to": "id"
+      },
+      {
+        "from": "name_id",
+        "id": 6,
+        "match": "NONE",
+        "on_delete": "NO ACTION",
+        "on_update": "NO ACTION",
+        "seq": 0,
+        "table": "Strings",
         "to": "id"
       }
     ],
-    "sql": "CREATE TABLE \"Mechanoids\" ( \"id\" INTEGER NOT NULL, \"text_id\" TEXT, \"name_id\" INTEGER, \"generation\" INTEGER, \"rating\" REAL, \"money\" REAL, \"configuration_id\" INTEGER, \"group_id\" INTEGER, \"clan_id\" INTEGER, \"rating_fight\" REAL, \"rating_courier\" REAL, \"rating_trade\" REAL, \"map_id\" INTEGER, \"mapBuilding_id\" INTEGER, \"x\" REAL, \"y\" REAL, \"z\" REAL, \"roll\" REAL, \"pitch\" REAL, \"yaw\" REAL, PRIMARY KEY (\"id\"), FOREIGN KEY (\"configuration_id\") REFERENCES \"Configurations\" (\"id\"), FOREIGN KEY (\"clan_id\") REFERENCES \"Clans\" (\"id\"), FOREIGN KEY (\"map_id\") REFERENCES \"Maps\" (\"id\"), FOREIGN KEY (\"mapBuilding_id\") REFERENCES \"MapBuildings\" (\"id\"), FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\"), FOREIGN KEY (\"group_id\") REFERENCES \"Groups\" (\"id\") )",
+    "sql": "CREATE TABLE \"Mechanoids\" ( \"id\" INTEGER, \"text_id\" TEXT, \"name_id\" INTEGER, \"modification_id\" INTEGER, \"map_id\" INTEGER, \"clan_id\" INTEGER, \"building_id\" INTEGER, \"configuration_id\" INTEGER, \"group_id\" INTEGER, \"generation\" INTEGER, \"money\" REAL, \"rating\" REAL, \"rating_fight\" REAL, \"rating_courier\" REAL, \"rating_trade\" REAL, \"x\" REAL, \"y\" REAL, \"z\" REAL, \"roll\" REAL, \"pitch\" REAL, \"yaw\" REAL, PRIMARY KEY (\"id\"), FOREIGN KEY (\"name_id\") REFERENCES \"Strings\" (\"id\"), FOREIGN KEY (\"modification_id\") REFERENCES \"Modifications\" (\"id\"), FOREIGN KEY (\"map_id\") REFERENCES \"ModificationMaps\" (\"id\"), FOREIGN KEY (\"clan_id\") REFERENCES \"Clans\" (\"id\"), FOREIGN KEY (\"building_id\") REFERENCES \"MapBuildings\" (\"id\"), FOREIGN KEY (\"configuration_id\") REFERENCES \"Configurations\" (\"id\"), FOREIGN KEY (\"group_id\") REFERENCES \"Groups\" (\"id\") )",
     "values": [
       {
         "building_id": 4,
@@ -72,6 +82,7 @@
         "group_id": 1,
         "id": 1,
         "map_id": 1,
+        "modification_id": 1,
         "money": 300.0,
         "name_id": 0,
         "pitch": 0.0,

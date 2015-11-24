@@ -224,7 +224,7 @@ field: FIELD L_CURLY_BRACKET field_contents R_CURLY_BRACKET
     }
     | PROPERTIES properties_braced
     {
-        pd->class_.properties.push_back(pd->properties);
+        pd->class_.properties.insert(pd->properties.begin(), pd->properties.end());
         RESET(pd->properties);
     }
     ;
@@ -240,11 +240,25 @@ properties_braced: L_CURLY_BRACKET properties R_CURLY_BRACKET
 properties: property
     | property properties
     ;
-property: key SEMICOLON
+property: value SEMICOLON
     {
-        pd->properties[*$1];
+        Property p;
+        p.key = *$1;
+        pd->properties[*$1] = p;
     }
     | key_value_pair SEMICOLON
+    {
+        pd->properties[pd->property.key] = pd->property;
+        RESET(pd->property);
+    }
+    | key properties_braced
+    {
+        Property p;
+        p.key = *$1;
+        p.properties = std::make_shared<Properties>(pd->properties);
+        RESET(pd->properties);
+        pd->properties[*$1] = p;
+    }
     ;
 
 specifiers_braced: L_CURLY_BRACKET specifiers R_CURLY_BRACKET
@@ -256,7 +270,8 @@ specifiers: specifier
 
 key_value_pair: key COLON value
     {
-        pd->properties[*$1] = *$3;
+        pd->property.key = *$1;
+        pd->property.value = *$3;
     }
     ;
 

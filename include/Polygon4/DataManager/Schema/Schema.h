@@ -133,11 +133,11 @@ public:
 
     iterator find(const Name &name)
     {
-        return std::find_if(Parent::begin(), Parent::end(), [&name](const auto &v) { return name == v.getCppName(); });
+        return std::find_if(Parent::begin(), Parent::end(), [&name](const auto &v) { return name == v.getName(); });
     }
     const_iterator find(const Name &name) const
     {
-        return std::find_if(Parent::begin(), Parent::end(), [&name](const auto &v) { return name == v.getCppName(); });
+        return std::find_if(Parent::begin(), Parent::end(), [&name](const auto &v) { return name == v.getName(); });
     }
 };
 
@@ -150,7 +150,7 @@ public:
     }
     Name getCppName() const
     {
-        return name;
+        return getName();
     }
     Name getCppArrayName() const
     {
@@ -208,6 +208,11 @@ using Databases = std::vector<Database>;
 class DLL_EXPORT Variable : public ObjectWithFlags
 {
 public:
+    using variable_ptr = std::shared_ptr<Variable>;
+    using DepVariable = variable_ptr;
+    using DepVariables = std::vector<DepVariable>;
+
+public:
     Name getName() const
     {
         return name;
@@ -238,14 +243,20 @@ public:
             return getName();
         return prefix + "." + getName();
     }
+    Name getEnumTypeName() const { return enumTypeName; }
 
+    bool empty() const { return name.empty(); }
     const Type *getType() const { return type; }
     DataType getDataType() const { return type->getDataType(); }
     int getId() const { return id; }
     void setId(int id) { this->id = id; }
     std::string getDefaultValue() const;
     std::string getRawDefaultValue() const { return defaultValue; }
+    std::string getGetOrderedObjectMap() const { return getOrderedObjectMap; }
     void setPrefix(const Name &prefix) { this->prefix = prefix; }
+
+    DepVariable getMasterVariable() const { return masterVariable; }
+    const DepVariables &getSlaveVariables() const { return slaveVariables; }
 
     bool isId() const
     {
@@ -276,6 +287,11 @@ private:
     Name prefix;
     Type *type;
     std::string defaultValue;
+    std::string getOrderedObjectMap;
+    Name enumTypeName;
+
+    DepVariable masterVariable;
+    DepVariables slaveVariables;
 
     friend Schema convert(const ast::Schema &schema);
 };
@@ -285,7 +301,7 @@ using Variables = ObjectArray<std::vector<Variable>>;
 class DLL_EXPORT Class : public Type
 {
 public:
-    void addVariable(Variable v);    
+    void initialize();
     Variables getVariables(bool container = false) const;
     Name getEnumName() const { return enumName; }
     virtual Class *getParent() const override { return parent; }
@@ -317,6 +333,8 @@ public:
     }
     Variable getNameVariable() const { return getVariable("name"); }
     Variable getTextVariable() const { return getVariable("text"); }
+    Variable getParentVariable() const { return parentVariable; }
+    Variable getChildVariable() const { return childVariable; }
 
     virtual bool isSimple() const override { return false; }
 
@@ -331,6 +349,7 @@ public:
 private:
     Variables variables;
     Name enumName;
+    Name subtreeItem;
     std::vector<ObjectName> namesOrder =
     {
         ObjectName::Custom,
@@ -341,7 +360,9 @@ private:
     };
     std::string objectName;
     Class *parent = nullptr;
+    Variable parentVariable;
     Class *child = nullptr;
+    Variable childVariable;
     std::vector<Class *> children;
     bool hasIdField = false;
     bool hasFks = false;

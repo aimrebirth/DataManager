@@ -3,6 +3,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 
 #include <boost/algorithm/string.hpp>
@@ -24,7 +25,77 @@ struct Database
 
 using Databases = std::vector<Database>;
 
-using Properties = std::unordered_map<Key, Value>;
+struct Properties;
+
+struct Property
+{
+    Key key;
+    Value value;
+    std::shared_ptr<Properties> properties;    
+};
+
+struct Properties : public std::map<Key, struct Property>
+{
+    using base = std::map<Key, struct Property>;
+    using iterator = base::iterator;
+    using const_iterator = base::const_iterator;
+
+    std::tuple<bool, Value> getPropertyValue(const Key &key) const
+    {
+        for (auto &p : *this)
+        {
+            if (p.first == key)
+                return std::make_tuple(true, p.second.value);
+            if (p.second.properties)
+            {
+                auto t = p.second.properties->getPropertyValue(key);
+                if (std::get<bool>(t))
+                    return t;
+            }
+        }
+        return std::make_tuple(true, Value());
+    }
+
+    ObjectFlags flags(bool assert = true) const
+    {
+        ObjectFlags f;
+        for (auto &p : *this)
+        {
+#define SET_PROPERTY(name, id) else if (p.first == name) f[id] = true
+            if (0);
+            SET_PROPERTY("enum_only", fEnumOnly);
+            SET_PROPERTY("first", fFirst);
+            SET_PROPERTY("last", fLast);
+            SET_PROPERTY("inline", fInline);
+            SET_PROPERTY("service", fService);
+            SET_PROPERTY("create_enum", fCreateEnum);
+            SET_PROPERTY("proxy", fProxy);
+            SET_PROPERTY("tree_view", fTreeView);
+            SET_PROPERTY("name", fName);
+            SET_PROPERTY("object_name", fObjectName);
+            SET_PROPERTY("enum_name", fEnumName);
+            SET_PROPERTY("prefixed", fPrefixed);
+            SET_PROPERTY("names_order", fNamesOrder);
+            SET_PROPERTY("parent", fParent);
+            SET_PROPERTY("child", fChild);
+            SET_PROPERTY("parent_var", fParent);
+            SET_PROPERTY("child_var", fChild);
+            SET_PROPERTY("subtree_item", fSubtreeItem);
+            else if (assert)
+                assert(false && "No such property");
+#undef SET_PROPERTY
+            if (p.second.properties)
+            {
+                bool assert = true;
+                if (p.first == "subtree_items")
+                    assert = false;
+                f |= p.second.properties->flags(assert);
+            }
+        }
+        return f;
+    }
+};
+
 using Specifier = Key;
 using Specifiers = std::set<Specifier>;
 
@@ -43,15 +114,19 @@ struct Variable
         f[fPrimaryKey] = hasProperty("pk");
         f[fEnumItem] = hasProperty("enum_item");
         f[fContainer] = hasProperty("container");
+        f[fGetOrderedObjectMap] = hasProperty("getOrderedObjectMap");
+        f[fDependsOn] = hasProperty("dependsOn");
+        f[fEnumType] = hasProperty("enum_type");
+        f[fBigEdit] = hasProperty("big_edit");        
         return f;
     }
 
-    Value getProperty(const Key &key) const
+    Property getProperty(const Key &key) const
     {
         auto i = properties.find(key);
         if (i != properties.end())
             return i->second;
-        return Value();
+        return Property();
     }
 
     bool hasProperty(const Key &key) const
@@ -61,6 +136,14 @@ struct Variable
         if (properties.find(key) != properties.end())
             return true;
         return false;
+    }
+
+    Value getPropertyValue(const Key &key) const
+    {
+        bool found;
+        Value v;
+        std::tie(found, v) = properties.getPropertyValue(key);
+        return v;
     }
 
     bool operator<(const Variable &rhs) const
@@ -82,49 +165,35 @@ using ClassSpecifiers = std::vector<ClassSpecifier>;
 struct Class
 {
     std::string name;
-    std::vector<Properties> properties;
+    Properties properties;
     Variables variables;
     ClassSpecifiers classSpecifiers;
 
-    Value getProperty(const Key &key) const
+    Value getPropertyValue(const Key &key) const
     {
+        bool found;
         Value v;
-        for (auto &p : properties)
-        {
-            auto i = p.find(key);
-            if (i != p.end())
-            {
-                v = i->second;
-                break;
-            }
-        }
-        replace_all(v, "\\\"", "\"");
+        std::tie(found, v) = properties.getPropertyValue(key);
+        if (found)
+            replace_all(v, "\\\"", "\"");
         return v;
     }
 
-    Name getHumanName() const
-    {
-        return getProperty("name");
-    }
+    Name getHumanName() const { return getPropertyValue("name"); }
+    Name getEnumName() const { return getPropertyValue("enum_name"); }
+    Name getParentName() const { return getPropertyValue("parent"); }
+    Name getParentVarName() const { return getPropertyValue("parent_var"); }
+    Name getChildName() const { return getPropertyValue("child"); }
+    Name getChildVarName() const { return getPropertyValue("child_var"); }
+    Name getObjectName() const { return getPropertyValue("object_name"); }
+    Name getSubtreeItem() const { return getPropertyValue("subtree_item"); }
 
-    Name getEnumName() const
-    {
-        return getProperty("enum_name");
-    }
-
-    Name getParentName() const
-    {
-        return getProperty("parent");
-    }
-    Name getChildName() const
-    {
-        return getProperty("child");
-    }
+    ObjectFlags flags() const { return properties.flags(); }
 
     std::vector<ObjectName> getNamesOrder() const
     {
         std::vector<ObjectName> namesOrder;
-        auto p = getProperty("names_order");
+        auto p = getPropertyValue("names_order");
         if (p.empty())
             return namesOrder;
         std::vector<std::string> names;
@@ -144,56 +213,7 @@ struct Class
         }
         return namesOrder;
     }
-
-    std::string getObjectName() const
-    {
-        return getProperty("object_name");
-    }
-
-    ObjectFlags flags() const
-    {
-        ObjectFlags f;
-        for (auto &props : properties)
-        {
-            for (auto &p : props)
-            {
-#define SET_PROPERTY(name, id) else if (p.first == name) f[id] = true
-                if (0);
-                SET_PROPERTY("enum_only", fEnumOnly);
-                SET_PROPERTY("first", fFirst);
-                SET_PROPERTY("last", fLast);
-                SET_PROPERTY("inline", fInline);
-                SET_PROPERTY("service", fService);
-                SET_PROPERTY("create_enum", fCreateEnum);
-                SET_PROPERTY("proxy", fProxy);
-                SET_PROPERTY("tree_view", fTreeView);
-                SET_PROPERTY("name", fName);
-                SET_PROPERTY("object_name", fObjectName);
-                SET_PROPERTY("parent", fParent);
-                SET_PROPERTY("enum_name", fEnumName);
-                SET_PROPERTY("prefixed", fPrefixed);
-                SET_PROPERTY("names_order", fNamesOrder);
-                SET_PROPERTY("child", fChild);
-                else
-                    assert(false);
-#undef SET_PROPERTY
-            }
-        }
-        return f;
-    }
-
-    void merge(const Class &rhs)
-    {
-        if (name.empty())
-            name = rhs.name;
-        for (auto &v : rhs.properties)
-            properties.push_back(v);
-        for (auto &v : rhs.variables)
-            variables.push_back(v);
-        for (auto &v : rhs.classSpecifiers)
-            classSpecifiers.push_back(v);
-    }
-
+    
     bool operator<(const Class &rhs) const
     {
         return name < rhs.name;
@@ -248,6 +268,7 @@ struct parser_data
     Database database;
     Databases databases;
     Properties properties;
+    Property property;
     Specifier specifier;
     Specifiers specifiers;
     Class class_;

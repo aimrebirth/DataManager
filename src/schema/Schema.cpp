@@ -11,18 +11,8 @@ const std::string iObject = "IObjectBase";
 const std::string idAccess = ".id";
 const std::string String = "String";
 const std::string containerAccess = ".";
-
-std::string tr(std::string s)
-{
-    return "QCoreApplication::translate(\"DB\", \"" + s + "\")";
-}
-
-std::string trUE4(std::string s)
-{
-    // #define USE_UNREAL_EDITOR
-    // #define LOCTEXT_NAMESPACE "DBTool"
-    return "LOCTEXT(\"DB\", \"" + s + "\")";
-}
+const std::string sqlBegin = "R\"sql(";
+const std::string sqlEnd = ")sql\"";
 
 std::string ctableType(const std::string &s)
 {
@@ -44,15 +34,6 @@ std::string splitWords(std::string s)
         r += s[i];
     }
     return r;
-}
-
-template<typename T, typename K>
-std::set<T> mapToSet(const std::map<K, T> &map)
-{
-    std::set<T> s;
-    for (auto &v : map)
-        s.insert(v.second);
-    return s;
 }
 
 DataType dataTypeFromName(const Name &name)
@@ -155,8 +136,10 @@ ModuleContext Schema::printEnums() const
     mc.hpp.before().addLine();
     mc.hpp.before().beginNamespace("polygon4");
     mc.hpp.before().beginNamespace("detail");
+    mc.hpp.before().addLine();
     for (auto &e : enums)
         mc += e.print();
+    mc.hpp.after().addLine();
     mc.hpp.after().endNamespace("detail");
     mc.hpp.after().addLine();
     mc.hpp.after().endNamespace("polygon4");
@@ -165,9 +148,10 @@ ModuleContext Schema::printEnums() const
     mc.cpp.before().addLine();
     mc.cpp.before().beginNamespace("polygon4");
     mc.cpp.before().beginNamespace("detail");
+    mc.cpp.before().addLine();
     for (auto &e : enums)
         mc += e.printTableRecord();
-    mc.cpp.addLine();
+    mc.cpp.after().addLine();
     mc.cpp.after().endNamespace("detail");
     mc.cpp.after().addLine();
     mc.cpp.after().endNamespace("polygon4");
@@ -422,11 +406,24 @@ ModuleContext Schema::printStorageImplementation() const
             for (auto &c : cls)
             {
                 mc.cpp.addLine("case EObjectType::" + c.getCppName() + ":");
-                mc.cpp.increaseIndent();
-                mc.cpp.addLine("item->children.push_back(tmp = add" + c.getCppName() + "(" + (c.getParent() ? "item->parent->object" : "") + ")->printTree());");
-                mc.cpp.addLine("tmp->parent = item;");
+                mc.cpp.beginBlock();
+                if (c.getParent())
+                {
+                    mc.cpp.addLine("auto p = item;");
+                    mc.cpp.addLine("while (!p->parent->object)");
+                    mc.cpp.increaseIndent();
+                    mc.cpp.addLine("p = p->parent;");
+                    mc.cpp.decreaseIndent();
+                    mc.cpp.addLine("item->children.push_back(tmp = add" + c.getCppName() + "(p->parent->object)->printTree());");
+                    mc.cpp.addLine("tmp->parent = item;");
+                }
+                else
+                {
+                    mc.cpp.addLine("item->children.push_back(tmp = add" + c.getCppName() + "()->printTree());");
+                    mc.cpp.addLine("tmp->parent = item;");
+                }
                 mc.cpp.addLine("break;");
-                mc.cpp.decreaseIndent();
+                mc.cpp.endBlock();
             }
             mc.cpp.addLine("default:");
             mc.cpp.increaseIndent();
@@ -467,19 +464,29 @@ ModuleContext Schema::printStorageImplementation() const
         mc.hpp.addLine();
         mc.hpp.addLine("virtual OrderedObjectMap getOrderedMap(EObjectType type, std::function<bool(" + iObject + " *)> f = std::function<bool(" + iObject + " *)>()) const override;");
 
+        auto prnt = [&](bool f)
+        {
+            mc.cpp.beginBlock("switch (type)", false);
+            for (auto &c : cls)
+            {
+                mc.cpp.addLine("case EObjectType::" + c.getCppName() + ":");
+                mc.cpp.increaseIndent();
+                mc.cpp.addLine("return " + c.getCppArrayVariableName() + ".getOrderedObjectMap(" + (f ? "f" : "") + ");");
+                mc.cpp.decreaseIndent();
+            }
+            mc.cpp.addLine("default:");
+            mc.cpp.increaseIndent();
+            mc.cpp.addLine("return OrderedObjectMap();");
+            mc.cpp.endBlock();
+        };
+
         mc.cpp.addLine();
         mc.cpp.beginFunction("OrderedObjectMap " + storageImpl + "::getOrderedMap(EObjectType type, std::function<bool(" + iObject + " *)> f) const");
-        mc.cpp.beginBlock("switch (type)", false);
-        for (auto &c : cls)
-        {
-            mc.cpp.addLine("case EObjectType::" + c.getCppName() + ":");
-            mc.cpp.increaseIndent();
-            mc.cpp.addLine("return ::getOrderedMap(" + c.getCppArrayVariableName() + ", f);");
-            mc.cpp.decreaseIndent();
-        }
-        mc.cpp.addLine("default:");
-        mc.cpp.increaseIndent();
-        mc.cpp.addLine("return OrderedObjectMap();");
+        mc.cpp.beginBlock("if (f)");
+        prnt(true);
+        mc.cpp.endBlock();
+        mc.cpp.beginBlock("else");
+        prnt(false);
         mc.cpp.endBlock();
         mc.cpp.endFunction();
     }
@@ -495,41 +502,37 @@ ModuleContext Class::print() const
     const auto vars_container = getVariables(true);
 
     // enums
+    if (flags[fCreateEnum])
     {
-        if (flags[fCreateEnum])
+        mc.hpp.beginBlock("enum class " + getEnumName() + " : EnumType");
+        for (auto &v : vars)
         {
-            mc.hpp.beginBlock("enum class " + getEnumName() + " : EnumType");
-            for (auto &v : vars)
-            {
-                if (v.getFlags()[fEnumItem])
-                    mc.hpp.addLine(v.getName() + ",");
-            }
-            mc.hpp.addLine();
-            mc.hpp.addLine("max,");
-            mc.hpp.endBlock(true);
-            mc.hpp.addLine();
+            if (v.getFlags()[fEnumItem])
+                mc.hpp.addLine(v.getName() + ",");
         }
+        mc.hpp.addLine();
+        mc.hpp.addLine("max,");
+        mc.hpp.endBlock(true);
+        mc.hpp.emptyLines(1);
     }
 
-    // class
+    // class, data
     {
         mc.hpp.beginBlock("class " + dll + " " + getCppName() + " : public I" + getCppName());
         mc.hpp.addLine("// data");
         mc.hpp.addLineNoSpace("public:");
         printVariables(mc);
-        mc.hpp.decreaseIndent();
     }
 
     // containers
+    if (!vars_container.empty())
     {
-        if (!vars_container.empty())
-            mc.hpp.addLine();
-        mc.hpp.increaseIndent();
+        mc.hpp.emptyLines(1);
         for (auto &v : vars_container)
             mc.hpp.addLine(v.print() + ";");
-        mc.hpp.addLine();
     }
 
+    mc.hpp.emptyLines(1);
     mc.hpp.addLine("// constructors");
     mc.hpp.addLineNoSpace("public:");
 
@@ -562,7 +565,7 @@ ModuleContext Class::print() const
         mc.cpp.endFunction();
     }
 
-    mc.hpp.addLine();
+    mc.hpp.emptyLines(1);
     mc.hpp.addLine("// functions");
     mc.hpp.addLineNoSpace("public:");
 
@@ -634,7 +637,7 @@ ModuleContext Class::print() const
         mc.cpp.endFunction();
     }
 
-    // setVariableString2()
+    // setVariableString() -> IObjectBase
     if (hasFks)
     {
         mc.hpp.addLine("virtual void setVariableString(int columnId, " + iObject + " *ptr) override;");
@@ -648,6 +651,8 @@ ModuleContext Class::print() const
             mc.cpp.addLine("case " + std::to_string(v.getId()) + ":");
             mc.cpp.increaseIndent();
             mc.cpp.addLine(v.printSetPtr() + ";");
+            for (auto &d : v.getSlaveVariables())
+                mc.cpp.addLine(d->getName() + ".clear();");
             mc.cpp.addLine("break;");
             mc.cpp.decreaseIndent();
         }
@@ -712,6 +717,15 @@ ModuleContext Class::print() const
         if (!vars_container.empty())
         {
             mc.cpp.addLine("auto item = createTreeItem();");
+            if (!subtreeItem.empty())
+            {
+                mc.cpp.addLine();
+                mc.cpp.addLine("auto subtree_item = std::make_shared<TreeItem>();");
+                mc.cpp.addLine("subtree_item->parent = item.get();");
+                mc.cpp.addLine("subtree_item->name = \"" + subtreeItem + "\";");
+                mc.cpp.addLine("item->children.push_back(subtree_item);");
+                mc.cpp.addLine("std::swap(item, subtree_item);");
+            }
             mc.cpp.addLine();
             mc.cpp.addLine("Ptr<TreeItem> root;");
             mc.cpp.addLine("Ptr<TreeItem> tmp;");
@@ -729,6 +743,11 @@ ModuleContext Class::print() const
                 mc.cpp.endBlock();
                 mc.cpp.addLine("item->children.push_back(root);");
             }
+            if (!subtreeItem.empty())
+            {
+                mc.cpp.addLine();
+                mc.cpp.addLine("std::swap(item, subtree_item);");
+            }
             mc.cpp.addLine();
             mc.cpp.addLine("return item;");
         }
@@ -742,7 +761,6 @@ ModuleContext Class::print() const
     // getName()
     {
         mc.hpp.addLine("virtual Text getName() const override;");
-        mc.hpp.addLine();
 
         mc.cpp.beginFunction("Text " + getCppName() + "::getName() const");
         mc.cpp.addLine("Text s;");
@@ -789,16 +807,7 @@ ModuleContext Class::print() const
             case ObjectName::Parent:
                 if (flags[fProxy])
                 {
-                    std::string var_name = parent->getCppVariableName();
-                    for (auto &v : getVariables())
-                    {
-                        if (parent->getName() == v.getType()->getName())
-                        {
-                            var_name = v.getName();
-                            break;
-                        }
-                    }
-                    mc.cpp.addLine("s = to_string(" + var_name + ");");
+                    mc.cpp.addLine("s = to_string(" + getChildVariable().getName() + ");");
                     checkReturn();
                 }
                 break;
@@ -825,8 +834,87 @@ ModuleContext Class::print() const
         mc.cpp.endFunction();
     }
 
+    // getOrderedObjectMap()
+    if (hasFks)
+    {
+        mc.hpp.emptyLines(1);
+        mc.hpp.addLine("virtual std::tuple<bool, OrderedObjectMap> getOrderedObjectMap(int columnId, Storage *storage = nullptr) const override;");
+
+        mc.cpp.beginFunction("std::tuple<bool, OrderedObjectMap> " + getCppName() + "::getOrderedObjectMap(int columnId, Storage *storage) const");
+        mc.cpp.addLine("OrderedObjectMap m;");
+        mc.cpp.beginBlock("switch (columnId)", false);
+        std::string fail = "return std::make_tuple(false, m);";
+        for (auto &v : vars)
+        {
+            if (!v.isFk())
+                continue;
+            mc.cpp.addLine("case " + std::to_string(v.getId()) + ":");
+            mc.cpp.increaseIndent();
+            if (v.hasFlags({ fGetOrderedObjectMap }))
+            {
+                mc.cpp.addLine("return std::make_tuple(true, " + v.getGetOrderedObjectMap() + ");");
+            }
+            else if (v.getType()->getCppName() == String)
+            {
+                mc.cpp.addLine("if (!storage)");
+                mc.cpp.increaseIndent();
+                mc.cpp.addLine(fail);
+                mc.cpp.decreaseIndent();
+                mc.cpp.addLine("return std::make_tuple(true, storage->strings.getOrderedObjectMap([](const String *s)");
+                mc.cpp.addLine("{");
+                mc.cpp.increaseIndent();
+                auto type = getCppName();
+                if (!v.getEnumTypeName().empty())
+                    type = v.getEnumTypeName();
+                mc.cpp.addLine("bool r = s->object == EObjectType::" + type + ";");
+                mc.cpp.addLine("r |= s->object == EObjectType::Any;");
+                mc.cpp.addLine("return r;");
+                mc.cpp.decreaseIndent();
+                mc.cpp.addLine("}));");
+            }
+            else
+            {
+                mc.cpp.addLine("if (!storage)");
+                mc.cpp.increaseIndent();
+                mc.cpp.addLine(fail);
+                mc.cpp.decreaseIndent();
+                mc.cpp.addLine("return std::make_tuple(true, storage->" + v.getType()->getCppArrayVariableName() + ".getOrderedObjectMap());");
+            }
+            mc.cpp.decreaseIndent();
+        }
+        mc.cpp.addLine("default:");
+        mc.cpp.increaseIndent();
+        mc.cpp.addLine(fail);
+        mc.cpp.endBlock(true);
+        mc.cpp.endFunction();
+    }
+
+    // getOrderedObjectMap() -> getChildOrderedObjectMap
+    {
+        if (!hasFks)
+            mc.hpp.emptyLines(1);
+        for (auto &v : vars_container)
+        {
+            if (!v.getType()->hasFlags({ fProxy }))
+                break;
+
+            mc.hpp.addLine("OrderedObjectMap get" + v.getNameWithCaptitalLetter() +  "() const;");
+
+            auto cv = ((Class *)v.getType())->getChildVariable();
+            mc.cpp.beginFunction("OrderedObjectMap " + getCppName() + "::get" + v.getNameWithCaptitalLetter() + "() const");
+            mc.cpp.addLine("OrderedObjectMap m;");
+            mc.cpp.addLine("for (auto &v : " + v.getName() + ")");
+            mc.cpp.increaseIndent();
+            mc.cpp.addLine("m.insert({ v->" + cv.getName() + "->getName(), v->" + cv.getName() + ".get() });");
+            mc.cpp.decreaseIndent();
+            mc.cpp.addLine("return m;");
+            mc.cpp.endFunction();
+        }
+    }
+
     // operator==()
     {
+        mc.hpp.emptyLines(1);
         mc.hpp.addLine("bool operator==(const " + getCppName() + " &rhs) const;");
 
         mc.cpp.beginFunction("bool " + getCppName() + "::operator==(const " + getCppName() + " &rhs) const");
@@ -845,75 +933,62 @@ ModuleContext Class::print() const
     }
 
     // operator->()
+    if (flags[fProxy])
     {
-        if (flags[fProxy])
-        {
-            mc.hpp.addLine("" + dataClassPtr + "<" + parent->getCppName() + "> operator->() const;");
+        mc.hpp.addLine("" + dataClassPtr + "<" + getChild()->getCppName() + "> operator->() const;");
 
-            mc.cpp.beginFunction("" + dataClassPtr + "<" + parent->getCppName() + "> " + getCppName() + "::operator->() const");
-            std::string var_name = parent->getCppVariableName();
-            for (auto &v : getVariables())
-            {
-                if (parent->getName() == v.getType()->getName())
-                {
-                    var_name = v.getName();
-                    break;
-                }
-            }
-            mc.cpp.addLine("if (" + var_name + ")");
-            mc.cpp.increaseIndent();
-            mc.cpp.addLine("return " + var_name + ";");
-            mc.cpp.decreaseIndent();
-            mc.cpp.addLine("throw EXCEPTION(\"Value is missing\");");
-            mc.cpp.endFunction();
-        }
+        auto cvar = getChildVariable();
+        mc.cpp.beginFunction("" + dataClassPtr + "<" + getChild()->getCppName() + "> " + getCppName() + "::operator->() const");
+        mc.cpp.addLine("if (" + cvar.getName() + ")");
+        mc.cpp.increaseIndent();
+        mc.cpp.addLine("return " + cvar.getName() + ";");
+        mc.cpp.decreaseIndent();
+        mc.cpp.addLine("throw EXCEPTION(\"Value is missing\");");
+        mc.cpp.endFunction();
     }
 
     // protected
     if (!vars_container.empty())
     {
-        mc.hpp.addLine();
+        mc.hpp.emptyLines(1);
         mc.hpp.addLineNoSpace("protected:");
 
         // init children
+        for (auto &v : vars_container)
         {
-            for (auto &v : vars_container)
-            {
-                mc.hpp.addLine("template <class T, class... Args>");
-                mc.hpp.addLine("void init" + v.getNameWithCaptitalLetter() + "(Args&&... args);");
-                mc.hpp.addLine();
+            mc.hpp.addLine("template <class T, class... Args>");
+            mc.hpp.addLine("void init" + v.getNameWithCaptitalLetter() + "(Args&&... args);");
+            mc.hpp.addLine();
 
-                auto &c = mc.hpp.after();
-                c.addLine("template <class T, class... Args>");
-                c.beginFunction("void " + getCppName() + "::init" + v.getNameWithCaptitalLetter() + "(Args&&... args)");
-                c.addLine("for (auto &v : " + v.getName() + ")");
-                c.beginBlock();
-                auto vclass = (Class *)v.getType();
-                if (vclass->getFlags()[fProxy])
+            auto &c = mc.hpp.after();
+            c.addLine("template <class T, class... Args>");
+            c.beginFunction("void " + getCppName() + "::init" + v.getNameWithCaptitalLetter() + "(Args&&... args)");
+            c.addLine("for (auto &v : " + v.getName() + ")");
+            c.beginBlock();
+            auto vclass = (Class *)v.getType();
+            if (vclass->getFlags()[fProxy])
+            {
+                std::string var_name = vclass->getChild()->getCppVariableName();
+                for (auto &v2 : vclass->getVariables())
                 {
-                    std::string var_name = vclass->getChild()->getCppVariableName();
-                    for (auto &v2 : vclass->getVariables())
+                    if (vclass->getChild()->getName() == v2.getType()->getName())
                     {
-                        if (vclass->getChild()->getName() == v2.getType()->getName())
-                        {
-                            var_name = v2.getName();
-                            break;
-                        }
+                        var_name = v2.getName();
+                        break;
                     }
-                    c.addLine("auto p = v->" + var_name + ".get();");
                 }
-                else
-                    c.addLine("auto p = v.second.get();");
-                c.addLine("replace<T>(p, std::forward<Args>(args)...);");
-                c.endBlock();
-                c.endFunction();
+                c.addLine("auto p = v->" + var_name + ".get();");
             }
+            else
+                c.addLine("auto p = v.second.get();");
+            c.addLine("replace<T>(p, std::forward<Args>(args)...);");
+            c.endBlock();
+            c.endFunction();
         }
     }
-    else
-        mc.hpp.addLine();
 
     // private
+    mc.hpp.emptyLines(1);
     mc.hpp.addLineNoSpace("private:");
 
     // copyFrom()
@@ -935,19 +1010,19 @@ ModuleContext Class::print() const
     }
 
     // private
-    mc.hpp.addLine();
+    mc.hpp.emptyLines(1);
     mc.hpp.addLineNoSpace("private:");
 
     // friends
     mc.hpp.addLine("friend class " + storageImpl + ";");
-    mc.hpp.addLine();
 
     // static functions & data
+    mc.hpp.emptyLines(1);
     mc.hpp.addLineNoSpace("public:");
 
     // type
     mc.hpp.addLine("static const EObjectType object_type = EObjectType::" + getCppName() + ";");
-    mc.hpp.addLine();
+    mc.hpp.emptyLines(1);
 
     // getSql()
     {
@@ -955,17 +1030,20 @@ ModuleContext Class::print() const
 
         mc.cpp.beginFunction("const char *" + getCppName() + "::getSql()");
         auto sql = printSql();
-        replace_all(sql, "\n", " \\\n");
-        replace_all(sql, "\"", "\\\"");
-        mc.cpp.addLine("return");
-        mc.cpp.addLine("\" \\");
+        //replace_all(sql, "\n", " \\\n");
+        //replace_all(sql, "\"", "\\\"");
+        mc.cpp.addLine("std::string sql = R\"sql(");
+        //mc.cpp.addLine("\" \\");
         mc.cpp.decreaseIndent();
-        mc.cpp.addLine(sql + " \\");
+        //mc.cpp.addLine(sql + " \\");
+        mc.cpp.addLine(sql);
         mc.cpp.increaseIndent();
-        mc.cpp.addLine("\";");
+        mc.cpp.addLine(")sql\";");
+        mc.cpp.addLine("return sql.c_str();");
         mc.cpp.endFunction();
     }
 
+    // end class
     mc.hpp.endBlock(true);
     mc.hpp.addLine();
     return mc;
@@ -993,9 +1071,6 @@ ModuleContext Class::printIo() const
     ModuleContext mc;
     const auto vars = getVariables();
     const auto vars_container = variables({ fContainer }, false, false);
-    bool fks = false;
-    for (auto &v : vars)
-        fks |= v.isFk();
 
     mc.hpp.increaseIndent();
 
@@ -1024,7 +1099,7 @@ ModuleContext Class::printIo() const
         mc.hpp.addLine("void _load" + getSqlName() + "Ptrs();");
 
         mc.cpp.beginFunction("void " + storageImpl + "::_load" + getSqlName() + "Ptrs()");
-        if (fks)
+        if (hasFks)
         {
             mc.cpp.addLine("for (auto &" + getCppVariableName() + " : " + getCppArrayVariableName() + ")");
             mc.cpp.beginBlock();
@@ -1099,7 +1174,7 @@ ModuleContext Class::printIo() const
         for (int i = 0; i < vars.size(); i++)
             mc.cpp.addText("?, ");
         mc.cpp.trimEnd(2);
-        mc.cpp.addLineNoSpace(");\";");
+        mc.cpp.addText(");\";");
         mc.cpp.addLine("auto db3 = db->getDb();");
         mc.cpp.addLine("sqlite3_stmt *stmt;");
         mc.cpp.addLine("sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);");
@@ -1138,7 +1213,7 @@ ModuleContext Class::printAddDeleteRecord() const
         mc.hpp.addLine("virtual " + dataClassPtr + "<" + getCppName() + "> add" + getCppName() + "(" + param_h + ") override;");
 
         mc.cpp.beginFunction("" + dataClassPtr + "<" + getCppName() + "> " + storageImpl + "::add" + getCppName() + "(" + param + ")");
-        if (hasIdField || !parent)
+        if (!getParent())
         {
             mc.cpp.addLine("return " + getCppArrayVariableName() + ".createAtEnd();");
         }
@@ -1223,7 +1298,15 @@ std::string Class::printSql() const
         s += quoted(v.getSqlName()) + " " + dataTypeToSqlite3(v.getType()->getDataType());
         auto d = v.getRawDefaultValue();
         if (!d.empty())
-            s += " DEFAULT " + quoted(d);
+        {
+            s += " DEFAULT ";
+            if (v.getDataType() == DataType::Enum)
+            {
+                s += "\"" + sqlEnd + " + std::to_string(static_cast<int>(" + d + ")) + " + sqlBegin + "\"";
+            }
+            else
+                s += quoted(d);
+        }
         s += ",\n";
 
         hasPks |= v.getFlags()[fPrimaryKey];
@@ -1265,30 +1348,32 @@ std::string Class::printSql() const
     return s;
 }
 
-void Class::addVariable(Variable v)
+void Class::initialize()
 {
-    if (v.isId())
-        hasIdField = true;
-    if (v.isFk())
-        hasFks = true;
-    if (v.getType()->hasFlags({ fInline }))
+    for (auto &v : variables)
     {
-        auto c = (Class *)v.getType();
-        for (auto &v : c->variables)
+        if (v.isId())
+            hasIdField = true;
+        if (v.isFk())
+            hasFks = true;
+        if (v.getType()->hasFlags({ fInline }))
         {
-            if (v.isId())
-                hasIdField = true;
-            if (v.isFk())
-                hasFks = true;
+            auto c = (Class *)v.getType();
+            for (auto &v : c->variables)
+            {
+                if (v.isId())
+                    hasIdField = true;
+                if (v.isFk())
+                    hasFks = true;
+            }
+        }
+        if (v.getType()->hasFlags({ fPrefixed }))
+        {
+            auto c = (Class *)v.getType();
+            for (auto &v2 : c->variables)
+                v2.setPrefix(v.getName());
         }
     }
-    if (v.getType()->hasFlags({ fPrefixed }))
-    {
-        auto c = (Class *)v.getType();
-        for (auto &v2 : c->variables)
-            v2.setPrefix(v.getName());
-    }
-    variables.push_back(v);
 }
 
 Variables Class::getVariables(bool container) const
@@ -1349,6 +1434,7 @@ ModuleContext Enum::printTableRecord() const
         if (!i.not_in_table)
             mc.cpp.addLine("{ " + getCppName() + "::" + i.name + ", \"" + i.name + "\" },");
     mc.cpp.endBlock(true);
+    mc.cpp.addLine();
     return mc;
 }
 
@@ -1369,6 +1455,14 @@ std::string Variable::print() const
         s += type->getCppName() + " " + getName();
         if (type->getDataType() == DataType::Integer || type->getDataType() == DataType::Real)
             s += " = " + getDefaultValue();
+        auto dv = getDefaultValue();
+        if (!dv.empty())
+        {
+            if (type->getDataType() == DataType::Enum)
+            {
+                s += " = " + getDefaultValue();
+            }
+        }
     }
     return s;
 }
@@ -1416,7 +1510,7 @@ std::string Variable::printSetPtr() const
     std::string s;
     if (isFk())
     {
-        s += getPrefixedName() + " = std::static_pointer_cast<" + type->getCppName() + ">(std::shared_ptr<" + iObject + ">(ptr, [](auto p){}))";
+        s += getPrefixedName() + " = ptr";
     }
     return s;
 }
@@ -1441,6 +1535,9 @@ std::string Variable::getDefaultValue() const
     case DataType::Blob:
         break;
     case DataType::Enum:
+        s += defaultValue.empty() ? "" : defaultValue;
+        break;
+    case DataType::Complex:
         break;
     default:
         assert(false);

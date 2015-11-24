@@ -21,10 +21,10 @@ try
     auto schema = parse_file(argv[1], &ts);
 
     fs::path p = argv[2];
-    auto header = p / "include" / "Polygon4" / "DataManager" / "detail";
-    auto src = p / "src" / "manager" / "detail";
+    auto header = p / "include" / "detail";
+    auto src = p / "src" / "detail";
 
-    auto printModule = [&header, &src](const std::string &name, const auto &module, const fs::path &subdir = fs::path())
+    auto printModule = [&header, &src](const std::string &name, auto &module, const fs::path &subdir = fs::path())
     {
         auto save = [](const auto &path, const std::string &s)
         {
@@ -34,6 +34,9 @@ try
             fs::create_directories(path.parent_path(), ec);
             std::ofstream(path.string()) << s;
         };
+
+        module.hpp.emptyLines(1);
+        module.cpp.emptyLines(1);
 
         save(header / subdir / (name + ".h"  ), module.hpp.getText());
         save(src    / subdir / (name + ".cpp"), module.cpp.getText());

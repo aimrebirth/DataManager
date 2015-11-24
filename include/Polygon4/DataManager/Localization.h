@@ -156,8 +156,11 @@ public:
         return s->second.str();
     }
 
-    void set(const translator_type &t)
+    void init(const translator_type &t)
     {
+        if (initialized)
+            return;
+        initialized = true;
         translator = t;
     }
 
@@ -176,6 +179,7 @@ public:
 
 private:
     translator_type translator;
+    bool initialized = false;
 };
 
 extern Translator translator;

@@ -4,6 +4,9 @@
 #  author: lzwdgc
 #
 
+# TODO:
+# - group strings in tree view by object type
+
 ################################################################################
 #
 # globals
@@ -31,7 +34,7 @@ types
     Money -> Price;
     Weight -> f32;
     Damage -> f32;
-    Rating -> f32;
+    RatingType -> f32;
     Reputation -> f32;
 };
 
@@ -59,7 +62,9 @@ enum EObjectType
     None = 0 { not_in_table },
     Building,
     Clan = 4,
+    ClanMemberName,
     ClanReputation,
+    ClanMechanoid,
     Configuration,
     ConfigurationEquipment,
     ConfigurationGood,
@@ -67,6 +72,7 @@ enum EObjectType
     ConfigurationWeapon,
     Equipment = 10,
     Glider = 11,
+    GliderDescription,
     Good = 12,
     Group = 14,
     GroupMechanoid,
@@ -89,7 +95,6 @@ enum EObjectType
     Player,
     Projectile = 34,
     Quest,
-    QuestReward,
     QuestRewardEquipment,
     QuestRewardGlider,
     QuestRewardGood,
@@ -203,6 +208,22 @@ class Coordinate
 
 ########################################
 
+class Rating
+{
+    RatingType rating;
+    RatingType rating_fight;
+    RatingType rating_courier;
+    RatingType rating_trade;
+
+    properties
+    {
+        service;
+        inline;
+    }
+};
+
+########################################
+
 class Common
 {
     i32 id { pk; };
@@ -221,8 +242,8 @@ class Common
 
 class LocalizedString
 {
-    str ru;
-    str en;
+    str ru { big_edit; };
+    str en { big_edit; };
 
     properties
     {
@@ -239,7 +260,7 @@ class String
 {
     i32 id { pk; };
     str text_id;
-    EObjectType object;
+    EObjectType object = "EObjectType::None";
     LocalizedString string;
 
     properties
@@ -292,6 +313,7 @@ class Equipment
 class Glider
 {
     Common common;
+    String description { enum_type: GliderDescription; };
 
     i32 standard;
     Weight weight;
@@ -488,20 +510,30 @@ class Mechanoid
     String name;
 
     Modification modification;
-    ModificationMap map;
-    Clan clan;
-    MapBuilding building;
+    Map map
+    {
+        getOrderedObjectMap: "modification->getMaps()";
+    };
+    Clan clan
+    {
+        getOrderedObjectMap: "modification->clans";
+    };
+    MapBuilding building
+    {
+        dependsOn: map;
+        getOrderedObjectMap: "map ? map->buildings : m";
+    };
     
     Configuration configuration;
-    Group group;
+    Group group
+    {
+        getOrderedObjectMap: "modification->groups";
+    };
 
     i32 generation;
     Money money;
 
     Rating rating;
-    Rating rating_fight;
-    Rating rating_courier;
-    Rating rating_trade;
 
     Coordinate coordinate;
 
@@ -509,7 +541,7 @@ class Mechanoid
 
     properties
     {
-        tree_view;
+        parent: Modification;
     }
 };
 
@@ -525,6 +557,8 @@ class Map
     f32 bx;
     f32 ky;
     f32 by;
+
+    Blob heightmap;
     
     MapBuilding buildings { container; };
     MapGood goods { container; };
@@ -553,12 +587,16 @@ class Modification
     str script_language;
     str script_main;
 
-    Mechanoid player_mechanoid;
+    Mechanoid player_mechanoid
+    {
+        getOrderedObjectMap: "mechanoids";
+    };
     Configuration cooperative_player_configuration;
 
     ModificationMap maps { container; };
     Clan clans { container; };
     Mechanoid mechanoids { container; };
+    Group groups { container; };
 
     properties
     {
@@ -613,7 +651,7 @@ class ConfigurationEquipment
     Configuration configuration;
     Equipment equipment;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
@@ -628,7 +666,7 @@ class ConfigurationGood
     Configuration configuration;
     Good good;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
@@ -643,7 +681,7 @@ class ConfigurationProjectile
     Configuration configuration;
     Projectile projectile;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
@@ -658,7 +696,7 @@ class ConfigurationWeapon
     Configuration configuration;
     Weapon weapon;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
@@ -675,26 +713,13 @@ class ConfigurationWeapon
 class Quest
 {
     i32 id { pk; };
+    str text_id;
     String name;
 
     String title;
     String description;
     i32 time;
-
-    QuestReward rewards { container; };
-
-    properties
-    {
-        tree_view;
-    }
-};
-
-class QuestReward
-{
-    i32 id { pk; };
-    str text_id;
-
-    Quest quest;
+    
     Money money;
     Rating rating;
 
@@ -708,21 +733,21 @@ class QuestReward
 
     properties
     {
-        object_name: "to_string(quest)";
-        parent: Quest;
+        tree_view;
+        subtree_item: "Rewards";
     }
 };
 
 class QuestRewardEquipment
 {
-    QuestReward quest_reward;
+    Quest quest;
     Equipment equipment;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
-        parent: QuestReward;
+        parent: Quest;
         child: Equipment;
         proxy;
     }
@@ -730,14 +755,14 @@ class QuestRewardEquipment
 
 class QuestRewardGlider
 {
-    QuestReward quest_reward;
+    Quest quest;
     Glider glider;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
-        parent: QuestReward;
+        parent: Quest;
         child: Glider;
         proxy;
     }
@@ -745,14 +770,14 @@ class QuestRewardGlider
 
 class QuestRewardGood
 {
-    QuestReward quest_reward;
+    Quest quest;
     Good good;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
-        parent: QuestReward;
+        parent: Quest;
         child: Good;
         proxy;
     }
@@ -760,14 +785,14 @@ class QuestRewardGood
 
 class QuestRewardModificator
 {
-    QuestReward quest_reward;
+    Quest quest;
     Modificator modificator;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
-        parent: QuestReward;
+        parent: Quest;
         child: Modificator;
         proxy;
     }
@@ -775,14 +800,14 @@ class QuestRewardModificator
 
 class QuestRewardProjectile
 {
-    QuestReward quest_reward;
+    Quest quest;
     Projectile projectile;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
-        parent: QuestReward;
+        parent: Quest;
         child: Projectile;
         proxy;
     }
@@ -790,14 +815,14 @@ class QuestRewardProjectile
 
 class QuestRewardReputation
 {
-    QuestReward quest_reward;
+    Quest quest;
     Clan clan;
 
-    Reputation quantity;
+    Reputation quantity = 1;
 
     properties
     {
-        parent: QuestReward;
+        parent: Quest;
         child: Clan;
 
         proxy;
@@ -806,14 +831,14 @@ class QuestRewardReputation
 
 class QuestRewardWeapon
 {
-    QuestReward quest_reward;
+    Quest quest;
     Weapon weapon;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
-        parent: QuestReward;
+        parent: Quest;
         child: Weapon;
         proxy;
     }
@@ -837,24 +862,46 @@ class Clan
     f32 noblivion;
     f32 playereffect;
     i32 color;
-
-    Mechanoid mechanoids { container; };
+    
+    ClanMechanoid mechanoids { container; };
     ClanReputation reputations { container; };
+
+    properties
+    {
+        parent: Modification;
+    }
+};
+
+class ClanMechanoid
+{
+    Clan clan;
+    Mechanoid mechanoid
+    {
+        getOrderedObjectMap: "clan->modification->mechanoids";
+    };
+
+    properties
+    {
+        parent: Clan;
+        child: Mechanoid;
+        proxy;
+    }
 };
 
 class ClanReputation
 {
     Clan clan1;
-    Clan clan2;
+    Clan clan2
+    {
+        getOrderedObjectMap: "clan1->modification->clans";
+    };
     Reputation reputation;
 
     properties
     {
-        object_name: "
-            clan1->getId() < clan2->getId() ?
-            (to_wstring(clan1) + L\" - \" + to_wstring(clan2)) :
-            (to_wstring(clan2) + L\" - \" + to_wstring(clan1))";
-        parent: Clan;
+        parent_var: clan1;
+        child_var: clan2;
+        proxy;
     }
 };
 
@@ -866,18 +913,23 @@ class Group
     str text_id;
     String name;
 
+    Modification modification;
+
     GroupMechanoid mechanoids { container; };
 
     properties
     {
-        tree_view;
+        parent: Modification;
     }
 };
 
 class GroupMechanoid
 {
     Group group;
-    Mechanoid mechanoid;
+    Mechanoid mechanoid
+    {
+        getOrderedObjectMap: "group->modification->mechanoids";
+    };
 
     properties
     {
@@ -898,9 +950,6 @@ class ModificationMap
     {
         parent: Modification;
         child: Map;
-
-        object_name: "to_string(map)";
-        names_order: "custom none";
         proxy;
     }
 };
@@ -938,7 +987,7 @@ class MapObject
     properties
     {
         object_name: "to_string(object)";
-        parent: Object;
+        parent: Map;
     }
 };
 
@@ -958,7 +1007,7 @@ class MapGood
     properties
     {
         object_name: "to_string(good)";
-        parent: Good;
+        parent: Map;
     }
 };
 
@@ -988,7 +1037,7 @@ class MapBuilding
     properties
     {
         object_name: "to_string(building)";
-        parent: Building;
+        parent: Map;
     }
 };
 
@@ -997,7 +1046,7 @@ class MapBuildingEquipment
     MapBuilding map_building;
     Equipment equipment;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
@@ -1012,7 +1061,7 @@ class MapBuildingGlider
     MapBuilding map_building;
     Glider glider;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
@@ -1027,7 +1076,7 @@ class MapBuildingGood
     MapBuilding map_building;
     Good good;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
@@ -1042,7 +1091,7 @@ class MapBuildingModificator
     MapBuilding map_building;
     Modificator modificator;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
@@ -1057,7 +1106,7 @@ class MapBuildingProjectile
     MapBuilding map_building;
     Projectile projectile;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {
@@ -1072,7 +1121,7 @@ class MapBuildingWeapon
     MapBuilding map_building;
     Weapon weapon;
 
-    Quantity quantity;
+    Quantity quantity = 1;
 
     properties
     {

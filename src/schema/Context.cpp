@@ -1,33 +1,43 @@
 #include "context.h"
 
-Context::Context(const std::string &indent, const std::string &newline)
+Context::Strings &operator+=(Context::Strings &s1, const Context::Strings &s2)
+{
+    s1.insert(s1.end(), s2.begin(), s2.end());
+    return s1;
+}
+
+Context::Strings operator+(const Context::Strings &s1, const Context::Strings &s2)
+{
+    Context::Strings s(s1.begin(), s1.end());
+    return s += s2;
+}
+
+Context::Context(const Text &indent, const Text &newline)
     : indent(indent), newline(newline)
 {
 }
 
-void Context::addText(const std::string &s)
+void Context::addText(const Text &s)
 {
-    text += s;
+    text.back() += s;
 }
 
-void Context::addNoNewLine(const std::string &s)
+void Context::addNoNewLine(const Text &s)
 {
-    text += space + s;
+    text.push_back(space + s);
 }
 
-void Context::addLineNoSpace(const std::string & s)
+void Context::addLineNoSpace(const Text & s)
 {
-    text += s + newline;
+    text.push_back(s);
 }
 
-void Context::addLine()
+void Context::addLine(const Text &s)
 {
-    text += newline;
-}
-
-void Context::addLine(const std::string &s)
-{
-    text += space + s + newline;
+    if (s.empty())
+        text.push_back(s);
+    else
+        text.push_back(space + s);
 }
 
 void Context::decreaseIndent()
@@ -41,7 +51,7 @@ void Context::increaseIndent()
     space += indent;
 }
 
-void Context::beginBlock(const std::string &s, bool indent)
+void Context::beginBlock(const Text &s, bool indent)
 {
     if (!s.empty())
         addLine(s);
@@ -56,7 +66,7 @@ void Context::endBlock(bool semicolon)
     addLine(semicolon ? "};" : "}");
 }
 
-void Context::beginFunction(const std::string &s)
+void Context::beginFunction(const Text &s)
 {
     beginBlock(s);
 }
@@ -67,7 +77,7 @@ void Context::endFunction()
     addLine();
 }
 
-void Context::beginNamespace(const std::string &s)
+void Context::beginNamespace(const Text &s)
 {
     addLineNoSpace("namespace " + s);
     addLineNoSpace("{");
@@ -75,9 +85,9 @@ void Context::beginNamespace(const std::string &s)
     namespaces.push(s);
 }
 
-void Context::endNamespace(const std::string &ns)
+void Context::endNamespace(const Text &ns)
 {
-    std::string s = ns;
+    Text s = ns;
     if (!namespaces.empty() && ns.empty())
     {
         s = namespaces.top();
@@ -86,7 +96,7 @@ void Context::endNamespace(const std::string &ns)
     addLineNoSpace("} // namespace " + s);
 }
 
-void Context::ifdef(const std::string &s)
+void Context::ifdef(const Text &s)
 {
     addLineNoSpace("#ifdef " + s);
 }
@@ -98,21 +108,47 @@ void Context::endif()
 
 void Context::trimEnd(size_t n)
 {
-    auto sz = text.size();
+    if (text.empty())
+        return;
+    auto &t = text.back();
+    auto sz = t.size();
     if (n > sz)
         n = sz;
-    text.resize(sz - n);
+    t.resize(sz - n);
 }
 
-std::string Context::getText() const
+Context::Text Context::getText() const
 {
-    std::string s;
+    Text s;
     if (before_)
         s += before_->getText();
-    s += text;
+    for (auto &str : text)
+        s += str + newline;
+    s.resize(s.size() - 1);
     if (after_)
         s += after_->getText();
     return s;
+}
+
+void Context::emptyLines(int n)
+{
+    int e = 0;
+    for (auto i = text.rbegin(); i != text.rend(); ++i)
+    {
+        if (i->empty())
+            e++;
+        else
+            break;
+    }
+    if (e < n)
+    {
+        while (e++ != n)
+            addLine();
+    }
+    else if (e > n)
+    {
+        text.resize(text.size() - (e - n));
+    }
 }
 
 Context &Context::operator+=(const Context &rhs)
@@ -121,16 +157,16 @@ Context &Context::operator+=(const Context &rhs)
         before_->text += rhs.before_->text;
     else if (rhs.before_)
     {
-        before().addLine();
-        before().addText(rhs.before_->text);
+        before().emptyLines(1);
+        before().text += rhs.before_->text;
     }
     text += rhs.text;
     if (after_ && rhs.after_)
         after_->text += rhs.after_->text;
     else if (rhs.after_)
     {
-        //after().addLine();
-        after().addText(rhs.after_->text);
+        after().emptyLines(1);
+        after().text += rhs.after_->text;
     }
     return *this;
 }

@@ -18,6 +18,10 @@
 
 #include <Polygon4/DataManager/Storage.h>
 
+#include <Polygon4/DataManager/Database.h>
+#include <Polygon4/DataManager/Localization.h>
+#include <Polygon4/DataManager/StorageImpl.h>
+
 namespace polygon4
 {
 
@@ -27,5 +31,19 @@ namespace detail
 #include "detail/Storage.cpp"
 
 } // namespace detail
+
+std::shared_ptr<Storage> initStorage(std::string filename)
+{
+    std::shared_ptr<Database> db = std::make_shared<Database>(filename);
+    return initStorage(db);
+}
+
+std::shared_ptr<Storage> initStorage(std::shared_ptr<Database> db)
+{
+    if (!detail::schema)
+        detail::schema = new Schema(detail::getSchema());
+    initTranslator();
+    return std::make_shared<detail::StorageImpl>(db);
+}
 
 } // namespace polygon4

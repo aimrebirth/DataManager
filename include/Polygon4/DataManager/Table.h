@@ -166,7 +166,36 @@ public:
         return v->second;
     }
 
-public: // container interface
+    OrderedObjectMap getOrderedObjectMap() const
+    {
+        OrderedObjectMap m;
+        for (auto &d : data)
+        {
+            auto p = d.second.get();
+            m.insert({ p->getName(), p });
+        }
+        return m;
+    }
+    template <typename F>
+    OrderedObjectMap getOrderedObjectMap(F &&f) const
+    {
+        OrderedObjectMap m;
+        for (auto &d : data)
+        {
+            auto p = d.second.get();
+            if (f(p))
+                m.insert({ p->getName(), p });
+        }
+        return m;
+    }
+
+    operator OrderedObjectMap() const
+    {
+        return getOrderedObjectMap();
+    }
+
+    // container interface
+public:
     iterator begin() { return data.begin(); }
     iterator end() { return data.end(); }
     const_iterator begin() const { return data.begin(); }
@@ -212,11 +241,10 @@ public: // container interface
         return data.erase(i);
     }
 
-    void setName(const std::string &name)
-    {
-        this->name = name;
-    }
-
+    // other functions
+public:
+    void setName(const std::string &name) { this->name = name; }
+    
 private:
     std::string name;
 	container data;

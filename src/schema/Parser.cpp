@@ -97,6 +97,7 @@ Schema convert(const ast::Schema &ast)
         class_.humanName = c.getHumanName();
         class_.enumName = c.getEnumName();
         class_.dataType = dataTypeFromName(c.name);
+        class_.subtreeItem = c.getSubtreeItem();
         auto no = c.getNamesOrder();
         if (!no.empty())
         {
@@ -166,33 +167,103 @@ Schema convert(const ast::Schema &ast)
     for (auto &c : s.classes)
     {
         auto &ac = *astClasses[c.name];
-        auto pn = ac.getParentName();
-        if (!pn.empty())
-        {
-            auto i = s.typePtrs.find(pn);
-            assert(i != s.typePtrs.end());
-            c.parent = (Class *)i->second;
-            c.parent->children.push_back(&c);
-        }
-        auto cn = ac.getChildName();
-        if (!cn.empty())
-        {
-            auto i = s.typePtrs.find(cn);
-            assert(i != s.typePtrs.end());
-            c.child = (Class *)i->second;
-        }
         for (auto &av : ac.variables)
         {
             Variable v;
             v.id = av.id;
             v.name = av.name;
             v.defaultValue = av.defaultValue;
+            v.getOrderedObjectMap = av.getPropertyValue("getOrderedObjectMap");
+            v.enumTypeName = av.getPropertyValue("enum_type");
             auto tn = find_type(av.type);
             auto t = s.typePtrs.find(tn);
             assert(t != s.typePtrs.end());
             v.type = s.typePtrs[tn];
             v.flags = av.flags();
-            c.addVariable(v);
+            c.variables.push_back(v);
+        }
+    }
+    // dependencies
+    for (auto &c : s.classes)
+    {
+        c.initialize();
+        auto &ac = *astClasses[c.name];
+        for (auto &av : ac.variables)
+        {
+            auto dep_name = av.getPropertyValue("dependsOn");
+            if (dep_name.empty())
+                continue;
+            auto master = c.variables.find(dep_name);
+            auto slave = c.variables.find(av.name);
+            master->slaveVariables.push_back(std::make_shared<Variable>(*slave));
+            slave->masterVariable = std::make_shared<Variable>(*master);
+        }
+    }
+    // parents and childs
+    for (auto &c : s.classes)
+    {
+        auto &ac = *astClasses[c.name];
+        auto pn = ac.getParentName();
+        auto pvn = ac.getParentVarName();
+        if (!pn.empty() || !pvn.empty())
+        {
+            assert(!(!pn.empty() && !pvn.empty()) && "Only one of 'parent' and 'parent_var' should be specified");
+            if (!pvn.empty())
+            {
+                auto v = c.variables.find(pvn);
+                c.parentVariable = *v;
+                auto t = (Class *)v->getType();
+                auto pn = t->getCppName();
+                auto i = s.typePtrs.find(pn);
+                assert(i != s.typePtrs.end());
+                c.parent = (Class *)i->second;
+                c.parent->children.push_back(&c);
+            }
+            else if (!pn.empty())
+            {
+                auto i = s.typePtrs.find(pn);
+                assert(i != s.typePtrs.end());
+                c.parent = (Class *)i->second;
+                c.parent->children.push_back(&c);
+                for (auto &v : c.getVariables())
+                {
+                    if (v.getType()->getCppName() == c.parent->getCppName())
+                    {
+                        c.parentVariable = v;
+                        break;
+                    }
+                }
+            }
+        }
+        auto cn = ac.getChildName();
+        auto cvn = ac.getChildVarName();
+        if (!cn.empty() || !cvn.empty())
+        {
+            assert(!(!cn.empty() && !cvn.empty()) && "Only one of 'child' and 'child_var' should be specified");
+            if (!cvn.empty())
+            {
+                auto v = c.variables.find(cvn);
+                c.childVariable = *v;
+                auto t = (Class *)v->getType();
+                auto cn = t->getCppName();
+                auto i = s.typePtrs.find(cn);
+                assert(i != s.typePtrs.end());
+                c.child = (Class *)i->second;
+            }
+            else if (!cn.empty())
+            {
+                auto i = s.typePtrs.find(cn);
+                assert(i != s.typePtrs.end());
+                c.child = (Class *)i->second;
+                for (auto &v : c.getVariables())
+                {
+                    if (v.getType()->getCppName() == c.child->getCppName())
+                    {
+                        c.childVariable = v;
+                        break;
+                    }
+                }
+            }
         }
     }
 

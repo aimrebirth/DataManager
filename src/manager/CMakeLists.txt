@@ -2,6 +2,12 @@
 # Polygon-4 Data Manager
 #
 
+set(generated_dir ${CMAKE_BINARY_DIR}/gen)
+set(generated_dir_inc           ${generated_dir}/include)
+set(generated_dir_inc_detail    ${generated_dir}/include/detail)
+set(generated_dir_src           ${generated_dir}/src)
+set(generated_dir_src_detail    ${generated_dir}/src/detail)
+
 # source groups
 set(SSRC ${PROJECT_SOURCE_DIR})
 set(BSRC ${CMAKE_CURRENT_BINARY_DIR})
@@ -14,8 +20,8 @@ set(H "${_H}$")
 
 set(H_CPP "(${H}|${CPP})")
 
-source_group("Source Files\\Detail" "${SSRC}/src/manager/detail/${CPP}")
-source_group("Header Files\\Detail" "${SSRC}/include/Polygon4/DataManager/detail/${H}")
+source_group("Header Files\\Detail" "${generated_dir_inc}/${H}")
+source_group("Source Files\\Detail" "${generated_dir_src}/${CPP}")
 source_group("Header Files\\Interface" "${SSRC}/include/Polygon4/DataManager/Interface/${H_CPP}")
 source_group("MOC files" ".*automoc\\.cpp")
 
@@ -23,28 +29,22 @@ source_group("MOC files" ".*automoc\\.cpp")
 file(GLOB db_inc1 "${PROJECT_SOURCE_DIR}/include/Polygon4/DataManager/*")
 file(GLOB db_inc2 "${PROJECT_SOURCE_DIR}/include/Polygon4/DataManager/Interface/*")
 file(GLOB db_src "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-file(GLOB db_src_hdr "${CMAKE_CURRENT_SOURCE_DIR}/detail/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/detail/*.h")
-set_source_files_properties(${db_src_hdr} PROPERTIES HEADER_FILE_ONLY True)
 
 if (NOT POLYGON4_ENGINE)
     add_definitions(-DPOLYGON4_STATIC)
 endif()
 
-set(generated_dir ${PROJECT_SOURCE_DIR})
-set(generated_dir_inc ${generated_dir}/include/Polygon4/DataManager/detail)
-set(generated_dir_src ${generated_dir}/src/manager/detail)
 set(generated_src
-    ${generated_dir_inc}/Types.h
-    ${generated_dir_src}/Types.cpp
-    ${generated_dir_inc}/Storage.h
-    ${generated_dir_src}/Storage.cpp
-    ${generated_dir_inc}/StorageImpl.h
-    ${generated_dir_src}/StorageImpl.cpp
-    ${generated_dir_src}/schema/Tokens.cpp
-    ${generated_dir_inc}/ObjectTypes.h
-    ${generated_dir_inc}/ObjectInterfaces.h
-    ${generated_dir_inc}/Enums.h
-    ${generated_dir_src}/Enums.cpp
+    ${generated_dir_inc_detail}/Types.h
+    ${generated_dir_src_detail}/Types.cpp
+    ${generated_dir_inc_detail}/Storage.h
+    ${generated_dir_src_detail}/Storage.cpp
+    ${generated_dir_inc_detail}/StorageImpl.h
+    ${generated_dir_src_detail}/StorageImpl.cpp
+    ${generated_dir_src_detail}/schema/Tokens.cpp
+    ${generated_dir_inc_detail}/ObjectInterfaces.h
+    ${generated_dir_inc_detail}/Enums.h
+    ${generated_dir_src_detail}/Enums.cpp
 )
 set_source_files_properties(${generated_src} PROPERTIES
     GENERATED True
@@ -52,13 +52,16 @@ set_source_files_properties(${generated_src} PROPERTIES
 )
 
 add_custom_command(OUTPUT ${generated_src}
-    COMMAND generator ${PROJECT_SOURCE_DIR}/data/schema.txt ${PROJECT_SOURCE_DIR}
+    COMMAND generator ${PROJECT_SOURCE_DIR}/data/schema.txt ${generated_dir}
     DEPENDS generator ${PROJECT_SOURCE_DIR}/data/schema.txt
 )
 
-set(DATA_MANAGER_ADDITIONAL_INCLUDES ${CMAKE_CURRENT_BINARY_DIR} CACHE STRING "Data manager generated includes dir" FORCE)
+set(DATA_MANAGER_ADDITIONAL_INCLUDES ${generated_dir_inc} CACHE STRING "Data manager generated includes dir" FORCE)
 
-add_library                 (DataManager ${db_src} ${db_inc1} ${db_inc2} ${db_src_hdr} ${generated_src} ${PROJECT_SOURCE_DIR}/data/schema.txt)
+include_directories(${generated_dir_inc})
+include_directories(${generated_dir_src})
+
+add_library                 (DataManager ${db_src} ${db_inc1} ${db_inc2} ${generated_src} ${PROJECT_SOURCE_DIR}/data/schema.txt)
 target_link_libraries       (DataManager sqlite3 schema)
 if (MSVC)
     target_compile_options  (DataManager PUBLIC /bigobj)

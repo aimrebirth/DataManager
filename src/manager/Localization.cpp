@@ -16,19 +16,19 @@ namespace polygon4
 
 void initTranslator()
 {
-    translator.set(translator_data);
+    translator.init(translator_data);
 }
 
 LocalizationTable<DataType> translator_DataType_data =
 {
 #define ENUM_NAME(x) DataType::x
     TS(Integer, "Целое", "Integer")
-    TS(Real, "Целое", "Integer")
-    TS(Text, "Целое", "Integer")
-    TS(Bool, "Целое", "Integer")
-    TS(Blob, "Целое", "Integer")
-    TS(Enum, "Целое", "Integer")
-    TS(Complex, "Целое", "Integer")
+    TS(Real, "Вещественное", "Real")
+    TS(Text, "Текст", "Text")
+    TS(Bool, "Логическое", "Boolean")
+    TS(Blob, "Двоичные данные", "Blob")
+    TS(Enum, "Перечисление", "Enumeration")
+    TS(Complex, "Объект", "Object")
     TS(None, "Неизвестный тип", "Unknown type")
 #undef ENUM_NAME
 };
@@ -86,6 +86,7 @@ const Translator::translator_type translator_data =
             { "Projectile", { "Снаряд",  "Projectile" } },
             { "Quest", { "Задание",  "Quest" } },
             { "QuestReward", { "Награда за задание",  "Quest Reward" } },
+            { "Reward",{ "Награда за задание",  "Quest Reward" } },
             { "QuestRewardEquipment", { "Оборудование за задание",  "Quest Reward Equipment" } },
             { "QuestRewardGlider", { "Глайдер за задание",  "Quest Reward Glider" } },
             { "QuestRewardGood", { "Товар за задание",  "Quest Reward Good" } },
@@ -136,6 +137,7 @@ const Translator::translator_type translator_data =
             { "Projectiles",{ "Снаряды",  "Projectiles" } },
             { "Quests",{ "Задания",  "Quests" } },
             { "Quest Rewards",{ "Награды за задание",  "Quest Rewards" } },
+            { "Rewards",{ "Награды",  "Rewards" } },
             { "Quest Reward Equipments",{ "Оборудование за задание",  "Quest Reward Equipments" } },
             { "Quest Reward Gliders",{ "Глайдеры за задание",  "Quest Reward Gliders" } },
             { "Quest Reward Goods",{ "Товары за задание",  "Quest Reward Goods" } },
@@ -230,7 +232,7 @@ const Translator::translator_type translator_data =
             { "directory", { "Директория", "directory"} },
             { "distance_detonation", { "Дистанция детонации", "distance_detonation"} },
             { "durability", { "Прочность", "durability"} },
-            { "en", { "", "en"} },
+            { "en", { "English", "English"} },
             { "equipment", { "Оборудование", "equipment"} },
             { "firerate", { "Частота стрельбы", "firerate"} },
             { "fx", { "", "fx"} },
@@ -299,7 +301,7 @@ const Translator::translator_type translator_data =
             { "roll", { "", "roll"} },
             { "rotate", { "Поворот", "rotate"} },
             { "rotatespeed", { "Скорость поворота", "rotatespeed"} },
-            { "ru", { "", "ru"} },
+            { "ru", { "Русский", "Русский"} },
             { "scale", { "Масштаб", "scale"} },
             { "scale_x", { "Масштаб по X", "scale_x"} },
             { "scale_y", { "Масштаб по Y", "scale_y"} },

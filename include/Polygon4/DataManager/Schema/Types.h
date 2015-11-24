@@ -28,11 +28,16 @@ enum ObjectFlag
     fEnumName,
     fPrefixed,
     fNamesOrder,
+    fSubtreeItem,
 
     // fields
     fPrimaryKey,
     fEnumItem,
     fContainer,
+    fGetOrderedObjectMap,
+    fDependsOn,
+    fEnumType,
+    fBigEdit,
 
     // enums
     fNotInTable,

@@ -21,7 +21,7 @@
 #include "Common.h"
 #include "String.h"
 
-#include "detail/Enums.h"
+#include <detail/Enums.h>
 
 namespace polygon4
 {

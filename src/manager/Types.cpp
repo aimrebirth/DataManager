@@ -19,13 +19,8 @@
 #include <Polygon4/DataManager/Types.h>
 
 #include <algorithm>
-#include <sstream>
 
-#ifdef USE_QT
-#include <qcoreapplication.h>
-#include <qtreewidget.h>
-#endif
-
+#include <Polygon4/DataManager/Storage.h>
 #include <Polygon4/DataManager/Table.h>
 
 namespace polygon4
@@ -56,6 +51,13 @@ bool to_bool(const std::string &s)
     if (s.empty() || s == "0" || s == "false")
         return false;
     return true;
+}
+
+std::tuple<bool, OrderedObjectMap> IObjectBase::getOrderedObjectMap(int columnId, Storage *storage) const
+{
+    if (storage)
+        return std::make_tuple(true, storage->getOrderedMap(getType()));
+    return std::make_tuple(false, OrderedObjectMap());
 }
 
 } // namespace detail

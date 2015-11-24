@@ -20,39 +20,11 @@
 
 #include <algorithm>
 
-#ifdef USE_QT
-#include <qtreewidget.h>
-#endif
-
 #include <sqlite3/sqlite3.h>
 
 #include <Polygon4/DataManager/Database.h>
 
 #define PROGRESS_CALLBACK(p) if (callback) callback(p)
-
-template <class T>
-polygon4::detail::OrderedObjectMap getOrderedMap(const polygon4::detail::CTable<T> &array)
-{
-    polygon4::detail::OrderedObjectMap map;
-    for (auto &v : array)
-        map.insert(std::make_pair(v.second->getName(), v.second.get()));
-    return map;
-}
-
-template <class T>
-polygon4::detail::OrderedObjectMap getOrderedMap(const polygon4::detail::CTable<T> &array, std::function<bool(polygon4::detail::IObjectBase *)> f)
-{
-    if (!f)
-        return getOrderedMap(array);
-    polygon4::detail::OrderedObjectMap map;
-    for (auto &v : array)
-    {
-        auto p = v.second.get();
-        if (f(p))
-            map.insert(std::make_pair(v->getName(), p));
-    }
-    return map;
-}
 
 namespace polygon4
 {
