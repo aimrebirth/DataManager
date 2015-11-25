@@ -1,3 +1,21 @@
+/*
+ * Polygon-4 Data Manager
+ * Copyright (C) 2015-2016 lzwdgc
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 #include <map>
@@ -53,7 +71,7 @@ struct Properties : public std::map<Key, struct Property>
                     return t;
             }
         }
-        return std::make_tuple(true, Value());
+        return std::make_tuple(false, Value());
     }
 
     ObjectFlags flags(bool assert = true) const
@@ -81,6 +99,9 @@ struct Properties : public std::map<Key, struct Property>
             SET_PROPERTY("parent_var", fParent);
             SET_PROPERTY("child_var", fChild);
             SET_PROPERTY("subtree_item", fSubtreeItem);
+            SET_PROPERTY("split_by", fSplitBy);
+            SET_PROPERTY("default", fDefault);
+            SET_PROPERTY("not_in_table", fNotInTable);
             else if (assert)
                 assert(false && "No such property");
 #undef SET_PROPERTY
@@ -96,16 +117,12 @@ struct Properties : public std::map<Key, struct Property>
     }
 };
 
-using Specifier = Key;
-using Specifiers = std::set<Specifier>;
-
 struct Variable
 {
     int id;
     std::string type;
     Name name;
     std::string defaultValue;
-    Specifiers specifiers;
     Properties properties;
 
     ObjectFlags flags() const
@@ -131,8 +148,6 @@ struct Variable
 
     bool hasProperty(const Key &key) const
     {
-        if (specifiers.find(key) != specifiers.end())
-            return true;
         if (properties.find(key) != properties.end())
             return true;
         return false;
@@ -154,20 +169,11 @@ struct Variable
 
 using Variables = std::vector<Variable>;
 
-struct ClassSpecifier
-{
-    std::string name;
-    Specifiers specifiers;
-};
-
-using ClassSpecifiers = std::vector<ClassSpecifier>;
-
 struct Class
 {
     std::string name;
     Properties properties;
     Variables variables;
-    ClassSpecifiers classSpecifiers;
 
     Value getPropertyValue(const Key &key) const
     {
@@ -226,20 +232,22 @@ struct EnumItem
 {
     Name name;
     int id;
-    Specifiers specifiers;
+    Properties properties;
 
     ObjectFlags flags() const
     {
         ObjectFlags f;
         f[fNotInTable] = hasProperty("not_in_table");
+        f[fDefault] = hasProperty("default");
         return f;
     }
 
     bool hasProperty(const Key &key) const
     {
-        if (specifiers.find(key) != specifiers.end())
-            return true;
-        return false;
+        bool e;
+        Value v;
+        std::tie(e, v) = properties.getPropertyValue(key);
+        return e;
     }
 };
 
@@ -269,8 +277,6 @@ struct parser_data
     Databases databases;
     Properties properties;
     Property property;
-    Specifier specifier;
-    Specifiers specifiers;
     Class class_;
     Classes classes;
     Enum enum_;

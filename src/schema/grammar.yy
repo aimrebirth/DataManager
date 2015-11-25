@@ -56,7 +56,7 @@ extern MemoryManager *parserMemoryManager;
 %token <rawStrVal> STRING
 %token <intVal> INTEGER
 
-%type <strVal> string name type key value specifier quoted_string any_value
+%type <strVal> string name type key value quoted_string any_value
 
 %%
 
@@ -119,18 +119,18 @@ enum_var: string COMMA
     {
         pd->enum_.items.push_back({*$1, $3});
     }
-    | string specifiers_braced COMMA
+    | string properties_braced COMMA
     {
         EnumItem item = {*$1, 0};
-        item.specifiers = pd->specifiers;
-        RESET(pd->specifiers);
+        item.properties = pd->properties;
+        RESET(pd->properties);
         pd->enum_.items.push_back(item);
     }
-    | string EQUAL INTEGER specifiers_braced COMMA
+    | string EQUAL INTEGER properties_braced COMMA
     {
         EnumItem item = {*$1, $3};
-        item.specifiers = pd->specifiers;
-        RESET(pd->specifiers);
+        item.properties = pd->properties;
+        RESET(pd->properties);
         pd->enum_.items.push_back(item);
     }
     ;
@@ -261,13 +261,6 @@ property: value SEMICOLON
     }
     ;
 
-specifiers_braced: L_CURLY_BRACKET specifiers R_CURLY_BRACKET
-    ;
-
-specifiers: specifier
-    | specifier specifiers
-    ;
-
 key_value_pair: key COLON value
     {
         pd->property.key = *$1;
@@ -275,11 +268,6 @@ key_value_pair: key COLON value
     }
     ;
 
-specifier: string
-    {
-        pd->specifiers.insert(*$1);
-    }
-    ;
 name: string
     ;
 type: string

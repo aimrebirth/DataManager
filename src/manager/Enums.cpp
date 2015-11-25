@@ -25,7 +25,8 @@
 #define CREATE_TABLE(t) \
     if (type_name == #t) \
         for (auto &e : table_ ## t) \
-            et[tr(e.second + ending)] = static_cast<int>(e.first)
+            if (table_ ## t ## _exclude.count(e.first) == 0) \
+                et[tr(e.second + ending)] = static_cast<int>(e.first)
 
 namespace polygon4
 {

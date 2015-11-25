@@ -5,7 +5,6 @@
 #
 
 # TODO:
-# - group strings in tree view by object type
 
 ################################################################################
 #
@@ -59,7 +58,7 @@ database sqlite3
 
 enum EObjectType
 {
-    None = 0 { not_in_table },
+    None = 0 { not_in_table; default; },
     Building,
     Clan = 4,
     ClanMemberName,
@@ -267,6 +266,7 @@ class String
     {
         tree_view;
         object_name: "to_string(string)";
+        split_by: object;
     }
 };
 

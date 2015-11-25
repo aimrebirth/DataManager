@@ -1,3 +1,21 @@
+/*
+ * Polygon-4 Data Manager
+ * Copyright (C) 2015-2016 lzwdgc
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
 #include <assert.h>
@@ -335,6 +353,7 @@ public:
     Variable getTextVariable() const { return getVariable("text"); }
     Variable getParentVariable() const { return parentVariable; }
     Variable getChildVariable() const { return childVariable; }
+    Variable getSplitByVariable() const { return splitBy; }
 
     virtual bool isSimple() const override { return false; }
 
@@ -364,6 +383,8 @@ private:
     Class *child = nullptr;
     Variable childVariable;
     std::vector<Class *> children;
+    Variable splitBy;
+
     bool hasIdField = false;
     bool hasFks = false;
 
@@ -376,7 +397,7 @@ struct EnumItem
 {
     Name name;
     int id;
-    bool not_in_table;
+    ObjectFlags flags;
 };
 
 using EnumItems = std::vector<EnumItem>;
@@ -384,6 +405,9 @@ using EnumItems = std::vector<EnumItem>;
 class Enum : public Type
 {
 public:
+    Name getTableName() const { return "table_" + getCppName(); }
+    Name getExcludeTableName() const { return getTableName() + "_exclude"; }
+
     ModuleContext print() const;
     ModuleContext printTableRecord() const;
 

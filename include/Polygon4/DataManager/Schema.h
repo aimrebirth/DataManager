@@ -1,6 +1,6 @@
 /*
  * Polygon-4 Data Manager
- * Copyright (C) 2015 lzwdgc
+ * Copyright (C) 2015-2016 lzwdgc
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as

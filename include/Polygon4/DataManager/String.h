@@ -1,6 +1,6 @@
 /*
- * Polygon-4 Engine
- * Copyright (C) 2015 lzwdgc
+ * Polygon-4 Data Manager
+ * Copyright (C) 2015-2016 lzwdgc
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,6 +24,10 @@
 
 #ifdef USE_QT
 #include <qstring.h>
+#endif
+
+#ifdef __UNREAL__
+#include <Text.h>
 #endif
 
 #include "Dll.h"
@@ -56,6 +60,16 @@ public:
 #ifdef USE_QT
     String(const QString &s);
 #endif
+#ifdef __UNREAL__
+    String(const FString &s)
+        : String(s.GetCharArray().GetData())
+    {
+    }
+    String(const FText &s)
+        : String(s.ToString())
+    {
+    }
+#endif
     String &operator=(const char *s);
     String &operator=(const wchar_t *s);
     String &operator=(const std::string &s);
@@ -63,10 +77,36 @@ public:
 #ifdef USE_QT
     String &operator=(const QString &s);
 #endif
+#ifdef __UNREAL__
+    String &operator=(const FString &s)
+    {
+        String tmp(s);
+        std::swap(*this, tmp);
+        return *this;
+    }
+    String &operator=(const FText &s)
+    {
+        String tmp(s);
+        std::swap(*this, tmp);
+        return *this;
+    }
+#endif
     ~String();
 
 #ifdef USE_QT
     QString toQString() const;
+#endif
+
+#ifdef __UNREAL__
+    FString toFString() const
+    {
+        return wstring().c_str();
+    }
+
+    FText toFText() const
+    {
+        return FText::FromString(toFString());
+    }
 #endif
 
     void clear();

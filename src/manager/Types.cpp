@@ -29,6 +29,19 @@ namespace polygon4
 namespace detail
 {
 
+int TreeItem::child_count() const
+{
+    int cc = 0;
+    for (auto &c : children)
+    {
+        if (c->type == EObjectType::None)
+            cc += c->child_count();
+        if (c->object)
+            cc++;
+    }
+    return cc;
+}
+
 void TreeItem::remove() const
 {
     if (!parent)

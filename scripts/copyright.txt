@@ -15,39 +15,3 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#pragma once
-
-#include "Storage.h"
-
-namespace polygon4
-{
-
-namespace detail
-{
-
-template <class MapObjectType, class ObjectType, typename Function>
-OrderedObjectMap getOrderedMapForObject(const std::shared_ptr<Storage> &storage, ObjectType *object, Function function)
-{
-    if (!object)
-        return OrderedObjectMap();
-    auto f = [object, function](auto o)
-    {
-        MapObjectType *mo = (MapObjectType *)o;
-        if (!mo)
-            return false;
-        return function(object, mo);
-    };
-    return storage->getOrderedMap(MapObjectType::object_type, f);
-}
-
-} // namespace detail
-
-namespace detail
-{
-
-#include "detail/StorageImpl.h"
-
-} // namespace detail
-
-} // namespace polygon4

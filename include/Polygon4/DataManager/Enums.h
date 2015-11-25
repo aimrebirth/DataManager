@@ -1,6 +1,6 @@
 /*
  * Polygon-4 Data Manager
- * Copyright (C) 2015 lzwdgc
+ * Copyright (C) 2015-2016 lzwdgc
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,7 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <map>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "Common.h"
 #include "String.h"
@@ -30,6 +34,12 @@ namespace detail
 {
 
 using EnumTable = std::map<String, int>;
+
+template <typename E>
+using EnumTextTable = std::unordered_map<E, std::string>;
+
+template <typename E>
+using EnumExcludeTable = std::unordered_set<E>;
 
 EnumTable getOrderedMap(const std::string &type_name);
 

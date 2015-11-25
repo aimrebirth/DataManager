@@ -1,3 +1,21 @@
+/*
+ * Polygon-4 Data Manager
+ * Copyright (C) 2015-2016 lzwdgc
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <Polygon4/DataManager/Schema/Schema.h>
 
 #include <Polygon4/DataManager/Schema/Print.h>
@@ -141,6 +159,10 @@ ModuleContext Schema::printEnums() const
         mc += e.print();
     mc.hpp.after().addLine();
     mc.hpp.after().endNamespace("detail");
+    for (auto &e : enums)
+    {
+        mc.hpp.after().addLine("String tr(detail::" + e.getCppName() + " e);");
+    }
     mc.hpp.after().addLine();
     mc.hpp.after().endNamespace("polygon4");
 
@@ -153,8 +175,14 @@ ModuleContext Schema::printEnums() const
         mc += e.printTableRecord();
     mc.cpp.after().addLine();
     mc.cpp.after().endNamespace("detail");
-    mc.cpp.after().addLine();
+    for (auto &e : enums)
+    {
+        mc.cpp.after().beginFunction("String tr(detail::" + e.getCppName() + " e)");
+        mc.cpp.after().addLine("return tr(detail::" + e.getTableName() + "[e]);");
+        mc.cpp.after().endFunction();
+    }
     mc.cpp.after().endNamespace("polygon4");
+
     return mc;
 }
 
@@ -221,10 +249,6 @@ ModuleContext Schema::printStorageImplementation() const
     mc.hpp.addLine(pragma_once);
     mc.hpp.addLine();
     mc.hpp.beginFunction("class StorageImpl : public Storage");
-    mc.hpp.addLineNoSpace("#ifdef USE_QT");
-    mc.hpp.addLine("Q_DECLARE_TR_FUNCTIONS(StorageImpl)");
-    mc.hpp.addLineNoSpace("#endif");
-    mc.hpp.addLine();
     mc.hpp.addLineNoSpace("private:");
     mc.hpp.addLine("std::shared_ptr<Database> db;");
     mc.hpp.addLine();
@@ -361,7 +385,7 @@ ModuleContext Schema::printStorageImplementation() const
             mc.cpp.endFunction();
         }
     }
-
+    
     // printTree()
     {
         mc.hpp.addLine();
@@ -384,11 +408,38 @@ ModuleContext Schema::printStorageImplementation() const
                 mc.cpp.addLine("item->type = EObjectType::" + c.getCppName() + ";");
                 mc.cpp.addLine("item->parent = root.get();");
                 mc.cpp.addLine("auto " + c.getCppArrayVariableName() + " = getOrderedMap(EObjectType::" + c.getCppName() + ");");
-                mc.cpp.addLine("for (auto &v : " + c.getCppArrayVariableName() + ")");
-                mc.cpp.beginBlock();
-                mc.cpp.addLine("item->children.push_back(tmp = v.second->printTree());");
-                mc.cpp.addLine("tmp->parent = item.get();");
-                mc.cpp.endBlock();
+                if (c.getFlags()[fSplitBy])
+                {
+                    auto split_var = c.getSplitByVariable();
+                    auto var_type = split_var.getType()->getCppName();
+                    mc.cpp.beginBlock();
+                    mc.cpp.addLine("std::unordered_map<" + var_type + ", Ptr<TreeItem>> categories;");
+                    mc.cpp.beginBlock("for (auto &v : " + c.getCppArrayVariableName() + ")");
+                    mc.cpp.addLine("tmp = v.second->printTree();");
+                    mc.cpp.addLine("auto o = (" + c.getCppName() + " *)tmp->object;");
+                    mc.cpp.addLine("if (!categories[o->" + split_var.getName() + "])");
+                    mc.cpp.increaseIndent();
+                    mc.cpp.addLine("categories[o->" + split_var.getName() + "] = std::make_shared<TreeItem>();");
+                    mc.cpp.decreaseIndent();
+                    mc.cpp.addLine("categories[o->" + split_var.getName() + "]->children.push_back(tmp);");
+                    mc.cpp.addLine("tmp->parent = categories[o->" + split_var.getName() + "].get();");
+                    mc.cpp.endBlock();
+                    mc.cpp.beginBlock("for (auto &v : categories)");
+                    mc.cpp.addLine("v.second->type = " + split_var.getType()->getCppName() + "::None;");
+                    mc.cpp.addLine("v.second->name = polygon4::tr(v.first);");
+                    mc.cpp.addLine("item->children.push_back(v.second);");
+                    mc.cpp.addLine("v.second->parent = item.get();");
+                    mc.cpp.endBlock();
+                    mc.cpp.endBlock();
+                }
+                else
+                {
+                    mc.cpp.addLine("for (auto &v : " + c.getCppArrayVariableName() + ")");
+                    mc.cpp.beginBlock();
+                    mc.cpp.addLine("item->children.push_back(tmp = v.second->printTree());");
+                    mc.cpp.addLine("tmp->parent = item.get();");
+                    mc.cpp.endBlock();
+                }
                 mc.cpp.addLine("root->children.push_back(item);");
             }
             mc.cpp.addLine();
@@ -1429,10 +1480,15 @@ ModuleContext Enum::print() const
 ModuleContext Enum::printTableRecord() const
 {
     ModuleContext mc;
-    mc.cpp.beginBlock("std::map<" + getCppName() + ", std::string> table_" + getCppName() + " =");
+    mc.cpp.beginBlock("EnumTextTable<" + getCppName() + "> " + getTableName() + " =");
     for (auto &i : items)
-        if (!i.not_in_table)
-            mc.cpp.addLine("{ " + getCppName() + "::" + i.name + ", \"" + i.name + "\" },");
+        mc.cpp.addLine("{ " + getCppName() + "::" + i.name + ", \"" + i.name + "\" },");
+    mc.cpp.endBlock(true);
+    mc.cpp.addLine();
+    mc.cpp.beginBlock("EnumExcludeTable<" + getCppName() + "> " + getExcludeTableName() + " =");
+    for (auto &i : items)
+        if (i.flags[fNotInTable])
+            mc.cpp.addLine("{ " + getCppName() + "::" + i.name + " },");
     mc.cpp.endBlock(true);
     mc.cpp.addLine();
     return mc;

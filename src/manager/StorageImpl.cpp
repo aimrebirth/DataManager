@@ -23,6 +23,7 @@
 #include <sqlite3/sqlite3.h>
 
 #include <Polygon4/DataManager/Database.h>
+#include <Polygon4/DataManager/Localization.h>
 
 #define PROGRESS_CALLBACK(p) if (callback) callback(p)
 
