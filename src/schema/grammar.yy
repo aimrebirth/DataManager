@@ -98,12 +98,26 @@ enums: enum
     | enum enums
     ;
 
-enum: ENUM string L_CURLY_BRACKET enum_vars R_CURLY_BRACKET SEMICOLON
+enum: simple_enum
+    | enum_with_properties
+    ;
+
+simple_enum: ENUM string L_CURLY_BRACKET enum_vars R_CURLY_BRACKET SEMICOLON
     {
         pd->enum_.name = *$2;
         pd->enums.push_back(pd->enum_);
         RESET(pd->enum_var_id);
         RESET(pd->enum_);
+    }
+    ;
+enum_with_properties: ENUM string L_CURLY_BRACKET enum_vars PROPERTIES properties_braced R_CURLY_BRACKET SEMICOLON
+    {
+        pd->enum_.name = *$2;
+        pd->enum_.properties = pd->properties;
+        pd->enums.push_back(pd->enum_);
+        RESET(pd->enum_var_id);
+        RESET(pd->enum_);
+        RESET(pd->properties);
     }
     ;
 

@@ -256,7 +256,31 @@ using EnumItems = std::vector<EnumItem>;
 struct Enum
 {
     std::string name;
+    Properties properties;
     EnumItems items;
+
+    ObjectFlags flags() const
+    {
+        ObjectFlags f;
+        f[fEnding] = hasProperty("ending");
+        return f;
+    }
+
+    bool hasProperty(const Key &key) const
+    {
+        bool e;
+        Value v;
+        std::tie(e, v) = properties.getPropertyValue(key);
+        return e;
+    }
+
+    std::string getEnding() const
+    {
+        bool e;
+        Value v;
+        std::tie(e, v) = properties.getPropertyValue("ending");
+        return v;
+    }
 };
 
 using Enums = std::vector<Enum>;

@@ -25,8 +25,6 @@
 #include "Common.h"
 #include "String.h"
 
-#include <detail/Enums.h>
-
 namespace polygon4
 {
 
@@ -41,8 +39,8 @@ using EnumTextTable = std::unordered_map<E, std::string>;
 template <typename E>
 using EnumExcludeTable = std::unordered_set<E>;
 
-EnumTable getOrderedMap(const std::string &type_name);
-
 } // namespace detail
 
 } // namespace polygon4
+
+#include "detail/Enums.h"

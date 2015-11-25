@@ -154,10 +154,10 @@ ModuleContext Schema::printEnums() const
     mc.hpp.before().addLine();
     mc.hpp.before().beginNamespace("polygon4");
     mc.hpp.before().beginNamespace("detail");
+    mc.hpp.before().addLine("EnumTable DLL_EXPORT getOrderedMap(const std::string &type_name);");
     mc.hpp.before().addLine();
     for (auto &e : enums)
         mc += e.print();
-    mc.hpp.after().addLine();
     mc.hpp.after().endNamespace("detail");
     for (auto &e : enums)
     {
@@ -170,15 +170,33 @@ ModuleContext Schema::printEnums() const
     mc.cpp.before().addLine();
     mc.cpp.before().beginNamespace("polygon4");
     mc.cpp.before().beginNamespace("detail");
-    mc.cpp.before().addLine();
     for (auto &e : enums)
         mc += e.printTableRecord();
-    mc.cpp.after().addLine();
+
+    // getOrderedMap()
+    {
+        mc.cpp.after().beginFunction("EnumTable getOrderedMap(const std::string &type_name)");
+        mc.cpp.after().addLine("EnumTable et;");
+        mc.cpp.after().addLine("std::string ending;");
+        for (auto &e : enums)
+        {
+            mc.cpp.after().addLine("ending = \"" + e.getEnding() + "\";");
+            mc.cpp.after().addLine("CREATE_TABLE(" + e.getCppName() + ");");
+        }
+        mc.cpp.after().addLine("return et;");
+        mc.cpp.after().endFunction();
+    }
+
     mc.cpp.after().endNamespace("detail");
     for (auto &e : enums)
     {
         mc.cpp.after().beginFunction("String tr(detail::" + e.getCppName() + " e)");
-        mc.cpp.after().addLine("return tr(detail::" + e.getTableName() + "[e]);");
+        mc.cpp.after().addLine("auto i = detail::" + e.getTableName() + ".find(e);");
+        mc.cpp.after().addLine("if (i != detail::" + e.getTableName() + ".end())");
+        mc.cpp.after().increaseIndent();
+        mc.cpp.after().addLine("return tr(i->second);");
+        mc.cpp.after().decreaseIndent();
+        mc.cpp.after().addLine("return MISSING_VALUE;");
         mc.cpp.after().endFunction();
     }
     mc.cpp.after().endNamespace("polygon4");
@@ -425,7 +443,7 @@ ModuleContext Schema::printStorageImplementation() const
                     mc.cpp.addLine("tmp->parent = categories[o->" + split_var.getName() + "].get();");
                     mc.cpp.endBlock();
                     mc.cpp.beginBlock("for (auto &v : categories)");
-                    mc.cpp.addLine("v.second->type = " + split_var.getType()->getCppName() + "::None;");
+                    mc.cpp.addLine("v.second->type = EObjectType::None;");
                     mc.cpp.addLine("v.second->name = polygon4::tr(v.first);");
                     mc.cpp.addLine("item->children.push_back(v.second);");
                     mc.cpp.addLine("v.second->parent = item.get();");
@@ -653,6 +671,8 @@ ModuleContext Class::print() const
             mc.cpp.increaseIndent();
             if (v.getType()->getDataType() == DataType::Enum)
                 mc.cpp.addLine("return to_string(static_cast<int>(" + v.getPrefixedName() + "));");
+            else if (v.getType()->isText())
+                mc.cpp.addLine("return " + v.getPrefixedName() + ";");
             else
                 mc.cpp.addLine("return to_string(" + v.getPrefixedName() + ");");
             mc.cpp.decreaseIndent();
@@ -1077,20 +1097,16 @@ ModuleContext Class::print() const
 
     // getSql()
     {
-        mc.hpp.addLine("static const char *getSql();");
+        mc.hpp.addLine("static std::string getSql();");
 
-        mc.cpp.beginFunction("const char *" + getCppName() + "::getSql()");
+        mc.cpp.beginFunction("std::string " + getCppName() + "::getSql()");
         auto sql = printSql();
-        //replace_all(sql, "\n", " \\\n");
-        //replace_all(sql, "\"", "\\\"");
         mc.cpp.addLine("std::string sql = R\"sql(");
-        //mc.cpp.addLine("\" \\");
         mc.cpp.decreaseIndent();
-        //mc.cpp.addLine(sql + " \\");
         mc.cpp.addLine(sql);
         mc.cpp.increaseIndent();
         mc.cpp.addLine(")sql\";");
-        mc.cpp.addLine("return sql.c_str();");
+        mc.cpp.addLine("return sql;");
         mc.cpp.endFunction();
     }
 
@@ -1480,7 +1496,7 @@ ModuleContext Enum::print() const
 ModuleContext Enum::printTableRecord() const
 {
     ModuleContext mc;
-    mc.cpp.beginBlock("EnumTextTable<" + getCppName() + "> " + getTableName() + " =");
+    mc.cpp.beginBlock("const EnumTextTable<" + getCppName() + "> " + getTableName() + " =");
     for (auto &i : items)
         mc.cpp.addLine("{ " + getCppName() + "::" + i.name + ", \"" + i.name + "\" },");
     mc.cpp.endBlock(true);
@@ -1527,28 +1543,26 @@ std::string Variable::printSet() const
 {
     std::string s;
     if (isFk())
-    {
-        s += getPrefixedName() + idAccess + " = std::stoi(to_string(text))";
-    }
+        s += getPrefixedName() + idAccess + " = std::stoi(text)";
     else
     {
         s += getPrefixedName() + " = ";
         switch (type->getDataType())
         {
         case DataType::Integer:
-            s += "std::stoi(to_string(text))";
+            s += "std::stoi(text)";
             break;
         case DataType::Real:
-            s += "std::stof(to_string(text))";
+            s += "std::stof(text)";
             break;
         case DataType::Text:
-            s += "to_string(text)";
+            s += "text";
             break;
         case DataType::Bool:
-            s += "to_bool(to_string(text))";
+            s += "to_bool(text)";
             break;
         case DataType::Enum:
-            s += "static_cast<" + getType()->getCppName() + ">(std::stoi(to_string(text)))";
+            s += "static_cast<" + getType()->getCppName() + ">(std::stoi(text))";
             break;
         case DataType::Blob:
             s += "text";
@@ -1660,8 +1674,8 @@ std::string Variable::printSaveSqlite3(std::string var) const
             s += "sqlite3_bind_double(stmt, " + std::to_string(id + 1) + ", " + var + "->" + getPrefixedName() + ")";
             break;
         case DataType::Text:
-            s += "sqlite3_bind_text(stmt, " + std::to_string(id + 1) + ", std::to_string(" + var + "->" + getPrefixedName() +
-                ").c_str()" + ", -1, SQLITE_TRANSIENT)";
+            s += "sqlite3_bind_text(stmt, " + std::to_string(id + 1) + ", " + var + "->" + getPrefixedName() +
+                ".toString().c_str()" + ", -1, SQLITE_TRANSIENT)";
             break;
         case DataType::Blob:
             s += "sqlite3_bind_blob(stmt, " + std::to_string(id + 1) + ", " +

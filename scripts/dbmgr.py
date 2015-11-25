@@ -9,6 +9,7 @@ import sqlite3
 values_key = 'values'
 fks_key = 'fks'
 sql_key = 'sql'
+blobs_key = 'blobs'
 
 def main():    
     parser = argparse.ArgumentParser(description='Polygon-4 DB Manager')
@@ -127,6 +128,16 @@ def dump(db, fn, tables):
             if not found:
                 continue
 
+        has_blobs = False
+        blobs = []
+
+        c.execute('PRAGMA table_info(' + name + ')')
+        rows = c.fetchall()
+        for row in rows:
+            if row['type'].lower() == 'blob':
+                blobs.append(row['name'])
+                has_blobs = True
+
         c.execute('select * from ' + name)
         rows = c.fetchall()
         # sometimes we still need to print empty tables
@@ -135,6 +146,9 @@ def dump(db, fn, tables):
 
         tdata = []
         for row in rows:
+            if has_blobs:
+                for bid in blobs:
+                    row[bid] = str(row[bid])
             tdata.append(row)
         
         print('dumping: ' + name)
@@ -148,6 +162,7 @@ def dump(db, fn, tables):
         d[values_key] = tdata
         d[sql_key] = table['sql']
         d[fks_key] = fks
+        d[blobs_key] = blobs
         data[name] = d
     conn.close()
     json.dump(data, open(fn, 'w'), sort_keys = True, indent = 2)

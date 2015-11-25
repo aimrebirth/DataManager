@@ -362,6 +362,16 @@ const Translator::translator_type translator_data =
             { "y", { "", "y"} },
             { "yaw", { "", "yaw"} },
             { "z", { "", "z"} },
+
+
+
+            // enum fields
+            { "Standard1",{ "Стандарт 1", "Standard 1" } },
+            { "Standard2",{ "Стандарт 2", "Standard 2" } },
+            { "Standard3",{ "Стандарт 3", "Standard 3" } },
+            { "Standard4",{ "Стандарт 4", "Standard 4" } },
+            { "Universal",{ "Универсальный", "Universal" } },
+            { "Other",{ "Другое", "Other" } },
         } // dict end
     }, // pair end
 };

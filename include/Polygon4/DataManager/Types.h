@@ -31,7 +31,6 @@
 #include "Localization.h"
 #include "Schema.h"
 #include "String.h"
-#include "Vector.h"
 
 #define POLYGON4_NONAME "NONAME"
 
@@ -241,7 +240,7 @@ template<class T>
 inline Text to_string(const Ptr<T> &ptr)
 {
     if (ptr)
-        return std::to_string(ptr->getName());
+        return ptr->getName();
     return Text();
 }
 
@@ -249,7 +248,7 @@ template<class T>
 inline Text to_wstring(const Ptr<T> &ptr)
 {
     if (ptr)
-        return std::to_wstring(ptr->getName());
+        return ptr->getName();
     return Text();
 }
 
@@ -257,7 +256,7 @@ template<class T>
 inline Text to_string(const IdPtr<T> &ptr)
 {
     if (ptr.ptr)
-        return std::to_string(ptr.ptr->getName());
+        return ptr.ptr->getName();
     return Text();
 }
 
@@ -265,7 +264,7 @@ template<class T>
 inline Text to_wstring(const IdPtr<T> &ptr)
 {
     if (ptr.ptr)
-        return std::to_wstring(ptr.ptr->getName());
+        return ptr.ptr->getName();
     return Text();
 }
 

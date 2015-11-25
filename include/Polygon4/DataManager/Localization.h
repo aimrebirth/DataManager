@@ -168,7 +168,7 @@ public:
         auto s = c->second.find(key);
         if (s == c->second.end())
         {
-            c->second[key] = { key.c_str() };
+            c->second[key] = { key };
             s = c->second.find(key);
         }
         return s->second.str();

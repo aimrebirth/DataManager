@@ -58,9 +58,12 @@ enum ObjectFlag
     fEnumType,
     fBigEdit,
 
-    // enums
+    // enum items
     fNotInTable,
     fDefault,
+
+    // enums
+    fEnding,
 
     fMaxFlag,
 };

@@ -152,6 +152,8 @@ Schema convert(const ast::Schema &ast)
     {
         Enum enum_;
         enum_.name = e.name;
+        enum_.flags = e.flags();
+        enum_.ending = e.getEnding();
         for (auto &i : e.items)
         {
             EnumItem ei;

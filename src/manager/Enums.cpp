@@ -20,13 +20,15 @@
 
 #include <Polygon4/DataManager/Localization.h>
 
-#include "detail/Enums.cpp"
-
 #define CREATE_TABLE(t) \
     if (type_name == #t) \
         for (auto &e : table_ ## t) \
             if (table_ ## t ## _exclude.count(e.first) == 0) \
                 et[tr(e.second + ending)] = static_cast<int>(e.first)
+
+#define MISSING_VALUE "VALUE IS MISSING"
+
+#include "detail/Enums.cpp"
 
 namespace polygon4
 {
@@ -34,14 +36,7 @@ namespace polygon4
 namespace detail
 {
 
-EnumTable getOrderedMap(const std::string &type_name)
-{
-    EnumTable et;
-    std::string ending;
-    ending = "s";
-    CREATE_TABLE(EObjectType);
-    return et;
-}
+// empty
 
 } // namespace detail
 

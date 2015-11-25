@@ -38,109 +38,137 @@ DLL_EXPORT std::string wstring2string(const std::wstring &s);
 namespace polygon4
 {
 
-class DLL_EXPORT Data
+class String : public std::wstring
+{
+    using base = std::wstring;
+
+public:
+    String() = default;
+    String(const String &) = default;
+    String &operator=(const String &s) = default;
+    String(String &&) = default;
+    String &operator=(String &&s) = default;
+    ~String() = default;
+
+    // string
+    String(const char *s)
+    {
+        if (s == nullptr)
+            return;
+        *this = String(std::string(s));
+    }
+    String(const std::string &s)
+        : base(string2wstring(s))
+    {
+    }
+    String &operator=(const std::string &s)
+    {
+        assign(s);
+        return *this;
+    }
+    std::string toString() const
+    {
+        return wstring2string(*this);
+    }
+    operator std::string() const { return toString(); }
+
+    // wstring
+    String(const wchar_t *s)
+    {
+        if (s == nullptr)
+            return;
+        *this = String(base(s));
+    }
+    String(const base &s)
+        : base(s)
+    {
+    }
+    String &operator=(const base &s)
+    {
+        assign(s);
+        return *this;
+    }
+    operator const wchar_t *() const { return c_str(); }
+
+#ifdef USE_QT
+    String(const QString &s)
+        : base(s.toStdWString())
+    {
+    }
+    String &operator=(const QString &s)
+    {
+        assign(s);
+        return *this;
+    }
+    QString toQString() const
+    {
+        return QString::fromStdWString(*this);
+    }
+    operator QString() const { return toQString(); }
+#endif
+
+#ifdef __UNREAL__
+    String(const FString &s)
+        : String(s.GetCharArray().GetData())
+    {}
+    String &operator=(const FString &s)
+    {
+        assign(s);
+        return *this;
+    }
+    FString toFString() const { return c_str(); }
+    operator FString() const { return toFString(); }
+
+    String(const FText &s)
+        : String(s.ToString())
+    {}
+    String &operator=(const FText &s)
+    {
+        assign(s);
+        return *this;
+    }
+    FText toFText() const { return FText::FromString(toFString()); }
+    operator FText() const { return toFText(); }
+#endif
+
+    bool operator==(const String &s) const
+    {
+        return compare(s) == 0;
+    }
+    bool operator!=(const String &s) const
+    {
+        return !operator==(s);
+    }
+    bool operator<(const String &s) const
+    {
+        return compare(s) < 0;
+    }
+    bool operator>(const String &s) const
+    {
+        return compare(s) > 0;
+    }
+    
+private:
+    template <typename T>
+    String &assign(const T &s)
+    {
+        String tmp(s);
+        std::swap(*this, tmp);
+        return *this;
+    }
+
+    int compare(const String &s) const
+    {
+        return wcscmp(c_str(), s.c_str());
+    }
+};
+
+class DLL_EXPORT Blob
 {
 public:
     using element_type = uint8_t;
     using data_type = std::shared_ptr<element_type>;
 
-    Data();
-
-    data_type d;
-};
-
-class DLL_EXPORT String
-{
-public:
-    String();
-    String(const char *s);
-    String(const wchar_t *s);
-    String(const std::string &s);
-    String(const std::wstring &s);
-#ifdef USE_QT
-    String(const QString &s);
-#endif
-#ifdef __UNREAL__
-    String(const FString &s)
-        : String(s.GetCharArray().GetData())
-    {
-    }
-    String(const FText &s)
-        : String(s.ToString())
-    {
-    }
-#endif
-    String &operator=(const char *s);
-    String &operator=(const wchar_t *s);
-    String &operator=(const std::string &s);
-    String &operator=(const std::wstring &s);
-#ifdef USE_QT
-    String &operator=(const QString &s);
-#endif
-#ifdef __UNREAL__
-    String &operator=(const FString &s)
-    {
-        String tmp(s);
-        std::swap(*this, tmp);
-        return *this;
-    }
-    String &operator=(const FText &s)
-    {
-        String tmp(s);
-        std::swap(*this, tmp);
-        return *this;
-    }
-#endif
-    ~String();
-
-#ifdef USE_QT
-    QString toQString() const;
-#endif
-
-#ifdef __UNREAL__
-    FString toFString() const
-    {
-        return wstring().c_str();
-    }
-
-    FText toFText() const
-    {
-        return FText::FromString(toFString());
-    }
-#endif
-
-    void clear();
-    bool empty() const;
-
-    Data getData() const;
-    int getMultiplier() const;
-    size_t getLength() const;
-
-    bool operator<(const String &rhs) const;
-    bool operator==(const String &rhs) const;
-    bool operator!=(const String &rhs) const;
-
-    friend String operator+(const String &lhs, const String &rhs);
-
-private:
-    Data data;
-    size_t length = 0;
-    int multiplier = 1;
-    
-    void copy(const void *bytes, size_t len, size_t mult = 1);
-    std::string string() const;
-    std::wstring wstring() const;
-
-    friend struct StringHash;
-};
-
-struct DLL_EXPORT StringHash
-{
-    std::size_t operator()(const polygon4::String &s) const;
-};
-
-class DLL_EXPORT Blob
-{
 public:
     Blob();
     Blob(const void *data, size_t length);
@@ -148,7 +176,7 @@ public:
     ~Blob();
     
     Blob &operator=(const Blob &rhs);
-    Blob &operator=(const String &s);
+    Blob &operator=(const String &rhs) { return *this; }
 
     bool empty() const;
 
@@ -157,46 +185,15 @@ public:
 
     void clear();
 
-    Data getData() const;
-    Data::element_type *getRawData() const;
+    data_type getData() const;
+    element_type *getRawData() const;
     size_t getLength() const;
 
 private:
-    Data data;
+    data_type data;
     size_t length = 0;
     
     void copy(const void *bytes, size_t len);
 };
 
 }
-
-
-namespace std
-{
-
-inline std::string to_string(const polygon4::String &s)
-{
-    if (s.getData().d.get() == 0)
-        return std::string();
-    if (s.getMultiplier() == 1)
-        return (const char *)s.getData().d.get();
-    if (s.getMultiplier() == 2)
-        return wstring2string((const wchar_t *)s.getData().d.get());
-    return std::string();
-}
-
-inline std::wstring to_wstring(const polygon4::String &s)
-{
-    if (s.getData().d.get() == 0)
-        return std::wstring();
-    if (s.getMultiplier() == 1)
-        return string2wstring((const char *)s.getData().d.get());
-    if (s.getMultiplier() == 2)
-        return (const wchar_t *)s.getData().d.get();
-    return std::wstring();
-}
-
-}
-
-using std::to_string;
-using std::to_wstring;

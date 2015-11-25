@@ -35,6 +35,8 @@ types
     Damage -> f32;
     RatingType -> f32;
     Reputation -> f32;
+
+    Resource -> str;
 };
 
 database sqlite3
@@ -61,22 +63,26 @@ enum EObjectType
     None = 0 { not_in_table; default; },
     Building,
     Clan = 4,
+    ClanDescription,
+    ClanMechanoid,
     ClanMemberName,
     ClanReputation,
-    ClanMechanoid,
     Configuration,
     ConfigurationEquipment,
     ConfigurationGood,
     ConfigurationProjectile,
     ConfigurationWeapon,
     Equipment = 10,
+    EquipmentDescription,
     Glider = 11,
     GliderDescription,
     Good = 12,
+    GoodDescription,
     Group = 14,
     GroupMechanoid,
     Map = 24,
     MapBuilding,
+    MapBuildingDescription,
     MapBuildingEquipment,
     MapBuildingGlider,
     MapBuildingGood,
@@ -89,11 +95,16 @@ enum EObjectType
     MechanoidQuest,
     Modification = 26,
     ModificationMap,
+    ModificationMapDescription,
     Modificator,
+    ModificatorDescription,
     Object,
     Player,
     Projectile = 34,
+    ProjectileDescription,
     Quest,
+    QuestDescription,
+    QuestTitle,
     QuestRewardEquipment,
     QuestRewardGlider,
     QuestRewardGood,
@@ -105,15 +116,32 @@ enum EObjectType
     Setting,
     String,
     Weapon = 48,
+    WeaponDescription,
     Any = 1000,
+    
+    properties
+    {
+        ending: "s";
+    }
 };
 
 enum QuestState
 {
-    None,
+    None { not_in_table; default; },
     Started,
     Completed,
     Abandoned,
+};
+
+enum Standard
+{
+    None { not_in_table; },
+    Standard1 { default; },
+    Standard2,
+    Standard3,
+    Standard4,
+    Universal,
+    Other,
 };
 
 ################################################################################
@@ -223,22 +251,6 @@ class Rating
 
 ########################################
 
-class Common
-{
-    i32 id { pk; };
-    str text_id;
-    str resource;
-    String name;
-
-    properties
-    {
-        service;
-        inline;
-    }
-};
-
-########################################
-
 class LocalizedString
 {
     str ru { big_edit; };
@@ -265,7 +277,7 @@ class String
     properties
     {
         tree_view;
-        object_name: "to_string(string)";
+        object_name: "string";
         split_by: object;
     }
 };
@@ -274,7 +286,10 @@ class String
 
 class Building
 {
-    Common common;
+    i32 id { pk; };
+    str text_id;
+    String name;
+    Resource resource;
 
     Scale scale;
 
@@ -288,10 +303,14 @@ class Building
 
 class Equipment
 {
-    Common common;
+    i32 id { pk; };
+    str text_id;
+    String name;
+    String description { enum_type: EquipmentDescription; };
+    Resource resource;
 
     i32 type;
-    i32 standard;
+    Standard standard;
     Weight weight;
     f32 durability;
     f32 power;
@@ -305,6 +324,7 @@ class Equipment
     properties
     {
         tree_view;
+        split_by: standard;
     }
 };
 
@@ -312,10 +332,14 @@ class Equipment
 
 class Glider
 {
-    Common common;
+    i32 id { pk; };
+    str text_id;
+    String name;
     String description { enum_type: GliderDescription; };
+    Resource resource; # static mesh
+    Resource resource_blueprint;
 
-    i32 standard;
+    Standard standard;
     Weight weight;
     Weight maxweight;
     f32 armor;
@@ -339,6 +363,7 @@ class Glider
     properties
     {
         tree_view;
+        split_by: standard;
     }
 };
 
@@ -348,9 +373,10 @@ class Good
 {
     i32 id { pk; };
     str text_id;
-    str resource;
-    str resource_drop;
     String name;
+    String description { enum_type: GoodDescription; };
+    Resource resource;
+    Resource resource_drop;
 
     Price price;
     Weight weight;
@@ -367,7 +393,10 @@ class Good
 
 class Object
 {
-    Common common;
+    i32 id { pk; };
+    str text_id;
+    String name;
+    Resource resource;
 
     i32 type;
     Scale scale;
@@ -430,7 +459,11 @@ class ScriptVariable
 
 class Projectile
 {
-    Common common;
+    i32 id { pk; };
+    str text_id;
+    String name;
+    String description { enum_type: ProjectileDescription; };
+    Resource resource;
 
     i32 type;
     i32 subtype;
@@ -458,11 +491,15 @@ class Projectile
 
 class Weapon
 {
-    Common common;
+    i32 id { pk; };
+    str text_id;
+    String name;
+    String description { enum_type: WeaponDescription; };
+    Resource resource;
 
     Projectile projectile;
     i32 type;
-    i32 standard;
+    Standard standard;
     Weight weight;
     f32 power;
     f32 firerate;
@@ -498,6 +535,7 @@ class Weapon
     properties
     {
         tree_view;
+        split_by: standard;
     }
 };
 
@@ -549,7 +587,10 @@ class Mechanoid
 
 class Map
 {
-    Common common;
+    i32 id { pk; };
+    str text_id;
+    String name;
+    Resource resource;
 
     f32 h_min;
     f32 h_max;
@@ -608,7 +649,11 @@ class Modification
 
 class Modificator
 {
-    Common common;
+    i32 id { pk; };
+    str text_id;
+    String name;
+    String description { enum_type: ModificatorDescription; };
+    Resource resource;
 
     f32 probability;
     Price price;
@@ -716,8 +761,8 @@ class Quest
     str text_id;
     String name;
 
-    String title;
-    String description;
+    String title { enum_type: QuestTitle; };
+    String description { enum_type: QuestDescription; };
     i32 time;
     
     Money money;
@@ -848,8 +893,12 @@ class QuestRewardWeapon
 
 class Clan
 {
-    Common common;
+    i32 id { pk; };
+    str text_id;
+    String name;
     String member_name;
+    String description { enum_type: ClanDescription; };
+    Resource resource;
 
     Modification modification;
 
@@ -945,6 +994,7 @@ class ModificationMap
 {
     Modification modification { pk; };
     Map map { pk; };
+    String description { enum_type: ModificationMapDescription; };
 
     properties
     {
@@ -1018,6 +1068,7 @@ class MapBuilding
     i32 id { pk; };
     str text_id;
     String name;
+    String description { enum_type: MapBuildingDescription; };
 
     Map map;
     Building building;

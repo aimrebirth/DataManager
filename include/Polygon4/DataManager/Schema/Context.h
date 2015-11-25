@@ -27,7 +27,7 @@ class Context
 {
 public:
     using Text = std::string;
-    using Strings = std::vector<std::string>;
+    using Lines = std::vector<std::string>;
 
 public:
     Context(const Text &indent = "    ", const Text &newline = "\n");
@@ -53,6 +53,7 @@ public:
     void trimEnd(size_t n);
 
     Text getText() const;
+    Lines getLines() const;
 
     Context &before()
     {
@@ -72,7 +73,7 @@ public:
     Context &operator+=(const Context &rhs);
 
 private:
-    Strings text;
+    Lines lines;
     std::unique_ptr<Context> before_;
     std::unique_ptr<Context> after_;
 

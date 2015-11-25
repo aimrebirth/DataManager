@@ -18,15 +18,15 @@
 
 #include "context.h"
 
-Context::Strings &operator+=(Context::Strings &s1, const Context::Strings &s2)
+Context::Lines &operator+=(Context::Lines &s1, const Context::Lines &s2)
 {
     s1.insert(s1.end(), s2.begin(), s2.end());
     return s1;
 }
 
-Context::Strings operator+(const Context::Strings &s1, const Context::Strings &s2)
+Context::Lines operator+(const Context::Lines &s1, const Context::Lines &s2)
 {
-    Context::Strings s(s1.begin(), s1.end());
+    Context::Lines s(s1.begin(), s1.end());
     return s += s2;
 }
 
@@ -37,25 +37,25 @@ Context::Context(const Text &indent, const Text &newline)
 
 void Context::addText(const Text &s)
 {
-    text.back() += s;
+    lines.back() += s;
 }
 
 void Context::addNoNewLine(const Text &s)
 {
-    text.push_back(space + s);
+    lines.push_back(space + s);
 }
 
 void Context::addLineNoSpace(const Text & s)
 {
-    text.push_back(s);
+    lines.push_back(s);
 }
 
 void Context::addLine(const Text &s)
 {
     if (s.empty())
-        text.push_back(s);
+        lines.push_back(s);
     else
-        text.push_back(space + s);
+        lines.push_back(space + s);
 }
 
 void Context::decreaseIndent()
@@ -127,9 +127,9 @@ void Context::endif()
 
 void Context::trimEnd(size_t n)
 {
-    if (text.empty())
+    if (lines.empty())
         return;
-    auto &t = text.back();
+    auto &t = lines.back();
     auto sz = t.size();
     if (n > sz)
         n = sz;
@@ -139,20 +139,27 @@ void Context::trimEnd(size_t n)
 Context::Text Context::getText() const
 {
     Text s;
-    if (before_)
-        s += before_->getText();
-    for (auto &str : text)
+    auto lines = getLines();
+    for (auto &str : lines)
         s += str + newline;
-    s.resize(s.size() - 1);
-    if (after_)
-        s += after_->getText();
     return s;
+}
+
+Context::Lines Context::getLines() const
+{
+    Lines lines;
+    if (before_)
+        lines += before_->getLines();
+    lines += this->lines;
+    if (after_)
+        lines += after_->getLines();
+    return lines;
 }
 
 void Context::emptyLines(int n)
 {
     int e = 0;
-    for (auto i = text.rbegin(); i != text.rend(); ++i)
+    for (auto i = lines.rbegin(); i != lines.rend(); ++i)
     {
         if (i->empty())
             e++;
@@ -166,26 +173,24 @@ void Context::emptyLines(int n)
     }
     else if (e > n)
     {
-        text.resize(text.size() - (e - n));
+        lines.resize(lines.size() - (e - n));
     }
 }
 
 Context &Context::operator+=(const Context &rhs)
 {
     if (before_ && rhs.before_)
-        before_->text += rhs.before_->text;
+        before_->lines += rhs.before_->lines;
     else if (rhs.before_)
     {
-        before().emptyLines(1);
-        before().text += rhs.before_->text;
+        before().lines += rhs.before_->lines;
     }
-    text += rhs.text;
+    lines += rhs.lines;
     if (after_ && rhs.after_)
-        after_->text += rhs.after_->text;
+        after_->lines += rhs.after_->lines;
     else if (rhs.after_)
     {
-        after().emptyLines(1);
-        after().text += rhs.after_->text;
+        after().lines += rhs.after_->lines;
     }
     return *this;
 }

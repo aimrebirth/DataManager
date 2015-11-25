@@ -197,6 +197,7 @@ public:
 
     virtual bool isSimple() const { return true; }
     bool isComplex() const { return !isSimple(); }
+    bool isText() const { return getCppName() == "Text"; }
 
     virtual void printVariables(ModuleContext &mc) const {}
 
@@ -408,10 +409,13 @@ public:
     Name getTableName() const { return "table_" + getCppName(); }
     Name getExcludeTableName() const { return getTableName() + "_exclude"; }
 
+    std::string getEnding() const { return ending; }
+
     ModuleContext print() const;
     ModuleContext printTableRecord() const;
 
 private:
+    std::string ending;
     EnumItems items;
 
     friend Schema convert(const ast::Schema &schema);
