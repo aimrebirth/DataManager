@@ -18,12 +18,10 @@
 
 #pragma once
 
-#define POLYGON4_MODIFICATION_INTERFACE
+#define POLYGON4_MECHANOID_INTERFACE
 
-class DLL_EXPORT IModification : public detail::IObjectBase
+class DLL_EXPORT IMechanoid : public detail::IObjectBase
 {
 public:
-    virtual bool newGame() { return false; }
-    virtual bool loadGame(const String &filename) { return false; }
-    virtual void spawnMechanoids() {}
+    virtual bool spawn(bool player = false) { return false; }
 };

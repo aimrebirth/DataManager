@@ -57,6 +57,7 @@ enum ObjectFlag
     fDependsOn,
     fEnumType,
     fBigEdit,
+    fDisplayName,
 
     // enum items
     fNotInTable,

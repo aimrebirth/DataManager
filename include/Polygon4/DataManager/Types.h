@@ -98,15 +98,15 @@ public:
     {
         static_assert(sizeof(T) <= alloc_size, "Object size is greater than maximum alloc size. Increase limit.");
 
-        auto a = new alloc_type[alloc_size];
-        new (a) T(std::forward<Args>(args)...);
-        auto p = std::shared_ptr<T>((T *)a, [](T *p) { delete[](alloc_type*)p; });
+        auto memory = new alloc_type[alloc_size];
+        auto raw = new (memory) T(std::forward<Args>(args)...);
+        auto p = std::shared_ptr<T>(raw, [](auto p) { delete[](alloc_type*)p; });
         p->initChildren();
         return p;
     }
 
     template <class New, class Old, class... Args>
-    static void replace(Old *p, Args&&... args)
+    static New *replace(Old *p, Args&&... args)
     {
         static_assert(
             sizeof(New) <= alloc_size &&
@@ -115,8 +115,9 @@ public:
 
         Old o = *p;
         p->~Old();
-        new (p) New(o, std::forward<Args>(args)...);
-        p->initChildren();
+        auto n = new (p) New(o, std::forward<Args>(args)...);
+        n->initChildren();
+        return n;
     }
 
     // generated functions
@@ -127,7 +128,7 @@ public:
     virtual void setVariableString(int columnId, IObjectBase *ptr) {}
     virtual const IObjectBase *getVariable(int columnId) const { return nullptr; }
     virtual EObjectType getVariableType(int columnId) const { return EObjectType::None; }
-    virtual Ptr<TreeItem> printTree() const = 0;
+    virtual Ptr<TreeItem> printTree() const { return createTreeItem(); }
     virtual Text getName() const { return POLYGON4_NONAME; }
 
     virtual std::tuple<bool, OrderedObjectMap> getOrderedObjectMap(int columnId, class Storage *storage = nullptr) const;
@@ -160,15 +161,16 @@ private:
 template <typename T>
 struct IdPtr
 {
+    using base_type = IObjectBase;
     using value_type = T;
 
     int id = 0;
-    IObjectBase *ptr = nullptr;
+    base_type *ptr = nullptr;
 
     IdPtr()
     {
     }
-    IdPtr(IObjectBase *p)
+    IdPtr(base_type *p)
         : ptr(p)
     {
         if (ptr)
@@ -194,7 +196,7 @@ struct IdPtr
     {
         return *this = rhs.get();
     }
-    IdPtr &operator=(IObjectBase *rhs)
+    IdPtr &operator=(base_type *rhs)
     {
         ptr = rhs;
         if (ptr)
@@ -221,10 +223,18 @@ struct IdPtr
     {
         return id == rhs.id && ptr == rhs.ptr;
     }
+    bool operator==(const T &rhs) const
+    {
+        return ptr == &rhs;
+    }
 
     operator bool() const
     {
         return ptr != nullptr;
+    }
+    operator T*() const
+    {
+        return (T *)ptr;
     }
 
     void clear()
@@ -278,6 +288,8 @@ using detail::TreeItem;
 
 } // namespace polygon4
 
+#include "detail/ForwardDeclarations.h"
+
 namespace polygon4
 {
 
@@ -285,6 +297,7 @@ namespace polygon4
 #include "interface/IMapObject.h"
 #include "interface/IMapBuilding.h"
 #include "interface/IModification.h"
+#include "Interface/IMechanoid.h"
 
 } // namespace polygon4
 

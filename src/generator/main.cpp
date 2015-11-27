@@ -66,6 +66,7 @@ try
     printModule("StorageImpl", schema.printStorageImplementation());
     printModule("Enums", schema.printEnums());
     printModule("Tokens", print(ts), "schema");
+    printModule("ForwardDeclarations", schema.printForwardDeclarations());
 
     return 0;
 }

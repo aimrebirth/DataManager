@@ -226,6 +226,7 @@ const Translator::translator_type translator_data =
             { "armor", { "Броня", "armor"} },
             { "author", { "Автор", "author"} },
             { "bcolor", { "", "bcolor"} },
+            { "blueprint",{ "Блюпринт", "Blueprint" } },
             { "bonusexp", { "Бонус к опыту", "bonusexp"} },
             { "bonusrepair", { "Бонус к починке", "bonusrepair"} },
             { "bonustrade", { "Бонус к торговле", "bonustrade"} },

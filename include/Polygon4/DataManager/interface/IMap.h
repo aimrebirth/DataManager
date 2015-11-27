@@ -25,4 +25,5 @@ class DLL_EXPORT IMap : public detail::IObjectBase
 public:
     virtual bool loadLevel() { return false; }
     virtual bool loadObjects() { return false; }
+    virtual bool spawnMechanoid(detail::Mechanoid *) { return false; }
 };

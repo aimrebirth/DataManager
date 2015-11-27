@@ -195,6 +195,7 @@ Schema convert(const ast::Schema &ast)
             v.defaultValue = av.defaultValue;
             v.getOrderedObjectMap = av.getPropertyValue("getOrderedObjectMap");
             v.enumTypeName = av.getPropertyValue("enum_type");
+            v.displayName = av.getPropertyValue("display_name");
             auto tn = find_type(av.type);
             auto t = s.typePtrs.find(tn);
             assert(t != s.typePtrs.end());

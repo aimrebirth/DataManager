@@ -134,7 +134,8 @@ struct Variable
         f[fGetOrderedObjectMap] = hasProperty("getOrderedObjectMap");
         f[fDependsOn] = hasProperty("dependsOn");
         f[fEnumType] = hasProperty("enum_type");
-        f[fBigEdit] = hasProperty("big_edit");        
+        f[fBigEdit] = hasProperty("big_edit");
+        f[fDisplayName] = hasProperty("display_name");
         return f;
     }
 
@@ -238,7 +239,7 @@ struct EnumItem
     {
         ObjectFlags f;
         f[fNotInTable] = hasProperty("not_in_table");
-        f[fDefault] = hasProperty("default");
+        f[fDefault] = hasProperty("default");      
         return f;
     }
 
@@ -248,6 +249,14 @@ struct EnumItem
         Value v;
         std::tie(e, v) = properties.getPropertyValue(key);
         return e;
+    }
+
+    Value getPropertyValue(const Key &key) const
+    {
+        bool found;
+        Value v;
+        std::tie(found, v) = properties.getPropertyValue(key);
+        return v;
     }
 };
 

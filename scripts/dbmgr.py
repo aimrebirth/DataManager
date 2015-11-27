@@ -20,7 +20,7 @@ def main():
     parser.add_argument('--merge', dest='merge', nargs='+', help='merge json files into single: db1.json db2.json ... dbN.json')
     parser.add_argument('--tables', dest='tables', nargs='*', help='load only these tables: table1.json table2.json ... tableN.json')
     parser.add_argument('--clear', dest='clear', action='store_true', help='clear the database first')
-    parser.add_argument('--clearfield', dest='clearfield', nargs=2, help='clear table field: table field')
+    parser.add_argument('--removefield', dest='removefield', nargs=2, help='remove table field: table field')
     parser.add_argument('--renamefield', dest='renamefield', nargs=3, help='rename table field: table old_field_name new_field_name')
     parser.add_argument('--enums', dest='enums', nargs=1, help='make enums using db: output.h')
     parser.add_argument('--exclude_tables', dest='exclude_tables', nargs='*', help='exclude these tables: table1.json table2.json ... tableN.json')
@@ -42,8 +42,8 @@ def main():
     if pargs.merge:
         merge(pargs.json, pargs.merge)
 
-    if pargs.clearfield:
-        clearfield(pargs.json, pargs.clearfield[0], pargs.clearfield[1])
+    if pargs.removefield:
+        removefield(pargs.json, pargs.removefield[0], pargs.removefield[1])
 
     if pargs.enums:
         make_enums(pargs.db, pargs.enums[0], pargs.tables, pargs.exclude_tables)
@@ -51,7 +51,7 @@ def main():
     if pargs.renamefield:
         renamefield(pargs.json, pargs.renamefield[0], pargs.renamefield[1], pargs.renamefield[2])
 
-def clearfield(fn, table, field):
+def removefield(fn, table, field):
     data = json.load(open(fn))
     for t in sorted(data):
         if t.lower() != table.lower():

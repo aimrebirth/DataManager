@@ -106,6 +106,8 @@ public:
         auto &s = (*this)[type];
         if (!s.empty())
             return s;
+        if (type == LocalizationType::en)
+            return s;
         return firstNonEmpty();
     }
 

@@ -80,6 +80,7 @@ public:
     template <class V, class ParentType>
     class iterator_base : public std::iterator<std::bidirectional_iterator_tag, V>
     {
+    public:
         using base = std::iterator<std::bidirectional_iterator_tag, V>;
 
         using value_type = typename base::value_type;
@@ -205,6 +206,11 @@ public:
 
     iterator find(key_type key) { return data.find(key); }
     const_iterator find(key_type key) const { return data.find(key); }
+
+    template <typename F>
+    iterator find_if(F &&f) { return std::find_if(data.begin(), data.end(), f); }
+    template <typename F>
+    const_iterator find_if(F &&f) const { return std::find_if(data.begin(), data.end(), f); }
 
     bool empty() const { data.empty(); }
     void clear() { data.clear(); }

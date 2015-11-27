@@ -263,6 +263,12 @@ public:
         return prefix + "." + getName();
     }
     Name getEnumTypeName() const { return enumTypeName; }
+    Name getDisplayName() const
+    {
+        if (displayName.empty())
+            return getName();
+        return displayName;
+    }
 
     bool empty() const { return name.empty(); }
     const Type *getType() const { return type; }
@@ -304,6 +310,7 @@ private:
     int id;
     Name name;
     Name prefix;
+    Name displayName;
     Type *type;
     std::string defaultValue;
     std::string getOrderedObjectMap;
@@ -438,6 +445,7 @@ public:
         return classes({ fService, fInline, fEnumOnly }, true);
     }
 
+    ModuleContext printForwardDeclarations() const;
     ModuleContext printObjectInterfaces() const;
     ModuleContext printTypes() const;
     ModuleContext printStorage() const;

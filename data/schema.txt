@@ -14,7 +14,7 @@
 
 globals
 {
-    version: "0.1.1"
+    version: "0.1.11"
 };
 
 types
@@ -37,6 +37,8 @@ types
     Reputation -> f32;
 
     Resource -> str;
+
+    IP -> str;
 };
 
 database sqlite3
@@ -142,6 +144,20 @@ enum Standard
     Standard4,
     Universal,
     Other,
+};
+
+enum WeaponType
+{
+    Light { default; },
+    Heavy,
+    RocketLauncher,
+    BombLauncher,
+};
+
+enum PlayerType
+{
+    Local { default; },
+    Internet,
 };
 
 ################################################################################
@@ -336,8 +352,7 @@ class Glider
     str text_id;
     String name;
     String description { enum_type: GliderDescription; };
-    Resource resource; # static mesh
-    Resource resource_blueprint;
+    Resource resource;
 
     Standard standard;
     Weight weight;
@@ -412,11 +427,20 @@ class Object
 class Player
 {
     i32 id { pk; };
-    Mechanoid mechanoid;
+    Modification modification;
+    Mechanoid mechanoid
+    {
+        getOrderedObjectMap: "modification->mechanoids";
+    };
+    PlayerType type;
+    IP ip;
+
+    Setting settings { container; };
     
     properties
     {
         object_name: "to_string(mechanoid)";
+        parent: Modification;
     }
 };
 
@@ -425,8 +449,8 @@ class Player
 class Setting
 {
     i32 id { pk; };
-    str text_id;
     Player player;
+    str key;
     i32 value_int;
     f32 value_float;
     str value_text;
@@ -434,7 +458,8 @@ class Setting
 
     properties
     {
-        tree_view;
+        object_name: "key";
+        parent: Player;
     }
 };
 
@@ -496,9 +521,9 @@ class Weapon
     String name;
     String description { enum_type: WeaponDescription; };
     Resource resource;
-
+    
+    WeaponType type;
     Projectile projectile;
-    i32 type;
     Standard standard;
     Weight weight;
     f32 power;
@@ -638,10 +663,25 @@ class Modification
     Clan clans { container; };
     Mechanoid mechanoids { container; };
     Group groups { container; };
+    Player players { container; };
 
     properties
     {
         tree_view;
+    }
+};
+
+class ModificationMap
+{
+    Modification modification { pk; };
+    Map map { pk; };
+    String description { enum_type: ModificationMapDescription; };
+
+    properties
+    {
+        parent: Modification;
+        child: Map;
+        proxy;
     }
 };
 
@@ -984,22 +1024,6 @@ class GroupMechanoid
     {
         parent: Group;
         child: Mechanoid;
-        proxy;
-    }
-};
-
-########################################
-
-class ModificationMap
-{
-    Modification modification { pk; };
-    Map map { pk; };
-    String description { enum_type: ModificationMapDescription; };
-
-    properties
-    {
-        parent: Modification;
-        child: Map;
         proxy;
     }
 };

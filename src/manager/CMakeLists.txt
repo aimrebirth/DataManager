@@ -2,7 +2,12 @@
 # Polygon-4 Data Manager
 #
 
-set(generated_dir ${CMAKE_BINARY_DIR}/gen)
+set(tail)
+if (MSVC)
+    set(tail _$(Configuration))
+endif()
+
+set(generated_dir ${CMAKE_BINARY_DIR}/gen${tail})
 set(generated_dir_inc           ${generated_dir}/include)
 set(generated_dir_inc_detail    ${generated_dir}/include/detail)
 set(generated_dir_src           ${generated_dir}/src)
@@ -20,8 +25,8 @@ set(H "${_H}$")
 
 set(H_CPP "(${H}|${CPP})")
 
-source_group("Header Files\\Detail" "${generated_dir_inc}/${H}")
-source_group("Source Files\\Detail" "${generated_dir_src}/${CPP}")
+source_group("Header Files\\Detail" "${CMAKE_BINARY_DIR}/gen.*/${H}")
+source_group("Source Files\\Detail" "${CMAKE_BINARY_DIR}/gen.*/${CPP}")
 source_group("Header Files\\Interface" "${SSRC}/include/Polygon4/DataManager/Interface/${H_CPP}")
 source_group("MOC files" ".*automoc\\.cpp")
 
@@ -35,6 +40,7 @@ if (NOT POLYGON4_ENGINE)
 endif()
 
 set(generated_src
+    ${generated_dir_inc_detail}/ForwardDeclarations.h
     ${generated_dir_inc_detail}/Types.h
     ${generated_dir_src_detail}/Types.cpp
     ${generated_dir_inc_detail}/Storage.h
