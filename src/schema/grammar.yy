@@ -27,7 +27,7 @@ extern MemoryManager *parserMemoryManager;
 
 %}
 
-%require "3.0.3"
+%require "2.5"
 %debug
 %start file
 %locations
