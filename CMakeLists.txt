@@ -82,6 +82,8 @@ if (SOLUTION_FOLDER)
     set_target_properties   (sqlite3 PROPERTIES FOLDER ${SOLUTION_FOLDER})
 endif()
 
+set(SCHEMA_FILE ${PROJECT_SOURCE_DIR}/data/schema.txt)
+
 add_subdirectory(src)
 
 ############################################################################### 

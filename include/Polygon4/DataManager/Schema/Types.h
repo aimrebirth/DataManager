@@ -54,7 +54,6 @@ enum ObjectFlag
     fEnumItem,
     fContainer,
     fGetOrderedObjectMap,
-    fDependsOn,
     fEnumType,
     fBigEdit,
     fDisplayName,

@@ -58,8 +58,8 @@ set_source_files_properties(${generated_src} PROPERTIES
 )
 
 add_custom_command(OUTPUT ${generated_src}
-    COMMAND generator ${PROJECT_SOURCE_DIR}/data/schema.txt ${generated_dir}
-    DEPENDS generator ${PROJECT_SOURCE_DIR}/data/schema.txt
+    COMMAND generator ${SCHEMA_FILE} ${generated_dir}
+    DEPENDS generator ${SCHEMA_FILE}
 )
 
 set(DATA_MANAGER_ADDITIONAL_INCLUDES ${generated_dir_inc} CACHE STRING "Data manager generated includes dir" FORCE)
@@ -67,7 +67,7 @@ set(DATA_MANAGER_ADDITIONAL_INCLUDES ${generated_dir_inc} CACHE STRING "Data man
 include_directories(${generated_dir_inc})
 include_directories(${generated_dir_src})
 
-add_library                 (DataManager ${db_src} ${db_inc1} ${db_inc2} ${generated_src} ${PROJECT_SOURCE_DIR}/data/schema.txt)
+add_library                 (DataManager ${db_src} ${db_inc1} ${db_inc2} ${generated_src} ${SCHEMA_FILE})
 target_link_libraries       (DataManager sqlite3 schema)
 if (MSVC)
     target_compile_options  (DataManager PUBLIC /bigobj)

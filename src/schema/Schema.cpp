@@ -249,7 +249,7 @@ ModuleContext Schema::printStorage() const
     mc.hpp.addLine("virtual Ptr<TreeItem> addRecord(TreeItem *item) = 0;");
     mc.hpp.addLine("virtual void deleteRecord(TreeItem *item) = 0;");
     mc.hpp.addLine();
-    mc.hpp.addLine("virtual OrderedObjectMap getOrderedMap(EObjectType type, std::function<bool(" + iObject + " *)> f = std::function<bool(" + iObject + " *)>()) const = 0;");
+    mc.hpp.addLine("virtual OrderedObjectMap getOrderedMap(EObjectType type, CheckFunction f = CheckFunction()) const = 0;");
     mc.hpp.addLine();
 
     // printAddDeleteRecordVirtual()
@@ -547,7 +547,7 @@ ModuleContext Schema::printStorageImplementation() const
     // printGetOrderedMap()
     {
         mc.hpp.addLine();
-        mc.hpp.addLine("virtual OrderedObjectMap getOrderedMap(EObjectType type, std::function<bool(" + iObject + " *)> f = std::function<bool(" + iObject + " *)>()) const override;");
+        mc.hpp.addLine("virtual OrderedObjectMap getOrderedMap(EObjectType type, CheckFunction f = CheckFunction()) const override;");
 
         auto prnt = [&](bool f)
         {
@@ -566,7 +566,7 @@ ModuleContext Schema::printStorageImplementation() const
         };
 
         mc.cpp.addLine();
-        mc.cpp.beginFunction("OrderedObjectMap " + storageImpl + "::getOrderedMap(EObjectType type, std::function<bool(" + iObject + " *)> f) const");
+        mc.cpp.beginFunction("OrderedObjectMap " + storageImpl + "::getOrderedMap(EObjectType type, CheckFunction f) const");
         mc.cpp.beginBlock("if (f)");
         prnt(true);
         mc.cpp.endBlock();
@@ -1013,21 +1013,6 @@ ModuleContext Class::print() const
         }
         mc.cpp.addLine("1;");
         mc.cpp.decreaseIndent();
-        mc.cpp.endFunction();
-    }
-
-    // operator->()
-    if (flags[fProxy])
-    {
-        mc.hpp.addLine("" + dataClassPtr + "<" + getChild()->getCppName() + "> operator->() const;");
-
-        auto cvar = getChildVariable();
-        mc.cpp.beginFunction("" + dataClassPtr + "<" + getChild()->getCppName() + "> " + getCppName() + "::operator->() const");
-        mc.cpp.addLine("if (" + cvar.getName() + ")");
-        mc.cpp.increaseIndent();
-        mc.cpp.addLine("return " + cvar.getName() + ";");
-        mc.cpp.decreaseIndent();
-        mc.cpp.addLine("throw EXCEPTION(\"Value is missing\");");
         mc.cpp.endFunction();
     }
 

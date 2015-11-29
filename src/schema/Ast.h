@@ -132,7 +132,6 @@ struct Variable
         f[fEnumItem] = hasProperty("enum_item");
         f[fContainer] = hasProperty("container");
         f[fGetOrderedObjectMap] = hasProperty("getOrderedObjectMap");
-        f[fDependsOn] = hasProperty("dependsOn");
         f[fEnumType] = hasProperty("enum_type");
         f[fBigEdit] = hasProperty("big_edit");
         f[fDisplayName] = hasProperty("display_name");

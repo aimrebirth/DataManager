@@ -30,6 +30,8 @@ namespace polygon4
 
 namespace detail
 {
+
+using CheckFunction = std::function<bool(IObjectBase*)>;
     
 #include "detail/Storage.h"
 

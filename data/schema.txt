@@ -375,6 +375,8 @@ class Glider
     f32 delta_t;
     f32 turbulence;
 
+    Scale scale;
+
     properties
     {
         tree_view;
@@ -583,22 +585,18 @@ class Mechanoid
     };
     MapBuilding building
     {
-        dependsOn: map;
         getOrderedObjectMap: "map ? map->buildings : m";
-    };
-    
+    };    
     Configuration configuration;
     Group group
     {
         getOrderedObjectMap: "modification->groups";
     };
-
     i32 generation;
     Money money;
-
     Rating rating;
-
     Coordinate coordinate;
+    bool enabled = true;
 
     MechanoidQuest quests { container; };
 
