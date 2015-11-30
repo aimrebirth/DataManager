@@ -71,6 +71,10 @@ endif()
 #
 ###############################################################################
 
+if (NOT POLYGON4_ENGINE)
+    add_definitions(-DPOLYGON4_STATIC)
+endif()
+
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(include)
 include_directories(dep)

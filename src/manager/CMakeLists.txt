@@ -35,10 +35,6 @@ file(GLOB db_inc1 "${PROJECT_SOURCE_DIR}/include/Polygon4/DataManager/*")
 file(GLOB db_inc2 "${PROJECT_SOURCE_DIR}/include/Polygon4/DataManager/Interface/*")
 file(GLOB db_src "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
-if (NOT POLYGON4_ENGINE)
-    add_definitions(-DPOLYGON4_STATIC)
-endif()
-
 set(generated_src
     ${generated_dir_inc_detail}/ForwardDeclarations.h
     ${generated_dir_inc_detail}/Types.h
