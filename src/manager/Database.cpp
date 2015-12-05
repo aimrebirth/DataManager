@@ -37,6 +37,7 @@ namespace polygon4
 
 Database::Database(const std::string &dbname)
 {
+    LOG_DEBUG(logger, "Initializing database");
     loadDatabase(dbname);
     name = dbname.substr(std::max((int)dbname.rfind("/"), (int)dbname.rfind("\\")) + 1);
     fullName = dbname;
@@ -52,6 +53,7 @@ void Database::loadDatabase(const std::string &dbname)
 {
     if (db)
         return;
+    LOG_DEBUG(logger, "Opening database");
     if (sqlite3_open(dbname.c_str(), &db))
     {
         std::string error = "Can't open database file: " + dbname + " error: " + sqlite3_errmsg(db);

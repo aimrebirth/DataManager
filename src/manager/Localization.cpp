@@ -18,6 +18,9 @@
 
 #include <Polygon4/DataManager/Localization.h>
 
+#include "Logger.h"
+DECLARE_STATIC_LOGGER(logger, "tr");
+
 #define TS(key, ...) { ENUM_NAME(key), { #key, { __VA_ARGS__ } } },
 
 namespace polygon4
@@ -34,6 +37,7 @@ namespace polygon4
 
 void initTranslator()
 {
+    LOG_DEBUG(logger, "Initializing translator");
     translator.init(translator_data);
 }
 

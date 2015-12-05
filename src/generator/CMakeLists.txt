@@ -7,7 +7,7 @@ set(generator_src
 )
 
 add_executable              (generator ${generator_src})
-target_link_libraries       (generator schema ${Boost_LIBRARIES})
+target_link_libraries       (generator schema)
 if (SOLUTION_FOLDER)
     set_target_properties   (generator PROPERTIES FOLDER ${SOLUTION_FOLDER})
 endif()

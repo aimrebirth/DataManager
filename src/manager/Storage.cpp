@@ -22,6 +22,9 @@
 #include <Polygon4/DataManager/Localization.h>
 #include <Polygon4/DataManager/StorageImpl.h>
 
+#include "Logger.h"
+DECLARE_STATIC_LOGGER(logger, "storage");
+
 namespace polygon4
 {
 
@@ -41,8 +44,12 @@ std::shared_ptr<Storage> initStorage(std::string filename)
 std::shared_ptr<Storage> initStorage(std::shared_ptr<Database> db)
 {
     if (!detail::schema)
+    {
+        LOG_DEBUG(logger, "Initializing schema");
         detail::schema = new Schema(detail::getSchema());
+    }
     initTranslator();
+    LOG_DEBUG(logger, "Initializing storage");
     return std::make_shared<detail::StorageImpl>(db);
 }
 

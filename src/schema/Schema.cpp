@@ -1144,6 +1144,7 @@ ModuleContext Class::printIo() const
         mc.hpp.addLine("void _load" + getSqlName() + "();");
 
         mc.cpp.beginFunction("void " + storageImpl + "::_load" + getSqlName() + "()");
+        mc.cpp.addLine("LOG_TRACE(logger, \"Loading " + getSqlName() + "\");");
         mc.cpp.addLine("const std::string query = \"select * from " + getSqlName() + ";\"" + ";");
         mc.cpp.addLine("auto db3 = db->getDb();");
         mc.cpp.addLine("sqlite3_stmt *stmt;");

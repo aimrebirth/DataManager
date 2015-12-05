@@ -25,6 +25,9 @@
 #include <Polygon4/DataManager/Database.h>
 #include <Polygon4/DataManager/Localization.h>
 
+#include "Logger.h"
+DECLARE_STATIC_LOGGER(logger, "storage_impl");
+
 #define PROGRESS_CALLBACK(p) if (callback) callback(p)
 
 namespace polygon4
