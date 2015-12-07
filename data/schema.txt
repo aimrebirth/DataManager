@@ -308,6 +308,7 @@ class Building
     Resource resource;
 
     Scale scale;
+    Rotation rotation;
 
     properties
     {
@@ -417,6 +418,7 @@ class Object
 
     i32 type;
     Scale scale;
+    Rotation rotation;
 
     properties
     {
