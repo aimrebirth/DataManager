@@ -57,9 +57,18 @@ public:
             return;
         *this = String(std::string(s));
     }
+    String(const unsigned char *s)
+        : String((const char *)s)
+    {
+    }
     String(const std::string &s)
         : base(string2wstring(s))
     {
+    }
+    String &operator=(const char *s)
+    {
+        assign(s);
+        return *this;
     }
     String &operator=(const std::string &s)
     {
@@ -79,9 +88,18 @@ public:
             return;
         *this = String(base(s));
     }
+    String(const unsigned wchar_t *s)
+        : String((const wchar_t *)s)
+    {
+    }
     String(const base &s)
         : base(s)
     {
+    }
+    String &operator=(const wchar_t *s)
+    {
+        assign(s);
+        return *this;
     }
     String &operator=(const base &s)
     {

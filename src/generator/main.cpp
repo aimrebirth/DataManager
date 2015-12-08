@@ -42,7 +42,7 @@ try
     auto header = p / "include" / "detail";
     auto src = p / "src" / "detail";
 
-    auto printModule = [&header, &src](const std::string &name, auto &module, const fs::path &subdir = fs::path())
+    auto printModule = [&header, &src](const std::string &name, auto module, const fs::path &subdir = fs::path())
     {
         auto save = [](const auto &path, const std::string &s)
         {

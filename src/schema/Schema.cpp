@@ -1503,7 +1503,7 @@ ModuleContext Enum::printTableRecord() const
     mc.cpp.beginBlock("EnumExcludeTable<" + getCppName() + "> " + getExcludeTableName() + " =");
     for (auto &i : items)
         if (i.flags[fNotInTable])
-            mc.cpp.addLine("{ " + getCppName() + "::" + i.name + " },");
+            mc.cpp.addLine(getCppName() + "::" + i.name + ",");
     mc.cpp.endBlock(true);
     mc.cpp.addLine();
     return mc;
@@ -1635,7 +1635,7 @@ std::string Variable::printLoadSqlite3(std::string var) const
         s += "(float)sqlite3_column_double";
         break;
     case DataType::Text:
-        s += "(const char *)sqlite3_column_text";
+        s += "sqlite3_column_text";
         break;
     case DataType::Blob:
         s += "Blob(sqlite3_column_blob(stmt, " + std::to_string(id) + "), sqlite3_column_bytes(stmt, " + std::to_string(id) + "))";
