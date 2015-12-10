@@ -88,10 +88,6 @@ public:
             return;
         *this = String(base(s));
     }
-    String(const unsigned wchar_t *s)
-        : String((const wchar_t *)s)
-    {
-    }
     String(const base &s)
         : base(s)
     {
