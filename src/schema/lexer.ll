@@ -57,6 +57,8 @@ STRING      [[:alpha:]_][[:alnum:]_]*
 ")"                     return R_BRACKET;
 "{"                     return L_CURLY_BRACKET;
 "}"                     return R_CURLY_BRACKET;
+"["                     return L_SQUARE_BRACKET;
+"]"                     return R_SQUARE_BRACKET;
 ","                     return COMMA;
 "\."                    return POINT;
 "->"                    return R_ARROW;

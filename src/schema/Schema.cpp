@@ -585,6 +585,7 @@ ModuleContext Class::print() const
     ModuleContext mc;
     const auto vars = getVariables();
     const auto vars_container = getVariables(true);
+    const auto vars_inline = vars({ fInline });
 
     // enums
     if (flags[fCreateEnum])
@@ -797,44 +798,79 @@ ModuleContext Class::print() const
     }
 
     // printTree()
-    if (!vars_container.empty())
+    if (!vars_container.empty() || !vars_inline.empty())
     {
         mc.hpp.addLine("virtual Ptr<TreeItem> printTree() const override;");
 
-        mc.cpp.beginFunction("Ptr<TreeItem> " + getCppName() + "::printTree() const");        
+        mc.cpp.beginFunction("Ptr<TreeItem> " + getCppName() + "::printTree() const");
         mc.cpp.addLine("auto item = createTreeItem();");
-        if (!subtreeItem.empty())
-        {
-            mc.cpp.addLine();
-            mc.cpp.addLine("auto subtree_item = std::make_shared<TreeItem>();");
-            mc.cpp.addLine("subtree_item->parent = item.get();");
-            mc.cpp.addLine("subtree_item->name = \"" + subtreeItem + "\";");
-            mc.cpp.addLine("item->children.push_back(subtree_item);");
-            mc.cpp.addLine("std::swap(item, subtree_item);");
-        }
         mc.cpp.addLine();
         mc.cpp.addLine("Ptr<TreeItem> root;");
         mc.cpp.addLine("Ptr<TreeItem> tmp;");
-        for (auto &v : vars_container)
+        if (!vars_inline.empty())
         {
+            mc.cpp.addLine("Ptr<TreeItem> inline_var;");
             mc.cpp.addLine();
-            mc.cpp.addLine("root = std::make_shared<TreeItem>();");
-            mc.cpp.addLine("root->name = \"" + splitWords(v.getNameWithCaptitalLetter()) + "\";");
-            mc.cpp.addLine("root->type = EObjectType::" + v.getType()->getCppName() + ";");
-            mc.cpp.addLine("root->parent = item.get();");
-            mc.cpp.addLine("for (auto &v : " + v.getName() + ")");
-            mc.cpp.beginBlock();
-            mc.cpp.addLine("root->children.push_back(tmp = v->printTree());");
-            mc.cpp.addLine("tmp->parent = root.get();");
-            mc.cpp.endBlock();
-            mc.cpp.addLine("item->children.push_back(root);");
+            mc.cpp.addLine("inline_var = std::make_shared<TreeItem>();");
+            mc.cpp.addLine("inline_var->name = \"Inline variables\";");
+            mc.cpp.addLine("inline_var->parent = item.get();");
+            mc.cpp.addLine("item->children.push_back(inline_var);");
+            for (auto &v : vars_inline)
+            {
+                mc.cpp.emptyLines(1);
+                mc.cpp.addLine("root = std::make_shared<TreeItem>();");
+                mc.cpp.addLine("root->name = \"" + v.getName() + "\";");
+                mc.cpp.addLine("root->type = EObjectType::" + v.getType()->getCppName() + ";");
+                mc.cpp.addLine("root->object = " + v.getName() + ";");
+                mc.cpp.addLine("root->parent = inline_var.get();");
+                mc.cpp.addLine("inline_var->children.push_back(root);");
+            }
         }
-        if (!subtreeItem.empty())
+        if (!vars_container.empty())
         {
-            mc.cpp.addLine();
-            mc.cpp.addLine("std::swap(item, subtree_item);");
+            if (!subtreeItem.empty())
+            {
+                mc.cpp.emptyLines(1);
+                mc.cpp.addLine("auto subtree_item = std::make_shared<TreeItem>();");
+                mc.cpp.addLine("subtree_item->parent = item.get();");
+                mc.cpp.addLine("subtree_item->name = \"" + subtreeItem + "\";");
+                mc.cpp.addLine("item->children.push_back(subtree_item);");
+                mc.cpp.addLine("std::swap(item, subtree_item);");
+            }
+            for (auto &v : vars_container)
+            {
+                mc.cpp.emptyLines(1);
+                mc.cpp.addLine("root = std::make_shared<TreeItem>();");
+                mc.cpp.addLine("root->name = \"" + splitWords(v.getNameWithCaptitalLetter()) + "\";");
+                mc.cpp.addLine("root->type = EObjectType::" + v.getType()->getCppName() + ";");
+                mc.cpp.addLine("root->parent = item.get();");
+                mc.cpp.addLine("for (auto &v : " + v.getName() + ")");
+                mc.cpp.beginBlock();
+                mc.cpp.addLine("root->children.push_back(tmp = v->printTree());");
+                mc.cpp.addLine("tmp->parent = root.get();");
+                if (v.hasFlags({ fReadOnly }))
+                {
+                    mc.cpp.addLine("tmp->flags[fReadOnly] = true;");
+                    mc.cpp.addLine("tmp->parent->flags[fReadOnly] = true;");
+                }
+                if (v.hasFlags({ fNoChildren }))
+                {
+                    mc.cpp.addLine("tmp->flags[fNoChildren] = true;");
+                }
+                if (v.hasFlags({ fObjectName }))
+                {
+                    mc.cpp.addLine("tmp->name = to_string(v->" + v.getObjectName() + ");");
+                }
+                mc.cpp.endBlock();
+                mc.cpp.addLine("item->children.push_back(root);");
+            }
+            if (!subtreeItem.empty())
+            {
+                mc.cpp.emptyLines(1);
+                mc.cpp.addLine("std::swap(item, subtree_item);");
+            }
         }
-        mc.cpp.addLine();
+        mc.cpp.emptyLines(1);
         mc.cpp.addLine("return item;");
         mc.cpp.endFunction();
     }
@@ -1114,23 +1150,6 @@ ModuleContext Class::print() const
     return mc;
 }
 
-ModuleContext Class::printAddDeleteRecordVirtual() const
-{
-    std::string param;
-    std::string param_name;
-    if (parent)
-    {
-        param_name = "parent";
-        param = "" + iObject + " *" + param_name + " = nullptr";
-    }
-    ModuleContext mc;
-    mc.hpp.increaseIndent();
-    mc.hpp.addLine("virtual " + dataClassPtr + "<" + getCppName() + "> add" + getCppName() + "(" + param + ") = 0;");
-    mc.hpp.addLine("virtual void delete" + getCppName() + "(" + iObject + " *object) = 0;");
-    mc.hpp.decreaseIndent();
-    return mc;
-}
-
 ModuleContext Class::printIo() const
 {
     ModuleContext mc;
@@ -1259,13 +1278,29 @@ ModuleContext Class::printIo() const
     return mc;
 }
 
-ModuleContext Class::printAddDeleteRecord() const
+ModuleContext Class::printAddDeleteRecordVirtual() const
 {
+    std::string param;
+    std::string param_name;
+    if (parent)
+    {
+        param_name = "parent";
+        param = "" + iObject + " *" + param_name + " = nullptr";
+    }
     ModuleContext mc;
     mc.hpp.increaseIndent();
+    mc.hpp.addLine("virtual " + dataClassPtr + "<" + getCppName() + "> add" + getCppName() + "(" + param + ") = 0;");
+    mc.hpp.addLine("virtual void delete" + getCppName() + "(" + iObject + " *object) = 0;");
+    mc.hpp.decreaseIndent();
+    return mc;
+}
 
-    std::string param, param_h;
-    std::string param_name;
+ModuleContext Class::printAddDeleteRecord() const
+{
+    const auto vars = getVariables();
+    const auto vars_inline = vars({ fInline });
+    
+    std::string param_name, param_h, param;
 
     if (getParent())
     {
@@ -1274,19 +1309,26 @@ ModuleContext Class::printAddDeleteRecord() const
         param = "" + iObject + " *" + param_name;
     }
 
+    ModuleContext mc;
+    mc.hpp.increaseIndent();
+    
     // add record
     {
         mc.hpp.addLine("virtual " + dataClassPtr + "<" + getCppName() + "> add" + getCppName() + "(" + param_h + ") override;");
 
         mc.cpp.beginFunction("" + dataClassPtr + "<" + getCppName() + "> " + storageImpl + "::add" + getCppName() + "(" + param + ")");
-        if (!getParent())
+        mc.cpp.addLine("auto v = " + getCppArrayVariableName() + ".createAtEnd();");
+        for (auto &v : vars_inline)
         {
-            mc.cpp.addLine("return " + getCppArrayVariableName() + ".createAtEnd();");
+            mc.cpp.addLine("v->" + v.getName() + " = " + v.getType()->getCppArrayVariableName() + ".createAtEnd();");
         }
-        else
+        if (getParent())
         {
+            std::string param_name = "parent";
+            std::string param_h = "" + iObject + " *" + param_name + " = nullptr";
+            std::string param = "" + iObject + " *" + param_name;
+
             std::string var = parent->getCppVariableName();
-            mc.cpp.addLine("auto v = " + getCppArrayVariableName() + ".createAtEnd();");
             mc.cpp.addLine(parent->getCppName() + " *" + var + " = (" + parent->getCppName() + " *)" + param_name + ";");
             std::string var_name1 = parent->getCppArrayVariableName();
             for (auto &v2 : parent->getVariables(true))
@@ -1308,8 +1350,8 @@ ModuleContext Class::printAddDeleteRecord() const
                 }
             }
             mc.cpp.addLine("v->" + var_name2 + " = " + parent->getCppArrayVariableName() + "[" + var + "->id];");
-            mc.cpp.addLine("return v;");
         }
+        mc.cpp.addLine("return v;");
         mc.cpp.endFunction();
     }
 
@@ -1317,7 +1359,12 @@ ModuleContext Class::printAddDeleteRecord() const
     {
         mc.hpp.addLine("virtual void delete" + getCppName() + "(" + iObject + " *object) override;");
 
-        mc.cpp.beginFunction("void " + storageImpl + "::delete" + getCppName() + "(" + iObject + " *v)");
+        mc.cpp.beginFunction("void " + storageImpl + "::delete" + getCppName() + "(" + iObject + " *o)");
+        mc.cpp.addLine("auto v = (" + getCppName() + " *)o;");
+        for (auto &v : vars_inline)
+        {
+            mc.cpp.addLine(v.getType()->getCppArrayVariableName() + ".erase(v->" + v.getName() + "->id);");
+        }
         mc.cpp.addLine(getCppArrayVariableName() + ".erase(v->id);");
         mc.cpp.endFunction();
     }
@@ -1477,7 +1524,7 @@ ModuleContext Enum::print() const
     std::vector<EnumItem> me;
     for (auto &i : items)
     {
-        if (i.id != 0)
+        if (i.id != i.default_id)
             mf[i.id] = i;
         else
             me.push_back(i);

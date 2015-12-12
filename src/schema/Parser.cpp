@@ -196,9 +196,14 @@ Schema convert(const ast::Schema &ast)
             v.getOrderedObjectMap = av.getPropertyValue("getOrderedObjectMap");
             v.enumTypeName = av.getPropertyValue("enum_type");
             v.displayName = av.getPropertyValue("display_name");
+            v.objectName = av.getPropertyValue("object_name");
             auto tn = find_type(av.type);
             auto t = s.typePtrs.find(tn);
-            assert(t != s.typePtrs.end());
+            if (t == s.typePtrs.end())
+            {
+                printf("Type not found! '%s'\n", tn.c_str());
+            }
+            assert(t != s.typePtrs.end() && "Type not found!");
             v.type = s.typePtrs[tn];
             v.flags = av.flags();
             c.variables.push_back(v);
@@ -245,7 +250,11 @@ Schema convert(const ast::Schema &ast)
             else if (!pn.empty())
             {
                 auto i = s.typePtrs.find(pn);
-                assert(i != s.typePtrs.end());
+                if (i == s.typePtrs.end())
+                {
+                    printf("Check spelling! '%s'\n", pn.c_str());
+                }
+                assert(i != s.typePtrs.end() && "Check spelling!");
                 c.parent = (Class *)i->second;
                 c.parent->children.push_back(&c);
                 for (auto &v : c.getVariables())

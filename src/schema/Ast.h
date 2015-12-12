@@ -135,6 +135,13 @@ struct Variable
         f[fEnumType] = hasProperty("enum_type");
         f[fBigEdit] = hasProperty("big_edit");
         f[fDisplayName] = hasProperty("display_name");
+        f[fReadOnly] = hasProperty("read_only");
+        f[fNoChildren] = hasProperty("no_children");
+        f[fObjectName] = hasProperty("object_name");
+        f[fInline] = hasProperty("inline");
+        f[fArray] = hasProperty("array");
+        f[fArrayKey] = hasProperty("array_key");
+        f[fInitialValue] = hasProperty("initial_value");
         return f;
     }
 
@@ -233,6 +240,8 @@ struct EnumItem
     Name name;
     int id;
     Properties properties;
+
+    static const int default_id = -1;
 
     ObjectFlags flags() const
     {
