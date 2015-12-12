@@ -35,8 +35,12 @@ extern MemoryManager *parserMemoryManager;
 //%no-lines
 %error-verbose
 
+//%skeleton "lalr1.cc"
+
 %define api.pure full
 %define api.push-pull push
+
+//%define api.value.type variant // will require 3.0
 
 %union {
     // lexer vars
@@ -52,6 +56,7 @@ extern MemoryManager *parserMemoryManager;
 %token ERROR_SYMBOL
 %token  L_BRACKET R_BRACKET COMMA QUOTE SEMICOLON COLON POINT
         L_CURLY_BRACKET R_CURLY_BRACKET SHARP R_ARROW EQUAL
+        L_SQUARE_BRACKET R_SQUARE_BRACKET
 %token GLOBALS CLASS FIELD TYPES PROPERTIES DATABASE ENUM
 %token <rawStrVal> STRING
 %token <intVal> INTEGER
@@ -127,22 +132,22 @@ enum_vars: enum_var
 
 enum_var: string COMMA
     {
-        pd->enum_.items.push_back({*$1, 0});
+        pd->enum_.items.push_back({ *$1, EnumItem::default_id });
     }
     | string EQUAL INTEGER COMMA
     {
-        pd->enum_.items.push_back({*$1, $3});
+        pd->enum_.items.push_back({ *$1, $3 });
     }
     | string properties_braced COMMA
     {
-        EnumItem item = {*$1, 0};
+        EnumItem item = { *$1, EnumItem::default_id };
         item.properties = pd->properties;
         RESET(pd->properties);
         pd->enum_.items.push_back(item);
     }
     | string EQUAL INTEGER properties_braced COMMA
     {
-        EnumItem item = {*$1, $3};
+        EnumItem item = { *$1, $3 };
         item.properties = pd->properties;
         RESET(pd->properties);
         pd->enum_.items.push_back(item);
@@ -266,6 +271,14 @@ property: value SEMICOLON
         RESET(pd->property);
     }
     | key properties_braced
+    {
+        Property p;
+        p.key = *$1;
+        p.properties = std::make_shared<Properties>(pd->properties);
+        RESET(pd->properties);
+        pd->properties[*$1] = p;
+    }
+    | key COLON L_SQUARE_BRACKET properties R_SQUARE_BRACKET SEMICOLON
     {
         Property p;
         p.key = *$1;
