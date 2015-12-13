@@ -119,7 +119,6 @@ struct Properties : public std::map<Key, struct Property>
 
 struct Variable
 {
-    int id;
     std::string type;
     Name name;
     std::string defaultValue;
@@ -142,6 +141,10 @@ struct Variable
         f[fArray] = hasProperty("array");
         f[fArrayKey] = hasProperty("array_key");
         f[fInitialValue] = hasProperty("initial_value");
+
+        // post effects
+        if (f[fArray])
+            f[fInline] = true;
         return f;
     }
 
@@ -307,25 +310,8 @@ struct Schema
     Version version;
     Types types;
     Databases databases;
-    Classes classes;
     Enums enums;
-};
-
-struct parser_data
-{
-    Types types;
-    Database database;
-    Databases databases;
-    Properties properties;
-    Property property;
-    Class class_;
     Classes classes;
-    Enum enum_;
-    Enums enums;
-    int variable_id = 0;
-    int enum_var_id = 0;
 };
-
-extern parser_data *pd;
 
 } // namespace ast

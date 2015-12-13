@@ -23,7 +23,7 @@
 
 void Token::print(ModuleContext &mc)
 {
-    std::string s = "{ " + std::to_string(token) + ", ";
+    std::string s = "{ " + std::to_string(token) + ", " + std::to_string(type) + ", ";
     switch (value.which())
     {
     case Integer:

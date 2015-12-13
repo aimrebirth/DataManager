@@ -58,6 +58,8 @@ struct DLL_EXPORT TreeItem
     IObjectBase *object = nullptr;
     TreeItem *parent = nullptr;
     std::vector<Ptr<TreeItem>> children;
+    ObjectFlags flags;
+    void *objectArrayVariable = nullptr;
 
     int child_count() const;
     void remove() const;
@@ -170,6 +172,10 @@ struct IdPtr
     IdPtr()
     {
     }
+    IdPtr(int id)
+        : id(id)
+    {
+    }
     IdPtr(base_type *p)
         : ptr(p)
     {
@@ -243,6 +249,9 @@ struct IdPtr
         ptr = nullptr;
     }
 };
+
+template <typename T>
+using CObjectArray = std::vector<IdPtr<T>>;
 
 using ProgressCallback = std::function<void(double)>;
 

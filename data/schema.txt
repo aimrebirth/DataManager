@@ -51,7 +51,7 @@ database sqlite3
         float -> Real;
         Text -> Text;
         Blob -> Blob;
-    }
+    };
 };
 
 ################################################################################
@@ -63,7 +63,8 @@ database sqlite3
 enum EObjectType
 {
     None = 0 { not_in_table; default; },
-    Building,
+    Building = 1,
+    BuildingDescription = 2,
     Clan = 4,
     ClanDescription,
     ClanMechanoid,
@@ -84,6 +85,7 @@ enum EObjectType
     GroupMechanoid,
     Map = 24,
     MapBuilding,
+    MapBuildingNameEnding,
     MapBuildingDescription,
     MapBuildingEquipment,
     MapBuildingGlider,
@@ -95,9 +97,13 @@ enum EObjectType
     MapObject,
     Mechanoid,
     MechanoidQuest,
+    Message,
+    MessageTitleDescription,
+    MessageTextDescription,
     Modification = 26,
     ModificationMap,
     ModificationMapDescription,
+    ModificationPlayer,
     Modificator,
     ModificatorDescription,
     Object,
@@ -106,6 +112,7 @@ enum EObjectType
     ProjectileDescription,
     Quest,
     QuestDescription,
+    QuestText,
     QuestTitle,
     QuestRewardEquipment,
     QuestRewardGlider,
@@ -120,6 +127,9 @@ enum EObjectType
     Weapon = 48,
     WeaponDescription,
     Any = 1000,
+
+    # other values
+    InlineVariables { not_in_table; },
     
     properties
     {
@@ -133,6 +143,7 @@ enum QuestState
     Started,
     Completed,
     Abandoned,
+    Failed,
 };
 
 enum Standard
@@ -156,8 +167,16 @@ enum WeaponType
 
 enum PlayerType
 {
-    Local { default; },
-    Internet,
+    Internet = 1,
+    Local = 0 { default; },
+};
+
+enum MessageType
+{
+    Info,
+    Text,
+    Message,
+    Packet,
 };
 
 ################################################################################
@@ -305,6 +324,7 @@ class Building
     i32 id { pk; };
     str text_id;
     String name;
+    String description { enum_type: BuildingDescription; inline; };
     Resource resource;
 
     Scale scale;
@@ -323,7 +343,7 @@ class Equipment
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: EquipmentDescription; };
+    String description { enum_type: EquipmentDescription; inline; };
     Resource resource;
 
     i32 type;
@@ -352,7 +372,7 @@ class Glider
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: GliderDescription; };
+    String description { enum_type: GliderDescription; inline; };
     Resource resource;
 
     Standard standard;
@@ -392,7 +412,7 @@ class Good
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: GoodDescription; };
+    String description { enum_type: GoodDescription; inline; };
     Resource resource;
     Resource resource_drop;
 
@@ -431,19 +451,42 @@ class Object
 class Player
 {
     i32 id { pk; };
-    Modification modification;
-    Mechanoid mechanoid
-    {
-        getOrderedObjectMap: "modification->mechanoids";
-    };
+    str nickname;
     PlayerType type;
     IP ip;
 
     Setting settings { container; };
+    ModificationPlayer modifications
+    {
+        container;
+        read_only;
+        no_children;
+        object_name: "modification";
+    };
     
     properties
     {
-        object_name: "to_string(mechanoid)";
+        object_name: "nickname";
+        tree_view;
+    }
+};
+
+class ModificationPlayer
+{
+    i32 id { pk; };
+    Modification modification;
+    Player player;
+
+    Mechanoid mechanoid
+    {
+        getOrderedObjectMap: "modification->mechanoids";
+    };
+
+    ScriptVariable variables { container; };
+    
+    properties
+    {
+        object_name: "to_string(player)";
         parent: Modification;
     }
 };
@@ -472,6 +515,7 @@ class Setting
 class ScriptVariable
 {
     i32 id { pk; };
+    ModificationPlayer player;
     str variable;
     i32 value_int;
     f32 value_float;
@@ -480,7 +524,25 @@ class ScriptVariable
     properties
     {
         object_name: "variable";
+        parent: ModificationPlayer;
+    }
+};
+
+########################################
+
+class Message
+{
+    i32 id { pk; };
+    str text_id;
+    MessageType type;
+    String title { enum_type: MessageTitleDescription; inline; };
+    String txt { enum_type: MessageTextDescription; inline; };
+
+    properties
+    {
+        object_name: "text_id";
         tree_view;
+        split_by: type;
     }
 };
 
@@ -491,7 +553,7 @@ class Projectile
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: ProjectileDescription; };
+    String description { enum_type: ProjectileDescription; inline; };
     Resource resource;
 
     i32 type;
@@ -523,7 +585,7 @@ class Weapon
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: WeaponDescription; };
+    String description { enum_type: WeaponDescription; inline; };
     Resource resource;
     
     WeaponType type;
@@ -653,17 +715,14 @@ class Modification
     str script_language;
     str script_main;
 
-    Mechanoid player_mechanoid
-    {
-        getOrderedObjectMap: "mechanoids";
-    };
+    Player player;
     Configuration cooperative_player_configuration;
 
     ModificationMap maps { container; };
     Clan clans { container; };
     Mechanoid mechanoids { container; };
     Group groups { container; };
-    Player players { container; };
+    ModificationPlayer players { container; };
 
     properties
     {
@@ -675,7 +734,7 @@ class ModificationMap
 {
     Modification modification { pk; };
     Map map { pk; };
-    String description { enum_type: ModificationMapDescription; };
+    String description { enum_type: ModificationMapDescription; inline; };
 
     properties
     {
@@ -692,7 +751,7 @@ class Modificator
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: ModificatorDescription; };
+    String description { enum_type: ModificatorDescription; inline; };
     Resource resource;
 
     f32 probability;
@@ -801,8 +860,23 @@ class Quest
     str text_id;
     String name;
 
-    String title { enum_type: QuestTitle; };
-    String description { enum_type: QuestDescription; };
+    String title            { enum_type: QuestTitle; inline; initial_value: [ object: QuestTitle; ]; };
+    String description      { enum_type: QuestDescription; inline; initial_value: [ object: QuestDescription; ]; };
+
+    String get              { enum_type: QuestText; inline; initial_value: [ object: QuestText; ]; };
+    String brief            { enum_type: QuestText; inline; initial_value: [ object: QuestText; ]; };
+    String complete         { enum_type: QuestText; inline; initial_value: [ object: QuestText; ]; };
+    String fail             { enum_type: QuestText; inline; initial_value: [ object: QuestText; ]; };
+    String in_progress      { enum_type: QuestText; inline; initial_value: [ object: QuestText; ]; };
+    String other_strings
+    {
+        enum_type: QuestText;
+        inline;
+        array;
+        array_key: text_id; ###############################################
+        initial_value: [ object: QuestText; ];
+    };
+
     i32 time;
     
     Money money;
@@ -937,7 +1011,7 @@ class Clan
     str text_id;
     String name;
     String member_name;
-    String description { enum_type: ClanDescription; };
+    String description { enum_type: ClanDescription; inline; };
     Resource resource;
 
     Modification modification;
@@ -1094,7 +1168,8 @@ class MapBuilding
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: MapBuildingDescription; };
+    String name_ending { enum_type: MapBuildingNameEnding; };
+    String description { enum_type: MapBuildingDescription; inline; };
 
     Map map;
     Building building;
@@ -1113,7 +1188,8 @@ class MapBuilding
 
     properties
     {
-        object_name: "to_string(building)";
+        object_name: "to_string(building) + (name_ending ? (Text(\" \") + to_string(name_ending)) : Text())";
+        names_order: "name custom text parent";
         parent: Map;
     }
 };

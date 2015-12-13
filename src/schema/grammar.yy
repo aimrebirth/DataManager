@@ -2,328 +2,407 @@
 #include <assert.h>
 #include <iostream>
 #include <string>
-#include <type_traits>
 
-#include <Polygon4/DataManager/MemoryManager.h>
+#include "ParserDriver.h"
 
-#include <Ast.h>
-
-using namespace ast;
-
-// Prevent using <unistd.h> because of bug in flex.
-#define YY_NO_UNISTD_H 1
-#include "lexer.h"
-#include "grammar.hpp"
-
-void yyerror(const YYLTYPE *yylloc, const std::string &msg);
-
-extern Schema *schema;
-extern MemoryManager *parserMemoryManager;
-
-#define CREATE(type, ...) parserMemoryManager->create<type>(__VA_ARGS__)
-#define CREATE_IF_NULL(v, type, ...) if (v == nullptr) v = parserMemoryManager->create<type>(__VA_ARGS__)
-#define SET_NULL(v) v = nullptr
-#define RESET(v) v = decltype(v)()
-
+#define yylex(p) p.lex()
 %}
 
-%require "2.5"
+////////////////////////////////////////
+
+// general settings
+%require "3.0"
 %debug
 %start file
 %locations
 %verbose
-//%no-lines
+%no-lines
 %error-verbose
 
-//%skeleton "lalr1.cc"
+////////////////////////////////////////
 
-%define api.pure full
-%define api.push-pull push
+// c++ skeleton and options
+%skeleton "lalr1.cc"
 
-//%define api.value.type variant // will require 3.0
+%define api.value.type variant
+%define api.token.constructor // C++ style of handling variants
+%define parse.assert // check C++ variant types
 
-%union {
-    // lexer vars
-    int intVal;
-    double doubleVal;
-    char *rawStrVal;
+%code requires // forward decl of C++ driver (our parser) in HPP
+{
+#include <Ast.h>
 
-    // parser vars
-    std::string *strVal;
+class ParserDriver;
 }
 
+// param to y::parser() constructor
+// the parsing context
+%param { ParserDriver &driver } 
+
+////////////////////////////////////////
+
+// tokens and types
 %token EOQ 0 "end of file"
 %token ERROR_SYMBOL
-%token  L_BRACKET R_BRACKET COMMA QUOTE SEMICOLON COLON POINT
-        L_CURLY_BRACKET R_CURLY_BRACKET SHARP R_ARROW EQUAL
-        L_SQUARE_BRACKET R_SQUARE_BRACKET
+%token L_BRACKET R_BRACKET COMMA QUOTE SEMICOLON COLON POINT
+       L_CURLY_BRACKET R_CURLY_BRACKET SHARP R_ARROW EQUAL
+       L_SQUARE_BRACKET R_SQUARE_BRACKET
 %token GLOBALS CLASS FIELD TYPES PROPERTIES DATABASE ENUM
-%token <rawStrVal> STRING
-%token <intVal> INTEGER
 
-%type <strVal> string name type key value quoted_string any_value
+%token <std::string> STRING
+%token <int> INTEGER
+
+%type <std::string> string name type key value quoted_string any_value globals
+%type <int> integer
+%type <ast::Property> key_value_pair property field_content
+%type <ast::Properties> properties properties_braced field_contents
+%type <ast::Variable> field class_content
+%type <ast::Variables> class_contents
+%type <ast::Class> class
+%type <ast::Classes> classes
+%type <ast::Type> type_decl
+%type <ast::Types> type_decls database_content database_contents types
+%type <ast::Database> database
+%type <ast::Databases> databases
+%type <ast::EnumItem> enum_var
+%type <ast::EnumItems> enum_vars
+%type <ast::Enum> enum simple_enum enum_with_properties
+%type <ast::Enums> enums
+%type <ast::Schema> schema file
+
+////////////////////////////////////////
 
 %%
 
-file: file_contents EOQ
+file: schema EOQ
+    { driver.setSchema($1); }
     ;
 
-file_contents: /* empty */
-    | globals
+schema: globals types databases enums classes
+    {
+        ast::Schema s;
+        s.version = $1;
+        s.types = $2;
+        s.databases = $3;
+        s.enums = $4;
+        s.classes = $5;
+        $$ = s;
+    }
     ;
 
-globals: global
-    | global globals
-    ;
-
-global: GLOBALS L_CURLY_BRACKET globals1 R_CURLY_BRACKET SEMICOLON
-    | TYPES L_CURLY_BRACKET type_decls R_CURLY_BRACKET SEMICOLON
+globals: GLOBALS L_CURLY_BRACKET string COLON value R_CURLY_BRACKET SEMICOLON
     {
-        schema->types = pd->types;
-        RESET(pd->types);
-    }
-    | databases
-    {
-        schema->databases = pd->databases;
-        RESET(pd->databases);
-    }
-    | classes
-    {
-        schema->classes = pd->classes;
-        RESET(pd->classes);
-    }
-    | enums
-    {
-        schema->enums = pd->enums;
-        RESET(pd->enums);
+        $$ = $5;
     }
     ;
 
 enums: enum
-    | enum enums
+    {
+        ast::Enums es;
+        es.push_back($1);
+        $$ = es;
+    }
+    | enums enum
+    {
+        $1.push_back($2);
+        $$ = $1;
+    }
     ;
-
 enum: simple_enum
+    { $$ = $1; }
     | enum_with_properties
+    { $$ = $1; }
     ;
-
 simple_enum: ENUM string L_CURLY_BRACKET enum_vars R_CURLY_BRACKET SEMICOLON
     {
-        pd->enum_.name = *$2;
-        pd->enums.push_back(pd->enum_);
-        RESET(pd->enum_var_id);
-        RESET(pd->enum_);
+        ast::Enum e;
+        e.name = $2;
+        e.items = $4;
+        $$ = e;
     }
     ;
 enum_with_properties: ENUM string L_CURLY_BRACKET enum_vars PROPERTIES properties_braced R_CURLY_BRACKET SEMICOLON
     {
-        pd->enum_.name = *$2;
-        pd->enum_.properties = pd->properties;
-        pd->enums.push_back(pd->enum_);
-        RESET(pd->enum_var_id);
-        RESET(pd->enum_);
-        RESET(pd->properties);
+        ast::Enum e;
+        e.name = $2;
+        e.items = $4;
+        e.properties = $6;
+        $$ = e;
     }
     ;
 
 enum_vars: enum_var
-    | enum_var enum_vars
+    {
+        ast::EnumItems es;
+        es.push_back($1);
+        $$ = es;
+    }
+    | enum_vars enum_var
+    {
+        $1.push_back($2);
+        $$ = $1;
+    }
     ;
 
 enum_var: string COMMA
     {
-        pd->enum_.items.push_back({ *$1, EnumItem::default_id });
+        ast::EnumItem i{ $1, ast::EnumItem::default_id };
+        $$ = i;
     }
-    | string EQUAL INTEGER COMMA
+    | string EQUAL integer COMMA
     {
-        pd->enum_.items.push_back({ *$1, $3 });
+        ast::EnumItem i{ $1, $3 };
+        $$ = i;
     }
     | string properties_braced COMMA
     {
-        EnumItem item = { *$1, EnumItem::default_id };
-        item.properties = pd->properties;
-        RESET(pd->properties);
-        pd->enum_.items.push_back(item);
+        ast::EnumItem i{ $1, ast::EnumItem::default_id };
+        i.properties = $2;
+        $$ = i;
     }
-    | string EQUAL INTEGER properties_braced COMMA
+    | string EQUAL integer properties_braced COMMA
     {
-        EnumItem item = { *$1, $3 };
-        item.properties = pd->properties;
-        RESET(pd->properties);
-        pd->enum_.items.push_back(item);
+        ast::EnumItem i{ $1, $3 };
+        i.properties = $4;
+        $$ = i;
     }
     ;
 
-globals1: string COLON value
-    {
-        schema->version = *$3;
-    }
-    ;
 
 databases: database
-    | database databases
+    {
+        ast::Databases ds;
+        ds.push_back($1);
+        $$ = ds;
+    }
+    | databases database
+    {
+        $1.push_back($2);
+        $$ = $1;
+    }
     ;
 database: DATABASE name L_CURLY_BRACKET database_contents R_CURLY_BRACKET SEMICOLON
     {
-        pd->database.name = *$2;
-        pd->databases.push_back(pd->database);
-        RESET(pd->database);
+        ast::Database d;
+        d.name = $2;
+        d.types = $4;
+        $$ = d;
     }
     ;
 database_contents: database_content
-    | database_content database_contents
-    ;
-database_content: TYPES L_CURLY_BRACKET type_decls R_CURLY_BRACKET
     {
-        pd->database.types = pd->types;
-        RESET(pd->types);
+        ast::Types ts($1.begin(), $1.end());
+        $$ = ts;
+    }
+    | database_contents database_content
+    {
+        $1.insert($2.begin(), $2.end());
+        $$ = $1;
     }
     ;
+database_content: types
+    { $$ = $1; }
+    ;
 
+types: TYPES L_CURLY_BRACKET type_decls R_CURLY_BRACKET SEMICOLON
+    { $$ = $3; }
+    ;
 type_decls: type_decl
-    | type_decl type_decls
+    {
+        ast::Types ts;
+        ts.insert($1);
+        $$ = ts;
+    }
+    | type_decls type_decl
+    {
+        $1.insert($2);
+        $$ = $1;
+    }
     ;
 type_decl: key R_ARROW value SEMICOLON
     {
-        pd->types.insert(Type(*$1, *$3));
+        $$ = ast::Type($1, $3);
     }
     ;
 
 classes: class
-    | class classes
+    {
+        ast::Classes cc;
+        cc.insert($1);
+        $$ = cc;
+    }
+    | classes class
+    {
+        $1.insert($2);
+        $$ = $1;
+    }
     ;
 class: CLASS name L_CURLY_BRACKET class_contents R_CURLY_BRACKET SEMICOLON
     {
-        pd->class_.name = *$2;
-        auto p = pd->classes.insert(pd->class_);
-        RESET(pd->class_);
-        pd->variable_id = 0;
-        assert(p.second);
+        ast::Class c;
+        c.name = $2;
+        c.variables = $4;
+        $$ = c;
+    }
+    | CLASS name L_CURLY_BRACKET class_contents PROPERTIES properties_braced R_CURLY_BRACKET SEMICOLON
+    {
+        ast::Class c;
+        c.name = $2;
+        c.variables = $4;
+        c.properties = $6;
+        $$ = c;
+    }
+    | CLASS name L_CURLY_BRACKET PROPERTIES properties_braced R_CURLY_BRACKET SEMICOLON
+    {
+        ast::Class c;
+        c.name = $2;
+        c.properties = $5;
+        $$ = c;
     }
     ;
 class_contents: class_content
-    | class_content class_contents
+    {
+        ast::Variables vs;
+        vs.push_back($1);
+        $$ = vs;
+    }
+    | class_contents class_content
+    {
+        $1.push_back($2);
+        $$ = $1;
+    }
     ;
 class_content: field
+    { $$ = $1; }
     ;
 
 field: FIELD L_CURLY_BRACKET field_contents R_CURLY_BRACKET
     {
-        Variable variable;
-        variable.properties = pd->properties;
-        pd->class_.variables.push_back(variable);
-        RESET(pd->properties);
+        ast::Variable v;
+        v.properties = $3;
+        $$ = v;
     }
     | type name SEMICOLON
     {
-        Variable variable;
-        variable.id = pd->variable_id++;
-        variable.type = *$1;
-        variable.name = *$2;
-        pd->class_.variables.push_back(variable);
+        ast::Variable v;
+        v.type = $1;
+        v.name = $2;
+        $$ = v;
     }
     | type name EQUAL any_value SEMICOLON
     {
-        Variable variable;
-        variable.id = pd->variable_id++;
-        variable.type = *$1;
-        variable.name = *$2;
-        variable.defaultValue = *$4;
-        pd->class_.variables.push_back(variable);
+        ast::Variable v;
+        v.type = $1;
+        v.name = $2;
+        v.defaultValue = $4;
+        $$ = v;
     }
     | type name properties_braced SEMICOLON
     {
-        Variable variable;
-        variable.id = pd->variable_id++;
-        variable.type = *$1;
-        variable.name = *$2;
-        variable.properties = pd->properties;
-        RESET(pd->properties);
-        pd->class_.variables.push_back(variable);
-    }
-    | PROPERTIES properties_braced
-    {
-        pd->class_.properties.insert(pd->properties.begin(), pd->properties.end());
-        RESET(pd->properties);
+        ast::Variable v;
+        v.type = $1;
+        v.name = $2;
+        v.properties = $3;
+        $$ = v;
     }
     ;
 field_contents: field_content
-    | field_content field_contents
+    {
+        ast::Properties ps;
+        ps[$1.key] = $1;
+        $$ = ps;
+    }
+    | field_contents field_content
+    {
+        $1[$2.key] = $2;
+        $$ = $1;
+    }
     ;
 field_content: key_value_pair SEMICOLON
+    { $$ = $1; }
     ;
 
 properties_braced: L_CURLY_BRACKET properties R_CURLY_BRACKET
+    { $$ = $2; }
     ;
 
 properties: property
-    | property properties
-    ;
-property: value SEMICOLON
     {
-        Property p;
-        p.key = *$1;
-        pd->properties[*$1] = p;
+        ast::Properties ps;
+        ps[$1.key] = $1;
+        $$ = ps;
+    }
+    | properties property
+    {
+        $1[$2.key] = $2;
+        $$ = $1;
+    }
+    ;
+property: key SEMICOLON
+    {
+        ast::Property p;
+        p.key = $1;
+        $$ = p;
     }
     | key_value_pair SEMICOLON
-    {
-        pd->properties[pd->property.key] = pd->property;
-        RESET(pd->property);
-    }
+    { $$ = $1; }
     | key properties_braced
     {
-        Property p;
-        p.key = *$1;
-        p.properties = std::make_shared<Properties>(pd->properties);
-        RESET(pd->properties);
-        pd->properties[*$1] = p;
+        ast::Property p;
+        p.key = $1;
+        p.properties = std::make_shared<ast::Properties>($2);
+        $$ = p;
     }
     | key COLON L_SQUARE_BRACKET properties R_SQUARE_BRACKET SEMICOLON
     {
-        Property p;
-        p.key = *$1;
-        p.properties = std::make_shared<Properties>(pd->properties);
-        RESET(pd->properties);
-        pd->properties[*$1] = p;
+        ast::Property p;
+        p.key = $1;
+        p.properties = std::make_shared<ast::Properties>($4);
+        $$ = p;
     }
     ;
 
 key_value_pair: key COLON value
     {
-        pd->property.key = *$1;
-        pd->property.value = *$3;
+        ast::Property p;
+        p.key = $1;
+        p.value = $3;
+        $$ = p;
     }
     ;
 
 name: string
+    { $$ = $1; }
     ;
 type: string
+    { $$ = $1; }
     ;
 key: string
+    { $$ = $1; }
     ;
 any_value: value
-    | INTEGER
-    {
-        $$ = CREATE(std::string, std::to_string($1));
-    }
+    { $$ = $1; }
+    | integer
+    { $$ = std::to_string($1); }
     ;
 value: string
+    { $$ = $1; }
     | quoted_string
+    { $$ = $1; }
     ;
 quoted_string: QUOTE string QUOTE
     { $$ = $2; }
     ;
 string: STRING
-    {
-        auto p = CREATE(std::string, $1);
-        free($1);
-        $$ = p;
-    }
+    { $$ = $1; }
+    ;
+integer: INTEGER
+    { $$ = $1; }
     ;
 
 %%
 
-void yyerror(const YYLTYPE *yylloc, const std::string &msg)
+void yy::parser::error(const location_type& l, const std::string& m)
 {
-    std::cerr << yylloc->first_line << ":" << yylloc->first_column << " " << msg << std::endl;
+    driver.error(l, m);
 }

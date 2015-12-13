@@ -2,23 +2,17 @@
 #pragma warning(disable: 4005)
 #include <string>
 
-#include <Polygon4/DataManager/MemoryManager.h>
-
-#include <Ast.h>
-
 #include "grammar.hpp"
-#define yyterminate() return EOQ 
 
-#define YY_USER_ACTION yylloc.first_column = yylloc.last_column; yylloc.last_column += yyleng;
+#define YY_USER_ACTION loc.columns(yyleng);
 
-#define CREATE_STRING yylval.rawStrVal = strdup(yytext)
-
-//#define PUSH_STATE(x) yy_push_state(x)
 #define PUSH_STATE(x) BEGIN(x)
-//#define POP_STATE yy_pop_state
 #define POP_STATE() BEGIN(0)
 
-#define YY_DECL int yylex (yyscan_t yyscanner, YYSTYPE &yylval, YYLTYPE &yylloc)
+#define YY_DECL yy::parser::symbol_type yylex(yyscan_t yyscanner, yy::location &loc)
+
+#define MAKE(x) yy::parser::make_ ## x(loc)
+#define MAKE_VALUE(x, v) yy::parser::make_ ## x((v), loc)
 %}
 
 %option nounistd
@@ -42,56 +36,61 @@ STRING      [[:alpha:]_][[:alnum:]_]*
 
 %%
 
+%{
+    // Code run each time yylex is called.
+    loc.step();
+%}
+
 #.*/\n                  ; // ignore comments
 
-[ \t]+                  ;
-\r                      ;
+[ \t]+                  loc.step();
+\r                      loc.step();
 \n                      {
-                            yylloc.first_line = ++yylloc.last_line; 
-                            yylloc.first_column = yylloc.last_column = 1;
+                            loc.lines(yyleng);
+                            loc.step();
                         }
                         
-";"                     return SEMICOLON;
-":"                     return COLON;
-"("                     return L_BRACKET;
-")"                     return R_BRACKET;
-"{"                     return L_CURLY_BRACKET;
-"}"                     return R_CURLY_BRACKET;
-"["                     return L_SQUARE_BRACKET;
-"]"                     return R_SQUARE_BRACKET;
-","                     return COMMA;
-"\."                    return POINT;
-"->"                    return R_ARROW;
-"="                     return EQUAL;
+";"                     return MAKE(SEMICOLON);
+":"                     return MAKE(COLON);
+"("                     return MAKE(L_BRACKET);
+")"                     return MAKE(R_BRACKET);
+"{"                     return MAKE(L_CURLY_BRACKET);
+"}"                     return MAKE(R_CURLY_BRACKET);
+"["                     return MAKE(L_SQUARE_BRACKET);
+"]"                     return MAKE(R_SQUARE_BRACKET);
+","                     return MAKE(COMMA);
+"\."                    return MAKE(POINT);
+"->"                    return MAKE(R_ARROW);
+"="                     return MAKE(EQUAL);
 
-globals                 { return GLOBALS; }
-types                   { return TYPES; }
-class                   { return CLASS; }
-database                { return DATABASE; }
-enum                    { return ENUM; }
+globals                 { return MAKE(GLOBALS); }
+types                   { return MAKE(TYPES); }
+class                   { return MAKE(CLASS); }
+database                { return MAKE(DATABASE); }
+enum                    { return MAKE(ENUM); }
 
-field                   return FIELD;
-properties              return PROPERTIES;
+field                   return MAKE(FIELD);
+properties              return MAKE(PROPERTIES);
 
-{INTEGER}               { yylval.intVal = std::stoi(yytext); return INTEGER; }
-{STRING}                { CREATE_STRING; return STRING;}
+{INTEGER}               { return MAKE_VALUE(INTEGER, std::stoi(yytext)); }
+{STRING}                { return MAKE_VALUE(STRING, yytext); }
 
-\"                      { PUSH_STATE(user_string);  return QUOTE; }
-<user_string>\"         { POP_STATE();              return QUOTE; }
+\"                      { PUSH_STATE(user_string);  return MAKE(QUOTE); }
+<user_string>\"         { POP_STATE();              return MAKE(QUOTE); }
 <user_string>(?:[^"\\]|\\.)*/\" {
-    CREATE_STRING;
     int n = 0;
     char *p = yytext;
     while ((p = strstr(p, "\n"))++ != 0)
         n++;
     if (n)
     {
-        yylloc.last_line += n;
-        yylloc.first_line = yylloc.last_line;
+        loc.lines(n);
+        loc.step();
     }
-    return STRING;
+    return MAKE_VALUE(STRING, yytext);
 }
 
-.                       { /*ECHO;*/ return ERROR_SYMBOL; }
+.                       { /*driver.error(loc, "invalid character");*/ return MAKE(ERROR_SYMBOL); }
+<<EOF>>                 return MAKE(EOQ);
 
 %%

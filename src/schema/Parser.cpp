@@ -21,62 +21,9 @@
 #include <algorithm>
 #include <fstream>
 
-// Prevent using <unistd.h> because of bug in flex.
-#include <grammar.hpp>
-#define YY_NO_UNISTD_H 1
-#define YY_DECL 1
-#include <lexer.h>
-extern int yylex(yyscan_t yyscanner, YYSTYPE &yylval, YYLTYPE &yylloc);
-
-#include <Polygon4/DataManager/MemoryManager.h>
 #include <Polygon4/DataManager/Schema/Context.h>
 
-#include "Ast.h"
-
-namespace ast
-{
-    parser_data *pd;
-}
-ast::Schema *schema;
-MemoryManager *parserMemoryManager;
-
-YYSTYPE convert(const Token &t)
-{
-    YYSTYPE yylval = { 0 };
-    switch (t.value.which())
-    {
-    case Token::Integer:
-        yylval.intVal = boost::get<int>(t.value);
-        break;
-    case Token::Float:
-        yylval.doubleVal = boost::get<double>(t.value);
-        break;
-    case Token::String:
-        yylval.rawStrVal = strdup(boost::get<std::string>(t.value).c_str());
-        break;
-    default:
-        break;
-    }
-    return yylval;
-}
-
-Token convert(BisonToken token, YYSTYPE &yylval)
-{
-    Token t;
-    t.token = token;
-    switch (token)
-    {
-    case INTEGER:
-        t.value = yylval.intVal;
-        break;
-    case STRING:
-        t.value = yylval.rawStrVal;
-        break;
-    default:
-        break;
-    }
-    return t;
-}
+#include "ParserDriver.h"
 
 Schema convert(const ast::Schema &ast)
 {
@@ -187,10 +134,11 @@ Schema convert(const ast::Schema &ast)
     for (auto &c : s.classes)
     {
         auto &ac = *astClasses[c.name];
+        int id = 0;
         for (auto &av : ac.variables)
         {
             Variable v;
-            v.id = av.id;
+            v.id = id++;
             v.name = av.name;
             v.defaultValue = av.defaultValue;
             v.getOrderedObjectMap = av.getPropertyValue("getOrderedObjectMap");
@@ -209,22 +157,45 @@ Schema convert(const ast::Schema &ast)
             c.variables.push_back(v);
         }
     }
-    // dependencies
+    // init classes
+    for (auto &c : s.classes)
+        c.initialize();
+    // dependencies, array keys, initial values
     for (auto &c : s.classes)
     {
-        c.initialize();
         auto &ac = *astClasses[c.name];
         if (ac.flags()[fSplitBy])
+        {
             c.splitBy = *c.variables.find(ac.getPropertyValue("split_by"));
+        }
         for (auto &av : ac.variables)
         {
+            // deps
             auto dep_name = av.getPropertyValue("dependsOn");
-            if (dep_name.empty())
-                continue;
-            auto master = c.variables.find(dep_name);
-            auto slave = c.variables.find(av.name);
-            master->slaveVariables.push_back(std::make_shared<Variable>(*slave));
-            slave->masterVariable = std::make_shared<Variable>(*master);
+            if (!dep_name.empty())
+            {
+                auto master = c.variables.find(dep_name);
+                auto slave = c.variables.find(av.name);
+                master->slaveVariables.push_back(std::make_shared<Variable>(*slave));
+                slave->masterVariable = std::make_shared<Variable>(*master);
+            }
+            // init values
+            auto initialValues = av.getProperty("initial_value").properties;
+            if (initialValues)
+            {
+                auto v = c.variables.find(av.name);
+                auto vc = (Class *)v->getType();
+                for (auto &p : *initialValues)
+                    v->initialValues[vc->getVariable(p.second.key)] = p.second.value;
+            }
+            // array keys
+            auto ak = av.getPropertyValue("array_key");
+            if (!ak.empty())
+            {
+                auto v = c.variables.find(av.name);
+                auto vc = (Class *)v->getType();
+                v->arrayKey = std::make_shared<Variable>(vc->getVariable(ak));
+            }
         }
     }
     // parents and childs
@@ -315,31 +286,12 @@ std::string read_file(const std::string &filename)
 
 Schema parse(const Tokens &tokens)
 {
-    ast::Schema astSchema;
-    ::schema = &astSchema;
-
-    MemoryManager mm;
-    ::parserMemoryManager = &mm;
-
-    int ret;
-    YYSTYPE yylval = { 0 };
-    YYLTYPE yylloc = { 1,1,1,1 };
-    yydebug = 0;
-    yypstate *ps = yypstate_new();
-    ast::pd = new ast::parser_data;
-    auto t = tokens.begin();
-    do {
-        yylval = convert(*t);
-        ret = yypush_parse(ps, t->token, &yylval, &yylloc);
-        t++;
-    } while (ret == YYPUSH_MORE);
-    delete ast::pd;
-    yypstate_delete(ps);
-
+    ParserDriver driver;
+    int ret = driver.parse(tokens);
     if (ret)
         throw std::runtime_error("Error during parsing file");
 
-    return convert(astSchema);
+    return convert(driver.getSchema());
 }
 
 Schema parse_string(const std::string &s, Tokens *tokens)
@@ -350,36 +302,12 @@ Schema parse_string(const std::string &s, Tokens *tokens)
         tokens->reserve(10000);
     }
 
-    ast::Schema astSchema;
-    ::schema = &astSchema;
-
-    MemoryManager mm;
-    ::parserMemoryManager = &mm;
-
-    int ret;
-    YYSTYPE yylval = { 0 };
-    YYLTYPE yylloc = { 1,1,1,1 };
-    yyscan_t scanner;
-    yylex_init(&scanner);
-    yy_scan_string(s.c_str(), scanner);
-    yydebug = 0;
-    yypstate *ps = yypstate_new();
-    ast::pd = new ast::parser_data;
-    do
-    {
-        ret = yylex(scanner, yylval, yylloc);
-        if (tokens)
-            tokens->push_back(convert(ret, yylval));
-        ret = yypush_parse(ps, ret, &yylval, &yylloc);
-    } while (ret == YYPUSH_MORE);
-    delete ast::pd;
-    yypstate_delete(ps);
-    yylex_destroy(scanner);
-
+    ParserDriver driver;
+    int ret = driver.parse(s, tokens);
     if (ret)
         throw std::runtime_error("Error during parsing file");
 
-    return convert(astSchema);
+    return convert(driver.getSchema());
 }
 
 Schema parse_file(const std::string &filename, Tokens *tokens)

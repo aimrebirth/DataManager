@@ -230,6 +230,14 @@ public:
     using variable_ptr = std::shared_ptr<Variable>;
     using DepVariable = variable_ptr;
     using DepVariables = std::vector<DepVariable>;
+    using InitialValues = std::map<Variable, std::string>;
+
+public:
+    std::string print() const;
+    std::string printSet() const;
+    std::string printSetPtr() const;
+    void printLoadSqlite3(Context &context, const std::string &var) const;
+    void printSaveSqlite3(Context &context, const std::string &var) const;
 
 public:
     Name getName() const
@@ -269,10 +277,19 @@ public:
             return getName();
         return displayName;
     }
+    Name getObjectName() const { return objectName; }
 
     bool empty() const { return name.empty(); }
     const Type *getType() const { return type; }
-    DataType getDataType() const { return type->getDataType(); }
+    DataType getDataType() const
+    {
+        auto dt = type->getDataType();
+        if (flags[fArray])
+        {
+            return dt == DataType::Complex ? DataType::ComplexArray : DataType::Array;
+        }
+        return dt;
+    }
     int getId() const { return id; }
     void setId(int id) { this->id = id; }
     std::string getDefaultValue() const;
@@ -299,12 +316,9 @@ public:
     {
         return getName() < rhs.getName();
     }
+    operator bool() const { return !getName().empty(); }
 
-    std::string print() const;
-    std::string printSet() const;
-    std::string printSetPtr() const;
-    std::string printLoadSqlite3(std::string var) const;
-    std::string printSaveSqlite3(std::string var) const;
+    const InitialValues &getInitialValues() const { return initialValues; }
 
 private:
     int id;
@@ -315,6 +329,9 @@ private:
     std::string defaultValue;
     std::string getOrderedObjectMap;
     Name enumTypeName;
+    Name objectName;
+    variable_ptr arrayKey;
+    InitialValues initialValues;
 
     DepVariable masterVariable;
     DepVariables slaveVariables;
@@ -404,8 +421,10 @@ using Classes = ObjectArray<std::list<Class>>;
 struct EnumItem
 {
     Name name;
-    int id;
+    int id = -1;
     ObjectFlags flags;
+
+    static const int default_id = -1;
 };
 
 using EnumItems = std::vector<EnumItem>;

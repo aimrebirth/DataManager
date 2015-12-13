@@ -34,6 +34,13 @@ int TreeItem::child_count() const
     int cc = 0;
     for (auto &c : children)
     {
+        if (type == EObjectType::InlineVariables)
+        {
+            cc++;
+            continue;
+        }
+        if (c->type == EObjectType::InlineVariables)
+            continue;
         if (c->type == EObjectType::None)
             cc += c->child_count();
         if (c->object)

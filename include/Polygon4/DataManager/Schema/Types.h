@@ -57,6 +57,11 @@ enum ObjectFlag
     fEnumType,
     fBigEdit,
     fDisplayName,
+    fReadOnly,
+    fNoChildren,
+    fArray,
+    fArrayKey,
+    fInitialValue,
 
     // enum items
     fNotInTable,
@@ -80,7 +85,9 @@ enum class DataType
     Real,
     Text,
     Blob,
+    Array,
     Complex,
+    ComplexArray,
     Enum,
 };
 

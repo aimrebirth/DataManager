@@ -18,34 +18,46 @@
 
 #pragma once
 
-#include <memory>
+#include <string>
 #include <vector>
 
-#include <boost/variant.hpp>
+#include <grammar.hpp>
 
-#include "Context.h"
+#include "Ast.h"
+#include "Token.h"
 
-using BisonToken = int;
-
-struct Token
+class ParserDriver
 {
-    enum Type
+    enum class Mode
     {
-        Integer,
-        Float,
         String,
-        None,
+        Tokens,
     };
 
-    using Value = boost::variant<int, double, std::string>;
+public:
+    ParserDriver();
 
-    BisonToken token;
-    int type;
-    Value value;
+    yy::parser::symbol_type lex();
+    int parse(const std::string &s, Tokens *tokens = nullptr);
+    int parse(const Tokens &tokens);
 
-    void print(ModuleContext &mc);
+    void error(const yy::location &l, const std::string &m);
+    void error(const std::string &m);
+
+    void setSchema(const ast::Schema &schema) { this->schema = schema; }
+    ast::Schema getSchema() const { return schema; }
+
+    // lex & parse
+private:
+    void *scanner;
+    yy::location location;
+    Mode parseMode;
+    bool debug;
+
+    // data
+private:
+    ast::Schema schema;
+    Tokens *tokensWrite;
+    const Tokens *tokensRead;
+    Tokens::const_iterator readIterator;
 };
-
-using Tokens = std::vector<Token>;
-
-ModuleContext print(Tokens &tokens);
