@@ -54,7 +54,7 @@ void TreeItem::remove() const
     if (!parent)
         return;
     auto &v = parent->children;
-    v.erase(std::remove_if(v.begin(), v.end(), [this](const auto &c) { return c.get() == this; }), v.end());
+    v.erase(std::remove_if(v.begin(), v.end(),[this](const auto &c) { return c.get() == this; }), v.end());
 }
 
 void TreeItem::update()
@@ -64,6 +64,16 @@ void TreeItem::update()
         name = object->getName();
         type = object->getType();
     }
+}
+
+Text TreeItem::get_name() const
+{
+    if (defaultName.empty())
+        return name;
+    Text s = tr(defaultName);
+    if (!name.empty())
+        s = s + " - " + name;
+    return s;
 }
 
 bool to_bool(const std::string &s)

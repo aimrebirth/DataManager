@@ -319,6 +319,7 @@ public:
     operator bool() const { return !getName().empty(); }
 
     const InitialValues &getInitialValues() const { return initialValues; }
+    const variable_ptr &getArrayKey() const { return arrayKey; }
 
 private:
     int id;

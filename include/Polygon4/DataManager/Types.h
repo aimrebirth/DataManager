@@ -51,9 +51,12 @@ class IObjectBase;
 
 using OrderedObjectMap = std::multimap<Text, IObjectBase *>;
 
+using ProgressCallback = std::function<void(double)>;
+
 struct DLL_EXPORT TreeItem
 {
     Text name;
+    Text defaultName;
     EObjectType type = EObjectType::None;
     IObjectBase *object = nullptr;
     TreeItem *parent = nullptr;
@@ -64,6 +67,7 @@ struct DLL_EXPORT TreeItem
     int child_count() const;
     void remove() const;
     void update();
+    Text get_name() const;
 };
 
 class DLL_EXPORT IObjectBase
@@ -250,10 +254,37 @@ struct IdPtr
     }
 };
 
-template <typename T>
-using CObjectArray = std::vector<IdPtr<T>>;
+template <typename T, typename K = int32_t>
+class CObjectArray : public std::vector<IdPtr<T>>
+{
+    using base = std::vector<IdPtr<T>>;
+    using data_value_type = size_t;
 
-using ProgressCallback = std::function<void(double)>;
+public:
+    using value_type = typename base::value_type;
+
+public:
+    using base::base;
+    using base::operator[];
+    
+    void add_key(const K &key, data_value_type v)
+    {
+        data[key] = v;
+    }
+
+    T get(const K &key) const
+    {
+        auto i = data.find(key);
+        if (i == data.end())
+            return T();
+        if (i->second > size())
+            return T();
+        return *operator[](i->second).get();
+    }
+
+private:
+    std::map<K, data_value_type> data;
+};
 
 template<class T>
 inline Text to_string(const Ptr<T> &ptr)

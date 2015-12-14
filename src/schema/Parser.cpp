@@ -189,10 +189,13 @@ Schema convert(const ast::Schema &ast)
                     v->initialValues[vc->getVariable(p.second.key)] = p.second.value;
             }
             // array keys
-            auto ak = av.getPropertyValue("array_key");
-            if (!ak.empty())
+            if (av.flags()[fArray])
             {
+                auto ak = av.getPropertyValue("array_key");
+                if (ak.empty())
+                    ak = "id";
                 auto v = c.variables.find(av.name);
+                assert(v != c.variables.end() && "Variable not found");
                 auto vc = (Class *)v->getType();
                 v->arrayKey = std::make_shared<Variable>(vc->getVariable(ak));
             }

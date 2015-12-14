@@ -873,7 +873,7 @@ class Quest
         enum_type: QuestText;
         inline;
         array;
-        array_key: text_id; ###############################################
+        array_key: text_id;
         initial_value: [ object: QuestText; ];
     };
 

@@ -886,6 +886,7 @@ ModuleContext Class::print() const
                     mc.cpp.beginBlock("for (auto &v : " + v.getName() + ")");
                     mc.cpp.addLine("auto root2 = std::make_shared<TreeItem>();");
                     mc.cpp.addLine("root2->name = v->getName();");
+                    mc.cpp.addLine("root2->defaultName = v->" + v.getArrayKey()->getName() + ";");
                     mc.cpp.addLine("root2->type = " + ObjectType + "::" + v.getType()->getCppName() + ";");
                     mc.cpp.addLine("root2->object = v.get();");
                     mc.cpp.addLine("root2->parent = root.get();");
@@ -895,7 +896,7 @@ ModuleContext Class::print() const
                 else
                 {
                     mc.cpp.addLine("root = std::make_shared<TreeItem>();");
-                    mc.cpp.addLine("root->name = \"" + v.getName() + "\";");
+                    mc.cpp.addLine("root->defaultName = \"" + v.getName() + "\";");
                     mc.cpp.addLine("root->type = " + ObjectType + "::" + v.getType()->getCppName() + ";");
                     mc.cpp.addLine("root->object = " + v.getName() + ".get();");
                     mc.cpp.addLine("root->parent = inline_var.get();");
@@ -1273,12 +1274,14 @@ ModuleContext Class::printIo() const
                     mc.cpp.addLine();
                 if (v.hasFlags({ fArray }))
                 {
-                    mc.cpp.beginBlock("for (auto &v : " + var + "->" + v.getName() + ")");
+                    auto var_name = var + "->" + v.getName();
+                    mc.cpp.beginBlock("for (size_t i = 0; i < " + var_name + ".size(); ++i)");
+                    mc.cpp.addLine("auto &v = " + var_name + "[i]" + ";");
                     mc.cpp.addLine("auto " + v.getName() + " = " + name2 + ".find(v" + idAccess + ");");
-                    mc.cpp.addLine("if (" + v.getName() + " != " + name2 + ".end())");
-                    mc.cpp.increaseIndent();
+                    mc.cpp.beginBlock("if (" + v.getName() + " != " + name2 + ".end())");
                     mc.cpp.addLine("v = *" + v.getName() + ";");
-                    mc.cpp.decreaseIndent();
+                    mc.cpp.addLine(var_name + ".add_key(v->" + v.getArrayKey()->getName() + ", i)" + ";");
+                    mc.cpp.endBlock();
                     mc.cpp.endBlock();
                 }
                 else
@@ -1667,7 +1670,7 @@ std::string Variable::print() const
     std::string s;
     if (flags[fArray])
     {
-        s += ObjectArray + "<" + type->getCppName() + "> " + getName();
+        s += ObjectArray + "<" + type->getCppName() + ", " + arrayKey->getType()->getCppName() + "> " + getName();
         return s;
     }
     if (flags[fContainer])
@@ -1796,7 +1799,7 @@ void Variable::printLoadSqlite3(Context &ctx, const std::string &var) const
         break;
     case DataType::ComplexArray:
         ctx.beginBlock();
-        ctx.addLine("auto size = sqlite3_column_bytes(stmt, " + std::to_string(id) + ");");
+        ctx.addLine("auto size = sqlite3_column_bytes(stmt, " + std::to_string(id) + ") / sizeof(int);");
         ctx.addLine("auto data = (int *)sqlite3_column_blob(stmt, " + std::to_string(id) + ");");
         ctx.addLine("std::vector<int> ids(data, data + size);");
         ctx.addLine("for (auto &id : ids)");
