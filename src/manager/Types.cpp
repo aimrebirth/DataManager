@@ -66,13 +66,18 @@ void TreeItem::update()
     }
 }
 
-Text TreeItem::get_name() const
+Text TreeItem::get_name()
 {
-    if (defaultName.empty())
-        return name;
-    Text s = tr(defaultName);
-    if (!name.empty())
-        s = s + " - " + name;
+    update();
+    Text s;
+    if (!defaultName.empty())
+    {
+        s = tr(defaultName);
+        if (!name.empty())
+            s += L" - ";
+    }
+    s += name;
+    replace_all<Text>(s, L"\n", L" ");
     return s;
 }
 

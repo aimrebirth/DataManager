@@ -1280,17 +1280,41 @@ ModuleContext Class::printIo() const
                     mc.cpp.addLine("auto " + v.getName() + " = " + name2 + ".find(v" + idAccess + ");");
                     mc.cpp.beginBlock("if (" + v.getName() + " != " + name2 + ".end())");
                     mc.cpp.addLine("v = *" + v.getName() + ";");
-                    mc.cpp.addLine(var_name + ".add_key(v->" + v.getArrayKey()->getName() + ", i)" + ";");
                     mc.cpp.endBlock();
+                    /*mc.cpp.beginBlock("else");
+                    mc.cpp.addLine("v = add" + v.getType()->getCppName() + "();");
+                    for (auto &iv : v.getInitialValues())
+                    {
+                        auto &iv_var = iv.first;
+                        std::string enum_name;
+                        if (iv_var.getType()->getCppName() == ObjectType)
+                            enum_name = ObjectType + "::";
+                        mc.cpp.addLine("v->" + iv.first.getName() + " = " + enum_name + iv.second + ";");
+                    }
+                    mc.cpp.endBlock();*/
+                    mc.cpp.addLine(var_name + ".add_key(v->" + v.getArrayKey()->getName() + ", i)" + ";");
                     mc.cpp.endBlock();
                 }
                 else
                 {
                     mc.cpp.addLine("auto " + v.getName() + " = " + name2 + ".find(" + var + "->" + v.getName() + idAccess + ");");
-                    mc.cpp.addLine("if (" + v.getName() + " != " + name2 + ".end())");
-                    mc.cpp.increaseIndent();
+                    mc.cpp.beginBlock("if (" + v.getName() + " != " + name2 + ".end())");
                     mc.cpp.addLine(var + "->" + v.getName() + " = *" + v.getName() + ";");
-                    mc.cpp.decreaseIndent();
+                    mc.cpp.endBlock();
+                    /*if (v.hasFlags({ fInline }))
+                    {
+                        mc.cpp.beginBlock("else");
+                        mc.cpp.addLine(var + "->" + v.getName() + " = add" + v.getType()->getCppName() + "();");
+                        for (auto &iv : v.getInitialValues())
+                        {
+                            auto &iv_var = iv.first;
+                            std::string enum_name;
+                            if (iv_var.getType()->getCppName() == ObjectType)
+                                enum_name = ObjectType + "::";
+                            mc.cpp.addLine(var + "->" + v.getName() + "->" + iv.first.getName() + " = " + enum_name + iv.second + ";");
+                        }
+                        mc.cpp.endBlock();
+                    }*/
                 }
                 prev = true;
             }

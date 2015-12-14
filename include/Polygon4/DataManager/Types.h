@@ -63,17 +63,16 @@ struct DLL_EXPORT TreeItem
     std::vector<Ptr<TreeItem>> children;
     ObjectFlags flags;
     void *objectArrayVariable = nullptr;
+    void *inlineVariable = nullptr;
 
     int child_count() const;
     void remove() const;
     void update();
-    Text get_name() const;
+    Text get_name();
 };
 
 class DLL_EXPORT IObjectBase
 {
-public:
-
 private:
     using alloc_type = uint8_t;
     static const int alloc_size = 1024;

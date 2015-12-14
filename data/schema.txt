@@ -324,7 +324,7 @@ class Building
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: BuildingDescription; inline; };
+    String description { enum_type: BuildingDescription; inline; initial_value: [ object: BuildingDescription; ]; };
     Resource resource;
 
     Scale scale;
@@ -343,7 +343,7 @@ class Equipment
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: EquipmentDescription; inline; };
+    String description { enum_type: EquipmentDescription; inline; initial_value: [ object: EquipmentDescription; ]; };
     Resource resource;
 
     i32 type;
@@ -372,7 +372,7 @@ class Glider
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: GliderDescription; inline; };
+    String description { enum_type: GliderDescription; inline; initial_value: [ object: GliderDescription; ]; };
     Resource resource;
 
     Standard standard;
@@ -412,7 +412,7 @@ class Good
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: GoodDescription; inline; };
+    String description { enum_type: GoodDescription; inline; initial_value: [ object: GoodDescription; ]; };
     Resource resource;
     Resource resource_drop;
 
@@ -535,8 +535,8 @@ class Message
     i32 id { pk; };
     str text_id;
     MessageType type;
-    String title { enum_type: MessageTitleDescription; inline; };
-    String txt { enum_type: MessageTextDescription; inline; };
+    String title { enum_type: MessageTitleDescription; inline; initial_value: [ object: MessageTitleDescription; ]; };
+    String txt { enum_type: MessageTextDescription; inline; initial_value: [ object: MessageTextDescription; ]; };
 
     properties
     {
@@ -553,7 +553,7 @@ class Projectile
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: ProjectileDescription; inline; };
+    String description { enum_type: ProjectileDescription; inline; initial_value: [ object: ProjectileDescription; ]; };
     Resource resource;
 
     i32 type;
@@ -585,7 +585,7 @@ class Weapon
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: WeaponDescription; inline; };
+    String description { enum_type: WeaponDescription; inline; initial_value: [ object: WeaponDescription; ]; };
     Resource resource;
     
     WeaponType type;
@@ -734,7 +734,7 @@ class ModificationMap
 {
     Modification modification { pk; };
     Map map { pk; };
-    String description { enum_type: ModificationMapDescription; inline; };
+    String description { enum_type: ModificationMapDescription; inline; initial_value: [ object: ModificationMapDescription; ]; };
 
     properties
     {
@@ -751,7 +751,7 @@ class Modificator
     i32 id { pk; };
     str text_id;
     String name;
-    String description { enum_type: ModificatorDescription; inline; };
+    String description { enum_type: ModificatorDescription; inline; initial_value: [ object: ModificatorDescription; ]; };
     Resource resource;
 
     f32 probability;
@@ -1011,10 +1011,15 @@ class Clan
     str text_id;
     String name;
     String member_name;
-    String description { enum_type: ClanDescription; inline; };
+    String description { enum_type: ClanDescription; inline; initial_value: [ object: ClanDescription; ]; };
     Resource resource;
 
     Modification modification;
+
+    ClanMechanoid leader
+    {
+        getOrderedObjectMap: "mechanoids";
+    };
 
     i32 bonusexp;
     i32 bonusrepair;
@@ -1168,8 +1173,8 @@ class MapBuilding
     i32 id { pk; };
     str text_id;
     String name;
-    String name_ending { enum_type: MapBuildingNameEnding; };
-    String description { enum_type: MapBuildingDescription; inline; };
+    String name_ending { enum_type: MapBuildingNameEnding; initial_value: [ object: MapBuildingNameEnding; ]; };
+    String description { enum_type: MapBuildingDescription; inline; initial_value: [ object: MapBuildingDescription; ]; };
 
     Map map;
     Building building;
@@ -1177,7 +1182,14 @@ class MapBuilding
     Coordinate coordinate;
     Scale scale;
 
+    #
+    # add modification map building
+    # with its own fields below
+    #
+
     bool interactive;
+
+    #Clan clan;
 
     MapBuildingEquipment equipments { container; };
     MapBuildingGlider gliders { container; };
