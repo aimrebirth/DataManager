@@ -78,6 +78,7 @@ Text TreeItem::get_name()
     }
     s += name;
     replace_all<Text>(s, L"\n", L" ");
+    s.resize(50);
     return s;
 }
 

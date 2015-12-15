@@ -265,6 +265,7 @@ public:
 public:
     using base::base;
     using base::operator[];
+    using base::size;
     
     void add_key(const K &key, data_value_type v)
     {
