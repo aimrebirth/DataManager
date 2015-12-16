@@ -65,6 +65,8 @@ struct DLL_EXPORT TreeItem
     void *objectArrayVariable = nullptr;
     void *inlineVariable = nullptr;
 
+    void *guiItem = nullptr;
+
     int child_count() const;
     void remove() const;
     void update();
@@ -103,7 +105,10 @@ public:
     {
         static_assert(sizeof(T) <= alloc_size, "Object size is greater than maximum alloc size. Increase limit.");
 
-        auto memory = new alloc_type[alloc_size];
+        auto size = sizeof(T);
+        if (T::replaceable)
+            size = alloc_size;
+        auto memory = new alloc_type[size];
         auto raw = new (memory) T(std::forward<Args>(args)...);
         auto p = std::shared_ptr<T>(raw, [](auto p) { delete[](alloc_type*)p; });
         p->initChildren();
@@ -113,10 +118,8 @@ public:
     template <class New, class Old, class... Args>
     static New *replace(Old *p, Args&&... args)
     {
-        static_assert(
-            sizeof(New) <= alloc_size &&
-            sizeof(New) >= sizeof(Old),
-            "Object size is greater than maximum alloc size. Increase limit.");
+        static_assert(sizeof(New) <= alloc_size, "Object size is greater than maximum alloc size. Increase limit.");
+        static_assert(New::replaceable, "This type is not replaceable. Turn on this option in schema.");
 
         Old o = *p;
         p->~Old();

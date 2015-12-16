@@ -76,9 +76,15 @@ Text TreeItem::get_name()
         if (!name.empty())
             s += L" - ";
     }
-    s += name;
+    s += tr(name);
+    int cc = child_count();
+    if (cc)
+        s += L" [" + std::to_wstring(cc) + L"]";
     replace_all<Text>(s, L"\n", L" ");
-    s.resize(50);
+
+    static const size_t max_size = 50;
+    if (s.size() > max_size)
+        s.resize(max_size);
     return s;
 }
 

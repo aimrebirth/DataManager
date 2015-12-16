@@ -103,6 +103,8 @@ enum EObjectType
     Modification = 26,
     ModificationMap,
     ModificationMapDescription,
+    ModificationMapBuilding,
+    ModificationMapBuildingMechanoid,
     ModificationPlayer,
     Modificator,
     ModificatorDescription,
@@ -639,18 +641,18 @@ class Mechanoid
     String name;
 
     Modification modification;
-    Map map
+    ModificationMap map
     {
-        getOrderedObjectMap: "modification->getMaps()";
+        getOrderedObjectMap: "modification->maps";
     };
     Clan clan
     {
         getOrderedObjectMap: "modification->clans";
     };
-    MapBuilding building
+    ModificationMapBuilding building
     {
         getOrderedObjectMap: "map ? map->buildings : m";
-    };    
+    };
     Configuration configuration;
     Group group
     {
@@ -667,6 +669,7 @@ class Mechanoid
     properties
     {
         parent: Modification;
+        replaceable;
     }
 };
 
@@ -696,6 +699,7 @@ class Map
     {
         names_order: "text name custom parent";
         tree_view;
+        replaceable;
     }
 };
 
@@ -727,19 +731,79 @@ class Modification
     properties
     {
         tree_view;
+        replaceable;
     }
 };
 
 class ModificationMap
 {
+    i32 id { pk; };
+    str text_id;
+
     Modification modification { pk; };
     Map map { pk; };
+
     String description { enum_type: ModificationMapDescription; inline; initial_value: [ object: ModificationMapDescription; ]; };
+
+    # containers
+    ModificationMapBuilding buildings { container; };
 
     properties
     {
         parent: Modification;
-        child: Map;
+        object_name: "to_string(map)";
+        replaceable;
+    }
+};
+
+class ModificationMapBuilding
+{
+    i32 id { pk; };
+    ModificationMap map { pk; };
+    MapBuilding building
+    {
+        pk;
+        getOrderedObjectMap: "map->map->buildings";
+    };
+
+    String name;
+    String name_ending { enum_type: MapBuildingNameEnding; initial_value: [ object: MapBuildingNameEnding; ]; };
+    String description { enum_type: MapBuildingDescription; inline; initial_value: [ object: MapBuildingDescription; ]; };
+
+    bool interactive;
+
+    Clan clan
+    {
+        getOrderedObjectMap: "map->modification->clans";
+    };
+
+    MapBuildingEquipment equipments { container; };
+    MapBuildingGlider gliders { container; };
+    MapBuildingGood goods { container; };
+    MapBuildingModificator modificators { container; };
+    MapBuildingProjectile projectiles { container; };
+    MapBuildingWeapon weapons { container; };
+
+    ModificationMapBuildingMechanoid mechanoids { container; };
+
+    properties
+    {
+        parent: ModificationMap;
+
+        object_name: "to_string(building) + (name_ending ? (Text(\" \") + to_string(name_ending)) : Text())";
+        names_order: "name custom text parent";
+    }
+};
+
+class ModificationMapBuildingMechanoid
+{
+    ModificationMapBuilding building { pk; };
+    Mechanoid mechanoid { pk; };
+
+    properties
+    {
+        parent: ModificationMapBuilding;
+        child: Mechanoid;
         proxy;
     }
 };
@@ -1143,6 +1207,7 @@ class MapObject
     {
         object_name: "to_string(object)";
         parent: Map;
+        replaceable;
     }
 };
 
@@ -1163,6 +1228,7 @@ class MapGood
     {
         object_name: "to_string(good)";
         parent: Map;
+        replaceable;
     }
 };
 
@@ -1172,9 +1238,6 @@ class MapBuilding
 {
     i32 id { pk; };
     str text_id;
-    String name;
-    String name_ending { enum_type: MapBuildingNameEnding; initial_value: [ object: MapBuildingNameEnding; ]; };
-    String description { enum_type: MapBuildingDescription; inline; initial_value: [ object: MapBuildingDescription; ]; };
 
     Map map;
     Building building;
@@ -1182,40 +1245,26 @@ class MapBuilding
     Coordinate coordinate;
     Scale scale;
 
-    #
-    # add modification map building
-    # with its own fields below
-    #
-
-    bool interactive;
-
-    #Clan clan;
-
-    MapBuildingEquipment equipments { container; };
-    MapBuildingGlider gliders { container; };
-    MapBuildingGood goods { container; };
-    MapBuildingModificator modificators { container; };
-    MapBuildingProjectile projectiles { container; };
-    MapBuildingWeapon weapons { container; };
-
     properties
     {
-        object_name: "to_string(building) + (name_ending ? (Text(\" \") + to_string(name_ending)) : Text())";
-        names_order: "name custom text parent";
         parent: Map;
+        object_name: "to_string(building)";
+        replaceable;
     }
 };
 
+########################################
+
 class MapBuildingEquipment
 {
-    MapBuilding map_building;
+    ModificationMapBuilding map_building;
     Equipment equipment;
 
     Quantity quantity = 1;
 
     properties
     {
-        parent: MapBuilding;
+        parent: ModificationMapBuilding;
         child: Equipment;
         proxy;
     }
@@ -1223,14 +1272,14 @@ class MapBuildingEquipment
 
 class MapBuildingGlider
 {
-    MapBuilding map_building;
+    ModificationMapBuilding map_building;
     Glider glider;
 
     Quantity quantity = 1;
 
     properties
     {
-        parent: MapBuilding;
+        parent: ModificationMapBuilding;
         child: Glider;
         proxy;
     }
@@ -1238,14 +1287,14 @@ class MapBuildingGlider
 
 class MapBuildingGood
 {
-    MapBuilding map_building;
+    ModificationMapBuilding map_building;
     Good good;
 
     Quantity quantity = 1;
 
     properties
     {
-        parent: MapBuilding;
+        parent: ModificationMapBuilding;
         child: Good;
         proxy;
     }
@@ -1253,14 +1302,14 @@ class MapBuildingGood
 
 class MapBuildingModificator
 {
-    MapBuilding map_building;
+    ModificationMapBuilding map_building;
     Modificator modificator;
 
     Quantity quantity = 1;
 
     properties
     {
-        parent: MapBuilding;
+        parent: ModificationMapBuilding;
         child: Modificator;
         proxy;
     }
@@ -1268,14 +1317,14 @@ class MapBuildingModificator
 
 class MapBuildingProjectile
 {
-    MapBuilding map_building;
+    ModificationMapBuilding map_building;
     Projectile projectile;
 
     Quantity quantity = 1;
 
     properties
     {
-        parent: MapBuilding;
+        parent: ModificationMapBuilding;
         child: Projectile;
         proxy;
     }
@@ -1283,14 +1332,14 @@ class MapBuildingProjectile
 
 class MapBuildingWeapon
 {
-    MapBuilding map_building;
+    ModificationMapBuilding map_building;
     Weapon weapon;
 
     Quantity quantity = 1;
 
     properties
     {
-        parent: MapBuilding;
+        parent: ModificationMapBuilding;
         child: Weapon;
         proxy;
     }

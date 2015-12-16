@@ -218,19 +218,12 @@ public:
 
     size_t erase(const ptr_type &v)
     {
-        size_t erased = 0;
-        while (1)
-        {
-            auto i = find_if(data.begin(), data.end(), [v](const auto &p) { return p.second == v; });
-            if (i == data.end())
-                break;
-            data.erase(i);
-            erased++;
-        }
-        return erased;
+        return erase(v.get());
     }
     size_t erase(const mapped_type *v)
     {
+        if (!v)
+            return 0;
         size_t erased = 0;
         while (1)
         {
@@ -238,13 +231,17 @@ public:
             if (i == data.end())
                 break;
             data.erase(i);
+            vacuumIds();
             erased++;
         }
         return erased;
     }
-    size_t erase(const key_type &i)
+    size_t erase(key_type i)
     {
-        return data.erase(i);
+        auto ret = data.erase(i);
+        if (ret)
+            vacuumIds();
+        return ret;
     }
 
     // other functions
@@ -255,6 +252,19 @@ private:
     std::string name;
 	container data;
     key_type maxId = 1;
+
+    void vacuumIds()
+    {
+        for (; maxId > 0; --maxId)
+        {
+            auto i = data.find(maxId);
+            if (i != data.end())
+            {
+                maxId++; // restore one id
+                break;
+            }
+        }
+    }
 };
 
 } // namespace detail

@@ -48,6 +48,7 @@ enum ObjectFlag
     fNamesOrder,
     fSubtreeItem,
     fSplitBy,
+    fReplaceable,
 
     // fields
     fPrimaryKey,

@@ -49,7 +49,7 @@ struct Property
 {
     Key key;
     Value value;
-    std::shared_ptr<Properties> properties;    
+    std::shared_ptr<Properties> properties;
 };
 
 struct Properties : public std::map<Key, struct Property>
@@ -102,6 +102,7 @@ struct Properties : public std::map<Key, struct Property>
             SET_PROPERTY("split_by", fSplitBy);
             SET_PROPERTY("default", fDefault);
             SET_PROPERTY("not_in_table", fNotInTable);
+            SET_PROPERTY("replaceable", fReplaceable);
             else if (assert)
                 assert(false && "No such property");
 #undef SET_PROPERTY
