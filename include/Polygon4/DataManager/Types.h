@@ -44,6 +44,8 @@ using std::to_string;
 
 using Text = String;
 
+using IdType = int;
+
 template <class T>
 using Ptr = std::shared_ptr<T>;
 
@@ -52,6 +54,11 @@ class IObjectBase;
 using OrderedObjectMap = std::multimap<Text, IObjectBase *>;
 
 using ProgressCallback = std::function<void(double)>;
+
+using alloc_type = uint8_t;
+using deleter = void(*)(IObjectBase*);
+
+using ObjectPtr = std::unique_ptr<IObjectBase, deleter>;
 
 struct DLL_EXPORT TreeItem
 {
@@ -76,7 +83,6 @@ struct DLL_EXPORT TreeItem
 class DLL_EXPORT IObjectBase
 {
 private:
-    using alloc_type = uint8_t;
     static const int alloc_size = 1024;
 
     // constructors
@@ -101,7 +107,7 @@ protected:
 
 public:
     template <class T, class... Args>
-    static std::shared_ptr<T> create(Args&&... args)
+    static auto create(Args&&... args)
     {
         static_assert(sizeof(T) <= alloc_size, "Object size is greater than maximum alloc size. Increase limit.");
 
@@ -110,7 +116,7 @@ public:
             size = alloc_size;
         auto memory = new alloc_type[size];
         auto raw = new (memory) T(std::forward<Args>(args)...);
-        auto p = std::shared_ptr<T>(raw, [](auto p) { delete[](alloc_type*)p; });
+        auto p = std::unique_ptr<T, deleter>(raw, [](auto p) { delete[](alloc_type*)p; });
         p->initChildren();
         return p;
     }
@@ -174,13 +180,13 @@ struct IdPtr
     using base_type = IObjectBase;
     using value_type = T;
 
-    int id = 0;
+    IdType id = 0;
     base_type *ptr = nullptr;
 
     IdPtr()
     {
     }
-    IdPtr(int id)
+    IdPtr(IdType id)
         : id(id)
     {
     }
@@ -195,7 +201,7 @@ struct IdPtr
     {
     }
 
-    IdPtr &operator=(int i)
+    IdPtr &operator=(IdType i)
     {
         id = i;
         return *this;

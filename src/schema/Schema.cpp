@@ -35,6 +35,11 @@ const std::string objectType = "EObjectType";
 const std::string variableType = "EVariableType";
 const std::string objectArray = "CObjectArray";
 
+std::string storageTableType(const std::string &s)
+{
+    return "StorageTable<" + s + ">";
+}
+
 std::string ctableType(const std::string &s)
 {
     return "CTable<" + s + ">";
@@ -280,9 +285,15 @@ ModuleContext Schema::printStorage() const
     mc.hpp.addLine(pragma_once);
     mc.hpp.addLine();
     mc.hpp.beginBlock("class Storage");
+    mc.hpp.addLineNoSpace("private:");
+    mc.hpp.addLine("template <class T> friend class StorageTable;");
+    mc.hpp.addLine();
+    mc.hpp.addLineNoSpace("private:");
+    mc.hpp.addLine("std::vector<ObjectPtr> db_objects;");
+    mc.hpp.addLine();
     mc.hpp.addLineNoSpace("public:");
     for (auto &c : cls)
-        mc.hpp.addLine(ctableType(c.getCppName()) + " " + c.getCppArrayVariableName() + ";");
+        mc.hpp.addLine(storageTableType(c.getCppName()) + " " + c.getCppArrayVariableName() + ";");
     mc.hpp.addLine();
     mc.hpp.addLineNoSpace("public:");
     mc.hpp.addLine("Storage();");
@@ -317,6 +328,9 @@ ModuleContext Schema::printStorage() const
     mc.cpp.beginFunction("Storage::Storage()");
     for (auto &c : cls)
         mc.cpp.addLine(c.getCppArrayVariableName() + ".setName(\"" + c.getCppName() + "\");");
+    mc.cpp.addLine();
+    for (auto &c : cls)
+        mc.cpp.addLine(c.getCppArrayVariableName() + ".setStorage(*this);");
     mc.cpp.endFunction();
     mc.cpp.beginFunction("Storage::~Storage()");
     mc.cpp.endBlock();
@@ -1350,8 +1364,10 @@ ModuleContext Class::printIo() const
         mc.cpp.beginFunction("void " + storageImpl + "::_load" + getSqlName() + "Ptrs()");
         if (hasFks)
         {
-            mc.cpp.addLine("for (auto &" + getCppVariableName() + " : " + getCppArrayVariableName() + ")");
+            mc.cpp.addLine("for (auto &v : " + getCppArrayVariableName() + ")");
             mc.cpp.beginBlock();
+            mc.cpp.addLine("auto " + getCppVariableName() + " = v.second;");
+            mc.cpp.addLine();
             bool prev = false;
             for (auto &v : vars)
             {
@@ -1389,7 +1405,7 @@ ModuleContext Class::printIo() const
                 {
                     mc.cpp.addLine("auto " + v.getName() + " = " + name2 + ".find(" + var + "->" + v.getName() + idAccess + ");");
                     mc.cpp.beginBlock("if (" + v.getName() + " != " + name2 + ".end())");
-                    mc.cpp.addLine(var + "->" + v.getName() + " = *" + v.getName() + ";");
+                    mc.cpp.addLine(var + "->" + v.getName() + " = IdPtr<" + getCppName() + ">(" + v.getName() + "->second);");
                     mc.cpp.endBlock();
                     /*if (v.hasFlags({ fInline }))
                     {
@@ -1424,8 +1440,7 @@ ModuleContext Class::printIo() const
             for (auto &v : vars_container)
             {
                 auto t = (Class *)v.getType();
-                mc.cpp.addLine("for (auto &" + t->getCppVariableName() + " : " + t->getCppArrayVariableName() + ")");
-                mc.cpp.increaseIndent();
+                mc.cpp.beginBlock("for (auto &" + t->getCppVariableName() + " : " + t->getCppArrayVariableName() + ")");
                 std::string var_name = getCppVariableName();
                 for (auto &v2 : t->getVariables())
                 {
@@ -1435,15 +1450,14 @@ ModuleContext Class::printIo() const
                         break;
                     }
                 }
+                mc.cpp.beginBlock(
+                    "if (" + getCppVariableName() + ".second->id" + " == " +
+                    t->getCppVariableName() + ".second->" + var_name + idAccess + ")");
                 mc.cpp.addLine(
-                    "if (" + getCppVariableName() + "->id" + " == " +
-                    t->getCppVariableName() + "->" + var_name + idAccess + ")");
-                mc.cpp.increaseIndent();
-                mc.cpp.addLine(
-                    getCppVariableName() + "->" + v.getName() + containerAccess +
-                    "insert(" + t->getCppVariableName() + ");");
-                mc.cpp.decreaseIndent();
-                mc.cpp.decreaseIndent();
+                    getCppVariableName() + ".second->" + v.getName() + containerAccess +
+                    "insert(" + t->getCppVariableName() + ".second);");
+                mc.cpp.endBlock();
+                mc.cpp.endBlock();
             }
             mc.cpp.endBlock();
         }
@@ -1466,7 +1480,7 @@ ModuleContext Class::printIo() const
         mc.cpp.addLine("sqlite3_stmt *stmt;");
         mc.cpp.addLine("sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0);");
         mc.cpp.beginBlock("for (auto &" + getCppVariableName() + " : " + getCppArrayVariableName() + ")");
-        mc.cpp.addLine("auto &v = " + getCppVariableName() + (hasIdField ? ".second" : "") + ";");
+        mc.cpp.addLine("auto &v = " + getCppVariableName() + ".second;");
         for (auto &v : vars)
             v.printSaveSqlite3(mc.cpp, "v");
         mc.cpp.addLine("sqlite3_step(stmt);");

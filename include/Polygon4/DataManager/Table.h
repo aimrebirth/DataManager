@@ -33,85 +33,62 @@ namespace polygon4
 namespace detail
 {
 
-template <class T1, class T2>
-struct TablePair : public std::pair<T1, T2>
+template <class T>
+class CTable : public std::unordered_set<T*>
 {
-    T2 &operator->()
+public:
+    OrderedObjectMap getOrderedObjectMap() const
     {
-        if (!this->second)
+        OrderedObjectMap m;
+        for (auto &d : *this)
         {
-            throw EXCEPTION("Trying to get empty object for id (" + std::to_string(this->first) +
-                            "). This should not happen. Check your database or source code");
+            m.insert({ d->getName(), d });
         }
-        return this->second;
+        return m;
     }
 
-    const T2 &operator->() const
+    template <typename F>
+    OrderedObjectMap getOrderedObjectMap(F &&f) const
     {
-        if (!this->second)
+        OrderedObjectMap m;
+        for (auto &d : *this)
         {
-            throw EXCEPTION("Trying to get empty object for id (" + std::to_string(this->first) +
-                "). This should not happen. Check your database or source code");
+            if (f(d))
+                m.insert({ d->getName(), d });
         }
-        return this->second;
+        return m;
     }
 
-    operator T2&()
+    operator OrderedObjectMap() const
     {
-        return this->second;
-    }
-
-    operator const T2&() const
-    {
-        return this->second;
+        return getOrderedObjectMap();
     }
 };
 
+class Storage;
+
 template <class T>
-class CTable
+class StorageTable : public std::unordered_map<IdType, T*>
 {
 public:
-    using key_type = int;
-    using mapped_type = T;
-    using ptr_type = Ptr<T>;
-    using value_type = TablePair<const key_type, ptr_type>;
-    using container = std::unordered_map<key_type, ptr_type>;
-    
-    template <class V, class ParentType>
-    class iterator_base : public std::iterator<std::bidirectional_iterator_tag, V>
-    {
-    public:
-        using base = std::iterator<std::bidirectional_iterator_tag, V>;
+    using base = std::unordered_map<IdType, T*>;
 
-        using value_type = typename base::value_type;
-        using reference = typename base::reference;
-        using pointer = typename base::pointer;
+    using iterator = typename base::iterator;
+    using const_iterator = typename base::const_iterator;
 
-    public:
-        iterator_base(const ParentType& iter) : i(iter) {}
-
-        iterator_base &operator++() { ++i; return *this; }
-        iterator_base operator++(int) { iterator_base tmp(*this); operator++(); return tmp; }
-
-        bool operator==(const iterator_base &rhs) const { return i == rhs.i; }
-        bool operator!=(const iterator_base &rhs) const { return i != rhs.i; }
-
-        reference operator*() { return (reference)*i; }
-        reference operator->() { return (reference)*i; }
-
-    private:
-        // parent iterator
-        ParentType i;
-    };
-
-    using iterator = iterator_base<value_type, typename container::iterator>;
-    using const_iterator = iterator_base<value_type, typename container::const_iterator>;
+    using key_type = typename base::key_type;
+    using value_type = typename base::value_type;
+    using ptr_type = T*;
+    using id_ptr_type = IdPtr<T>;
 
 public:
     // create value
     ptr_type create()
     {
-        return T::template create<T>();
+        auto ptr = T::template create<T>();
+        auto raw = ptr.get();
+        storage->db_objects.emplace_back(std::move(ptr));
+        return raw;
     }
 
     // create value and append it to the end of container
@@ -119,7 +96,7 @@ public:
     {
         auto v = create();
         v->setId(maxId);
-        return data[maxId++] = v;
+        return base::operator[](maxId++) = v;
     }
 
     // here we insert element with checking its id
@@ -131,15 +108,15 @@ public:
             throw EXCEPTION("Bad id (" + std::to_string(key) + ") < 1 detected. Table: '" + name + "'" +
                 ", value: '" + v->getName().toString() + "'");
         }
-        auto old = data.find(key);
-        if (old != data.end())
+        auto old = find(key);
+        if (old != end())
         {
             throw EXCEPTION("Duplicate key (" + std::to_string(key) + ") detected. Table '" + name + "'" +
                 ", old value: '" + old->second->getName().toString() + "'" +
                 ", new value: '" + old->second->getName().toString() + "'");
         }
         if (key < maxId)
-            data[key] = v;
+            base::operator[](key) = v;
         else if (key == maxId)
             insertAtEnd(v);
         else
@@ -152,15 +129,15 @@ public:
     ptr_type insertAtEnd(const ptr_type &v)
     {
         v->setId(maxId);
-        data[maxId++] = v;
+        base::operator[](maxId++) = v;
         return v;
     }
 
     // get by key
     ptr_type operator[](const key_type &i) const // does not change the container
     {
-        auto v = data.find(i);
-        if (v == data.end())
+        auto v = find(i);
+        if (v == end())
         {
             throw EXCEPTION("key (" + std::to_string(i) + ") not found in table '" + name + "'");
         }
@@ -170,20 +147,21 @@ public:
     OrderedObjectMap getOrderedObjectMap() const
     {
         OrderedObjectMap m;
-        for (auto &d : data)
+        for (auto &d : *this)
         {
-            auto p = d.second.get();
+            auto p = d.second;
             m.insert({ p->getName(), p });
         }
         return m;
     }
+
     template <typename F>
     OrderedObjectMap getOrderedObjectMap(F &&f) const
     {
         OrderedObjectMap m;
-        for (auto &d : data)
+        for (auto &d : *this)
         {
-            auto p = d.second.get();
+            auto p = d.second;
             if (f(p))
                 m.insert({ p->getName(), p });
         }
@@ -197,25 +175,22 @@ public:
 
     // container interface
 public:
-    iterator begin() { return data.begin(); }
-    iterator end() { return data.end(); }
-    const_iterator begin() const { return data.begin(); }
-    const_iterator end() const { return data.end(); }
-    const_iterator cbegin() const { return data.cbegin(); }
-    const_iterator cend() const { return data.cend(); }
-
-    iterator find(key_type key) { return data.find(key); }
-    const_iterator find(key_type key) const { return data.find(key); }
+    id_ptr_type get_id_ptr(const key_type &i) const
+    {
+        auto v = find(i);
+        if (v == end())
+        {
+            throw EXCEPTION("key (" + std::to_string(i) + ") not found in table '" + name + "'");
+        }
+        return id_ptr_type(v->second);
+    }
 
     template <typename F>
-    iterator find_if(F &&f) { return std::find_if(data.begin(), data.end(), f); }
+    iterator find_if(F &&f) { return std::find_if(begin(), end(), f); }
+
     template <typename F>
-    const_iterator find_if(F &&f) const { return std::find_if(data.begin(), data.end(), f); }
-
-    bool empty() const { data.empty(); }
-    void clear() { data.clear(); }
-    size_t count(const key_type &k) const { return data.count(k); }
-
+    const_iterator find_if(F &&f) const { return std::find_if(begin(), end(), f); }
+    
     size_t erase(const ptr_type &v)
     {
         return erase(v.get());
@@ -227,18 +202,18 @@ public:
         size_t erased = 0;
         while (1)
         {
-            auto i = find_if(data.begin(), data.end(), [v](const auto &p){ return p.second.ptr.get() == v; });
-            if (i == data.end())
+            auto i = find_if([v](const auto &p) { return p.second.get() == v; });
+            if (i == end())
                 break;
-            data.erase(i);
+            base::erase(i);
             vacuumIds();
             erased++;
         }
         return erased;
     }
-    size_t erase(key_type i)
+    size_t erase(const key_type &i)
     {
-        auto ret = data.erase(i);
+        auto ret = base::erase(i);
         if (ret)
             vacuumIds();
         return ret;
@@ -247,18 +222,19 @@ public:
     // other functions
 public:
     void setName(const std::string &name) { this->name = name; }
-    
+    void setStorage(Storage &storage) { this->storage = &storage; }
+
 private:
     std::string name;
-	container data;
     key_type maxId = 1;
+    Storage *storage;
 
     void vacuumIds()
     {
         for (; maxId > 0; --maxId)
         {
-            auto i = data.find(maxId);
-            if (i != data.end())
+            auto i = find(maxId);
+            if (i != end())
             {
                 maxId++; // restore one id
                 break;
