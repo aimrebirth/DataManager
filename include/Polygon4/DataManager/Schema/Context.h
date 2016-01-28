@@ -27,7 +27,27 @@ class Context
 {
 public:
     using Text = std::string;
-    using Lines = std::vector<std::string>;
+
+private:
+    struct Line
+    {
+        Text text;
+        int n_indents = 0;
+
+        Line() {}
+        Line(const Text &t, int n = 0)
+            : text(t), n_indents(n)
+        {}
+
+        Line& operator+=(const Text &t)
+        {
+            text += t;
+            return *this;
+        }
+    };
+
+public:
+    using Lines = std::vector<Line>;
 
 public:
     Context(const Text &indent = "    ", const Text &newline = "\n");
@@ -58,26 +78,29 @@ public:
     Context &before()
     {
         if (!before_)
-            before_ = std::make_unique<Context>();
+            before_ = std::make_shared<Context>();
         return *before_;
     }
     Context &after()
     {
         if (!after_)
-            after_ = std::make_unique<Context>();
+            after_ = std::make_shared<Context>();
         return *after_;
     }
     
     void emptyLines(int n);
 
+    // add with "as is" indent
     Context &operator+=(const Context &rhs);
+    // add with relative indent
+    void addWithRelativeIndent(const Context &rhs);
 
 private:
     Lines lines;
-    std::unique_ptr<Context> before_;
-    std::unique_ptr<Context> after_;
+    std::shared_ptr<Context> before_;
+    std::shared_ptr<Context> after_;
 
-    Text space;
+    int n_indents = 0;
     Text indent;
     Text newline;
     std::stack<Text> namespaces;

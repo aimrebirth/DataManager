@@ -102,7 +102,6 @@ struct Properties : public std::map<Key, struct Property>
             SET_PROPERTY("split_by", fSplitBy);
             SET_PROPERTY("default", fDefault);
             SET_PROPERTY("not_in_table", fNotInTable);
-            SET_PROPERTY("replaceable", fReplaceable);
             else if (assert)
                 assert(false && "No such property");
 #undef SET_PROPERTY

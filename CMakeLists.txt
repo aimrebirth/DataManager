@@ -46,7 +46,7 @@ else()
 endif(WIN32)
 
 find_package(Boost 1.54 REQUIRED filesystem system)
-find_package(BISON 2.4 REQUIRED)
+find_package(BISON 3.0 REQUIRED)
 find_package(FLEX 2.5.35 REQUIRED)
 
 ###############################################################################

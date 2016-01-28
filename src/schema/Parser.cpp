@@ -273,6 +273,7 @@ Schema convert(const ast::Schema &ast)
         }
     }
 
+    s.initialize();
     return s;
 }
 

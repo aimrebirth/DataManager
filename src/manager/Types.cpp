@@ -29,6 +29,8 @@ namespace polygon4
 namespace detail
 {
 
+bool IObjectBase::replaceable = false;
+
 int TreeItem::child_count() const
 {
     int cc = 0;

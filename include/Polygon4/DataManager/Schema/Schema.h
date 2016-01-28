@@ -437,6 +437,7 @@ public:
     Name getExcludeTableName() const { return getTableName() + "_exclude"; }
 
     std::string getEnding() const { return ending; }
+    EnumItems& getItems() { return items; }
 
     ModuleContext print() const;
     ModuleContext printTableRecord() const;
@@ -453,6 +454,8 @@ using Enums = ObjectArray<std::list<Enum>>;
 class DLL_EXPORT Schema
 {
 public:
+    void initialize();
+
     const Class &getClass(const Name &name) const
     {
         auto i = classes.find(name);

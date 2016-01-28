@@ -35,7 +35,7 @@
 class ParserDriver;
 }
 
-// param to y::parser() constructor
+// param to yy::parser() constructor
 // the parsing context
 %param { ParserDriver &driver } 
 

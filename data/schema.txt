@@ -67,14 +67,6 @@ enum EObjectType
     BuildingDescription = 2,
     Clan = 4,
     ClanDescription,
-    ClanMechanoid,
-    ClanMemberName,
-    ClanReputation,
-    Configuration,
-    ConfigurationEquipment,
-    ConfigurationGood,
-    ConfigurationProjectile,
-    ConfigurationWeapon,
     Equipment = 10,
     EquipmentDescription,
     Glider = 11,
@@ -84,48 +76,18 @@ enum EObjectType
     Group = 14,
     GroupMechanoid,
     Map = 24,
-    MapBuilding,
     MapBuildingNameEnding,
     MapBuildingDescription,
-    MapBuildingEquipment,
-    MapBuildingGlider,
-    MapBuildingGood,
-    MapBuildingModificator,
-    MapBuildingProjectile,
-    MapBuildingWeapon,
-    MapGood,
-    MapObject,
-    Mechanoid,
-    MechanoidQuest,
-    Message,
     MessageTitleDescription,
     MessageTextDescription,
     Modification = 26,
-    ModificationMap,
     ModificationMapDescription,
-    ModificationMapBuilding,
-    ModificationMapBuildingMechanoid,
-    ModificationPlayer,
-    Modificator,
     ModificatorDescription,
-    Object,
-    Player,
     Projectile = 34,
     ProjectileDescription,
-    Quest,
     QuestDescription,
     QuestText,
     QuestTitle,
-    QuestRewardEquipment,
-    QuestRewardGlider,
-    QuestRewardGood,
-    QuestRewardModificator,
-    QuestRewardProjectile,
-    QuestRewardReputation,
-    QuestRewardWeapon,
-    ScriptVariable,
-    Setting,
-    String,
     Weapon = 48,
     WeaponDescription,
     Any = 1000,
@@ -669,7 +631,6 @@ class Mechanoid
     properties
     {
         parent: Modification;
-        replaceable;
     }
 };
 
@@ -699,7 +660,6 @@ class Map
     {
         names_order: "text name custom parent";
         tree_view;
-        replaceable;
     }
 };
 
@@ -731,7 +691,6 @@ class Modification
     properties
     {
         tree_view;
-        replaceable;
     }
 };
 
@@ -752,7 +711,6 @@ class ModificationMap
     {
         parent: Modification;
         object_name: "to_string(map)";
-        replaceable;
     }
 };
 
@@ -766,7 +724,7 @@ class ModificationMapBuilding
         getOrderedObjectMap: "map->map->buildings";
     };
 
-    String name;
+    String name { enum_type: Building; };
     String name_ending { enum_type: MapBuildingNameEnding; initial_value: [ object: MapBuildingNameEnding; ]; };
     String description { enum_type: MapBuildingDescription; inline; initial_value: [ object: MapBuildingDescription; ]; };
 
@@ -790,8 +748,8 @@ class ModificationMapBuilding
     {
         parent: ModificationMap;
 
-        object_name: "to_string(building) + (name_ending ? (Text(\" \") + to_string(name_ending)) : Text())";
-        names_order: "name custom text parent";
+        object_name: "(name ? to_string(name) : to_string(building)) + (name_ending ? (Text(\" \") + to_string(name_ending)) : Text())";
+        names_order: "custom name text parent";
     }
 };
 
@@ -926,38 +884,38 @@ class Quest
 
     String title            { enum_type: QuestTitle; inline; initial_value: [ object: QuestTitle; ]; };
     String description      { enum_type: QuestDescription; inline; initial_value: [ object: QuestDescription; ]; };
-
-    String get              { enum_type: QuestText; inline; initial_value: [ object: QuestText; ]; };
-    String brief            { enum_type: QuestText; inline; initial_value: [ object: QuestText; ]; };
-    String complete         { enum_type: QuestText; inline; initial_value: [ object: QuestText; ]; };
-    String fail             { enum_type: QuestText; inline; initial_value: [ object: QuestText; ]; };
-    String in_progress      { enum_type: QuestText; inline; initial_value: [ object: QuestText; ]; };
-    String other_strings
-    {
-        enum_type: QuestText;
-        inline;
-        array;
-        array_key: text_id;
-        initial_value: [ object: QuestText; ];
-    };
-
+    
     i32 time;
     
     Money money;
     Rating rating;
 
-    QuestRewardEquipment equipments { container; };
-    QuestRewardGlider gliders { container; };
-    QuestRewardGood goods { container; };
-    QuestRewardModificator modificators { container; };
-    QuestRewardProjectile projectiles { container; };
-    QuestRewardReputation reputations { container; };
-    QuestRewardWeapon weapons { container; };
+    QuestRewardEquipment equipments { container; subtree_item: "Rewards"; };
+    QuestRewardGlider gliders { container; subtree_item: "Rewards"; };
+    QuestRewardGood goods { container; subtree_item: "Rewards"; };
+    QuestRewardModificator modificators { container; subtree_item: "Rewards"; };
+    QuestRewardProjectile projectiles { container; subtree_item: "Rewards"; };
+    QuestRewardReputation reputations { container; subtree_item: "Rewards"; };
+    QuestRewardWeapon weapons { container; subtree_item: "Rewards"; };
+
+    QuestString strings { container; };
 
     properties
     {
         tree_view;
-        subtree_item: "Rewards";
+    }
+};
+
+class QuestString
+{
+    Quest quest;
+    str text_id;
+    LocalizedString string;
+
+    properties
+    {
+        parent: Quest;
+        object_name: "string";
     }
 };
 
@@ -1207,7 +1165,6 @@ class MapObject
     {
         object_name: "to_string(object)";
         parent: Map;
-        replaceable;
     }
 };
 
@@ -1228,7 +1185,6 @@ class MapGood
     {
         object_name: "to_string(good)";
         parent: Map;
-        replaceable;
     }
 };
 
@@ -1249,7 +1205,6 @@ class MapBuilding
     {
         parent: Map;
         object_name: "to_string(building)";
-        replaceable;
     }
 };
 

@@ -37,36 +37,37 @@ Context::Context(const Text &indent, const Text &newline)
 
 void Context::addText(const Text &s)
 {
+    if (lines.empty())
+        lines.emplace_back();
     lines.back() += s;
 }
 
 void Context::addNoNewLine(const Text &s)
 {
-    lines.push_back(space + s);
+    lines.push_back(Line{ s, n_indents });
 }
 
 void Context::addLineNoSpace(const Text & s)
 {
-    lines.push_back(s);
+    lines.push_back(Line{ s });
 }
 
 void Context::addLine(const Text &s)
 {
     if (s.empty())
-        lines.push_back(s);
+        lines.push_back(Line{});
     else
-        lines.push_back(space + s);
+        lines.push_back({ s, n_indents });
 }
 
 void Context::decreaseIndent()
 {
-    if (space.size() >= indent.size())
-        space.resize(space.size() - indent.size());
+    n_indents--;
 }
 
 void Context::increaseIndent()
 {
-    space += indent;
+    n_indents++;
 }
 
 void Context::beginBlock(const Text &s, bool indent)
@@ -129,7 +130,7 @@ void Context::trimEnd(size_t n)
 {
     if (lines.empty())
         return;
-    auto &t = lines.back();
+    auto &t = lines.back().text;
     auto sz = t.size();
     if (n > sz)
         n = sz;
@@ -140,8 +141,13 @@ Context::Text Context::getText() const
 {
     Text s;
     auto lines = getLines();
-    for (auto &str : lines)
-        s += str + newline;
+    for (auto &line : lines)
+    {
+        Text space;
+        for (int i = 0; i < line.n_indents; i++)
+            space += indent;
+        s += space + line.text + newline;
+    }
     return s;
 }
 
@@ -161,7 +167,7 @@ void Context::emptyLines(int n)
     int e = 0;
     for (auto i = lines.rbegin(); i != lines.rend(); ++i)
     {
-        if (i->empty())
+        if (i->text.empty())
             e++;
         else
             break;
@@ -193,4 +199,28 @@ Context &Context::operator+=(const Context &rhs)
         after().lines += rhs.after_->lines;
     }
     return *this;
+}
+
+void Context::addWithRelativeIndent(const Context &rhs)
+{
+    auto addWithRelativeIndent = [this](Lines &l1, Lines l2)
+    {
+        for (auto &l : l2)
+            l.n_indents += n_indents;
+        l1 += l2;
+    };
+
+    if (before_ && rhs.before_)
+        addWithRelativeIndent(before_->lines, rhs.before_->lines);
+    else if (rhs.before_)
+    {
+        addWithRelativeIndent(before().lines, rhs.before_->lines);
+    }
+    addWithRelativeIndent(lines, rhs.lines);
+    if (after_ && rhs.after_)
+        addWithRelativeIndent(after_->lines, rhs.after_->lines);
+    else if (rhs.after_)
+    {
+        addWithRelativeIndent(after().lines, rhs.after_->lines);
+    }
 }

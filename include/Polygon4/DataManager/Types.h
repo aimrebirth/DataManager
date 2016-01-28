@@ -119,7 +119,6 @@ public:
     static New *replace(Old *p, Args&&... args)
     {
         static_assert(sizeof(New) <= alloc_size, "Object size is greater than maximum alloc size. Increase limit.");
-        static_assert(New::replaceable, "This type is not replaceable. Turn on this option in schema.");
 
         Old o = *p;
         p->~Old();
@@ -159,6 +158,9 @@ protected:
         item->update();
         return item;
     }
+
+public:
+    static bool replaceable;
     
     // friends
 private:
