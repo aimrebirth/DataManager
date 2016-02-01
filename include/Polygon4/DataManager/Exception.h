@@ -22,27 +22,23 @@
 #include <sstream>
 #include <string>
 
+#include "Dll.h"
+
 #define EXCEPTION_PARAMS __FILE__, __FUNCTION__, __LINE__
 #define EXCEPTION(msg) polygon4::Exception(EXCEPTION_PARAMS, msg)
 
 namespace polygon4
 {
 
-class Exception : public std::exception
+class DLL_EXPORT Exception : public std::exception
 {
 public:
-    Exception(){}
-    Exception(const char *file, const char *function, int line, const std::string &msg)
-    {
-        std::stringstream ss;
-        ss << "Exception in file: " << file << ", function: " << function << ", line: " << line << ". "
-           << "Error description: " << msg;
+    Exception();
+    Exception(const char *file, const char *function, int line, const std::string &msg);
+    virtual ~Exception();
 
-        what_str = ss.str();
-    }
-    virtual ~Exception() throw () {}
+    virtual const char *what() const noexcept;
 
-    virtual const char *what() const throw () { return what_str.c_str(); }
 protected:
     std::string what_str;
 };

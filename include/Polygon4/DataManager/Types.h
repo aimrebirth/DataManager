@@ -51,7 +51,10 @@ using Ptr = std::shared_ptr<T>;
 
 class IObjectBase;
 
-using OrderedObjectMap = std::multimap<Text, IObjectBase *>;
+using OrderedObjectMap = std::multimap<Text, IObjectBase*>;
+
+template <typename K>
+using KeyMap = std::unordered_map<K, IObjectBase*>;
 
 using ProgressCallback = std::function<void(double)>;
 
@@ -106,6 +109,7 @@ protected:
     virtual void initChildren() {}
 
 public:
+#ifndef SWIG
     template <class T, class... Args>
     static auto create(Args&&... args)
     {
@@ -132,6 +136,7 @@ public:
         n->initChildren();
         return n;
     }
+#endif
 
     // generated functions
 public:
@@ -153,6 +158,8 @@ public:
     bool operator<(const IObjectBase &rhs) const { return getName() < rhs.getName(); }
 
     // data
+public:
+    Storage *storage;
 protected:
     int id = 0;
 
@@ -167,7 +174,7 @@ protected:
 
 public:
     static bool replaceable;
-    
+
     // friends
 private:
     friend class StorageImpl;
@@ -257,44 +264,15 @@ struct IdPtr
         return (T *)ptr;
     }
 
+    void reset()
+    {
+        clear();
+    }
     void clear()
     {
         id = 0;
         ptr = nullptr;
     }
-};
-
-template <typename T, typename K = int32_t>
-class CObjectArray : public std::vector<IdPtr<T>>
-{
-    using base = std::vector<IdPtr<T>>;
-    using data_value_type = size_t;
-
-public:
-    using value_type = typename base::value_type;
-
-public:
-    using base::base;
-    using base::operator[];
-    using base::size;
-    
-    void add_key(const K &key, data_value_type v)
-    {
-        data[key] = v;
-    }
-
-    T get(const K &key) const
-    {
-        auto i = data.find(key);
-        if (i == data.end())
-            return T();
-        if (i->second > size())
-            return T();
-        return *operator[](i->second).get();
-    }
-
-private:
-    std::map<K, data_value_type> data;
 };
 
 template<class T>
@@ -336,6 +314,7 @@ bool to_bool(const std::string &s);
 using detail::IdPtr;
 using detail::Ptr;
 using detail::TreeItem;
+using detail::KeyMap;
 
 } // namespace polygon4
 
@@ -344,11 +323,20 @@ using detail::TreeItem;
 namespace polygon4
 {
 
+// forward decls for interfaces
+class ScriptEngine;
+
+namespace detail
+{
+
+#include "interface/IConfiguration.h"
 #include "interface/IMap.h"
 #include "interface/IMapObject.h"
 #include "interface/IMapBuilding.h"
 #include "interface/IModification.h"
 #include "Interface/IMechanoid.h"
+
+} // namespace detail
 
 } // namespace polygon4
 

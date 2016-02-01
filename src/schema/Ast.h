@@ -63,7 +63,9 @@ struct Properties : public std::map<Key, struct Property>
         for (auto &p : *this)
         {
             if (p.first == key)
+            {
                 return std::make_tuple(true, p.second.value);
+            }
             if (p.second.properties)
             {
                 auto t = p.second.properties->getPropertyValue(key);
@@ -102,6 +104,8 @@ struct Properties : public std::map<Key, struct Property>
             SET_PROPERTY("split_by", fSplitBy);
             SET_PROPERTY("default", fDefault);
             SET_PROPERTY("not_in_table", fNotInTable);
+            SET_PROPERTY("service_db", fServiceDb);
+            SET_PROPERTY("no_save", fNoSave);
             else if (assert)
                 assert(false && "No such property");
 #undef SET_PROPERTY
@@ -229,7 +233,7 @@ struct Class
         }
         return namesOrder;
     }
-    
+
     bool operator<(const Class &rhs) const
     {
         return name < rhs.name;
@@ -250,7 +254,7 @@ struct EnumItem
     {
         ObjectFlags f;
         f[fNotInTable] = hasProperty("not_in_table");
-        f[fDefault] = hasProperty("default");      
+        f[fDefault] = hasProperty("default");
         return f;
     }
 

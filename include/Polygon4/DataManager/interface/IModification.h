@@ -24,6 +24,7 @@ class DLL_EXPORT IModification : public detail::IObjectBase
 {
 public:
     virtual bool newGame() { return false; }
-    virtual bool loadGame(const String &filename) { return false; }
+    virtual bool loadGame(const Text &filename) { return false; }
     virtual void spawnMechanoids() {}
+    virtual ScriptEngine *getScriptEngine() const { return nullptr; }
 };

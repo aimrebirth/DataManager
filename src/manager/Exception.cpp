@@ -1,6 +1,6 @@
 /*
  * Polygon-4 Data Manager
- * Copyright (C) 2015-2016 lzwdgc
+ * Copyright (C) 2015 lzwdgc
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,20 +16,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <Polygon4/DataManager/Exception.h>
 
-#define POLYGON4_MECHANOID_INTERFACE
+#include "Logger.h"
+DECLARE_STATIC_LOGGER(logger, "exception");
 
-class DLL_EXPORT IMechanoid : public detail::IObjectBase
+namespace polygon4
 {
-public:
-    virtual bool spawn() { return false; }
 
-    virtual ModificationPlayer *getPlayer() const { return nullptr; }
-    virtual void setPlayer(ModificationPlayer *in_player) {}
-    virtual bool isPlayer() const { return false; }
+Exception::Exception()
+{
+}
 
-    virtual void enterBuilding(MapBuilding *building) {}
+Exception::Exception(const char *file, const char *function, int line, const std::string &msg)
+{
+    std::stringstream ss;
+    ss << "Exception in file: " << file << ", function: " << function << ", line: " << line << ". "
+        << "Error description: " << msg;
 
-    virtual Configuration *getConfiguration() { return nullptr; }
-};
+    what_str = ss.str();
+
+    LOG_ERROR(logger, what_str);
+}
+
+Exception::~Exception()
+{
+}
+
+const char *Exception::what() const noexcept
+{
+    return what_str.c_str();
+}
+
+}

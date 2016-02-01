@@ -321,6 +321,9 @@ public:
     const InitialValues &getInitialValues() const { return initialValues; }
     const variable_ptr &getArrayKey() const { return arrayKey; }
 
+    int getFromVersion() const { return from_version; }
+    int getToVersion() const { return to_version; }
+
 private:
     int id;
     Name name;
@@ -337,6 +340,9 @@ private:
     DepVariable masterVariable;
     DepVariables slaveVariables;
 
+    int from_version = 0;
+    int to_version = 0;
+
     friend Schema convert(const ast::Schema &schema);
 };
 
@@ -350,7 +356,7 @@ public:
     Name getEnumName() const { return enumName; }
     virtual Class *getParent() const override { return parent; }
     virtual Class *getChild() const override { return child; }
-    
+
     Variable getVariable(const std::string &name) const
     {
         auto variables = getVariables();
@@ -386,11 +392,11 @@ public:
     std::string printSql() const;
     virtual void printVariables(ModuleContext &mc) const override;
 
-    ModuleContext print() const;
+    ModuleContext print(const Schema &schema) const;
     ModuleContext printIo() const;
     ModuleContext printAddDeleteRecordVirtual() const;
     ModuleContext printAddDeleteRecord() const;
-    
+
 private:
     Variables variables;
     Name enumName;
@@ -463,9 +469,17 @@ public:
             throw std::runtime_error("No class with such name: " + name);
         return *i;
     }
-    Classes getClasses() const
+    const Classes &getClasses() const
     {
-        return classes({ fService, fInline, fEnumOnly }, true);
+        if (main.empty())
+            main = classes({ fService, fInline, fEnumOnly }, true);
+        return main;
+    }
+    const Classes &getServiceDbClasses() const
+    {
+        if (service_db.empty())
+            service_db = classes({ fServiceDb });
+        return service_db;
     }
 
     ModuleContext printForwardDeclarations() const;
@@ -475,6 +489,8 @@ public:
     ModuleContext printStorageImplementation() const;
     ModuleContext printEnums() const;
 
+    Version getVersion() const { return version; }
+
 private:
     Version version;
     Types types;
@@ -483,6 +499,23 @@ private:
     Enums enums;
 
     std::unordered_map<Name, Type*> typePtrs;
+
+    mutable Classes main, service_db;
+
+    template <typename F>
+    void executeForClasses(F &&f, bool reverse = false) const
+    {
+        if (reverse)
+        {
+            std::forward<F>(f)(getServiceDbClasses());
+            std::forward<F>(f)(getClasses());
+        }
+        else
+        {
+            std::forward<F>(f)(getClasses());
+            std::forward<F>(f)(getServiceDbClasses());
+        }
+    }
 
     friend Schema convert(const ast::Schema &schema);
 };

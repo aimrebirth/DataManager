@@ -20,10 +20,14 @@
 
 #define POLYGON4_MAPBUILDING_INTERFACE
 
+class ModificationMapBuilding;
+
 class DLL_EXPORT IMapBuilding : public detail::IObjectBase
 {
 public:
     virtual bool spawn() { return false; }
 
-protected:
+    virtual void initModificationMapBuilding() {}
+    virtual ModificationMapBuilding *getModificationMapBuilding() const { return nullptr; }
+    virtual void setModificationMapBuilding(ModificationMapBuilding*) {}
 };

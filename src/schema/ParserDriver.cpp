@@ -94,11 +94,7 @@ int ParserDriver::parse(const std::string &s, Tokens *tokens)
 
     yylex_init(&scanner);
     yy_scan_string(s.c_str(), scanner);
-
-    yy::parser parser(*this);
-    parser.set_debug_level(debug);
-    int res = parser.parse();
-
+    auto res = parse();
     yylex_destroy(scanner);
 
     return res;
@@ -109,11 +105,15 @@ int ParserDriver::parse(const Tokens &tokens)
     parseMode = Mode::Tokens;
     tokensRead = &tokens;
     readIterator = tokensRead->cbegin();
+    auto res = parse();
+    return res;
+}
 
+int ParserDriver::parse()
+{
     yy::parser parser(*this);
     parser.set_debug_level(debug);
     int res = parser.parse();
-
     return res;
 }
 

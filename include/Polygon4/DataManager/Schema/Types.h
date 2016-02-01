@@ -48,6 +48,8 @@ enum ObjectFlag
     fNamesOrder,
     fSubtreeItem,
     fSplitBy,
+    fServiceDb,
+    fNoSave,
 
     // fields
     fPrimaryKey,

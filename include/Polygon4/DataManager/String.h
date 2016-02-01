@@ -40,6 +40,7 @@ namespace polygon4
 
 class String : public std::wstring
 {
+public:
     using base = std::wstring;
 
 public:
@@ -161,7 +162,7 @@ public:
     {
         return compare(s) > 0;
     }
-    
+
 private:
     template <typename T>
     String &assign(const T &s)
@@ -188,7 +189,7 @@ public:
     Blob(const void *data, size_t length);
     Blob(const Blob &rhs);
     ~Blob();
-    
+
     Blob &operator=(const Blob &rhs);
     Blob &operator=(const String &rhs) { return *this; }
 
@@ -206,8 +207,20 @@ public:
 private:
     data_type data;
     size_t length = 0;
-    
+
     void copy(const void *bytes, size_t len);
 };
 
+}
+
+namespace std
+{
+    template<>
+    struct hash<polygon4::String>
+    {
+        std::size_t operator()(const polygon4::String &s) const
+        {
+            return hash<typename polygon4::String::base>()(s);
+        }
+    };
 }

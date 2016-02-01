@@ -32,7 +32,7 @@ namespace detail
 {
 
 using CheckFunction = std::function<bool(IObjectBase*)>;
-    
+
 #include "detail/Storage.h"
 
 } // namespace detail

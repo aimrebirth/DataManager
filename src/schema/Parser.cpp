@@ -45,7 +45,7 @@ Schema convert(const ast::Schema &ast)
     // COPY
     s.version = ast.version;
 
-    // types 
+    // types
     for (auto &t : ast.types)
     {
         Type type;
@@ -145,6 +145,12 @@ Schema convert(const ast::Schema &ast)
             v.enumTypeName = av.getPropertyValue("enum_type");
             v.displayName = av.getPropertyValue("display_name");
             v.objectName = av.getPropertyValue("object_name");
+            {
+                auto f = av.getPropertyValue("from_version");
+                v.from_version = f.empty() ? 0 : std::stoi(f);
+                auto t = av.getPropertyValue("to_version");
+                v.to_version = t.empty() ? 0 : std::stoi(t);
+            }
             auto tn = find_type(av.type);
             auto t = s.typePtrs.find(tn);
             if (t == s.typePtrs.end())

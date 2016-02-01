@@ -1,5 +1,5 @@
 /*
- * Polygon-4 Engine
+ * Polygon-4 Data Manager
  * Copyright (C) 2015 lzwdgc
  *
  * This program is free software: you can redistribute it and/or modify
@@ -106,5 +106,5 @@ void Blob::copy(const void *bytes, size_t len)
     data = data_type(s, [](element_type *s) { delete[] s; });
     length = len;
 }
-    
+
 } // namespace polygon4

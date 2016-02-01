@@ -92,6 +92,7 @@ void Context::beginFunction(const Text &s)
 
 void Context::endFunction()
 {
+    emptyLines(0);
     endBlock();
     addLine();
 }

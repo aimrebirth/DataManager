@@ -60,4 +60,6 @@ private:
     Tokens *tokensWrite;
     const Tokens *tokensRead;
     Tokens::const_iterator readIterator;
+
+    int parse();
 };

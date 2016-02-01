@@ -18,18 +18,9 @@
 
 #pragma once
 
-#define POLYGON4_MECHANOID_INTERFACE
+#define POLYGON4_CONFIGURATION_INTERFACE
 
-class DLL_EXPORT IMechanoid : public detail::IObjectBase
+class DLL_EXPORT IConfiguration : public detail::IObjectBase
 {
 public:
-    virtual bool spawn() { return false; }
-
-    virtual ModificationPlayer *getPlayer() const { return nullptr; }
-    virtual void setPlayer(ModificationPlayer *in_player) {}
-    virtual bool isPlayer() const { return false; }
-
-    virtual void enterBuilding(MapBuilding *building) {}
-
-    virtual Configuration *getConfiguration() { return nullptr; }
 };

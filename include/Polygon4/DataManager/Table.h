@@ -34,9 +34,19 @@ namespace detail
 {
 
 template <class T>
-class CTable : public std::unordered_set<T*>
+class CVector : public std::vector<T*>
 {
 public:
+    using base = std::vector<T*>;
+    using value_type = typename base::value_type;
+
+public:
+    void insert(value_type p)
+    {
+        if (p)
+            push_back(p);
+    }
+
     OrderedObjectMap getOrderedObjectMap() const
     {
         OrderedObjectMap m;
@@ -83,18 +93,20 @@ public:
 
 public:
     // create value
-    ptr_type create()
+    template <class... Args>
+    ptr_type create(Args&&... args)
     {
-        auto ptr = T::template create<T>();
+        auto ptr = T::template create<T>(std::forward<Args>(args)...);
         auto raw = ptr.get();
         storage->db_objects.emplace_back(std::move(ptr));
         return raw;
     }
 
     // create value and append it to the end of container
-    ptr_type createAtEnd()
+    template <class... Args>
+    ptr_type createAtEnd(Args&&... args)
     {
-        auto v = create();
+        auto v = create(std::forward<Args>(args)...);
         v->setId(maxId);
         return base::operator[](maxId++) = v;
     }
@@ -185,12 +197,21 @@ public:
         return id_ptr_type(v->second);
     }
 
+    template <typename K>
+    KeyMap<K> get_key_map(K T::*p) const
+    {
+        KeyMap<K> map;
+        for (auto &v : *this)
+            map[v.second->*p] = v.second;
+        return map;
+    }
+
     template <typename F>
     iterator find_if(F &&f) { return std::find_if(begin(), end(), f); }
 
     template <typename F>
     const_iterator find_if(F &&f) const { return std::find_if(begin(), end(), f); }
-    
+
     size_t erase(const ptr_type &v)
     {
         return erase(v.get());
@@ -240,7 +261,52 @@ private:
                 break;
             }
         }
+        if (maxId == 0)
+            maxId = 1;
     }
+};
+
+template <typename T, typename K = int32_t>
+class CObjectArray : public CVector<T>
+{
+public:
+    using base = CVector<T>;
+    using value_type = typename base::value_type;
+
+    using unordered = std::unordered_map<K, value_type>;
+    using ordered = std::map<K, value_type>;
+
+public:
+    using base::base;
+    using base::operator[];
+    using base::size;
+
+    void insert(value_type p)
+    {
+        if (!p)
+            return;
+        if (mptr)
+            data[p->*mptr] = p;
+        push_back(p);
+    }
+
+    void setMemberPtr(K T::*p) { mptr = p; }
+
+    value_type operator[](const K &key)
+    {
+        return data[key];
+    }
+    value_type operator[](const K &key) const
+    {
+        return data[key];
+    }
+
+    unordered get_unordered() const { return data; }
+    ordered get_ordered() const { return ordered(data.begin(), data.end()); }
+
+private:
+    unordered data;
+    K T::*mptr = nullptr;
 };
 
 } // namespace detail

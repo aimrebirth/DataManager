@@ -1,5 +1,5 @@
 /*
- * Polygon-4 Engine
+ * Polygon-4 Data Manager
  * Copyright (C) 2015 lzwdgc
  *
  * This program is free software: you can redistribute it and/or modify

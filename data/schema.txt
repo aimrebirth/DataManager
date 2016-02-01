@@ -14,7 +14,7 @@
 
 globals
 {
-    version: "0.1.11"
+    version: "26"
 };
 
 types
@@ -94,7 +94,7 @@ enum EObjectType
 
     # other values
     InlineVariables { not_in_table; },
-    
+
     properties
     {
         ending: "s";
@@ -141,6 +141,12 @@ enum MessageType
     Text,
     Message,
     Packet,
+};
+
+enum ScriptLanguage
+{
+    None { not_in_table; },
+    Lua { default; },
 };
 
 ################################################################################
@@ -250,6 +256,33 @@ class Rating
 
 ########################################
 
+class Value
+{
+    i32 value_int;
+    f32 value_float;
+    str value_text;
+
+    properties
+    {
+        service;
+        inline;
+    }
+};
+
+class ValueWithBlob
+{
+    Value value;
+    blob value_blob;
+
+    properties
+    {
+        service;
+        inline;
+    }
+};
+
+########################################
+
 class LocalizedString
 {
     str ru { big_edit; };
@@ -259,6 +292,22 @@ class LocalizedString
     {
         service;
         prefixed;
+    }
+};
+
+########################################
+
+class DbSetting
+{
+    str key { pk; };
+    Value value;
+
+    properties
+    {
+        service;
+        service_db;
+        object_name: "key";
+        no_save;
     }
 };
 
@@ -427,7 +476,7 @@ class Player
         no_children;
         object_name: "modification";
     };
-    
+
     properties
     {
         object_name: "nickname";
@@ -447,7 +496,7 @@ class ModificationPlayer
     };
 
     ScriptVariable variables { container; };
-    
+
     properties
     {
         object_name: "to_string(player)";
@@ -462,10 +511,7 @@ class Setting
     i32 id { pk; };
     Player player;
     str key;
-    i32 value_int;
-    f32 value_float;
-    str value_text;
-    blob value_blob;
+    ValueWithBlob value;
 
     properties
     {
@@ -481,9 +527,7 @@ class ScriptVariable
     i32 id { pk; };
     ModificationPlayer player;
     str variable;
-    i32 value_int;
-    f32 value_float;
-    str value_text;
+    Value value;
 
     properties
     {
@@ -551,7 +595,7 @@ class Weapon
     String name;
     String description { enum_type: WeaponDescription; inline; initial_value: [ object: WeaponDescription; ]; };
     Resource resource;
-    
+
     WeaponType type;
     Projectile projectile;
     Standard standard;
@@ -615,6 +659,7 @@ class Mechanoid
     {
         getOrderedObjectMap: "map ? map->buildings : m";
     };
+    Configuration initial_configuration;
     Configuration configuration;
     Group group
     {
@@ -651,7 +696,7 @@ class Map
     f32 by;
 
     Blob heightmap;
-    
+
     MapBuilding buildings { container; };
     MapGood goods { container; };
     MapObject objects { container; };
@@ -676,7 +721,7 @@ class Modification
     str date_modified;
     str comment;
     str version;
-    str script_language;
+    ScriptLanguage script_language;
     str script_main;
 
     Player player;
@@ -704,6 +749,8 @@ class ModificationMap
 
     String description { enum_type: ModificationMapDescription; inline; initial_value: [ object: ModificationMapDescription; ]; };
 
+    str script_main;
+
     # containers
     ModificationMapBuilding buildings { container; };
 
@@ -717,6 +764,8 @@ class ModificationMap
 class ModificationMapBuilding
 {
     i32 id { pk; };
+    str text_id;
+
     ModificationMap map { pk; };
     MapBuilding building
     {
@@ -884,9 +933,9 @@ class Quest
 
     String title            { enum_type: QuestTitle; inline; initial_value: [ object: QuestTitle; ]; };
     String description      { enum_type: QuestDescription; inline; initial_value: [ object: QuestDescription; ]; };
-    
+
     i32 time;
-    
+
     Money money;
     Rating rating;
 
@@ -898,7 +947,12 @@ class Quest
     QuestRewardReputation reputations { container; subtree_item: "Rewards"; };
     QuestRewardWeapon weapons { container; subtree_item: "Rewards"; };
 
-    QuestString strings { container; };
+    QuestString strings
+    {
+        container;
+        array;
+        array_key: text_id;
+    };
 
     properties
     {
@@ -1052,7 +1106,7 @@ class Clan
     f32 noblivion;
     f32 playereffect;
     i32 color;
-    
+
     ClanMechanoid mechanoids { container; };
     ClanReputation reputations { container; };
 

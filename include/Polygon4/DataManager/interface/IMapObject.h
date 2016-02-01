@@ -24,6 +24,4 @@ class DLL_EXPORT IMapObject : public detail::IObjectBase
 {
 public:
     virtual bool spawn() { return false; }
-
-protected:
 };

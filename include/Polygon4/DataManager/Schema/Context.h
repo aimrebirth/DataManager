@@ -87,7 +87,7 @@ public:
             after_ = std::make_shared<Context>();
         return *after_;
     }
-    
+
     void emptyLines(int n);
 
     // add with "as is" indent
