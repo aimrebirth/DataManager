@@ -130,10 +130,13 @@ public:
     {
         static_assert(sizeof(New) <= alloc_size, "Object size is greater than maximum alloc size. Increase limit.");
 
+        if (p->replaced_)
+            return (New *)p;
         Old o = *p;
         p->~Old();
         auto n = new (p) New(o, std::forward<Args>(args)...);
         n->initChildren();
+        p->replaced_ = true;
         return n;
     }
 #endif
@@ -159,7 +162,8 @@ public:
 
     // data
 public:
-    Storage *storage;
+    Storage *storage_ = nullptr;
+    bool replaced_ = false;
 protected:
     int id = 0;
 
@@ -171,6 +175,11 @@ protected:
         item->update();
         return item;
     }
+
+public:
+    void setStorage(Storage *storage) { storage_ = storage; }
+    Storage *getStorage() const { return storage_; }
+    bool isReplaced() const { return replaced_; }
 
 public:
     static bool replaceable;

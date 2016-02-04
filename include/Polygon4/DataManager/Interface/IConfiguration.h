@@ -20,7 +20,15 @@
 
 #define POLYGON4_CONFIGURATION_INTERFACE
 
-class DLL_EXPORT IConfiguration : public detail::IObjectBase
+class DLL_EXPORT IConfiguration : public IObjectBase
 {
 public:
+    virtual void addObject(IObjectBase *) {}
+
+    virtual void addEquipment(Equipment *) {}
+    virtual void addGlider(Glider *) {}
+    virtual void addGood(Good *) {}
+    virtual void addModificator(Modificator *) {}
+    virtual void addProjectile(Projectile *) {}
+    virtual void addWeapon(Weapon *) {}
 };

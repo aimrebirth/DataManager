@@ -344,6 +344,9 @@ ModuleContext Schema::printStorage() const
     mc.hpp.addLineNoSpace("public:");
     mc.hpp.addLine("int get_storage_version() const;");
     mc.hpp.addLine("int get_db_version() const;");
+    mc.hpp.addLine();
+    mc.hpp.addLineNoSpace("public:");
+    mc.hpp.addLine("static std::string getSql();");
     mc.hpp.endBlock(true);
 
     // cpp
@@ -368,6 +371,15 @@ ModuleContext Schema::printStorage() const
     mc.cpp.endFunction();
     mc.cpp.beginFunction("int Storage::get_db_version() const");
     mc.cpp.addLine("return db_version;");
+    mc.cpp.endFunction();
+    mc.cpp.beginFunction("std::string Storage::getSql()");
+    mc.cpp.addLine("std::string sql;");
+    executeForClasses([&mc](const auto &cls)
+    {
+        for (auto &c : cls)
+            mc.cpp.addLine("sql += " + c.getCppName() + "::getSql();");
+    });
+    mc.cpp.addLine("return sql;");
     mc.cpp.endFunction();
     return mc;
 }
@@ -1354,6 +1366,54 @@ ModuleContext Class::print(const Schema &schema) const
         mc.cpp.endFunction();
     }
 
+    // public
+    mc.hpp.emptyLines(1);
+    mc.hpp.addLineNoSpace("public:");
+
+    // deepCopyFrom()
+    {
+        mc.hpp.addLine("void deepCopyFrom(const " + getCppName() + " &rhs);");
+
+        mc.cpp.beginFunction("void " + getCppName() + "::deepCopyFrom(const " + getCppName() + " &rhs)");
+        for (auto &v : vars)
+        {
+            if (v.isId())
+                continue;
+            mc.cpp.addLine(v.getPrefixedName() + " = rhs." + v.getPrefixedName() + ";");
+        }
+        if (!vars_container.empty())
+        {
+            mc.cpp.addLine();
+            mc.cpp.addLine("auto s = getStorage();");
+            mc.cpp.addLine();
+            for (auto &v : vars_container)
+            {
+                mc.cpp.addLine(v.getPrefixedName() + " = rhs." + v.getPrefixedName() + ";");
+
+                auto vclass = (Class *)v.getType();
+                if (vclass->getFlags()[fProxy])
+                {
+                    std::string var_name = vclass->getChild()->getCppVariableName();
+                    for (auto &v2 : vclass->getVariables())
+                    {
+                        if (vclass->getParent()->getName() == v2.getType()->getName())
+                        {
+                            var_name = v2.getName();
+                            break;
+                        }
+                    }
+                    mc.cpp.beginBlock("for (auto &v : " + v.getPrefixedName() + ")");
+                    mc.cpp.addLine("auto v2 = s->" + vclass->getCppArrayVariableName() + ".createAtEnd(*v);");
+                    mc.cpp.addLine("v2->" + var_name + " = this;");
+                    mc.cpp.addLine("v = v2;");
+                    mc.cpp.endBlock();
+                    mc.cpp.addLine();
+                }
+            }
+        }
+        mc.cpp.endFunction();
+    }
+
     // private
     mc.hpp.emptyLines(1);
     mc.hpp.addLineNoSpace("private:");
@@ -1426,7 +1486,6 @@ ModuleContext Class::printIo() const
         mc.cpp.addLine("while (sqlite3_step(stmt) == SQLITE_ROW)");
         mc.cpp.beginBlock();
         mc.cpp.addLine("auto v = " + getCppArrayVariableName() + ".create();");
-        mc.cpp.addLine("v->storage = this;");
         for (auto &v : vars)
         {
             v.printLoadSqlite3(mc.cpp, "v");

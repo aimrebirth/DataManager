@@ -39,6 +39,8 @@ class CVector : public std::vector<T*>
 public:
     using base = std::vector<T*>;
     using value_type = typename base::value_type;
+    using iterator = typename base::iterator;
+    using const_iterator = typename base::const_iterator;
 
 public:
     void insert(value_type p)
@@ -99,6 +101,7 @@ public:
         auto ptr = T::template create<T>(std::forward<Args>(args)...);
         auto raw = ptr.get();
         storage->db_objects.emplace_back(std::move(ptr));
+        raw->setStorage(storage);
         return raw;
     }
 

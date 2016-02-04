@@ -14,7 +14,7 @@
 
 globals
 {
-    version: "26"
+    version: "30"
 };
 
 types
@@ -26,6 +26,8 @@ types
 
     str -> Text;
     blob -> Blob;
+
+    date -> i32;
 
     Quantity -> i32;
 
@@ -147,6 +149,14 @@ enum ScriptLanguage
 {
     None { not_in_table; },
     Lua { default; },
+};
+
+enum JournalRecordType
+{
+    None { default; not_in_table; },
+    InProgress,
+    Completed,
+    Failed,
 };
 
 ################################################################################
@@ -369,6 +379,7 @@ class Equipment
     f32 value3;
     bool manual;
     Price price;
+    i32 max_count = 1;
     bool notrade;
 
     properties
@@ -433,6 +444,7 @@ class Good
     Weight weight;
     bool notrade;
     i32 type;
+    i32 max_count = 1;
 
     properties
     {
@@ -495,6 +507,7 @@ class ModificationPlayer
         getOrderedObjectMap: "modification->mechanoids";
     };
 
+    JournalRecord records { container; };
     ScriptVariable variables { container; };
 
     properties
@@ -521,6 +534,22 @@ class Setting
 };
 
 ########################################
+
+class JournalRecord
+{
+    i32 id { pk; };
+    str text_id;
+    ModificationPlayer player;
+    Message message;
+    date date;
+    JournalRecordType type;
+
+    properties
+    {
+        object_name: "text_id";
+        parent: ModificationPlayer;
+    }
+};
 
 class ScriptVariable
 {
@@ -832,6 +861,7 @@ class Modificator
     f32 k_param2;
     i32 unicum_id;
     i32 mask;
+    i32 max_count = 1;
 
     properties
     {
@@ -852,6 +882,7 @@ class Configuration
 
     ConfigurationEquipment equipments { container; };
     ConfigurationGood goods { container; };
+    ConfigurationModificator modificators { container; };
     ConfigurationProjectile projectiles { container; };
     ConfigurationWeapon weapons { container; };
 
@@ -887,6 +918,21 @@ class ConfigurationGood
     {
         parent: Configuration;
         child: Good;
+        proxy;
+    }
+};
+
+class ConfigurationModificator
+{
+    Configuration configuration;
+    Modificator modificator;
+
+    Quantity quantity = 1;
+
+    properties
+    {
+        parent: Configuration;
+        child: Modificator;
         proxy;
     }
 };
