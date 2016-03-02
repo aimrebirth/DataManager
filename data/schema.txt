@@ -14,7 +14,7 @@
 
 globals
 {
-    version: "30"
+    version: "31"
 };
 
 types
@@ -152,6 +152,14 @@ enum ScriptLanguage
 };
 
 enum JournalRecordType
+{
+    None { default; not_in_table; },
+    InProgress,
+    Completed,
+    Failed,
+};
+
+enum QuestRecordType
 {
     None { default; not_in_table; },
     InProgress,
@@ -508,6 +516,7 @@ class ModificationPlayer
     };
 
     JournalRecord records { container; };
+    QuestRecord quests { container; };
     ScriptVariable variables { container; };
 
     properties
@@ -538,7 +547,6 @@ class Setting
 class JournalRecord
 {
     i32 id { pk; };
-    str text_id;
     ModificationPlayer player;
     Message message;
     date date;
@@ -546,7 +554,22 @@ class JournalRecord
 
     properties
     {
-        object_name: "text_id";
+        object_name: "to_string(message)";
+        parent: ModificationPlayer;
+    }
+};
+
+class QuestRecord
+{
+    i32 id { pk; };
+    ModificationPlayer player;
+    Quest quest;
+    date date;
+    QuestRecordType type;
+
+    properties
+    {
+        object_name: "to_string(quest)";
         parent: ModificationPlayer;
     }
 };
@@ -778,7 +801,8 @@ class ModificationMap
 
     String description { enum_type: ModificationMapDescription; inline; initial_value: [ object: ModificationMapDescription; ]; };
 
-    str script_main;
+    str script_dir;
+    str script_name;
 
     # containers
     ModificationMapBuilding buildings { container; };
@@ -805,6 +829,8 @@ class ModificationMapBuilding
     String name { enum_type: Building; };
     String name_ending { enum_type: MapBuildingNameEnding; initial_value: [ object: MapBuildingNameEnding; ]; };
     String description { enum_type: MapBuildingDescription; inline; initial_value: [ object: MapBuildingDescription; ]; };
+
+    str script_name;
 
     bool interactive;
 

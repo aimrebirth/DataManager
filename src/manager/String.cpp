@@ -96,7 +96,7 @@ bool Blob::operator!=(const Blob &rhs) const
 }
 
 Blob::data_type Blob::getData() const { return data; }
-Blob::element_type *Blob::getRawData() const { return data.get(); }
+Blob::element_type *Blob::getRawData() const { return length == 0 ? nullptr : data.get(); }
 size_t Blob::getLength() const { return length; }
 
 void Blob::copy(const void *bytes, size_t len)

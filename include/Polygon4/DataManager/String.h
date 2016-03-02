@@ -163,6 +163,23 @@ public:
         return compare(s) > 0;
     }
 
+    String operator+(const String &s) const
+    {
+        String tmp = *this;
+        tmp.base::operator+=(s);
+        return tmp;
+    }
+    String &operator+=(const std::string &s)
+    {
+        base::operator+=(String(s));
+        return *this;
+    }
+    String &operator+=(String &&s)
+    {
+        base::operator+=(std::move(s));
+        return *this;
+    }
+
 private:
     template <typename T>
     String &assign(const T &s)
