@@ -488,6 +488,8 @@ ModuleContext Schema::printStorageImplementation() const
             mc.cpp.addLine("_save" + c.getSqlName() + "();");
             mc.cpp.addLine("PROGRESS_CALLBACK(" + std::to_string(progress += step) + ");");
         }
+        mc.cpp.addLine();
+        mc.cpp.addLine("db->save();");
         mc.cpp.endFunction();
     }
 

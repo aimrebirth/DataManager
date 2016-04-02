@@ -30,7 +30,7 @@ namespace polygon4
 {
 
 class DLL_EXPORT Database
-{    
+{
     typedef int(*Sqlite3Callback)(void*, int, char**, char**);
     typedef std::function<int(int, char**, char**)> DatabaseCallback;
 
@@ -39,6 +39,8 @@ public:
     ~Database();
 
     void loadDatabase(const std::string &dbname);
+    void save() const;
+
     bool isLoaded() const;
     sqlite3 *getDb() const;
 
