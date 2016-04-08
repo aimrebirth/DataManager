@@ -489,13 +489,6 @@ class Player
     IP ip;
 
     Setting settings { container; };
-    #ModificationPlayer modifications
-    #{
-    #    container;
-    #    read_only;
-    #    no_children;
-    #    object_name: "modification";
-    #};
 
     properties
     {

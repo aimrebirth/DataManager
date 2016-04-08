@@ -309,6 +309,7 @@ ModuleContext Schema::printStorage() const
     mc.hpp.addLine();
     mc.hpp.addLine("virtual void load(ProgressCallback callback = ProgressCallback()) = 0;");
     mc.hpp.addLine("virtual void save(ProgressCallback callback = ProgressCallback()) const = 0;");
+    mc.hpp.addLine("virtual void save(const std::string &fn) const = 0;");
     mc.hpp.addLine();
     mc.hpp.addLine("virtual Ptr<TreeItem> printTree() const = 0;");
     mc.hpp.addLine();
@@ -396,7 +397,7 @@ ModuleContext Schema::printStorageImplementation() const
     mc.hpp.addLine();
     mc.hpp.beginFunction("class StorageImpl : public Storage");
     mc.hpp.addLineNoSpace("private:");
-    mc.hpp.addLine("std::shared_ptr<Database> db;");
+    mc.hpp.addLine("mutable std::shared_ptr<Database> db;");
     mc.hpp.addLine();
     mc.hpp.addLineNoSpace("private:");
 
@@ -490,6 +491,19 @@ ModuleContext Schema::printStorageImplementation() const
         }
         mc.cpp.addLine();
         mc.cpp.addLine("db->save();");
+        mc.cpp.endFunction();
+    }
+
+    // save(fn)
+    {
+        mc.hpp.addLine("virtual void save(const std::string &fn) const override;");
+
+        mc.cpp.beginFunction("void " + storageImpl + "::save(const std::string &fn) const");
+        mc.cpp.addLine("auto old = db;");
+        mc.cpp.addLine("db = std::make_shared<Database>(fn);");
+        mc.cpp.addLine("create();");
+        mc.cpp.addLine("save();");
+        mc.cpp.addLine("db = old;");
         mc.cpp.endFunction();
     }
 
@@ -1413,6 +1427,24 @@ ModuleContext Class::print(const Schema &schema) const
                 }
             }
         }
+        mc.cpp.endFunction();
+    }
+
+    // deepClone(): deepCopyFrom() + copy id
+    {
+        mc.hpp.addLine(getCppName() + " deepClone();");
+
+        mc.cpp.beginFunction(getCppName() + " " + getCppName() + "::deepClone()");
+        mc.cpp.addLine(getCppName() + " v;");
+        mc.cpp.addLine("v.deepCopyFrom(*this);");
+        // deepCopyFrom() does not copy id field, but here it's important for us
+        for (auto &v : vars)
+        {
+            if (!v.isId())
+                continue;
+            mc.cpp.addLine("v." + v.getPrefixedName() + " = " + v.getPrefixedName() + ";");
+        }
+        mc.cpp.addLine("return v;");
         mc.cpp.endFunction();
     }
 

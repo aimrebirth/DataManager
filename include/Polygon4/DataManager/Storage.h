@@ -41,8 +41,8 @@ using detail::Storage;
 class Database;
 
 DLL_EXPORT
-std::shared_ptr<Storage> initStorage(std::string filename);
+std::shared_ptr<Storage> initStorage(const std::string &filename);
 DLL_EXPORT
-std::shared_ptr<Storage> initStorage(std::shared_ptr<Database> db);
+std::shared_ptr<Storage> initStorage(const std::shared_ptr<Database> &db);
 
 } // namespace polygon4
