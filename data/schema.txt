@@ -14,7 +14,7 @@
 
 globals
 {
-    version: "31"
+    version: "32"
 };
 
 types
@@ -533,6 +533,13 @@ class Setting
         object_name: "key";
         parent: Player;
     }
+};
+
+########################################
+
+class SaveGame
+{
+    Modification modification;
 };
 
 ########################################

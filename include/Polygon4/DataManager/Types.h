@@ -222,6 +222,11 @@ struct IdPtr
         id = i;
         return *this;
     }
+    IdPtr &operator=(const IdPtr &rhs)
+    {
+        *this = rhs.ptr;
+        return *this;
+    }
     template <class V>
     IdPtr &operator=(const IdPtr<V> &rhs)
     {
@@ -231,6 +236,13 @@ struct IdPtr
     IdPtr &operator=(const Ptr<T> &rhs)
     {
         return *this = rhs.get();
+    }
+    IdPtr &operator=(const base_type *rhs)
+    {
+        ptr = rhs;
+        if (ptr)
+            id = ptr->id;
+        return *this;
     }
     IdPtr &operator=(base_type *rhs)
     {
