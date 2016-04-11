@@ -14,7 +14,7 @@
 
 globals
 {
-    version: "32"
+    version: "33"
 };
 
 types
@@ -508,7 +508,12 @@ class ModificationPlayer
         getOrderedObjectMap: "modification->mechanoids";
     };
 
-    JournalRecord records { container; };
+    JournalRecord records
+    {
+        container;
+        array;
+        array_key: "text_id";
+    };
     QuestRecord quests { container; };
     ScriptVariable variables { container; };
 
@@ -548,6 +553,7 @@ class JournalRecord
 {
     i32 id { pk; };
     ModificationPlayer player;
+    str text_id;
     Message message;
     date date;
     JournalRecordType type;

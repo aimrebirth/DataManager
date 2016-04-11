@@ -295,11 +295,11 @@ public:
 
     void setMemberPtr(K T::*p) { mptr = p; }
 
-    value_type operator[](const K &key)
+    value_type &operator[](const K &key)
     {
         return data[key];
     }
-    value_type operator[](const K &key) const
+    const value_type &operator[](const K &key) const
     {
         return data[key];
     }
