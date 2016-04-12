@@ -32,4 +32,16 @@ public:
     virtual void enterBuilding(MapBuilding *building) {}
 
     virtual Configuration *getConfiguration() { return nullptr; }
+
+    virtual float getMoney() const { return 0.0f; }
+    virtual bool hasMoney(float m) const { return false; }
+    virtual void setMoney(float m) { }
+
+    virtual float getRating(RatingType type = RatingType::Normal) const { return 0.0f; }
+    virtual bool hasRating(float rating, RatingType type = RatingType::Normal) const { return false; }
+    virtual void setRating(float rating, RatingType type = RatingType::Normal) { }
+
+    virtual int getRatingLevel(RatingType type = RatingType::Normal) const { return 0; }
+    virtual bool hasRatingLevel(int level, RatingType type = RatingType::Normal) const { return false; }
+    virtual void setRatingLevel(int level, RatingType type = RatingType::Normal) { }
 };

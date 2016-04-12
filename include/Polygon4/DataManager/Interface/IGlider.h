@@ -18,21 +18,10 @@
 
 #pragma once
 
-#define POLYGON4_CONFIGURATION_INTERFACE
+#define POLYGON4_GLIDER_INTERFACE
 
-class DLL_EXPORT IConfiguration : public IObjectBase
+class DLL_EXPORT IGlider : public IObjectBase
 {
 public:
-    virtual void addObject(IObjectBase *) {}
-
-    virtual void addEquipment(Equipment *) {}
-    virtual void addGlider(Glider *) {}
-    virtual void addGood(Good *) {}
-    virtual void addModificator(Modificator *) {}
-    virtual void addProjectile(Projectile *) {}
-    virtual void addWeapon(Weapon *) {}
-
-    virtual float getMass() const { return 0.0f; }
-    virtual float getTotalMass() const { return 0.0f; }
     virtual float getCapacity() const { return 0.0f; }
 };

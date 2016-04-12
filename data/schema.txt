@@ -35,7 +35,7 @@ types
     Money -> Price;
     Weight -> f32;
     Damage -> f32;
-    RatingType -> f32;
+    Rating -> f32;
     Reputation -> f32;
 
     Resource -> str;
@@ -167,6 +167,14 @@ enum QuestRecordType
     Failed,
 };
 
+enum RatingType
+{
+    Normal,
+    Courier,
+    Fight,
+    Trade,
+};
+
 ################################################################################
 #
 # classes
@@ -248,22 +256,6 @@ class Coordinate
 {
     Location location;
     Rotation rotation;
-
-    properties
-    {
-        service;
-        inline;
-    }
-};
-
-########################################
-
-class Rating
-{
-    RatingType rating;
-    RatingType rating_fight;
-    RatingType rating_courier;
-    RatingType rating_trade;
 
     properties
     {
@@ -725,7 +717,10 @@ class Mechanoid
     };
     i32 generation;
     Money money;
-    Rating rating;
+    Rating rating = 1;
+    Rating rating_fight = 1;
+    Rating rating_courier = 1;
+    Rating rating_trade = 1;
     Coordinate coordinate;
     bool enabled = true;
 
@@ -1016,6 +1011,9 @@ class Quest
 
     Money money;
     Rating rating;
+    Rating rating_fight;
+    Rating rating_courier;
+    Rating rating_trade;
 
     QuestRewardEquipment equipments { container; subtree_item: "Rewards"; };
     QuestRewardGlider gliders { container; subtree_item: "Rewards"; };

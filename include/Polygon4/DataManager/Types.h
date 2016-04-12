@@ -160,13 +160,11 @@ public:
 
     bool operator<(const IObjectBase &rhs) const { return getName() < rhs.getName(); }
 
-    // data
-public:
-    Storage *storage_ = nullptr;
-    bool replaced_ = false;
-protected:
-    int id = 0;
+    void setStorage(Storage *storage) { storage_ = storage; }
+    Storage *getStorage() const { return storage_; }
+    bool isReplaced() const { return replaced_; }
 
+protected:
     Ptr<TreeItem> createTreeItem(TreeItem *parent = nullptr) const
     {
         auto item = std::make_shared<TreeItem>();
@@ -176,11 +174,14 @@ protected:
         return item;
     }
 
-public:
-    void setStorage(Storage *storage) { storage_ = storage; }
-    Storage *getStorage() const { return storage_; }
-    bool isReplaced() const { return replaced_; }
+    // data
+protected:
+    int id = 0;
+private:
+    Storage *storage_ = nullptr;
+    bool replaced_ = false;
 
+    // static & friends
 public:
     static bool replaceable;
 
@@ -340,6 +341,7 @@ using detail::KeyMap;
 } // namespace polygon4
 
 #include "detail/ForwardDeclarations.h"
+#include "detail/Enums.h"
 
 namespace polygon4
 {
@@ -351,6 +353,7 @@ namespace detail
 {
 
 #include "interface/IConfiguration.h"
+#include "interface/IGlider.h"
 #include "interface/IMap.h"
 #include "interface/IMapObject.h"
 #include "interface/IMapBuilding.h"
@@ -366,5 +369,4 @@ namespace detail
 #undef DECLARE_INTERFACE_STUB
 
 #include "Table.h"
-#include "detail/Enums.h"
 #include "detail/Types.h"

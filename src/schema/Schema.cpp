@@ -2010,13 +2010,13 @@ std::string Variable::print() const
         if (getDataType() == DataType::Integer ||
             getDataType() == DataType::Real ||
             getDataType() == DataType::Bool)
-            s += " = " + getDefaultValue();
+            s += "{ " + getDefaultValue() + " }";
         auto dv = getDefaultValue();
         if (!dv.empty())
         {
             if (getDataType() == DataType::Enum)
             {
-                s += " = " + getDefaultValue();
+                s += "{ " + getDefaultValue() + " }";
             }
         }
     }
