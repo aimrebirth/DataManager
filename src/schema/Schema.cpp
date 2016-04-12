@@ -657,53 +657,10 @@ ModuleContext Schema::printStorageImplementation() const
                     mc.cpp.addLine("p = p->parent;");
                     mc.cpp.decreaseIndent();
                 }
-                // auto set fields
-                /*auto sw = [&](const std::string &item)
-                {
-                    mc.cpp.beginBlock("switch (" + item + "->type)", false);
-                    for (auto &c2 : cls)
-                    {
-                        const auto vars = c2.getVariables();
-                        const auto vars_inline = vars({ fInline });
-                        for (auto &v : vars_inline)
-                        {
-                            if (v.hasFlags({ fArray }))
-                                continue;
-                            if (v.getType()->getCppName() != c.getCppName())
-                                continue;
-                            mc.cpp.addLine("case " + objectType + "::" + c2.getCppName() + ":");
-                            mc.cpp.beginBlock();
-                            auto &ivs = v.getInitialValues();
-                            for (auto &iv : ivs)
-                            {
-                                auto &iv_var = iv.first;
-                                std::string enum_name;
-                                if (iv_var.getType()->getCppName() == objectType)
-                                    enum_name = objectType + "::";
-                                mc.cpp.addLine("v->" + iv.first.getName() + " = " + enum_name + iv.second + ";");
-                            }
-                            mc.cpp.addLine("break;");
-                            mc.cpp.endBlock();
-                        }
-                    }
-                    mc.cpp.addLine("default:");
-                    mc.cpp.increaseIndent();
-                    mc.cpp.addLine("break;");
-                    mc.cpp.endBlock();
-                };*/
                 mc.cpp.addLine("auto v = add" + c.getCppName() + "(" + (c.getParent() ? "p->parent->object" : "") + ");");
                 mc.cpp.beginBlock("if (item->inlineVariable)");
                 mc.cpp.addLine("*(" + dataClassPtr + "<" + c.getCppName() + ">*)item->inlineVariable = v;");
                 mc.cpp.addLine("item->object = v.get();");
-                //mc.cpp.addLine("auto i = std::find_if(item->parent->children.begin(), item->parent->children.end(), [item](const auto &c) { return c.get() == item; });");
-                //mc.cpp.addLine("tmp = *i;");
-                // FIXME: ?
-                //mc.cpp.addLine("item = item->parent;");
-                //mc.cpp.addLine("while (!item->object)");
-                //mc.cpp.increaseIndent();
-                //mc.cpp.addLine("item = item->parent;");
-                //mc.cpp.decreaseIndent();
-                //sw("item");
                 mc.cpp.endBlock();
                 mc.cpp.beginBlock("else");
                 mc.cpp.addLine("item->children.push_back(tmp = v->printTree());");
@@ -711,11 +668,6 @@ ModuleContext Schema::printStorageImplementation() const
                 mc.cpp.endBlock();
                 mc.cpp.beginBlock("if (item->objectArrayVariable)");
                 mc.cpp.addLine("auto vec = (" + objectArray + "<" + c.getCppName() + ">*)item->objectArrayVariable;");
-                //mc.cpp.addLine("while (!item->object)");
-                //mc.cpp.increaseIndent();
-                //mc.cpp.addLine("item = item->parent;");
-                //mc.cpp.decreaseIndent();
-                //sw("item");
                 mc.cpp.addLine("vec->push_back(v);");
                 mc.cpp.endBlock();
                 mc.cpp.addLine("break;");
@@ -1571,18 +1523,6 @@ ModuleContext Class::printIo() const
                     mc.cpp.beginBlock("if (" + v.getName() + " != " + name2 + ".end())");
                     mc.cpp.addLine("v = *" + v.getName() + ";");
                     mc.cpp.endBlock();
-                    // auto create and set inline fields
-                    /*mc.cpp.beginBlock("else");
-                    mc.cpp.addLine("v = add" + v.getType()->getCppName() + "();");
-                    for (auto &iv : v.getInitialValues())
-                    {
-                        auto &iv_var = iv.first;
-                        std::string enum_name;
-                        if (iv_var.getType()->getCppName() == objectType)
-                            enum_name = objectType + "::";
-                        mc.cpp.addLine("v->" + iv.first.getName() + " = " + enum_name + iv.second + ";");
-                    }
-                    mc.cpp.endBlock();*/
                     mc.cpp.addLine(var_name + ".add_key(v->" + v.getArrayKey()->getName() + ", i)" + ";");
                     mc.cpp.endBlock();
                 }
@@ -1592,20 +1532,6 @@ ModuleContext Class::printIo() const
                     mc.cpp.beginBlock("if (" + v.getName() + " != " + name2 + ".end())");
                     mc.cpp.addLine(var + "->" + v.getName() + " = IdPtr<" + getCppName() + ">(" + v.getName() + "->second);");
                     mc.cpp.endBlock();
-                    /*if (v.hasFlags({ fInline }))
-                    {
-                        mc.cpp.beginBlock("else");
-                        mc.cpp.addLine(var + "->" + v.getName() + " = add" + v.getType()->getCppName() + "();");
-                        for (auto &iv : v.getInitialValues())
-                        {
-                            auto &iv_var = iv.first;
-                            std::string enum_name;
-                            if (iv_var.getType()->getCppName() == objectType)
-                                enum_name = objectType + "::";
-                            mc.cpp.addLine(var + "->" + v.getName() + "->" + iv.first.getName() + " = " + enum_name + iv.second + ";");
-                        }
-                        mc.cpp.endBlock();
-                    }*/
                 }
                 prev = true;
             }
@@ -1728,21 +1654,6 @@ ModuleContext Class::printAddDeleteRecord() const
 
         mc.cpp.beginFunction("" + dataClassPtr + "<" + getCppName() + "> " + storageImpl + "::add" + getCppName() + "(" + param + ")");
         mc.cpp.addLine("auto v = " + getCppArrayVariableName() + ".createAtEnd();");
-        /*for (auto &v : vars_inline)
-        {
-            if (v.hasFlags({ fArray }))
-                continue;
-            mc.cpp.addLine("v->" + v.getName() + " = " + v.getType()->getCppArrayVariableName() + ".createAtEnd();");
-            auto &ivs = v.getInitialValues();
-            for (auto &iv : ivs)
-            {
-                auto &iv_var = iv.first;
-                std::string enum_name;
-                if (iv_var.getType()->getCppName() == objectType)
-                    enum_name = objectType + "::";
-                mc.cpp.addLine("v->" + v.getName() + "->" + iv.first.getName() + " = " + enum_name + iv.second + ";");
-            }
-        }*/
         if (getParent())
         {
             std::string param_name = "parent";
