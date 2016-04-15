@@ -105,9 +105,6 @@ public:
 
     virtual const Class &getClass() const = 0;
 
-protected:
-    virtual void initChildren() {}
-
 public:
 #ifndef SWIG
     template <class T, class... Args>
@@ -121,7 +118,6 @@ public:
         auto memory = new alloc_type[size];
         auto raw = new (memory) T(std::forward<Args>(args)...);
         auto p = std::unique_ptr<T, deleter>(raw, [](auto p) { delete[](alloc_type*)p; });
-        p->initChildren();
         return p;
     }
 
@@ -135,7 +131,6 @@ public:
         Old o = *p;
         p->~Old();
         auto n = new (p) New(o, std::forward<Args>(args)...);
-        n->initChildren();
         p->replaced_ = true;
         return n;
     }

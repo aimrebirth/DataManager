@@ -1270,48 +1270,6 @@ ModuleContext Class::print(const Schema &schema) const
         mc.cpp.endFunction();
     }
 
-    // protected
-    if (!vars_container.empty())
-    {
-        mc.hpp.emptyLines(1);
-        mc.hpp.addLineNoSpace("protected:");
-
-        // init children
-        for (auto &v : vars_container)
-        {
-            if (v.getFlags()[fArray])
-                continue;
-            mc.hpp.addLine("template <class T, class... Args>");
-            mc.hpp.addLine("void init" + v.getNameWithCaptitalLetter() + "(Args&&... args);");
-            mc.hpp.addLine();
-
-            auto &c = mc.hpp.after();
-            c.addLine("template <class T, class... Args>");
-            c.beginFunction("void " + getCppName() + "::init" + v.getNameWithCaptitalLetter() + "(Args&&... args)");
-            c.addLine("for (auto &v : " + v.getName() + ")");
-            c.beginBlock();
-            auto vclass = (Class *)v.getType();
-            if (vclass->getFlags()[fProxy])
-            {
-                std::string var_name = vclass->getChild()->getCppVariableName();
-                for (auto &v2 : vclass->getVariables())
-                {
-                    if (vclass->getChild()->getName() == v2.getType()->getName())
-                    {
-                        var_name = v2.getName();
-                        break;
-                    }
-                }
-                c.addLine("auto p = v->" + var_name + ".get();");
-            }
-            else
-                c.addLine("auto p = v;");
-            c.addLine("replace<T>(p, std::forward<Args>(args)...);");
-            c.endBlock();
-            c.endFunction();
-        }
-    }
-
     // private
     mc.hpp.emptyLines(1);
     mc.hpp.addLineNoSpace("private:");

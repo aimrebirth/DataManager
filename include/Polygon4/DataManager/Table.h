@@ -304,6 +304,11 @@ public:
         return data[key];
     }
 
+    size_t count(const K &key) const
+    {
+        return data.count(key);
+    }
+
     unordered get_unordered() const { return data; }
     ordered get_ordered() const { return ordered(data.begin(), data.end()); }
 

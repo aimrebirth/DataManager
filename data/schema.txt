@@ -14,7 +14,7 @@
 
 globals
 {
-    version: "33"
+    version: "34"
 };
 
 types
@@ -27,7 +27,7 @@ types
     str -> Text;
     blob -> Blob;
 
-    date -> i32;
+    timestamp -> f32;
 
     Quantity -> i32;
 
@@ -537,6 +537,7 @@ class Setting
 class SaveGame
 {
     Modification modification;
+    timestamp playtime;
 };
 
 ########################################
@@ -547,7 +548,7 @@ class JournalRecord
     ModificationPlayer player;
     str text_id;
     Message message;
-    date date;
+    timestamp time;
     JournalRecordType type;
 
     properties
@@ -562,7 +563,7 @@ class QuestRecord
     i32 id { pk; };
     ModificationPlayer player;
     Quest quest;
-    date date;
+    timestamp time;
     QuestRecordType type;
 
     properties
