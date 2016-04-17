@@ -26,7 +26,14 @@ DECLARE_STATIC_LOGGER(logger, "tr");
 namespace polygon4
 {
 
-LocalizationType gCurrentLocalizationId = LocalizationType::ru;
+LocalizationType getCurrentLocalizationId(LocalizationType type)
+{
+    static LocalizationType loc = LocalizationType::ru;
+    if (type != LocalizationType::max)
+        loc = type;
+    return loc;
+}
+
 Translator translator;
 extern const Translator::translator_type translator_data;
 
@@ -34,6 +41,80 @@ extern const Translator::translator_type translator_data;
 
 namespace polygon4
 {
+
+LocalizedString::LocalizedString()
+{
+}
+
+LocalizedString::LocalizedString(const std::initializer_list<string_type> &list)
+{
+    auto max = size();
+    if (list.size() < max)
+        max = list.size();
+    auto i1 = begin();
+    auto i2 = list.begin();
+    for (size_t i = 0; i < max; i++)
+        *i1++ = *i2++;
+}
+
+size_t LocalizedString::size() const
+{
+    return end() - begin();
+}
+
+LocalizedString::iterator LocalizedString::begin()
+{
+    return &__Begin + 1;
+}
+
+LocalizedString::iterator LocalizedString::end()
+{
+    return &__End;
+}
+
+LocalizedString::const_iterator LocalizedString::begin() const
+{
+    return &__Begin + 1;
+}
+
+LocalizedString::const_iterator LocalizedString::end() const
+{
+    return &__End;
+}
+
+LocalizedString::string_type &LocalizedString::operator[](LocalizationType type)
+{
+    return *(begin() + static_cast<int>(type));
+}
+const LocalizedString::string_type &LocalizedString::operator[](LocalizationType type) const
+{
+    return *(begin() + static_cast<int>(type));
+}
+
+LocalizedString::operator LocalizedString::string_type() const
+{
+    return str();
+}
+
+LocalizedString::string_type LocalizedString::str(LocalizationType type) const
+{
+    if (type == LocalizationType::max)
+        type = getCurrentLocalizationId();
+    auto &s = (*this)[type];
+    if (!s.empty())
+        return s;
+    if (type == LocalizationType::en)
+        return s;
+    return firstNonEmpty();
+}
+
+LocalizedString::string_type LocalizedString::firstNonEmpty() const
+{
+    for (auto &s : *this)
+        if (!s.empty())
+            return s;
+    return LocalizedString::string_type();
+}
 
 void initTranslator()
 {

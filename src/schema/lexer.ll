@@ -26,7 +26,7 @@
 
 DIGIT       [0-9]
 DIGITS      {DIGIT}{DIGIT}*
-INTEGER     {DIGITS}
+INTEGER     [+-]?{DIGITS}
 
 STRING      [[:alpha:]_][[:alnum:]_]*
 
@@ -49,7 +49,7 @@ STRING      [[:alpha:]_][[:alnum:]_]*
                             loc.lines(yyleng);
                             loc.step();
                         }
-                        
+
 ";"                     return MAKE(SEMICOLON);
 ":"                     return MAKE(COLON);
 "("                     return MAKE(L_BRACKET);

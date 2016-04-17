@@ -33,17 +33,18 @@ namespace polygon4
 
 enum class LocalizationType : EnumType
 {
-    min         =   0,
+    min = 0,
 
-    ru          =   0,
+    ru = 0,
     en,
 
     max,
 };
 
-extern LocalizationType gCurrentLocalizationId;
+DLL_EXPORT
+LocalizationType getCurrentLocalizationId(LocalizationType type = LocalizationType::max);
 
-class LocalizedString
+class DLL_EXPORT LocalizedString
 {
 public:
     using string_type = String;
@@ -51,73 +52,24 @@ public:
     using const_iterator = const string_type*;
 
 public:
-    LocalizedString()
-    {
-    }
-    LocalizedString(const std::initializer_list<string_type> &list)
-    {
-        auto max = size();
-        if (list.size() < max)
-            max = list.size();
-        auto i1 = begin();
-        auto i2 = list.begin();
-        for (size_t i = 0; i < max; i++)
-            *i1++ = *i2++;
-    }
+    LocalizedString();
+    LocalizedString(const std::initializer_list<string_type> &list);
 
-    size_t size() const
-    {
-        return end() - begin();
-    }
+    size_t size() const;
 
-    iterator begin()
-    {
-        return &__Begin + 1;
-    }
-    iterator end()
-    {
-        return &__End;
-    }
+    iterator begin();
+    iterator end();
 
-    const_iterator begin() const
-    {
-        return &__Begin + 1;
-    }
-    const_iterator end() const
-    {
-        return &__End;
-    }
+    const_iterator begin() const;
+    const_iterator end() const;
 
-    string_type &operator[](LocalizationType type)
-    {
-        return *(begin() + static_cast<int>(type));
-    }
-    const string_type &operator[](LocalizationType type) const
-    {
-        return *(begin() + static_cast<int>(type));
-    }
+    string_type &operator[](LocalizationType type);
+    const string_type &operator[](LocalizationType type) const;
 
-    operator string_type() const
-    {
-        return str();
-    }
-    string_type str(LocalizationType type = gCurrentLocalizationId) const
-    {
-        auto &s = (*this)[type];
-        if (!s.empty())
-            return s;
-        if (type == LocalizationType::en)
-            return s;
-        return firstNonEmpty();
-    }
+    operator string_type() const;
+    string_type str(LocalizationType type = LocalizationType::max) const;
 
-    string_type firstNonEmpty() const
-    {
-        for (auto &s : *this)
-            if (!s.empty())
-                return s;
-        return string_type();
-    }
+    string_type firstNonEmpty() const;
 
 private:
     string_type __Begin;

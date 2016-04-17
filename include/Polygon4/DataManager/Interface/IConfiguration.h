@@ -23,14 +23,14 @@
 class DLL_EXPORT IConfiguration : public IObjectBase
 {
 public:
-    virtual void addObject(IObjectBase *) {}
+    virtual void addObject(IObjectBase *o, int quantity = 1) {}
 
-    virtual void addEquipment(Equipment *) {}
-    virtual void addGlider(Glider *) {}
-    virtual void addGood(Good *) {}
-    virtual void addModificator(Modificator *) {}
-    virtual void addProjectile(Projectile *) {}
-    virtual void addWeapon(Weapon *) {}
+    virtual void addEquipment(Equipment *e, int quantity = 1) {}
+    virtual void addGlider(Glider *g) {}
+    virtual void addGood(Good *g, int quantity = 1) {}
+    virtual void addModificator(Modificator *m, int quantity = 1) {}
+    virtual void addProjectile(Projectile *p, int quantity = 1) {}
+    virtual void addWeapon(Weapon *w, int quantity = 1) {}
 
     virtual float getMass() const { return 0.0f; }
     virtual float getTotalMass() const { return 0.0f; }

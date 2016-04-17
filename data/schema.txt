@@ -4,8 +4,6 @@
 #  author: lzwdgc
 #
 
-# TODO:
-
 ################################################################################
 #
 # globals
@@ -14,7 +12,7 @@
 
 globals
 {
-    version: "34"
+    version: "35"
 };
 
 types
@@ -173,6 +171,15 @@ enum RatingType
     Courier,
     Fight,
     Trade,
+};
+
+enum EquipmentType
+{
+    Equipment { default; },
+    Reactor,
+    Generator,
+    Armor,
+    Engine,
 };
 
 ################################################################################
@@ -369,7 +376,7 @@ class Equipment
     String description { enum_type: EquipmentDescription; inline; initial_value: [ object: EquipmentDescription; ]; };
     Resource resource;
 
-    i32 type;
+    EquipmentType type;
     Standard standard;
     Weight weight;
     f32 durability;
@@ -1346,7 +1353,7 @@ class MapBuildingEquipment
     ModificationMapBuilding map_building;
     Equipment equipment;
 
-    Quantity quantity = 1;
+    Quantity quantity = -1;
 
     properties
     {
@@ -1361,7 +1368,7 @@ class MapBuildingGlider
     ModificationMapBuilding map_building;
     Glider glider;
 
-    Quantity quantity = 1;
+    Quantity quantity = -1;
 
     properties
     {
@@ -1376,7 +1383,7 @@ class MapBuildingGood
     ModificationMapBuilding map_building;
     Good good;
 
-    Quantity quantity = 1;
+    Quantity quantity = -1;
 
     properties
     {
@@ -1406,7 +1413,7 @@ class MapBuildingProjectile
     ModificationMapBuilding map_building;
     Projectile projectile;
 
-    Quantity quantity = 1;
+    Quantity quantity = -1;
 
     properties
     {
@@ -1421,7 +1428,7 @@ class MapBuildingWeapon
     ModificationMapBuilding map_building;
     Weapon weapon;
 
-    Quantity quantity = 1;
+    Quantity quantity = -1;
 
     properties
     {

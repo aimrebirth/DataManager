@@ -288,9 +288,15 @@ public:
     {
         if (!p)
             return;
-        if (mptr)
-            data[p->*mptr] = p;
+        insert_to_data(p);
         push_back(p);
+    }
+
+    void insert_to_data(value_type p)
+    {
+        if (!p || !mptr)
+            return;
+        data[p->*mptr] = p;
     }
 
     void setMemberPtr(K T::*p) { mptr = p; }
