@@ -37,6 +37,8 @@
 namespace polygon4
 {
 
+struct Settings;
+
 namespace detail
 {
 
@@ -157,6 +159,10 @@ public:
 
     void setStorage(Storage *storage) { storage_ = storage; }
     Storage *getStorage() const { return storage_; }
+
+    Settings &getSettings();
+    const Settings &getSettings() const;
+
     bool isReplaced() const { return replaced_; }
 
 protected:

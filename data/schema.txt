@@ -12,7 +12,7 @@
 
 globals
 {
-    version: "35"
+    version: "36"
 };
 
 types
@@ -180,6 +180,30 @@ enum EquipmentType
     Generator,
     Armor,
     Engine,
+};
+
+enum GliderType
+{
+    Base { default; },
+    Attacker,
+    Cargo,
+    Speed,
+};
+
+enum GliderSpecialType
+{
+    Normal { default; },
+    TwoLightWeapons,
+    TwoHeavyWeapons,
+    NoWeapons,
+};
+
+enum BuildingButtons
+{
+    Base            = 0b1011111 { default; },
+    JournalOnly     = 0b1000011,
+    JournalAndTrade = 0b1001011,
+    Tunnel          = 0b1100011,
 };
 
 ################################################################################
@@ -407,13 +431,15 @@ class Glider
     Resource resource;
 
     Standard standard;
+    GliderType type;
+    GliderSpecialType special_type;
+
     Weight weight;
     Weight maxweight;
     f32 armor;
     Price price;
     f32 restore;
     f32 power;
-    bool special;
     f32 rotatespeed;
 
     f32 resfront;
@@ -842,6 +868,7 @@ class ModificationMapBuilding
     str script_name;
 
     bool interactive;
+    BuildingButtons buttons;
 
     Clan clan
     {

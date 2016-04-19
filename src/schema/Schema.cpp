@@ -210,30 +210,6 @@ ModuleContext Schema::printEnums() const
     for (auto &e : enums)
         mc += e.print();
 
-    // enum of variables
-    /*{
-        std::map<std::string, Variable> vars;
-        mc.hpp.beginBlock("enum class " + variableType + " : EnumType");
-        for (auto &c : cls)
-        {
-            auto vs = c.getVariables();
-            for (auto &v : vs)
-            {
-                auto i = vars.find(v.getName());
-                if (i != vars.end())
-                {
-                    assert(i->second.getType() == v.getType());
-                }
-                vars[v.getName()] = v;
-            }
-        }
-        for (auto &v : vars)
-        {
-            mc.hpp.addLine(v.first + ",");
-        }
-        mc.hpp.endBlock(true);
-    }*/
-
     mc.hpp.after().endNamespace("detail");
     for (auto &e : enums)
         mc.hpp.after().addLine("String tr(detail::" + e.getCppName() + " e);");
@@ -342,9 +318,15 @@ ModuleContext Schema::printStorage() const
     for (auto &c : cls_service)
         mc.hpp.addLine(storageTableType(c.getCppName()) + " " + c.getCppArrayVariableName() + ";");
     mc.hpp.addLine();
+    const std::string settings = "_settings";
+    mc.hpp.addLine("Settings " + settings + ";");
+    mc.hpp.addLine();
     mc.hpp.addLineNoSpace("public:");
     mc.hpp.addLine("int get_storage_version() const;");
     mc.hpp.addLine("int get_db_version() const;");
+    mc.hpp.addLine();
+    mc.hpp.addLine("Settings &getSettings() { return " + settings + "; }");
+    mc.hpp.addLine("const Settings &getSettings() const { return " + settings + "; }");
     mc.hpp.addLine();
     mc.hpp.addLineNoSpace("public:");
     mc.hpp.addLine("static std::string getSql();");

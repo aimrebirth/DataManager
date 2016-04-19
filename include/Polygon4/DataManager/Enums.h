@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <bitset>
 #include <map>
 #include <unordered_map>
 #include <unordered_set>
@@ -27,6 +28,21 @@
 
 namespace polygon4
 {
+
+enum BuildingButton
+{
+    bbSave,
+    bbJournal,
+    bbGlider,
+    bbTrade,
+    bbClans,
+    bbTunnel,
+    bbExit,
+
+    bbMax,
+};
+
+using BuildingButtonsBitset = std::bitset<bbMax>;
 
 namespace detail
 {

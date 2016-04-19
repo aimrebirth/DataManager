@@ -104,6 +104,16 @@ std::tuple<bool, OrderedObjectMap> IObjectBase::getOrderedObjectMap(int columnId
     return std::make_tuple(false, OrderedObjectMap());
 }
 
+Settings &IObjectBase::getSettings()
+{
+    return getStorage()->getSettings();
+}
+
+const Settings &IObjectBase::getSettings() const
+{
+    return getStorage()->getSettings();
+}
+
 } // namespace detail
 
 namespace detail

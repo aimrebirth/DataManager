@@ -27,6 +27,7 @@
 DIGIT       [0-9]
 DIGITS      {DIGIT}{DIGIT}*
 INTEGER     [+-]?{DIGITS}
+BININT      0b[01]+
 
 STRING      [[:alpha:]_][[:alnum:]_]*
 
@@ -73,6 +74,7 @@ field                   return MAKE(FIELD);
 properties              return MAKE(PROPERTIES);
 
 {INTEGER}               { return MAKE_VALUE(INTEGER, std::stoi(yytext)); }
+{BININT}                { return MAKE_VALUE(INTEGER, std::stoi(yytext + 2, nullptr, 2)); }
 {STRING}                { return MAKE_VALUE(STRING, yytext); }
 
 \"                      { PUSH_STATE(user_string);  return MAKE(QUOTE); }
