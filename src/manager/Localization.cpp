@@ -118,7 +118,7 @@ LocalizedString::string_type LocalizedString::firstNonEmpty() const
 
 void initTranslator()
 {
-    LOG_DEBUG(logger, "Initializing translator");
+    LOG_TRACE(logger, "Initializing translator");
     translator.init(translator_data);
 }
 

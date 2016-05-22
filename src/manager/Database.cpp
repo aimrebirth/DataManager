@@ -133,7 +133,7 @@ namespace polygon4
 
 Database::Database(const std::string &dbname)
 {
-    LOG_DEBUG(logger, "Initializing database");
+    LOG_TRACE(logger, "Initializing database: " << dbname);
     loadDatabase(dbname);
     name = dbname.substr(std::max((int)dbname.rfind("/"), (int)dbname.rfind("\\")) + 1);
     fullName = dbname;
@@ -149,7 +149,7 @@ void Database::loadDatabase(const std::string &dbname)
 {
     if (db)
         return;
-    LOG_DEBUG(logger, "Opening database");
+    LOG_TRACE(logger, "Opening database: " << dbname);
     db = load_from_file(dbname.c_str());
     execute("PRAGMA cache_size = -2000;"); // cache size (N * page size)
     execute("PRAGMA page_size = 4096;"); // page size bytes (N * page size)

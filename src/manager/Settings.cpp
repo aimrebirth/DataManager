@@ -1,6 +1,6 @@
 /*
-* Polygon-4 Engine
-* Copyright (C) 2015 lzwdgc
+* Polygon-4 Data Manager
+* Copyright (C) 2015-2016 lzwdgc
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License as
@@ -18,44 +18,23 @@
 
 #pragma once
 
-#include <bitset>
+#include <Polygon4/DataManager/Settings.h>
 
-#include <Polygon4/DataManager/String.h>
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 namespace polygon4
 {
 
-enum GameFlag
+void Settings::Directories::setGameDir(const String &p)
 {
-    // only autosaves are allowed
-    gfIronWill,
+    game = p;
 
-    // player can bring <5 gen. mechs to other sectors
-    gfCanTransferMechanoidsBetweenSectors,
+    mods = game + "/Mods";
+    fs::create_directories(mods);
 
-    // db tool mode: prevents from executing unneeded actions
-    gfDbTool,
-
-    //
-    gfMaxFlag,
-};
-
-using GameFlags = std::bitset<gfMaxFlag>;
-
-struct Settings
-{
-    struct Directories
-    {
-        String game;
-        String mods;
-        String saves;
-
-        void setGameDir(const String &p);
-    };
-
-    Directories dirs;
-    GameFlags flags;
-    float playtime = 0.0f;
-};
+    saves = game + "/Saves";
+    fs::create_directories(saves);
+}
 
 } // namespace polygon4
