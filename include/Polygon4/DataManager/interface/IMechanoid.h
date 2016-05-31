@@ -33,6 +33,7 @@ public:
 
     virtual Configuration *getConfiguration() { return nullptr; }
 
+    virtual void addMoney(float m) { }
     virtual float getMoney() const { return 0.0f; }
     virtual bool hasMoney(float m) const { return false; }
     virtual void setMoney(float m) { }
@@ -44,4 +45,7 @@ public:
     virtual int getRatingLevel(RatingType type = RatingType::Normal) const { return 0; }
     virtual bool hasRatingLevel(int level, RatingType type = RatingType::Normal) const { return false; }
     virtual void setRatingLevel(int level, RatingType type = RatingType::Normal) { }
+
+    virtual bool buy(float money) { return false; }
+    virtual void sell(float money) { }
 };

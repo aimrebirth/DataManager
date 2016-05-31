@@ -30,7 +30,7 @@ public:
     virtual void addGood(Good *g, int quantity = 1) {}
     virtual void addModificator(Modificator *m, int quantity = 1) {}
     virtual void addProjectile(Projectile *p, int quantity = 1) {}
-    virtual void addWeapon(Weapon *w, int quantity = 1) {}
+    virtual void addWeapon(Weapon *w) {}
 
     virtual float getMass() const { return 0.0f; }
     virtual float getTotalMass() const { return 0.0f; }

@@ -20,14 +20,6 @@
 
 #include <Polygon4/DataManager/Localization.h>
 
-#define CREATE_TABLE(t) \
-    if (type_name == #t) \
-        for (auto &e : table_ ## t) \
-            if (table_ ## t ## _exclude.count(e.first) == 0) \
-                et[tr(e.second + ending)] = static_cast<int>(e.first)
-
-#define MISSING_VALUE "VALUE IS MISSING"
-
 #include "detail/Enums.cpp"
 
 namespace polygon4

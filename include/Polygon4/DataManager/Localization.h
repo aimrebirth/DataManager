@@ -28,6 +28,15 @@
 
 #include "Schema/Types.h"
 
+// table for translations
+#define CREATE_TABLE(t) \
+    if (type_name == #t) \
+        for (auto &e : table_ ## t) \
+            if (table_ ## t ## _exclude.count(e.first) == 0) \
+                et[tr(e.second + ending)] = static_cast<int>(e.first)
+
+#define MISSING_VALUE "VALUE IS MISSING"
+
 namespace polygon4
 {
 
