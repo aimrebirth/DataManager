@@ -163,6 +163,22 @@ public:
         return compare(s) > 0;
     }
 
+    String operator+(const char *s) const
+    {
+        if (s == nullptr)
+            return *this;
+        String tmp = *this;
+        tmp.base::operator+=(String(s));
+        return tmp;
+    }
+    String operator+(const wchar_t *s) const
+    {
+        if (s == nullptr)
+            return *this;
+        String tmp = *this;
+        tmp.base::operator+=(String(s));
+        return tmp;
+    }
     String operator+(const String &s) const
     {
         String tmp = *this;
