@@ -157,6 +157,11 @@ public:
     {
         return std::find_if(Parent::begin(), Parent::end(), [&name](const auto &v) { return name == v.getName(); });
     }
+
+    bool has(const Name &name) const
+    {
+        return find(name) != Parent::end();
+    }
 };
 
 class DLL_EXPORT Type : public ObjectWithFlags

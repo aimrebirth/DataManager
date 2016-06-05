@@ -1145,6 +1145,16 @@ ModuleContext Class::print(const Schema &schema) const
         mc.cpp.endFunction();
     }
 
+    // getTextId
+    if (vars.has("text_id"))
+    {
+        mc.hpp.addLine("virtual Text getTextId() const override;");
+
+        mc.cpp.beginFunction("Text " + getCppName() + "::getTextId() const");
+        mc.cpp.addLine("return text_id;");
+        mc.cpp.endFunction();
+    }
+
     // getClass()
     {
         mc.hpp.addLine("virtual const Class &getClass() const override;");
