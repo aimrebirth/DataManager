@@ -33,7 +33,6 @@
 #include "String.h"
 
 #define POLYGON4_NONAME "NONAME"
-#define POLYGON4_NOTEXTID "NOTEXTID"
 
 namespace polygon4
 {
@@ -149,7 +148,8 @@ public:
     virtual EObjectType getVariableType(int columnId) const { return EObjectType::None; }
     virtual Ptr<TreeItem> printTree() const { return createTreeItem(); }
     virtual Text getName() const { return POLYGON4_NONAME; }
-    virtual Text getTextId() const { return POLYGON4_NOTEXTID; }
+    virtual Text getTextId() const { return "NO_TEXT_ID"; }
+    virtual Text getDescription() const { return "NO_DESCRIPTION"; }
 
     virtual std::tuple<bool, OrderedObjectMap> getOrderedObjectMap(int columnId, class Storage *storage = nullptr) const;
 

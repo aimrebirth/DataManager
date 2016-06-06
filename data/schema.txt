@@ -12,7 +12,7 @@
 
 globals
 {
-    version: "36"
+    version: "37"
 };
 
 types
@@ -1411,6 +1411,7 @@ class MapBuildingGood
     Good good;
 
     Quantity quantity = -1;
+    bool sell = false;
 
     properties
     {
