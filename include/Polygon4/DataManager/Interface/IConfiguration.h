@@ -23,7 +23,7 @@
 class DLL_EXPORT IConfiguration : public IObjectBase
 {
 public:
-    virtual void addObject(IObjectBase *o, int quantity = 1) {}
+    virtual void addItem(IObjectBase *o, int quantity = 1) {}
 
     virtual void addEquipment(Equipment *e, int quantity = 1) {}
     virtual void addGlider(Glider *g) {}

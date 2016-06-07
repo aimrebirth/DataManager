@@ -12,7 +12,7 @@
 
 globals
 {
-    version: "37"
+    version: "38"
 };
 
 types
@@ -541,11 +541,25 @@ class ModificationPlayer
     };
     QuestRecord quests { container; };
     ScriptVariable variables { container; };
+    VisitedBuilding visited_buildings { container; };
 
     properties
     {
         object_name: "to_string(player)";
         parent: Modification;
+    }
+};
+
+class VisitedBuilding
+{
+    ModificationPlayer player;
+    ModificationMapBuilding building;
+
+    properties
+    {
+        parent: ModificationPlayer;
+        child: ModificationMapBuilding;
+        proxy;
     }
 };
 
@@ -610,12 +624,12 @@ class ScriptVariable
 {
     i32 id { pk; };
     ModificationPlayer player;
-    str variable;
+    str key;
     Value value;
 
     properties
     {
-        object_name: "variable";
+        object_name: "key";
         parent: ModificationPlayer;
     }
 };
@@ -867,7 +881,7 @@ class ModificationMapBuilding
 
     str script_name;
 
-    bool interactive;
+    bool interactive = true;
     BuildingButtons buttons;
 
     Clan clan
@@ -1324,7 +1338,7 @@ class MapObject
     Coordinate coordinate;
     Scale scale;
 
-    bool interactive;
+    bool interactive = false;
 
     properties
     {

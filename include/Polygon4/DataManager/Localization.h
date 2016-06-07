@@ -64,6 +64,8 @@ public:
     LocalizedString();
     LocalizedString(const std::initializer_list<string_type> &list);
 
+    LocalizedString &operator=(const string_type &s);
+
     size_t size() const;
 
     iterator begin();

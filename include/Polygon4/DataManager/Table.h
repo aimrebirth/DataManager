@@ -75,6 +75,12 @@ public:
     {
         return getOrderedObjectMap();
     }
+
+    template <typename F>
+    iterator find_if(F &&f) { return std::find_if(begin(), end(), f); }
+
+    template <typename F>
+    const_iterator find_if(F &&f) const { return std::find_if(begin(), end(), f); }
 };
 
 class Storage;

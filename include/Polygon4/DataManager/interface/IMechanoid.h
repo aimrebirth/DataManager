@@ -48,4 +48,6 @@ public:
 
     virtual bool buy(float money) { return false; }
     virtual void sell(float money) { }
+
+    virtual bool setName(const Text &name) { return false; }
 };

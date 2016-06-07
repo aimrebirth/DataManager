@@ -57,6 +57,13 @@ LocalizedString::LocalizedString(const std::initializer_list<string_type> &list)
         *i1++ = *i2++;
 }
 
+LocalizedString &LocalizedString::operator=(const string_type &s)
+{
+    auto type = getCurrentLocalizationId();
+    (*this)[type] = s;
+    return *this;
+}
+
 size_t LocalizedString::size() const
 {
     return end() - begin();
