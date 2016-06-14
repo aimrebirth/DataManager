@@ -68,10 +68,10 @@ void TreeItem::update()
     }
 }
 
-Text TreeItem::get_name()
+::polygon4::String TreeItem::get_name()
 {
     update();
-    Text s;
+    ::polygon4::String s;
     if (!defaultName.empty())
     {
         s = tr(defaultName);
@@ -82,7 +82,7 @@ Text TreeItem::get_name()
     int cc = child_count();
     if (cc)
         s += L" [" + std::to_wstring(cc) + L"]";
-    replace_all<Text>(s, L"\n", L" ");
+    replace_all<::polygon4::String>(s, L"\n", L" ");
 
     static const size_t max_size = 50;
     if (s.size() > max_size)

@@ -45,9 +45,10 @@ public:
     virtual int getRatingLevel(RatingType type = RatingType::Normal) const { return 0; }
     virtual bool hasRatingLevel(int level, RatingType type = RatingType::Normal) const { return false; }
     virtual void setRatingLevel(int level, RatingType type = RatingType::Normal) { }
+    virtual ::polygon4::String getRatingLevelName(RatingType type = RatingType::Normal) const { return ::polygon4::String(); }
 
     virtual bool buy(float money) { return false; }
     virtual void sell(float money) { }
 
-    virtual bool setName(const Text &name) { return false; }
+    virtual bool setName(const ::polygon4::String &name) { return false; }
 };

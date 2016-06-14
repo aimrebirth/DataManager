@@ -24,6 +24,7 @@ class DLL_EXPORT IConfiguration : public IObjectBase
 {
 public:
     virtual void addItem(IObjectBase *o, int quantity = 1) {}
+    virtual bool hasItem(const IObjectBase *o, int quantity = 1) const { return false; }
 
     virtual void addEquipment(Equipment *e, int quantity = 1) {}
     virtual void addGlider(Glider *g) {}
@@ -32,7 +33,15 @@ public:
     virtual void addProjectile(Projectile *p, int quantity = 1) {}
     virtual void addWeapon(Weapon *w) {}
 
+    // mass of equipment
     virtual float getMass() const { return 0.0f; }
+    // mass of equipment + glider
     virtual float getTotalMass() const { return 0.0f; }
+    // mass of max allowed mass
     virtual float getCapacity() const { return 0.0f; }
+
+    // armor from equipment
+    virtual float getArmor() const { return 0.0f; }
+    // armor from equipment + glider
+    virtual float getMaxArmor() const { return 0.0f; }
 };

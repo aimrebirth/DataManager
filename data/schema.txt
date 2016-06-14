@@ -12,7 +12,7 @@
 
 globals
 {
-    version: "38"
+    version: "40"
 };
 
 types
@@ -22,7 +22,7 @@ types
     f32 -> float;
     bool -> bool;
 
-    str -> Text;
+    str -> P4String;
     blob -> Blob;
 
     timestamp -> f32;
@@ -35,6 +35,8 @@ types
     Damage -> f32;
     Rating -> f32;
     Reputation -> f32;
+    Armor -> f32;
+    Energy -> f32;
 
     Resource -> str;
 
@@ -49,7 +51,7 @@ database sqlite3
         int32_t -> Integer;
         uint32_t -> Integer;
         float -> Real;
-        Text -> Text;
+        P4String -> Text;
         Blob -> Blob;
     };
 };
@@ -541,7 +543,8 @@ class ModificationPlayer
     };
     QuestRecord quests { container; };
     ScriptVariable variables { container; };
-    VisitedBuilding visited_buildings { container; };
+    # known_buildings
+    ModificationPlayerBuilding buildings { container; };
 
     properties
     {
@@ -550,10 +553,17 @@ class ModificationPlayer
     }
 };
 
-class VisitedBuilding
+class ModificationPlayerBuilding
 {
+    # modification player information
+    # about modification map building
+    # (location, visited flag etc.)
+
     ModificationPlayer player;
     ModificationMapBuilding building;
+
+    bool visited = false;
+    bool know_location = false;
 
     properties
     {
@@ -902,7 +912,7 @@ class ModificationMapBuilding
     {
         parent: ModificationMap;
 
-        object_name: "(name ? to_string(name) : to_string(building)) + (name_ending ? (Text(\" \") + to_string(name_ending)) : Text())";
+        object_name: "(name ? to_string(name) : to_string(building)) + (name_ending ? (::polygon4::String(\" \") + to_string(name_ending)) : ::polygon4::String())";
         names_order: "custom name text parent";
     }
 };
@@ -955,6 +965,11 @@ class Configuration
     str text_id;
     String name;
     Glider glider;
+
+    # current values
+    Armor armor;
+    Energy energy_shield;
+    Energy energy;
 
     ConfigurationEquipment equipments { container; };
     ConfigurationGood goods { container; };

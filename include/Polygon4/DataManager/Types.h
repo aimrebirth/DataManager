@@ -44,7 +44,7 @@ namespace detail
 
 using std::to_string;
 
-using Text = String;
+using P4String = ::polygon4::String;
 
 using IdType = int;
 
@@ -53,7 +53,7 @@ using Ptr = std::shared_ptr<T>;
 
 class IObjectBase;
 
-using OrderedObjectMap = std::multimap<Text, IObjectBase*>;
+using OrderedObjectMap = std::multimap< ::polygon4::String, IObjectBase*>;
 
 template <typename K>
 using KeyMap = std::unordered_map<K, IObjectBase*>;
@@ -67,8 +67,8 @@ using ObjectPtr = std::unique_ptr<IObjectBase, deleter>;
 
 struct DLL_EXPORT TreeItem
 {
-    Text name;
-    Text defaultName;
+    ::polygon4::String name;
+    ::polygon4::String defaultName;
     EObjectType type = EObjectType::None;
     IObjectBase *object = nullptr;
     TreeItem *parent = nullptr;
@@ -82,7 +82,7 @@ struct DLL_EXPORT TreeItem
     int child_count() const;
     void remove() const;
     void update();
-    Text get_name();
+    ::polygon4::String get_name();
 };
 
 class DLL_EXPORT IObjectBase
@@ -141,15 +141,15 @@ public:
     // generated functions
 public:
     virtual EObjectType getType() const = 0;
-    virtual Text getVariableString(int columnId) const = 0;
-    virtual void setVariableString(int columnId, const Text &text) = 0;
+    virtual ::polygon4::String getVariableString(int columnId) const = 0;
+    virtual void setVariableString(int columnId, const ::polygon4::String &text) = 0;
     virtual void setVariableString(int columnId, IObjectBase *ptr) {}
     virtual const IObjectBase *getVariable(int columnId) const { return nullptr; }
     virtual EObjectType getVariableType(int columnId) const { return EObjectType::None; }
     virtual Ptr<TreeItem> printTree() const { return createTreeItem(); }
-    virtual Text getName() const { return POLYGON4_NONAME; }
-    virtual Text getTextId() const { return "NO_TEXT_ID"; }
-    virtual Text getDescription() const { return "NO_DESCRIPTION"; }
+    virtual ::polygon4::String getName() const { return POLYGON4_NONAME; }
+    virtual ::polygon4::String getTextId() const { return "NO_TEXT_ID"; }
+    virtual ::polygon4::String getDescription() const { return "NO_DESCRIPTION"; }
 
     virtual std::tuple<bool, OrderedObjectMap> getOrderedObjectMap(int columnId, class Storage *storage = nullptr) const;
 
@@ -300,36 +300,46 @@ struct IdPtr
     }
 };
 
+inline auto to_string(const ::polygon4::String &s)
+{
+    return s;
+}
+
+inline auto to_wstring(const ::polygon4::String &s)
+{
+    return s;
+}
+
 template<class T>
-inline Text to_string(const Ptr<T> &ptr)
+inline ::polygon4::String to_string(const Ptr<T> &ptr)
 {
     if (ptr)
         return ptr->getName();
-    return Text();
+    return ::polygon4::String();
 }
 
 template<class T>
-inline Text to_wstring(const Ptr<T> &ptr)
+inline ::polygon4::String to_wstring(const Ptr<T> &ptr)
 {
     if (ptr)
         return ptr->getName();
-    return Text();
+    return ::polygon4::String();
 }
 
 template<class T>
-inline Text to_string(const IdPtr<T> &ptr)
+inline ::polygon4::String to_string(const IdPtr<T> &ptr)
 {
     if (ptr.ptr)
         return ptr.ptr->getName();
-    return Text();
+    return ::polygon4::String();
 }
 
 template<class T>
-inline Text to_wstring(const IdPtr<T> &ptr)
+inline ::polygon4::String to_wstring(const IdPtr<T> &ptr)
 {
     if (ptr.ptr)
         return ptr.ptr->getName();
-    return Text();
+    return ::polygon4::String();
 }
 
 bool to_bool(const std::string &s);

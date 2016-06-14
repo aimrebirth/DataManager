@@ -27,7 +27,7 @@ const std::string dataClassPtr = "IdPtr";
 const std::string storageImpl = "StorageImpl";
 const std::string iObject = "IObjectBase";
 const std::string idAccess = ".id";
-const std::string String = "String";
+const std::string StringDbType = "String";
 const std::string containerAccess = ".";
 const std::string sqlBegin = "R\"sql(";
 const std::string sqlEnd = ")sql\"";
@@ -36,6 +36,7 @@ const std::string variableType = "EVariableType";
 const std::string objectArray = "CObjectArray";
 const std::string dbSetting = "DbSetting";
 const std::string db_version = "VERSION";
+const std::string string_type = "P4String";
 
 std::string storageTableType(const std::string &s)
 {
@@ -65,7 +66,7 @@ DataType dataTypeFromName(const Name &name)
         return DataType::Real;
     if (name == "bool")
         return DataType::Bool;
-    if (name == "Text")
+    if (name == string_type)
         return DataType::Text;
     if (name == "Blob")
         return DataType::Blob;
@@ -243,7 +244,7 @@ ModuleContext Schema::printEnums() const
     mc.cpp.after().endNamespace("detail");
     auto print_enum_function = [&mc](const auto &e, const std::string &fname, const std::string &fcall)
     {
-        mc.cpp.after().beginFunction("String " + fname + "(detail::" + e.getCppName() + " e)");
+        mc.cpp.after().beginFunction("::polygon4::String " + fname + "(detail::" + e.getCppName() + " e)");
         mc.cpp.after().addLine("auto i = detail::" + e.getTableName() + ".find(e);");
         mc.cpp.after().addLine("if (i != detail::" + e.getTableName() + ".end())");
         mc.cpp.after().increaseIndent();
@@ -853,9 +854,9 @@ ModuleContext Class::print(const Schema &schema) const
 
     // getVariableString()
     {
-        mc.hpp.addLine("virtual Text getVariableString(int columnId) const override;");
+        mc.hpp.addLine("virtual " + string_type + " getVariableString(int columnId) const override;");
 
-        mc.cpp.beginFunction("Text " + getCppName() + "::getVariableString(int columnId) const");
+        mc.cpp.beginFunction("" + string_type + " " + getCppName() + "::getVariableString(int columnId) const");
         mc.cpp.beginBlock("switch (columnId)", false);
         for (auto &v : vars)
         {
@@ -883,9 +884,9 @@ ModuleContext Class::print(const Schema &schema) const
 
     // setVariableString()
     {
-        mc.hpp.addLine("virtual void setVariableString(int columnId, const Text &text) override;");
+        mc.hpp.addLine("virtual void setVariableString(int columnId, const " + string_type + " &text) override;");
 
-        mc.cpp.beginFunction("void " + getCppName() + "::setVariableString(int columnId, const Text &text)");
+        mc.cpp.beginFunction("void " + getCppName() + "::setVariableString(int columnId, const " + string_type + " &text)");
         mc.cpp.beginBlock("switch (columnId)", false);
         for (auto &v : vars)
         {
@@ -1080,10 +1081,10 @@ ModuleContext Class::print(const Schema &schema) const
 
     // getName()
     {
-        mc.hpp.addLine("virtual Text getName() const override;");
+        mc.hpp.addLine("virtual " + string_type + " getName() const override;");
 
-        mc.cpp.beginFunction("Text " + getCppName() + "::getName() const");
-        mc.cpp.addLine("Text s;");
+        mc.cpp.beginFunction("" + string_type + " " + getCppName() + "::getName() const");
+        mc.cpp.addLine("" + string_type + " s;");
 
         std::string return_add;
         auto checkReturn = [&]
@@ -1148,9 +1149,9 @@ ModuleContext Class::print(const Schema &schema) const
     // getTextId
     if (vars.has("text_id"))
     {
-        mc.hpp.addLine("virtual Text getTextId() const override;");
+        mc.hpp.addLine("virtual " + string_type + " getTextId() const override;");
 
-        mc.cpp.beginFunction("Text " + getCppName() + "::getTextId() const");
+        mc.cpp.beginFunction("" + string_type + " " + getCppName() + "::getTextId() const");
         mc.cpp.addLine("return text_id;");
         mc.cpp.endFunction();
     }
@@ -1158,9 +1159,9 @@ ModuleContext Class::print(const Schema &schema) const
     // getTextId
     if (vars.has("description"))
     {
-        mc.hpp.addLine("virtual Text getDescription() const override;");
+        mc.hpp.addLine("virtual " + string_type + " getDescription() const override;");
 
-        mc.cpp.beginFunction("Text " + getCppName() + "::getDescription() const");
+        mc.cpp.beginFunction("" + string_type + " " + getCppName() + "::getDescription() const");
         mc.cpp.addLine("return description->string;");
         mc.cpp.endFunction();
     }
@@ -1194,7 +1195,7 @@ ModuleContext Class::print(const Schema &schema) const
             {
                 mc.cpp.addLine("return std::make_tuple(true, " + v.getGetOrderedObjectMap() + ");");
             }
-            else if (v.getType()->getCppName() == String)
+            else if (v.getType()->getCppName() == StringDbType)
             {
                 mc.cpp.addLine("if (!storage)");
                 mc.cpp.increaseIndent();
