@@ -40,8 +40,12 @@ public:
     // mass of max allowed mass
     virtual float getCapacity() const { return 0.0f; }
 
-    // armor from equipment
-    virtual float getArmor() const { return 0.0f; }
-    // armor from equipment + glider
+    virtual float getCurrentEnergy() const { return 0.0f; }
+    virtual float getMaxEnergy() const { return 0.0f; }
+
+    virtual float getCurrentEnergyShield() const { return 0.0f; }
+    virtual float getMaxEnergyShield() const { return 0.0f; }
+
+    virtual float getCurrentArmor() const { return 0.0f; }
     virtual float getMaxArmor() const { return 0.0f; }
 };

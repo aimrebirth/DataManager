@@ -12,7 +12,7 @@
 
 globals
 {
-    version: "40"
+    version: "42"
 };
 
 types
@@ -182,6 +182,7 @@ enum EquipmentType
     Generator,
     Armor,
     Engine,
+    Shield,
 };
 
 enum GliderType
@@ -738,6 +739,7 @@ class Weapon
     f32 inside_z;
 
     bool notrade;
+    bool hidden_in_menu;
 
     properties
     {
@@ -1048,7 +1050,12 @@ class ConfigurationWeapon
     Configuration configuration;
     Weapon weapon;
 
-    Quantity quantity = 1;
+    u32 ammo;
+    f32 overheat;
+
+    # fire rate (armed timed value)
+    f32 current_time = 0;
+    bool ready = true;
 
     properties
     {

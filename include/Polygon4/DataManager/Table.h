@@ -257,7 +257,7 @@ public:
 private:
     std::string name;
     key_type maxId = 1;
-    Storage *storage;
+    Storage *storage = nullptr;
 
     void vacuumIds()
     {

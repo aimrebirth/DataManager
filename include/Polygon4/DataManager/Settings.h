@@ -36,6 +36,9 @@ enum GameFlag
     // db tool mode: prevents from executing unneeded actions
     gfDbTool,
 
+    // replenish reactor & shield energy
+    gfReplenishEnergyOnBuildingExit,
+
     //
     gfMaxFlag,
 };
@@ -54,7 +57,7 @@ struct Settings
     };
 
     Directories dirs;
-    GameFlags flags;
+    GameFlags flags = 0b1000;
     float playtime = 0.0f;
 };
 

@@ -366,6 +366,7 @@ namespace detail
 {
 
 #include "interface/IConfiguration.h"
+#include "Interface/IConfigurationWeapon.h"
 #include "interface/IGlider.h"
 #include "interface/IMap.h"
 #include "interface/IMapObject.h"
