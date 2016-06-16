@@ -20,6 +20,8 @@
 
 #define POLYGON4_CONFIGURATION_INTERFACE
 
+class Projectile;
+
 class DLL_EXPORT IConfiguration : public IObjectBase
 {
 public:
@@ -48,4 +50,9 @@ public:
 
     virtual float getCurrentArmor() const { return 0.0f; }
     virtual float getMaxArmor() const { return 0.0f; }
+
+    virtual bool isDead() const { return true; }
+    virtual void hit(Projectile *projectile) { }
+
+    virtual void tick(float delta_seconds) {}
 };
