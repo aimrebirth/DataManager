@@ -93,8 +93,8 @@ private:
     // constructors
 public:
     IObjectBase() = default;
-    IObjectBase(const IObjectBase &) = default;
-    IObjectBase &operator=(const IObjectBase &) = default;
+    IObjectBase(const IObjectBase &o) { copyFrom(o); }
+    IObjectBase &operator=(const IObjectBase &o) { copyFrom(o); return *this; }
     IObjectBase(IObjectBase &&) = default;
     IObjectBase &operator=(IObjectBase &&) = default;
     virtual ~IObjectBase() {}
@@ -183,6 +183,13 @@ protected:
 private:
     Storage *storage_ = nullptr;
     bool replaced_ = false;
+
+    void copyFrom(const IObjectBase &o)
+    {
+        id = o.id;
+        storage_ = o.storage_;
+        // do not copy replaced_ flag!
+    }
 
     // static & friends
 public:
