@@ -151,14 +151,6 @@ enum ScriptLanguage
     Lua { default; },
 };
 
-enum JournalRecordType
-{
-    None { default; not_in_table; },
-    InProgress,
-    Completed,
-    Failed,
-};
-
 enum QuestRecordType
 {
     None { default; not_in_table; },
@@ -179,10 +171,9 @@ enum EquipmentType
 {
     Equipment { default; },
     Reactor,
-    Generator,
+    EnergyShield,
     Armor,
     Engine,
-    Shield,
 };
 
 enum GliderType
@@ -607,7 +598,7 @@ class JournalRecord
     str text_id;
     Message message;
     timestamp time;
-    JournalRecordType type;
+    QuestRecordType type;
 
     properties
     {
