@@ -27,6 +27,7 @@ class DLL_EXPORT IConfiguration : public IObjectBase
 public:
     virtual void addItem(IObjectBase *o, int quantity = 1) {}
     virtual bool hasItem(const IObjectBase *o, int quantity = 1) const { return false; }
+    virtual bool removeItem(IObjectBase *o, int quantity = 1) { return false; }
 
     virtual void addEquipment(Equipment *e, int quantity = 1) {}
     virtual void addGlider(Glider *g) {}
