@@ -1162,7 +1162,10 @@ ModuleContext Class::print(const Schema &schema) const
         mc.hpp.addLine("virtual " + string_type + " getDescription() const override;");
 
         mc.cpp.beginFunction("" + string_type + " " + getCppName() + "::getDescription() const");
+        mc.cpp.beginBlock("if (description)");
         mc.cpp.addLine("return description->string;");
+        mc.cpp.endBlock();
+        mc.cpp.addLine("return \"NO DESCRIPTION AVAILABLE\";");
         mc.cpp.endFunction();
     }
 
