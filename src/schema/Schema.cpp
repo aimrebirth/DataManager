@@ -398,7 +398,7 @@ ModuleContext Schema::printStorageImplementation() const
     mc.hpp.addLineNoSpace("public:");
     mc.hpp.addLine("StorageImpl(std::shared_ptr<Database> db) : db(db) {}");
     mc.hpp.addLine();
-    mc.hpp.addLine("void setDb(std::shared_ptr<Database> db) { this->db = db; }");
+    mc.hpp.addLine("void setDb(std::shared_ptr<Database> db_in) { db = db_in; }");
     mc.hpp.addLine();
 
     // create()

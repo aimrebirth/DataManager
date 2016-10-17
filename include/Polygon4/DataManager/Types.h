@@ -102,7 +102,7 @@ public:
     // custom functions
 public:
     int getId(int defaultValue = 0) const { return hasId() ? id : defaultValue; }
-    void setId(int id) { this->id = id; }
+    void setId(int id_in) { id = id_in; }
     virtual bool hasId() const { return false; }
 
     virtual const Class &getClass() const = 0;

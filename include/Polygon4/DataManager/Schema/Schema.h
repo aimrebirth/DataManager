@@ -50,28 +50,28 @@ public:
 
     bool hasFlags(const std::vector<ObjectFlag> &in_flags, bool revert = false) const
     {
-        ObjectFlags flags;
+        ObjectFlags flags_new;
         for (auto &f : in_flags)
-            flags.set(f);
+            flags_new.set(f);
         ObjectFlags r = this->flags;
         if (revert)
-            r = r ^ flags;
-        r = r & flags;
-        r = r ^ flags;
+            r = r ^ flags_new;
+        r = r & flags_new;
+        r = r ^ flags_new;
         return r.none();
     }
     bool hasFlags(const std::initializer_list<ObjectFlag> &in_flags, bool revert = false) const
     {
         return hasFlags(std::vector<ObjectFlag>(in_flags), revert);
     }
-    bool hasFlags(ObjectFlags flags, bool revert = false) const
+    bool hasFlags(ObjectFlags in_flags, bool revert = false) const
     {
         if (revert)
-            flags.flip();
-        return flags == this->flags;
+            in_flags.flip();
+        return in_flags == flags;
     }
 
-    void setFlags(const ObjectFlags &flags) { this->flags = flags; }
+    void setFlags(const ObjectFlags &flags_in) { flags = flags_in; }
 
 protected:
     ObjectFlags flags;
@@ -296,11 +296,11 @@ public:
         return dt;
     }
     int getId() const { return id; }
-    void setId(int id) { this->id = id; }
+    void setId(int id_in) { id = id_in; }
     std::string getDefaultValue() const;
     std::string getRawDefaultValue() const { return defaultValue; }
     std::string getGetOrderedObjectMap() const { return getOrderedObjectMap; }
-    void setPrefix(const Name &prefix) { this->prefix = prefix; }
+    void setPrefix(const Name &prefix_in) { prefix = prefix_in; }
 
     DepVariable getMasterVariable() const { return masterVariable; }
     const DepVariables &getSlaveVariables() const { return slaveVariables; }
@@ -362,27 +362,27 @@ public:
     virtual Class *getParent() const override { return parent; }
     virtual Class *getChild() const override { return child; }
 
-    Variable getVariable(const std::string &name) const
+    Variable getVariable(const std::string &name_in) const
     {
-        auto variables = getVariables();
+        auto vars = getVariables();
         Variables::const_iterator i;
-        i = find_if(variables.begin(), variables.end(), [name](const auto &p)
+        i = find_if(vars.begin(), vars.end(), [&name_in](const auto &p)
         {
-            return p.getName() == name;
+            return p.getName() == name_in;
         });
-        if (i != variables.end())
+        if (i != vars.end())
             return *i;
-        i = find_if(variables.begin(), variables.end(), [name](const auto &p)
+        i = find_if(vars.begin(), vars.end(), [&name_in](const auto &p)
         {
-            return p.getName() == name + "_id";
+            return p.getName() == name_in + "_id";
         });
-        if (i != variables.end())
+        if (i != vars.end())
             return *i;
-        i = find_if(variables.begin(), variables.end(), [name](const auto &p)
+        i = find_if(vars.begin(), vars.end(), [&name_in](const auto &p)
         {
-            return p.getName().find(name) != -1;
+            return p.getName().find(name_in) != -1;
         });
-        if (i != variables.end())
+        if (i != vars.end())
             return *i;
         return Variable();
     }
