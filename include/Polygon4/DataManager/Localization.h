@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "Common.h"
-#include "Dll.h"
 #include "Enums.h"
 #include "String.h"
 
@@ -50,10 +49,10 @@ enum class LocalizationType : EnumType
     max,
 };
 
-DLL_EXPORT
+DATA_MANAGER_API
 LocalizationType getCurrentLocalizationId(LocalizationType type = LocalizationType::max);
 
-class DLL_EXPORT LocalizedString
+class DATA_MANAGER_API LocalizedString
 {
 public:
     using string_type = String;
@@ -169,9 +168,9 @@ extern Translator translator;
 
 void initTranslator();
 
-DLL_EXPORT
+DATA_MANAGER_API
 String tr(DataType type);
-DLL_EXPORT
+DATA_MANAGER_API
 String tr(const std::string &key, const std::string &context = std::string());
 
 }

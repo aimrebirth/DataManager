@@ -20,7 +20,7 @@
 
 #define POLYGON4_MECHANOID_INTERFACE
 
-class DLL_EXPORT IMechanoid : public detail::IObjectBase
+class DATA_MANAGER_API IMechanoid : public detail::IObjectBase
 {
 public:
     virtual bool spawn() { return false; }

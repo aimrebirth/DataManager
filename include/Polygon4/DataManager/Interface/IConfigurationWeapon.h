@@ -20,7 +20,7 @@
 
 #define POLYGON4_CONFIGURATIONWEAPON_INTERFACE
 
-class DLL_EXPORT IConfigurationWeapon : public detail::IObjectBase
+class DATA_MANAGER_API IConfigurationWeapon : public detail::IObjectBase
 {
 public:
     virtual void addTime(float tick) {}

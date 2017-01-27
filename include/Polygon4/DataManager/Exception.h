@@ -22,15 +22,13 @@
 #include <sstream>
 #include <string>
 
-#include "Dll.h"
-
 #define EXCEPTION_PARAMS __FILE__, __FUNCTION__, __LINE__
 #define EXCEPTION(msg) polygon4::Exception(EXCEPTION_PARAMS, msg)
 
 namespace polygon4
 {
 
-class DLL_EXPORT Exception : public std::exception
+class DATA_MANAGER_API Exception : public std::exception
 {
 public:
     Exception();

@@ -22,7 +22,7 @@
 
 #include "Ast.h"
 
-const std::string dll = "DLL_EXPORT";
+const std::string dll = "DATA_MANAGER_API";
 const std::string dataClassPtr = "IdPtr";
 const std::string storageImpl = "StorageImpl";
 const std::string iObject = "IObjectBase";
@@ -206,7 +206,7 @@ ModuleContext Schema::printEnums() const
     mc.hpp.before().addLine();
     mc.hpp.before().beginNamespace("polygon4");
     mc.hpp.before().beginNamespace("detail");
-    mc.hpp.before().addLine("EnumTable DLL_EXPORT getOrderedMap(const std::string &type_name);");
+    mc.hpp.before().addLine("EnumTable "+ dll + " getOrderedMap(const std::string &type_name);");
     mc.hpp.before().addLine();
     for (auto &e : enums)
         mc += e.print();

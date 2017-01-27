@@ -1,0 +1,114 @@
+projects:
+    data_manager:
+        type: lib
+        api_name: DATA_MANAGER_API
+        files:
+            - include/.*
+            - src/manager/.*\.h
+            - src/manager/.*\.cpp
+            - data/schema.txt
+        include_directories:
+            public:
+                - include
+            private:
+                - src/manager
+        dependencies:
+            - name: generator
+              reference: generator
+            - schema
+            - pvt.cppan.demo.boost.log: 1
+            - pvt.cppan.demo.sqlite3: 3
+            
+        options:
+            any:
+                compile_options:
+                    msvc:
+                        public:
+                            - "/wd4251"
+                            
+        post_sources: |        
+            set(tail)
+            if (MSVC)
+                set(tail _$(Configuration))
+            endif()
+
+            set(generated_dir ${BDIR}/gen${tail})
+            set(generated_dir_inc           ${generated_dir}/include)
+            set(generated_dir_inc_detail    ${generated_dir}/include/detail)
+            set(generated_dir_src           ${generated_dir}/src)
+            set(generated_dir_src_detail    ${generated_dir}/src/detail)
+
+            set(generated_src
+                ${generated_dir_inc_detail}/ForwardDeclarations.h
+                ${generated_dir_inc_detail}/Types.h
+                ${generated_dir_src_detail}/Types.cpp
+                ${generated_dir_inc_detail}/Storage.h
+                ${generated_dir_src_detail}/Storage.cpp
+                ${generated_dir_inc_detail}/StorageImpl.h
+                ${generated_dir_src_detail}/StorageImpl.cpp
+                ${generated_dir_src_detail}/schema/Tokens.cpp
+                ${generated_dir_inc_detail}/ObjectInterfaces.h
+                ${generated_dir_inc_detail}/Enums.h
+                ${generated_dir_src_detail}/Enums.cpp
+            )
+            add_custom_command(OUTPUT ${generated_src}
+                COMMAND generator ${SDIR}/data/schema.txt ${generated_dir}
+                DEPENDS generator ${SDIR}/data/schema.txt
+            )
+            set_source_files_properties(${generated_src} PROPERTIES
+                GENERATED True
+                HEADER_FILE_ONLY True
+            )
+            set(src ${src} ${generated_src})
+        post_target: |
+            target_include_directories(${this}
+                PUBLIC ${generated_dir_inc}
+                PRIVATE ${generated_dir_src}
+            )
+            
+    generator:
+        files: src/generator/main.cpp
+        dependencies:
+            - schema
+            - pvt.cppan.demo.boost.filesystem: 1
+    
+    schema:
+        type: lib
+        api_name: SCHEMA_API
+        files:
+            - include/.*
+            - src/schema/.*\.h
+            - src/schema/.*\.cpp
+            - src/schema/.*\.ll
+            - src/schema/.*\.yy
+        include_directories:
+            public:
+                - include
+            private:
+                - include/Polygon4/DataManager/Schema
+                - src/schema
+        options:
+            any:
+                compile_options:
+                    msvc:
+                        public:
+                            - "/wd4251"
+        dependencies:
+            pvt.cppan.demo.boost.algorithm: 1
+            pvt.cppan.demo.boost.variant: 1
+            pvt.cppan.demo.lexxmark.winflexbison.bison: master
+            pvt.cppan.demo.lexxmark.winflexbison.flex: 2.6.1
+            
+        post_sources: |
+            add_custom_command(OUTPUT
+                ${BDIR}/lexer.h ${BDIR}/lexer.cpp
+                ${BDIR}/grammar.hpp ${BDIR}/grammar.cpp
+                COMMAND pvt.cppan.demo.lexxmark.winflexbison.flex --header-file=${BDIR}/lexer.h -o lexer.cpp ${SDIR}/src/schema/lexer.ll
+                COMMAND pvt.cppan.demo.lexxmark.winflexbison.bison --defines=grammar.hpp -o grammar.cpp ${SDIR}/src/schema/grammar.yy
+                WORKING_DIRECTORY ${BDIR}
+            )
+            set(src ${src}
+                ${BDIR}/lexer.h ${BDIR}/lexer.cpp
+                ${BDIR}/grammar.hpp ${BDIR}/grammar.cpp
+            )
+            

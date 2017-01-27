@@ -20,7 +20,7 @@
 
 #include <algorithm>
 
-#include <sqlite3/sqlite3.h>
+#include <sqlite3.h>
 
 #include <Polygon4/DataManager/Schema.h>
 #include <Polygon4/DataManager/Storage.h>

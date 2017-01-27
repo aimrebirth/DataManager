@@ -30,10 +30,8 @@
 #include <Text.h>
 #endif
 
-#include "Dll.h"
-
-DLL_EXPORT std::wstring string2wstring(const std::string &s);
-DLL_EXPORT std::string wstring2string(const std::wstring &s);
+DATA_MANAGER_API std::wstring string2wstring(const std::string &s);
+DATA_MANAGER_API std::string wstring2string(const std::wstring &s);
 
 namespace polygon4
 {
@@ -211,7 +209,7 @@ private:
     }
 };
 
-class DLL_EXPORT Blob
+class DATA_MANAGER_API Blob
 {
 public:
     using element_type = uint8_t;

@@ -20,7 +20,7 @@
 
 #define POLYGON4_MAPOBJECT_INTERFACE
 
-class DLL_EXPORT IMapObject : public detail::IObjectBase
+class DATA_MANAGER_API IMapObject : public detail::IObjectBase
 {
 public:
     virtual bool spawn() { return false; }

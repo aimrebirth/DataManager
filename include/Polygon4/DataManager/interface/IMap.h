@@ -20,7 +20,7 @@
 
 #define POLYGON4_MAP_INTERFACE
 
-class DLL_EXPORT IMap : public detail::IObjectBase
+class DATA_MANAGER_API IMap : public detail::IObjectBase
 {
 public:
     virtual bool loadLevel() { return false; }

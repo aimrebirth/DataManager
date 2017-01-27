@@ -29,8 +29,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "../Dll.h"
-
 #include "Context.h"
 #include "Types.h"
 
@@ -43,7 +41,7 @@ namespace ast
 
 class Schema;
 
-class ObjectWithFlags
+class SCHEMA_API ObjectWithFlags
 {
 public:
     const ObjectFlags &getFlags() const { return flags; }
@@ -78,7 +76,7 @@ protected:
 };
 
 template <typename Container>
-class ObjectArray : public Container
+class SCHEMA_API ObjectArray : public Container
 {
 public:
     using Parent = Container;
@@ -164,7 +162,7 @@ public:
     }
 };
 
-class DLL_EXPORT Type : public ObjectWithFlags
+class SCHEMA_API Type : public ObjectWithFlags
 {
 public:
     Name getName() const
@@ -211,6 +209,11 @@ public:
         return name < rhs.name;
     }
 
+    bool operator==(const Type &rhs) const
+    {
+        return name == rhs.name;
+    }
+
 protected:
     Name name;
     Name humanName;
@@ -229,7 +232,7 @@ struct Database
 
 using Databases = std::vector<Database>;
 
-class DLL_EXPORT Variable : public ObjectWithFlags
+class SCHEMA_API Variable : public ObjectWithFlags
 {
 public:
     using variable_ptr = std::shared_ptr<Variable>;
@@ -353,7 +356,7 @@ private:
 
 using Variables = ObjectArray<std::vector<Variable>>;
 
-class DLL_EXPORT Class : public Type
+class SCHEMA_API Class : public Type
 {
 public:
     void initialize();
@@ -462,7 +465,7 @@ private:
 
 using Enums = ObjectArray<std::list<Enum>>;
 
-class DLL_EXPORT Schema
+class SCHEMA_API Schema
 {
 public:
     void initialize();

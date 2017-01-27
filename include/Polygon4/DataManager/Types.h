@@ -65,7 +65,7 @@ using deleter = void(*)(IObjectBase*);
 
 using ObjectPtr = std::unique_ptr<IObjectBase, deleter>;
 
-struct DLL_EXPORT TreeItem
+struct DATA_MANAGER_API TreeItem
 {
     ::polygon4::String name;
     ::polygon4::String defaultName;
@@ -85,7 +85,7 @@ struct DLL_EXPORT TreeItem
     ::polygon4::String get_name();
 };
 
-class DLL_EXPORT IObjectBase
+class DATA_MANAGER_API IObjectBase
 {
 private:
     static const int alloc_size = 1024;
@@ -385,7 +385,7 @@ namespace detail
 
 } // namespace polygon4
 
-#define DECLARE_INTERFACE_STUB(n) class DLL_EXPORT I ## n : public detail::IObjectBase {}
+#define DECLARE_INTERFACE_STUB(n) class DATA_MANAGER_API I ## n : public detail::IObjectBase {}
 #include "detail/ObjectInterfaces.h"
 #undef DECLARE_INTERFACE_STUB
 

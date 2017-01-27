@@ -22,7 +22,7 @@
 
 class Projectile;
 
-class DLL_EXPORT IConfiguration : public IObjectBase
+class DATA_MANAGER_API IConfiguration : public IObjectBase
 {
 public:
     virtual void addItem(IObjectBase *o, int quantity = 1) {}

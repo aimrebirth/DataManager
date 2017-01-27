@@ -21,7 +21,6 @@
 #include <memory>
 #include <string>
 
-#include "Dll.h"
 #include "Schema.h"
 #include "Settings.h"
 #include "Types.h"
@@ -41,9 +40,9 @@ using CheckFunction = std::function<bool(IObjectBase*)>;
 using detail::Storage;
 class Database;
 
-DLL_EXPORT
+DATA_MANAGER_API
 std::shared_ptr<Storage> initStorage(const std::string &filename);
-DLL_EXPORT
+DATA_MANAGER_API
 std::shared_ptr<Storage> initStorage(const std::shared_ptr<Database> &db);
 
 } // namespace polygon4

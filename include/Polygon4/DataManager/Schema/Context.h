@@ -23,7 +23,7 @@
 #include <stack>
 #include <vector>
 
-class Context
+class SCHEMA_API Context
 {
 public:
     using Text = std::string;

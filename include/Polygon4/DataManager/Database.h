@@ -22,14 +22,12 @@
 #include <memory>
 #include <string>
 
-#include "Dll.h"
-
 struct sqlite3;
 
 namespace polygon4
 {
 
-class DLL_EXPORT Database
+class DATA_MANAGER_API Database
 {
     typedef int(*Sqlite3Callback)(void*, int, char**, char**);
     typedef std::function<int(int, char**, char**)> DatabaseCallback;

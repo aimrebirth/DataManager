@@ -48,4 +48,5 @@ struct Token
 
 using Tokens = std::vector<Token>;
 
+SCHEMA_API
 ModuleContext print(Tokens &tokens);

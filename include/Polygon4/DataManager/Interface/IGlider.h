@@ -20,7 +20,7 @@
 
 #define POLYGON4_GLIDER_INTERFACE
 
-class DLL_EXPORT IGlider : public IObjectBase
+class DATA_MANAGER_API IGlider : public IObjectBase
 {
 public:
     virtual float getCapacity() const { return 0.0f; }

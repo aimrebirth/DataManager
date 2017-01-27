@@ -20,7 +20,7 @@
 
 #define POLYGON4_MODIFICATION_INTERFACE
 
-class DLL_EXPORT IModification : public detail::IObjectBase
+class DATA_MANAGER_API IModification : public detail::IObjectBase
 {
 public:
     virtual bool newGame() { return false; }

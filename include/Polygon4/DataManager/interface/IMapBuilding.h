@@ -22,7 +22,7 @@
 
 class ModificationMapBuilding;
 
-class DLL_EXPORT IMapBuilding : public detail::IObjectBase
+class DATA_MANAGER_API IMapBuilding : public detail::IObjectBase
 {
 public:
     virtual bool spawn() { return false; }

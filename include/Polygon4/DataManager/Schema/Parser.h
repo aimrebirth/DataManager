@@ -24,6 +24,9 @@
 #include "Schema.h"
 #include "Token.h"
 
+SCHEMA_API
 Schema parse(const Tokens &tokens);
+SCHEMA_API
 Schema parse_string(const std::string &s, Tokens *tokens = nullptr);
+SCHEMA_API
 Schema parse_file(const std::string &filename, Tokens *tokens = nullptr);

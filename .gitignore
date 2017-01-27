@@ -1,3 +1,7 @@
 win*
 lib
 /build*
+
+*.dll
+*.lnk
+*.exe
