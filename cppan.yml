@@ -16,20 +16,22 @@ projects:
             - name: generator
               reference: generator
             - schema
+            - memory
             - pvt.cppan.demo.boost.log: 1
             - pvt.cppan.demo.sqlite3: 3
-            
+
         options:
             any:
                 compile_options:
                     msvc:
                         public:
                             - "/wd4251"
-                            
-        post_sources: |        
+                            - "/wd4275"
+
+        post_sources: |
             set(tail)
             if (MSVC)
-                set(tail _$(Configuration))
+                #set(tail _$(Configuration))
             endif()
 
             set(generated_dir ${BDIR}/gen${tail})
@@ -40,38 +42,41 @@ projects:
 
             set(generated_src
                 ${generated_dir_inc_detail}/ForwardDeclarations.h
-                ${generated_dir_inc_detail}/Types.h
-                ${generated_dir_src_detail}/Types.cpp
-                ${generated_dir_inc_detail}/Storage.h
-                ${generated_dir_src_detail}/Storage.cpp
-                ${generated_dir_inc_detail}/StorageImpl.h
-                ${generated_dir_src_detail}/StorageImpl.cpp
-                ${generated_dir_src_detail}/schema/Tokens.cpp
-                ${generated_dir_inc_detail}/ObjectInterfaces.h
-                ${generated_dir_inc_detail}/Enums.h
-                ${generated_dir_src_detail}/Enums.cpp
+                #${generated_dir_inc_detail}/Types.h
+                #${generated_dir_src_detail}/Types.cpp
+                #${generated_dir_inc_detail}/Storage.h
+                #${generated_dir_src_detail}/Storage.cpp
+                #${generated_dir_inc_detail}/StorageImpl.h
+                #${generated_dir_src_detail}/StorageImpl.cpp
+                #${generated_dir_src_detail}/schema/Tokens.cpp
+                #${generated_dir_inc_detail}/ObjectInterfaces.h
+                #${generated_dir_inc_detail}/Enums.h
+                #${generated_dir_src_detail}/Enums.cpp
             )
             add_custom_command(OUTPUT ${generated_src}
-                COMMAND generator ${SDIR}/data/schema.txt ${generated_dir}
-                DEPENDS generator ${SDIR}/data/schema.txt
+                COMMAND ${generator} ${SDIR}/data/schema.txt ${generated_dir}
+                DEPENDS ${generator} ${SDIR}/data/schema.txt
+                COMMENT "Generating data files"
             )
-            set_source_files_properties(${generated_src} PROPERTIES
+            file(GLOB_RECURSE src_gen "${generated_dir}/*")
+            set_source_files_properties(${src_gen} PROPERTIES
                 GENERATED True
                 HEADER_FILE_ONLY True
             )
-            set(src ${src} ${generated_src})
+            set(src ${src} ${generated_src} ${src_gen})
         post_target: |
             target_include_directories(${this}
                 PUBLIC ${generated_dir_inc}
                 PRIVATE ${generated_dir_src}
             )
-            
+
     generator:
         files: src/generator/main.cpp
         dependencies:
             - schema
+            - memory
             - pvt.cppan.demo.boost.filesystem: 1
-    
+
     schema:
         type: lib
         api_name: SCHEMA_API
@@ -94,11 +99,12 @@ projects:
                         public:
                             - "/wd4251"
         dependencies:
-            pvt.cppan.demo.boost.algorithm: 1
-            pvt.cppan.demo.boost.variant: 1
-            pvt.cppan.demo.lexxmark.winflexbison.bison: master
-            pvt.cppan.demo.lexxmark.winflexbison.flex: 2.6.1
-            
+            - memory
+            - pvt.cppan.demo.boost.algorithm: 1
+            - pvt.cppan.demo.boost.variant: 1
+            - pvt.cppan.demo.lexxmark.winflexbison.bison: master
+            - pvt.cppan.demo.lexxmark.winflexbison.flex: 2.6.1
+
         post_sources: |
             add_custom_command(OUTPUT
                 ${BDIR}/lexer.h ${BDIR}/lexer.cpp
@@ -111,4 +117,12 @@ projects:
                 ${BDIR}/lexer.h ${BDIR}/lexer.cpp
                 ${BDIR}/grammar.hpp ${BDIR}/grammar.cpp
             )
-            
+
+    memory:
+        type: lib
+        static_only: true
+        files:
+            - include/Polygon4/Memory.h
+            - src/memory/Memory.cpp
+        #dependencies:
+        #    - pvt.cppan.demo.intel.tbb.tbbmalloc_proxy: 4
