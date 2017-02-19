@@ -36,7 +36,7 @@ DataType dataTypeFromName(const Name &name);
 
 namespace ast
 {
-    class Schema;
+    struct Schema;
 }
 
 class Schema;
@@ -84,6 +84,12 @@ public:
     using value_type = typename Parent::value_type;
     using iterator = typename Parent::iterator;
     using const_iterator = typename Parent::const_iterator;
+
+    using Parent::begin;
+    using Parent::end;
+
+    using Parent::cbegin;
+    using Parent::cend;
 
 public:
     template <class T>
@@ -477,6 +483,17 @@ public:
             throw std::runtime_error("No class with such name: " + name);
         return *i;
     }
+    const Classes &getAllClasses() const
+    {
+        if (all.empty())
+        {
+            getClasses();
+            getServiceDbClasses();
+            all.insert(all.end(), main.begin(), main.end());
+            all.insert(all.end(), service_db.begin(), service_db.end());
+        }
+        return all;
+    }
     const Classes &getClasses() const
     {
         if (main.empty())
@@ -493,6 +510,7 @@ public:
     ModuleContext printForwardDeclarations() const;
     ModuleContext printObjectInterfaces() const;
     ModuleContext printTypes() const;
+    ModuleContext printType(const Class &c) const;
     ModuleContext printStorage() const;
     ModuleContext printStorageImplementation() const;
     ModuleContext printEnums() const;
@@ -508,7 +526,7 @@ private:
 
     std::unordered_map<Name, Type*> typePtrs;
 
-    mutable Classes main, service_db;
+    mutable Classes all, main, service_db;
 
     template <typename F>
     void executeForClasses(F &&f, bool reverse = false) const

@@ -18,14 +18,13 @@
 
 #pragma once
 
-#include <memory>
-#include <stdint.h>
-#include <type_traits>
-#include <unordered_map>
-#include <utility>
-
 #include "Exception.h"
-#include "Types.h"
+#include "Pointer.h"
+#include "ObjectMap.h"
+
+#include <memory>
+#include <type_traits>
+#include <utility>
 
 namespace polygon4
 {

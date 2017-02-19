@@ -21,15 +21,3 @@
 #include <Polygon4/DataManager/Localization.h>
 
 #include "detail/Enums.cpp"
-
-namespace polygon4
-{
-
-namespace detail
-{
-
-// empty
-
-} // namespace detail
-
-} // namespace polygon4

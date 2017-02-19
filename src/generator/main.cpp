@@ -61,12 +61,15 @@ try
     };
 
     printModule("ObjectInterfaces", schema.printObjectInterfaces());
-    printModule("Types", schema.printTypes());
     printModule("Storage", schema.printStorage());
     printModule("StorageImpl", schema.printStorageImplementation());
     printModule("Enums", schema.printEnums());
     printModule("Tokens", print(ts), "schema");
     printModule("ForwardDeclarations", schema.printForwardDeclarations());
+
+    printModule("Types", schema.printTypes());
+    for (auto &c : schema.getAllClasses())
+        printModule(c.getName(), schema.printType(c), "types");
 
     return 0;
 }

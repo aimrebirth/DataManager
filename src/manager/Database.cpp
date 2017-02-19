@@ -18,14 +18,11 @@
 
 #include <Polygon4/DataManager/Database.h>
 
-#include <algorithm>
+#include <Polygon4/DataManager/Exception.h>
 
 #include <sqlite3.h>
 
-#include <Polygon4/DataManager/Schema.h>
-#include <Polygon4/DataManager/Storage.h>
-#include <Polygon4/DataManager/StorageImpl.h>
-#include <Polygon4/DataManager/Exception.h>
+#include <algorithm>
 
 #include "Logger.h"
 DECLARE_STATIC_LOGGER(logger, "db");

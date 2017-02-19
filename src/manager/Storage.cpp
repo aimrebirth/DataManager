@@ -21,6 +21,7 @@
 #include <Polygon4/DataManager/Database.h>
 #include <Polygon4/DataManager/Localization.h>
 #include <Polygon4/DataManager/StorageImpl.h>
+#include <Polygon4/DataManager/Types.h>
 
 #include "Logger.h"
 DECLARE_STATIC_LOGGER(logger, "storage");

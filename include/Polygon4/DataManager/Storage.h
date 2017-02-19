@@ -21,9 +21,12 @@
 #include <memory>
 #include <string>
 
+#include "Enums.h"
 #include "Schema.h"
 #include "Settings.h"
-#include "Types.h"
+#include "Table.h"
+
+#include "detail/ForwardDeclarations.h"
 
 namespace polygon4
 {
@@ -31,7 +34,11 @@ namespace polygon4
 namespace detail
 {
 
+class IObjectBase;
+struct TreeItem;
+
 using CheckFunction = std::function<bool(IObjectBase*)>;
+using ProgressCallback = std::function<void(double)>;
 
 #include "detail/Storage.h"
 

@@ -255,3 +255,5 @@ namespace std
         }
     };
 }
+
+using P4String = ::polygon4::String;

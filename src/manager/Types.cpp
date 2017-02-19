@@ -18,10 +18,8 @@
 
 #include <Polygon4/DataManager/Types.h>
 
-#include <algorithm>
-
 #include <Polygon4/DataManager/Storage.h>
-#include <Polygon4/DataManager/Table.h>
+#include <Polygon4/DataManager/TreeItem.h>
 
 namespace polygon4
 {
@@ -90,11 +88,104 @@ void TreeItem::update()
     return s;
 }
 
-bool to_bool(const std::string &s)
+IObjectBase::IObjectBase(const IObjectBase &o)
 {
-    if (s.empty() || s == "0" || s == "false")
-        return false;
-    return true;
+    copyFrom(o);
+}
+
+IObjectBase &IObjectBase::operator=(const IObjectBase &o)
+{
+    copyFrom(o);
+    return *this;
+}
+
+IObjectBase::~IObjectBase()
+{
+}
+
+int IObjectBase::getId(int defaultValue) const
+{
+    return hasId() ? id : defaultValue;
+}
+
+void IObjectBase::setId(int id_in)
+{
+    id = id_in;
+}
+
+bool IObjectBase::hasId() const
+{
+    return false;
+}
+
+void IObjectBase::setVariableString(int columnId, IObjectBase *ptr)
+{
+}
+
+const IObjectBase *IObjectBase::getVariable(int columnId) const
+{
+    return nullptr;
+}
+
+EObjectType IObjectBase::getVariableType(int columnId) const
+{
+    return EObjectType::None;
+}
+
+Ptr<TreeItem> IObjectBase::printTree() const
+{
+    return createTreeItem();
+}
+
+::polygon4::String IObjectBase::getName() const
+{
+    return POLYGON4_NONAME;
+}
+
+::polygon4::String IObjectBase::getTextId() const
+{
+    return "NO_TEXT_ID";
+}
+
+::polygon4::String IObjectBase::getDescription() const
+{
+    return "NO_DESCRIPTION";
+}
+
+bool IObjectBase::operator<(const IObjectBase &rhs) const
+{
+    return getName() < rhs.getName();
+}
+
+void IObjectBase::setStorage(Storage *storage)
+{
+    storage_ = storage;
+}
+
+Storage *IObjectBase::getStorage() const
+{
+    return storage_;
+}
+
+bool IObjectBase::isReplaced() const
+{
+    return replaced_;
+}
+
+Ptr<TreeItem> IObjectBase::createTreeItem(TreeItem *parent) const
+{
+    auto item = std::make_shared<TreeItem>();
+    item->parent = parent;
+    item->object = const_cast<IObjectBase*>(this);
+    item->update();
+    return item;
+}
+
+void IObjectBase::copyFrom(const IObjectBase &o)
+{
+    id = o.id;
+    storage_ = o.storage_;
+    // do not copy replaced_ flag!
 }
 
 std::tuple<bool, OrderedObjectMap> IObjectBase::getOrderedObjectMap(int columnId, Storage *storage) const
@@ -112,6 +203,13 @@ Settings &IObjectBase::getSettings()
 const Settings &IObjectBase::getSettings() const
 {
     return getStorage()->getSettings();
+}
+
+bool to_bool(const std::string &s)
+{
+    if (s.empty() || s == "0" || s == "false")
+        return false;
+    return true;
 }
 
 } // namespace detail

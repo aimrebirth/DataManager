@@ -1,6 +1,6 @@
 /*
  * Polygon-4 Data Manager
- * Copyright (C) 2015 lzwdgc
+ * Copyright (C) 2015-2016 lzwdgc
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,19 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <Polygon4/DataManager/StorageImpl.h>
+#pragma once
 
-#include <sqlite3.h>
-
-#include <Polygon4/DataManager/Database.h>
-#include <Polygon4/DataManager/Localization.h>
-#include <Polygon4/DataManager/TreeItem.h>
-#include <Polygon4/DataManager/Types.h>
-
-#include "Logger.h"
-DECLARE_STATIC_LOGGER(logger, "storage_impl");
-
-#define PROGRESS_CALLBACK(p) if (callback) callback(p)
+#include "Enums.h"
+#include "Pointer.h"
+#include "Schema.h"
+#include "String.h"
 
 namespace polygon4
 {
@@ -36,8 +29,30 @@ namespace polygon4
 namespace detail
 {
 
-#include "detail/StorageImpl.cpp"
+class IObjectBase;
+
+struct DATA_MANAGER_API TreeItem
+{
+    P4String name;
+    P4String defaultName;
+    EObjectType type = EObjectType::None;
+    IObjectBase *object = nullptr;
+    TreeItem *parent = nullptr;
+    std::vector<Ptr<TreeItem>> children;
+    ObjectFlags flags;
+    void *objectArrayVariable = nullptr;
+    void *inlineVariable = nullptr;
+
+    void *guiItem = nullptr;
+
+    int child_count() const;
+    void remove() const;
+    void update();
+    P4String get_name();
+};
 
 } // namespace detail
+
+using detail::TreeItem;
 
 } // namespace polygon4

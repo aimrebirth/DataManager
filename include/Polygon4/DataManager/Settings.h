@@ -45,9 +45,9 @@ enum GameFlag
 
 using GameFlags = std::bitset<gfMaxFlag>;
 
-struct Settings
+struct DATA_MANAGER_API Settings
 {
-    struct Directories
+    struct DATA_MANAGER_API Directories
     {
         String game;
         String mods;
