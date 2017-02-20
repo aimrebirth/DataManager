@@ -124,5 +124,4 @@ projects:
         files:
             - include/Polygon4/Memory.h
             - src/memory/Memory.cpp
-        #dependencies:
-        #    - pvt.cppan.demo.intel.tbb.tbbmalloc_proxy: 4
+

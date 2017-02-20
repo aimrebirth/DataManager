@@ -142,4 +142,9 @@ struct UNDERSCORE(init)
     }
 } UNDERSCORE(init);
 
+/*__declspec(dllexport)
+void __my_memory_manager()
+{
+}*/
+
 #endif
