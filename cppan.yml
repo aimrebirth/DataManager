@@ -1,3 +1,5 @@
+root_project: pvt.lzwdgc.polygon4.data_manager
+
 projects:
     data_manager:
         type: lib
