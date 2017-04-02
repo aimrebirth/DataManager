@@ -22,6 +22,8 @@
 
 #if defined(_WIN32) && defined(DATA_MANAGER_ALIGNED_ALLOCATOR)
 
+#include <windows.h>
+
 void* alloc_internal(size_t size)
 {
     return _aligned_malloc(size, size >= 16 ? 16 : 8);
