@@ -60,19 +60,17 @@ projects:
                 DEPENDS ${generator} ${SDIR}/data/schema.txt
                 COMMENT "Generating data files"
             )
-            file(GLOB_RECURSE src_gen "${generated_dir}/*")
-            set_source_files_properties(${src_gen} PROPERTIES
-                GENERATED True
+            set_source_files_properties(${generated_src} PROPERTIES
                 HEADER_FILE_ONLY True
             )
-            set(src ${src} ${generated_src} ${src_gen})
+            set(src ${src} ${generated_src})
         post_target: |
             target_include_directories(${this}
                 PUBLIC ${generated_dir_inc}
                 PRIVATE ${generated_dir_src}
             )
             if (MSVC)
-                target_compile_options  (${this} PUBLIC /bigobj)
+                target_compile_options(${this} PUBLIC /bigobj)
             endif()
 
     generator:
