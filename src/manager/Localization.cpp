@@ -110,8 +110,6 @@ LocalizedString::string_type LocalizedString::str(LocalizationType type) const
     auto &s = (*this)[type];
     if (!s.empty())
         return s;
-    if (type == LocalizationType::en)
-        return s;
     return firstNonEmpty();
 }
 
