@@ -43,8 +43,9 @@ enum class LocalizationType : EnumType
 {
     min = 0,
 
-    ru = 0,
-    en,
+#define ADD_LANGUAGE(l, i) l = i,
+#include "Languages.inl"
+#undef ADD_LANGUAGE
 
     max,
 };
@@ -84,8 +85,9 @@ public:
 private:
     string_type __Begin;
 public:
-    string_type ru;
-    string_type en;
+#define ADD_LANGUAGE(l, i) string_type l;
+#include "Languages.inl"
+#undef ADD_LANGUAGE
 private:
     string_type __End;
 };
@@ -95,17 +97,8 @@ struct LocalizationInfo
     std::string key;
     LocalizedString data;
 
-    String str() const
-    {
-        String s = data;
-        if (!s.empty())
-            return s;
-        return key;
-    }
-    operator String() const
-    {
-        return str();
-    }
+	String str() const;
+	operator String() const;
 };
 
 template <typename T>
@@ -121,43 +114,13 @@ public:
     using translator_type = std::unordered_map<context_type, dictionary_type>;
 
 public:
-    String tr(const key_type &key, const context_type &context = context_type())
-    {
-        auto c = translator.find(context);
-        if (c == translator.end())
-        {
-            translator[context];
-            c = translator.find(context);
-        }
-        auto s = c->second.find(key);
-        if (s == c->second.end())
-        {
-            c->second[key] = { key };
-            s = c->second.find(key);
-        }
-        return s->second.str();
-    }
+	String tr(const key_type &key, const context_type &context = context_type());
 
-    void init(const translator_type &t)
-    {
-        if (initialized)
-            return;
-        initialized = true;
-        translator = t;
-    }
+	void init(const translator_type &t);
 
-    void add(const key_type &key, const LocalizedString &ls)
-    {
-        translator[""][key] = ls;
-    }
-    void add(const key_type &key, const context_type &context, const LocalizedString &ls)
-    {
-        translator[context][key] = ls;
-    }
-    void add(const context_type &context, const dictionary_type &d)
-    {
-        translator[context].insert(d.begin(), d.end());
-    }
+	void add(const key_type &key, const LocalizedString &ls);
+	void add(const key_type &key, const context_type &context, const LocalizedString &ls);
+	void add(const context_type &context, const dictionary_type &d);
 
 private:
     translator_type translator;

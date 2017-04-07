@@ -322,6 +322,11 @@ class LocalizedString
 {
     str ru { big_edit; };
     str en { big_edit; };
+    str de { big_edit; }; # German
+    str fr { big_edit; };
+    str es { big_edit; };
+    str et { big_edit; }; # Estonian
+    str cs { big_edit; }; # Czech
 
     properties
     {
