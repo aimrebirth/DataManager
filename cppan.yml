@@ -42,6 +42,9 @@ projects:
             set(generated_dir_src           ${generated_dir}/src)
             set(generated_dir_src_detail    ${generated_dir}/src/detail)
 
+            execute_process(${CMAKE_COMMAND} -E make_directory ${generated_dir_inc})
+            execute_process(${CMAKE_COMMAND} -E make_directory ${generated_dir_src})
+
             set(generated_src
                 ${generated_dir_inc_detail}/ForwardDeclarations.h
                 #${generated_dir_inc_detail}/Types.h
