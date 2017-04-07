@@ -94,7 +94,7 @@ private:
 
 struct LocalizationInfo
 {
-    std::string key;
+    String key;
     LocalizedString data;
 
 	String str() const;
@@ -107,7 +107,7 @@ using LocalizationTable = std::unordered_map<T, LocalizationInfo>;
 class Translator
 {
 public:
-    using key_type = std::string;
+    using key_type = String;
     using value_type = LocalizedString;
     using dictionary_type = std::unordered_map<key_type, value_type>;
     using context_type = key_type;
@@ -134,6 +134,6 @@ void initTranslator();
 DATA_MANAGER_API
 String tr(DataType type);
 DATA_MANAGER_API
-String tr(const std::string &key, const std::string &context = std::string());
+String tr(const String &key, const String &context = String());
 
 }
