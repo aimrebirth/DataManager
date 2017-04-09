@@ -105,11 +105,18 @@ LocalizedString::operator LocalizedString::string_type() const
 
 LocalizedString::string_type LocalizedString::str(LocalizationType type) const
 {
-    if (type == LocalizationType::max)
-        type = getCurrentLocalizationId();
-    auto &s = (*this)[type];
-    if (!s.empty())
-        return s;
+    // return requested language
+    auto s = &(*this)[type];
+    if (!s->empty())
+        return *s;
+    // if it's not russian, by default return english string
+    if (type != LocalizationType::ru)
+    {
+        s = &(*this)[LocalizationType::en];
+        if (!s->empty())
+            return *s;
+    }
+    // otherwise return just first non-empty
     return firstNonEmpty();
 }
 

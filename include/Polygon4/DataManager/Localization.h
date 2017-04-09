@@ -78,7 +78,7 @@ public:
     const string_type &operator[](LocalizationType type) const;
 
     operator string_type() const;
-    string_type str(LocalizationType type = LocalizationType::max) const;
+    string_type str(LocalizationType type = getCurrentLocalizationId()) const;
 
     string_type firstNonEmpty() const;
 
