@@ -1,3 +1,4 @@
+// append only?
 ADD_LANGUAGE(ru, 0)
 ADD_LANGUAGE(en, 1)
 ADD_LANGUAGE(de, 2)
@@ -5,3 +6,4 @@ ADD_LANGUAGE(fr, 3)
 ADD_LANGUAGE(es, 4)
 ADD_LANGUAGE(et, 5)
 ADD_LANGUAGE(cs, 6)
+ADD_LANGUAGE(tr, 7)

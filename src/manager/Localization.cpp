@@ -235,6 +235,7 @@ const Translator::translator_type translator_data =
                 {"es", {"Español", "Español"}},
                 {"et", {"Eesti", "Eesti"}},
                 {"cs", {"Čeština", "Čeština"}},
+                {"tr", {"Türkçe", "Türkçe"}},
 
                 // table names (singular)
                 {"None", {"Отсутствует", "None"}},
@@ -461,7 +462,7 @@ const Translator::translator_type translator_data =
                 {"noblivion", {"", "noblivion"}},
                 {"notrade", {"Не продаётся", "notrade"}},
                 {"numstate", {"", "numstate"}},
-                {"object", {"Объект", "object"}},
+                {"object", {"Объект", "Object"}},
                 {"other_strings", {"Другие строки", "other_strings"}},
                 {"pitch", {"", "pitch"}},
                 {"player", {"Игрок", "player"}},
