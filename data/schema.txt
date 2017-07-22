@@ -1358,6 +1358,7 @@ class MapObject
     Scale scale;
 
     bool interactive = false;
+    bool enabled = true;
 
     properties
     {
@@ -1378,6 +1379,7 @@ class MapGood
 
     Coordinate coordinate;
     Scale scale;
+    bool enabled = true;
 
     properties
     {
@@ -1398,6 +1400,7 @@ class MapBuilding
 
     Coordinate coordinate;
     Scale scale;
+    bool enabled = true;
 
     properties
     {
