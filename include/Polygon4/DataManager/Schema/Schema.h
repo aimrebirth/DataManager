@@ -171,6 +171,8 @@ public:
 class SCHEMA_API Type : public ObjectWithFlags
 {
 public:
+    virtual ~Type() = default;
+
     Name getName() const
     {
         return name;
@@ -365,6 +367,8 @@ using Variables = ObjectArray<std::vector<Variable>>;
 class SCHEMA_API Class : public Type
 {
 public:
+    virtual ~Class() = default;
+
     void initialize();
     Variables getVariables(bool container = false) const;
     Name getEnumName() const { return enumName; }
@@ -453,6 +457,8 @@ using EnumItems = std::vector<EnumItem>;
 class Enum : public Type
 {
 public:
+    virtual ~Enum() = default;
+
     Name getTableName() const { return "table_" + getCppName(); }
     Name getExcludeTableName() const { return getTableName() + "_exclude"; }
 

@@ -94,6 +94,7 @@ public:
     using const_iterator = typename base::const_iterator;
 
     using key_type = typename base::key_type;
+    using mapped_type = typename base::mapped_type;
     using value_type = typename base::value_type;
     using ptr_type = T*;
     using id_ptr_type = IdPtr<T>;
