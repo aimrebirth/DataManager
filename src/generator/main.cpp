@@ -36,13 +36,13 @@ try
     }
 
     Tokens ts;
-    auto schema = parse_file(argv[1], &ts);
+    const auto schema = parse_file(argv[1], &ts);
 
-    fs::path p = argv[2];
-    auto header = p / "include" / "detail";
-    auto src = p / "src" / "detail";
+    const fs::path p = argv[2];
+    const auto header = p / "include" / "detail";
+    const auto src = p / "src" / "detail";
 
-    auto printModule = [&header, &src](const std::string &name, auto module, const fs::path &subdir = fs::path())
+    auto printModule = [&header, &src](const std::string &name, auto module, const fs::path &subdir = "")
     {
         auto save = [](const auto &path, const std::string &s)
         {
