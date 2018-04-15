@@ -47,16 +47,16 @@ projects:
 
             set(generated_src
                 ${generated_dir_inc_detail}/ForwardDeclarations.h
-                #${generated_dir_inc_detail}/Types.h
-                #${generated_dir_src_detail}/Types.cpp
-                #${generated_dir_inc_detail}/Storage.h
-                #${generated_dir_src_detail}/Storage.cpp
-                #${generated_dir_inc_detail}/StorageImpl.h
-                #${generated_dir_src_detail}/StorageImpl.cpp
-                #${generated_dir_src_detail}/schema/Tokens.cpp
-                #${generated_dir_inc_detail}/ObjectInterfaces.h
-                #${generated_dir_inc_detail}/Enums.h
-                #${generated_dir_src_detail}/Enums.cpp
+                ${generated_dir_inc_detail}/Types.h
+                ${generated_dir_src_detail}/Types.cpp
+                ${generated_dir_inc_detail}/Storage.h
+                ${generated_dir_src_detail}/Storage.cpp
+                ${generated_dir_inc_detail}/StorageImpl.h
+                ${generated_dir_src_detail}/StorageImpl.cpp
+                ${generated_dir_src_detail}/schema/Tokens.cpp
+                ${generated_dir_inc_detail}/ObjectInterfaces.h
+                ${generated_dir_inc_detail}/Enums.h
+                ${generated_dir_src_detail}/Enums.cpp
             )
             add_custom_command(OUTPUT ${generated_src}
                 COMMAND ${generator} ${SDIR}/data/schema.txt ${generated_dir}
