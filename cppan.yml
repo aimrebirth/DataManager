@@ -1,5 +1,7 @@
 root_project: pvt.lzwdgc.polygon4.data_manager
 
+common_settings:
+    c++: 17
 projects:
     data_manager:
         type: lib
@@ -109,7 +111,7 @@ projects:
             - pvt.cppan.demo.boost.algorithm: 1
             - pvt.cppan.demo.boost.variant: 1
             - pvt.cppan.demo.lexxmark.winflexbison.bison: master
-            - pvt.cppan.demo.lexxmark.winflexbison.flex: 2.6.1
+            - pvt.cppan.demo.lexxmark.winflexbison.flex: master
 
         post_sources: |
             add_custom_command(OUTPUT

@@ -76,10 +76,10 @@ public:
     }
 
     template <typename F>
-    iterator find_if(F &&f) { return std::find_if(begin(), end(), f); }
+    iterator find_if(F &&f) { return std::find_if(base::begin(), base::end(), f); }
 
     template <typename F>
-    const_iterator find_if(F &&f) const { return std::find_if(begin(), end(), f); }
+    const_iterator find_if(F &&f) const { return std::find_if(base::begin(), base::end(), f); }
 };
 
 class Storage;
@@ -130,7 +130,7 @@ public:
                 ", value: '" + v->getName().toString() + "'");
         }
         auto old = find(key);
-        if (old != end())
+        if (old != base::end())
         {
             throw EXCEPTION("Duplicate key (" + std::to_string(key) + ") detected. Table '" + name + "'" +
                 ", old value: '" + old->second->getName().toString() + "'" +
@@ -158,7 +158,7 @@ public:
     ptr_type operator[](const key_type &i) const // does not change the container
     {
         auto v = find(i);
-        if (v == end())
+        if (v == base::end())
         {
             throw EXCEPTION("key (" + std::to_string(i) + ") not found in table '" + name + "'");
         }
@@ -199,7 +199,7 @@ public:
     id_ptr_type get_id_ptr(const key_type &i) const
     {
         auto v = find(i);
-        if (v == end())
+        if (v == base::end())
         {
             throw EXCEPTION("key (" + std::to_string(i) + ") not found in table '" + name + "'");
         }
@@ -216,10 +216,10 @@ public:
     }
 
     template <typename F>
-    iterator find_if(F &&f) { return std::find_if(begin(), end(), f); }
+    iterator find_if(F &&f) { return std::find_if(base::begin(), base::end(), f); }
 
     template <typename F>
-    const_iterator find_if(F &&f) const { return std::find_if(begin(), end(), f); }
+    const_iterator find_if(F &&f) const { return std::find_if(base::begin(), base::end(), f); }
 
     size_t erase(const ptr_type &v)
     {
@@ -233,7 +233,7 @@ public:
         while (1)
         {
             auto i = find_if([v](const auto &p) { return p.second.get() == v; });
-            if (i == end())
+            if (i == base::end())
                 break;
             base::erase(i);
             vacuumIds();
@@ -264,7 +264,7 @@ private:
         for (; maxId > 0; --maxId)
         {
             auto i = find(maxId);
-            if (i != end())
+            if (i != base::end())
             {
                 maxId++; // restore one id
                 break;
