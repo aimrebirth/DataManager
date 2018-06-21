@@ -157,7 +157,7 @@ public:
     // get by key
     ptr_type operator[](const key_type &i) const // does not change the container
     {
-        auto v = find(i);
+        auto v = base::find(i);
         if (v == base::end())
         {
             throw EXCEPTION("key (" + std::to_string(i) + ") not found in table '" + name + "'");
