@@ -1,43 +1,130 @@
 %{
-#include <assert.h>
-#include <iostream>
-#include <string>
-
-#include "ParserDriver.h"
-
-#define yylex(p) p.lex()
+#include <schema_parser.h>
 %}
 
 ////////////////////////////////////////
 
 // general settings
 %require "3.0"
-%debug
+//%debug
 %start file
 %locations
 %verbose
-%no-lines
+//%no-lines
 %error-verbose
 
 ////////////////////////////////////////
 
 // c++ skeleton and options
 %skeleton "lalr1.cc"
-
 %define api.value.type variant
 %define api.token.constructor // C++ style of handling variants
 %define parse.assert // check C++ variant types
+%code provides { #include <primitives/helper/bison_yy.h> }
+%parse-param { MY_PARSER_DRIVER &driver } // param to yy::parser() constructor (the parsing context)
 
-%code requires // forward decl of C++ driver (our parser) in HPP
+%code requires
 {
 #include <Ast.h>
-
-class ParserDriver;
+#include <Token.h>
 }
 
-// param to yy::parser() constructor
-// the parsing context
-%param { ParserDriver &driver }
+%code provides
+{
+struct MY_PARSER_DRIVER : MY_PARSER
+{
+    using base = MY_PARSER;
+
+    enum class Mode
+    {
+        String,
+        Tokens,
+    };
+
+    Mode parseMode;
+    ast::Schema schema;
+    Tokens *tokensWrite;
+    const Tokens *tokensRead;
+    Tokens::const_iterator readIterator;
+
+    symbol_type convert(const Token &t)
+    {
+        symbol_type s;
+        s.type = t.token;
+        switch (t.type)
+        {
+        case Token::Integer:
+            s.value.build<int>(boost::get<int>(t.value));
+            break;
+        case Token::String:
+            s.value.build<std::string>(boost::get<std::string>(t.value));
+            break;
+        }
+        return s;
+    }
+
+    Token convert(const symbol_type &tok)
+    {
+        Token t;
+        t.token = tok.type;
+
+        by_type bt;
+        bt.type = tok.type;
+        switch (bt.token())
+        {
+        case token::INTEGER:
+            t.type = Token::Integer;
+            t.value = tok.value.as<int>();
+            break;
+        case token::STRING:
+            t.type = Token::String;
+            t.value = tok.value.as<std::string>();
+            break;
+        default:
+            t.type = Token::None;
+            break;
+        }
+        return t;
+    }
+
+    symbol_type lex()
+    {
+        if (parseMode == Mode::String)
+        {
+            auto ret = base::lex();
+            if (tokensWrite)
+                tokensWrite->push_back(convert(ret));
+            return ret;
+        }
+        else
+        {
+            return convert(*readIterator++);
+        }
+    }
+
+    int parse(const std::string &s, Tokens *tokens)
+    {
+        parseMode = Mode::String;
+        tokensWrite = tokens;
+        //auto parser(*this); // why copy?
+        //int res = parser.base::parse(s);
+        //return res;
+        return base::parse(s);
+    }
+
+    int parse(const Tokens &tokens)
+    {
+        parseMode = Mode::Tokens;
+        tokensRead = &tokens;
+        readIterator = tokensRead->cbegin();
+        //auto parser(*this); // why copy?
+        return /*parser.*/THIS_PARSER::parser::parse();
+    }
+
+    void setSchema(const ast::Schema &schema) { this->schema = schema; }
+    ast::Schema getSchema() const { return schema; }
+};
+}
 
 ////////////////////////////////////////
 
@@ -401,8 +488,3 @@ integer: INTEGER
     ;
 
 %%
-
-void yy::parser::error(const location_type& l, const std::string& m)
-{
-    driver.error(l, m);
-}

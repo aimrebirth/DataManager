@@ -16,18 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <fstream>
-#include <iostream>
-
-#include <boost/filesystem.hpp>
-
-namespace fs = boost::filesystem;
-
 #include <Polygon4/DataManager/Schema/Schema.h>
 #include <Polygon4/DataManager/Schema/Parser.h>
 
+#include <primitives/filesystem.h>
+#include <primitives/sw/main.h>
+
+#include <fstream>
+#include <iostream>
+
 int main(int argc, char *argv[])
-try
 {
     if (argc < 3)
     {
@@ -38,7 +36,7 @@ try
     Tokens ts;
     const auto schema = parse_file(argv[1], &ts);
 
-    const fs::path p = argv[2];
+    const path p = argv[2];
     const auto header = p / "include" / "detail";
     const auto src = p / "src" / "detail";
 
@@ -48,8 +46,8 @@ try
         {
             if (s.empty())
                 return;
-            boost::system::error_code ec;
-            fs::create_directories(path.parent_path(), ec);
+            error_code ec;
+            create_directories(path.parent_path(), ec);
             std::ofstream(path.string()) << s;
         };
 
@@ -72,14 +70,4 @@ try
         printModule(c.getName(), schema.printType(c), "types");
 
     return 0;
-}
-catch (std::exception &e)
-{
-    std::cerr << e.what() << "\n";
-    return 1;
-}
-catch (...)
-{
-    std::cerr << "unknown exception" << "\n";
-    return 1;
 }

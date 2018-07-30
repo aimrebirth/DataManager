@@ -18,15 +18,17 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include "Schema.h"
 #include "Token.h"
+
+#include <primitives/filesystem.h>
+
+#include <string>
+#include <vector>
 
 SCHEMA_API
 Schema parse(const Tokens &tokens);
 SCHEMA_API
 Schema parse_string(const std::string &s, Tokens *tokens = nullptr);
 SCHEMA_API
-Schema parse_file(const std::string &filename, Tokens *tokens = nullptr);
+Schema parse_file(const path &filename, Tokens *tokens = nullptr);

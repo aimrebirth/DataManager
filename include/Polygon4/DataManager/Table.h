@@ -45,7 +45,7 @@ public:
     void insert(value_type p)
     {
         if (p)
-            push_back(p);
+            base::push_back(p);
     }
 
     OrderedObjectMap getOrderedObjectMap() const
@@ -129,7 +129,7 @@ public:
             throw EXCEPTION("Bad id (" + std::to_string(key) + ") < 1 detected. Table: '" + name + "'" +
                 ", value: '" + v->getName().toString() + "'");
         }
-        auto old = find(key);
+        auto old = base::find(key);
         if (old != base::end())
         {
             throw EXCEPTION("Duplicate key (" + std::to_string(key) + ") detected. Table '" + name + "'" +
@@ -198,7 +198,7 @@ public:
 public:
     id_ptr_type get_id_ptr(const key_type &i) const
     {
-        auto v = find(i);
+        auto v = base::find(i);
         if (v == base::end())
         {
             throw EXCEPTION("key (" + std::to_string(i) + ") not found in table '" + name + "'");
@@ -263,7 +263,7 @@ private:
     {
         for (; maxId > 0; --maxId)
         {
-            auto i = find(maxId);
+            auto i = base::find(maxId);
             if (i != base::end())
             {
                 maxId++; // restore one id
@@ -295,7 +295,7 @@ public:
         if (!p)
             return;
         insert_to_data(p);
-        push_back(p);
+        base::push_back(p);
     }
 
     void insert_to_data(value_type p)

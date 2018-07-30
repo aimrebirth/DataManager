@@ -18,12 +18,12 @@
 
 #include <Polygon4/DataManager/Schema/Parser.h>
 
-#include <algorithm>
-#include <fstream>
+#include <schema_parser.h>
 
 #include <Polygon4/DataManager/Schema/Context.h>
 
-#include "ParserDriver.h"
+#include <algorithm>
+#include <fstream>
 
 Schema convert(const ast::Schema &ast)
 {
@@ -283,20 +283,9 @@ Schema convert(const ast::Schema &ast)
     return s;
 }
 
-std::string read_file(const std::string &filename)
-{
-    std::ifstream ifile(filename);
-    if (!ifile)
-        throw std::runtime_error("Cannot open file " + filename);
-    std::string f, s;
-    while (std::getline(ifile, s))
-        f += s + "\n";
-    return f;
-}
-
 Schema parse(const Tokens &tokens)
 {
-    ParserDriver driver;
+    SchemaParserDriver driver;
     int ret = driver.parse(tokens);
     if (ret)
         throw std::runtime_error("Error during parsing file");
@@ -312,7 +301,7 @@ Schema parse_string(const std::string &s, Tokens *tokens)
         tokens->reserve(10000);
     }
 
-    ParserDriver driver;
+    SchemaParserDriver driver;
     int ret = driver.parse(s, tokens);
     if (ret)
         throw std::runtime_error("Error during parsing file");
@@ -320,7 +309,7 @@ Schema parse_string(const std::string &s, Tokens *tokens)
     return convert(driver.getSchema());
 }
 
-Schema parse_file(const std::string &filename, Tokens *tokens)
+Schema parse_file(const path &filename, Tokens *tokens)
 {
     auto s = read_file(filename);
     return parse_string(s, tokens);

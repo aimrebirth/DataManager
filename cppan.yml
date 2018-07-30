@@ -2,6 +2,10 @@ root_project: pvt.lzwdgc.polygon4.data_manager
 
 common_settings:
     c++: 17
+
+add_directories:
+    - d:/dev/primitives
+
 projects:
     data_manager:
         type: lib
@@ -83,7 +87,9 @@ projects:
         dependencies:
             - schema
             - memory
-            - pvt.cppan.demo.boost.filesystem: 1
+            - name: pvt.egorpugin.primitives.sw.main
+              version: master
+              local: primitives.sw.main
 
     schema:
         type: lib
@@ -110,21 +116,25 @@ projects:
             - memory
             - pvt.cppan.demo.boost.algorithm: 1
             - pvt.cppan.demo.boost.variant: 1
-            - pvt.cppan.demo.lexxmark.winflexbison.bison: master
-            - pvt.cppan.demo.lexxmark.winflexbison.flex: master
+            - name: pvt.egorpugin.primitives.templates
+              version: master
+              local: primitives.templates
+            - name: pvt.egorpugin.primitives.filesystem
+              version: master
+              local: primitives.filesystem
+            - name: pvt.cppan.demo.lexxmark.winflexbison.flex
+              version: master
+              ref: flex
+              condition:
+                  - WIN32
+            - name: pvt.cppan.demo.lexxmark.winflexbison.bison
+              version: master
+              ref: bison
+              condition:
+                  - WIN32
 
         post_sources: |
-            add_custom_command(OUTPUT
-                ${BDIR}/lexer.h ${BDIR}/lexer.cpp
-                ${BDIR}/grammar.hpp ${BDIR}/grammar.cpp
-                COMMAND pvt.cppan.demo.lexxmark.winflexbison.flex --header-file=${BDIR}/lexer.h -o lexer.cpp ${SDIR}/src/schema/lexer.ll
-                COMMAND pvt.cppan.demo.lexxmark.winflexbison.bison --defines=grammar.hpp -o grammar.cpp ${SDIR}/src/schema/grammar.yy
-                WORKING_DIRECTORY ${BDIR}
-            )
-            set(src ${src}
-                ${BDIR}/lexer.h ${BDIR}/lexer.cpp
-                ${BDIR}/grammar.hpp ${BDIR}/grammar.cpp
-            )
+            cppan_flex_bison_pair(LALR1_CPP_VARIANT_PARSER src/schema/schema)
 
     memory:
         type: lib
