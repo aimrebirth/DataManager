@@ -21,24 +21,23 @@
 
 #include <primitives/filesystem.h>
 #include <primitives/sw/main.h>
+#include <primitives/sw/settings.h>
 
 #include <fstream>
 #include <iostream>
 
 int main(int argc, char *argv[])
 {
-    if (argc < 3)
-    {
-        printf("Usage: %s schema.txt out_dir\n", argv[0]);
-        return 1;
-    }
+    cl::opt<path> schema_fn(cl::Positional, cl::desc("<schema>"), cl::Required);
+    cl::opt<path> out_dir(cl::Positional, cl::desc("<output dir>"), cl::Required);
+
+    cl::ParseCommandLineOptions(argc, argv);
 
     Tokens ts;
-    const auto schema = parse_file(argv[1], &ts);
+    const auto schema = parse_file(schema_fn, &ts);
 
-    const path p = argv[2];
-    const auto header = p / "include" / "detail";
-    const auto src = p / "src" / "detail";
+    const auto header = out_dir / "include" / "detail";
+    const auto src = out_dir / "src" / "detail";
 
     auto printModule = [&header, &src](const std::string &name, auto module, const fs::path &subdir = "")
     {

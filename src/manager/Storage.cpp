@@ -36,7 +36,7 @@ namespace detail
 
 } // namespace detail
 
-std::shared_ptr<Storage> initStorage(const std::string &filename)
+std::shared_ptr<Storage> initStorage(const path &filename)
 {
     std::shared_ptr<Database> db = std::make_shared<Database>(filename);
     return initStorage(db);

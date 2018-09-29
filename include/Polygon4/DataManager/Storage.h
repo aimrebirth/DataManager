@@ -28,6 +28,8 @@
 
 #include "detail/ForwardDeclarations.h"
 
+#include <primitives/filesystem.h>
+
 namespace polygon4
 {
 
@@ -48,7 +50,7 @@ using detail::Storage;
 class Database;
 
 DATA_MANAGER_API
-std::shared_ptr<Storage> initStorage(const std::string &filename);
+std::shared_ptr<Storage> initStorage(const path &filename);
 DATA_MANAGER_API
 std::shared_ptr<Storage> initStorage(const std::shared_ptr<Database> &db);
 

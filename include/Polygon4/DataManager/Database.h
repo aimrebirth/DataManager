@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <primitives/filesystem.h>
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -33,17 +35,17 @@ class DATA_MANAGER_API Database
     typedef std::function<int(int, char**, char**)> DatabaseCallback;
 
 public:
-    Database(const std::string &dbname);
+    Database(const path &dbname);
     ~Database();
 
-    void loadDatabase(const std::string &dbname);
+    void loadDatabase(const path &dbname);
     void save() const;
 
     bool isLoaded() const;
     sqlite3 *getDb() const;
 
     std::string getName() const;
-    std::string getFullName() const;
+    path getFullName() const;
 
     bool execute(const std::string &sql, void *object, Sqlite3Callback callback, bool nothrow = false, std::string *errmsg = 0) const;
     bool execute(const std::string &sql, DatabaseCallback callback = DatabaseCallback(), bool nothrow = false, std::string *errmsg = 0) const;
@@ -51,7 +53,7 @@ public:
 private:
     sqlite3 *db = 0;
     std::string name;
-    std::string fullName;
+    path fullName;
 };
 
 }
