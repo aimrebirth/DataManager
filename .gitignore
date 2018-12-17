@@ -2,6 +2,7 @@ win*
 lib
 /build*
 /.cppan*
+/.sw*
 
 *.dll
 *.lnk

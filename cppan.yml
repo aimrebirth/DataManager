@@ -119,6 +119,9 @@ projects:
             - name: pvt.egorpugin.primitives.templates
               version: master
               local: primitives.templates
+            - name: pvt.egorpugin.primitives.context
+              version: master
+              local: primitives.context
             - name: pvt.egorpugin.primitives.filesystem
               version: master
               local: primitives.filesystem
