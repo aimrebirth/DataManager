@@ -3,6 +3,7 @@
 void build(Solution &s)
 {
     auto &DataManager = s.addLibrary("Polygon4.DataManager", "master");
+    DataManager += Git("https://github.com/aimrebirth/DataManager", "", "{v}");
 
     auto &memory = DataManager.addStaticLibrary("memory");
     memory.CPPVersion = CPPLanguageStandard::CPP17;
