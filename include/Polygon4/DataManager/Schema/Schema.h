@@ -18,6 +18,9 @@
 
 #pragma once
 
+#include "Context.h"
+#include "Types.h"
+
 #include <assert.h>
 
 #include <algorithm>
@@ -28,9 +31,6 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
-
-#include "Context.h"
-#include "Types.h"
 
 DataType dataTypeFromName(const Name &name);
 
@@ -46,28 +46,9 @@ class SCHEMA_API ObjectWithFlags
 public:
     const ObjectFlags &getFlags() const { return flags; }
 
-    bool hasFlags(const std::vector<ObjectFlag> &in_flags, bool revert = false) const
-    {
-        ObjectFlags flags_new;
-        for (auto &f : in_flags)
-            flags_new.set(f);
-        ObjectFlags r = this->flags;
-        if (revert)
-            r = r ^ flags_new;
-        r = r & flags_new;
-        r = r ^ flags_new;
-        return r.none();
-    }
-    bool hasFlags(const std::initializer_list<ObjectFlag> &in_flags, bool revert = false) const
-    {
-        return hasFlags(std::vector<ObjectFlag>(in_flags), revert);
-    }
-    bool hasFlags(ObjectFlags in_flags, bool revert = false) const
-    {
-        if (revert)
-            in_flags.flip();
-        return in_flags == flags;
-    }
+    bool hasFlags(const std::vector<ObjectFlag> &in_flags, bool revert = false) const;
+    bool hasFlags(const std::initializer_list<ObjectFlag> &in_flags, bool revert = false) const;
+    bool hasFlags(ObjectFlags in_flags, bool revert = false) const;
 
     void setFlags(const ObjectFlags &flags_in) { flags = flags_in; }
 

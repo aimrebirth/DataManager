@@ -75,8 +75,8 @@ enum ObjectFlag
     fMaxFlag,
 };
 
-//using ObjectFlags = std::bitset<fMaxFlag>;
-using ObjectFlags = std::bitset<64>;
+using ObjectFlags = std::bitset<fMaxFlag>;
+//using ObjectFlags = std::bitset<64>;
 
 using Version = std::string;
 

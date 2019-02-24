@@ -102,6 +102,31 @@ std::string dataTypeToSqlite3(DataType t)
     return s;
 }
 
+bool ObjectWithFlags::hasFlags(const std::vector<ObjectFlag> &in_flags, bool revert) const
+{
+    ObjectFlags flags_new;
+    for (auto &f : in_flags)
+        flags_new.set(f);
+    ObjectFlags r = this->flags;
+    if (revert)
+        r = r ^ flags_new;
+    r = r & flags_new;
+    r = r ^ flags_new;
+    return r.none();
+}
+
+bool ObjectWithFlags::hasFlags(const std::initializer_list<ObjectFlag> &in_flags, bool revert) const
+{
+    return hasFlags(std::vector<ObjectFlag>(in_flags), revert);
+}
+
+bool ObjectWithFlags::hasFlags(ObjectFlags in_flags, bool revert) const
+{
+    if (revert)
+        in_flags.flip();
+    return in_flags == flags;
+}
+
 void Schema::initialize()
 {
     for (auto &e : enums)
