@@ -48,8 +48,8 @@ void build(Solution &s)
         DataManager += "src/manager"_idir;
 
         DataManager.Public += schema;
-        DataManager.Public += "org.sw.demo.boost.log-1"_dep;
         DataManager.Public += "org.sw.demo.sqlite3-3"_dep;
+        DataManager.Public += "pub.egorpugin.primitives.log-master"_dep;
 
         {
             auto c = DataManager.addCommand();

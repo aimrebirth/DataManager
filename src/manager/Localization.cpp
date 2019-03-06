@@ -18,7 +18,7 @@
 
 #include <Polygon4/DataManager/Localization.h>
 
-#include "Logger.h"
+#include <primitives/log.h>
 DECLARE_STATIC_LOGGER(logger, "tr");
 
 #define TS(key, ...) { ENUM_NAME(key), { #key, { __VA_ARGS__ } } },
@@ -35,12 +35,7 @@ LocalizationType getCurrentLocalizationId(LocalizationType type)
 }
 
 Translator translator;
-extern const Translator::translator_type translator_data;
-
-}
-
-namespace polygon4
-{
+const Translator::translator_type &get_translator_data();
 
 LocalizedString::LocalizedString()
 {
@@ -187,7 +182,7 @@ void Translator::add(const context_type &context, const dictionary_type &d)
 void initTranslator()
 {
     LOG_TRACE(logger, "Initializing translator");
-    translator.init(translator_data);
+    translator.init(get_translator_data());
 }
 
 LocalizationTable<DataType> translator_DataType_data =
@@ -217,10 +212,11 @@ String tr(const String &key, const String &context)
     return translator.tr(key, context);
 }
 
-// do not make strings wide!
-// NOT L"..."
-const Translator::translator_type translator_data =
-    {
+const Translator::translator_type &get_translator_data()
+{
+    // do not make strings wide!
+    // NOT L"..."
+    static const Translator::translator_type translator_data = {
         {
             // pair < context, dict >
             "", // context
@@ -406,7 +402,8 @@ const Translator::translator_type translator_data =
                 {"comment", {"Комментарий", "comment"}},
                 {"complete", {"Выполнено", "complete"}},
                 {"configuration", {"Конфигурация", "configuration"}},
-                {"cooperative_player_configuration", {"Конфигурация сетевого игрока", "cooperative_player_configuration"}},
+                {"cooperative_player_configuration",
+                 {"Конфигурация сетевого игрока", "cooperative_player_configuration"}},
                 {"damage", {"Урон", "damage"}},
                 {"damagetype", {"Тип урона", "damagetype"}},
                 {"date_created", {"Дата создания", "date_created"}},
@@ -610,6 +607,9 @@ const Translator::translator_type translator_data =
 
             } // dict end
         },    // pair end
-};
+    };
 
+    return translator_data;
 }
+
+} // namespace polygon4

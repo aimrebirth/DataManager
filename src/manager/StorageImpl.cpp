@@ -25,7 +25,7 @@
 #include <Polygon4/DataManager/TreeItem.h>
 #include <Polygon4/DataManager/Types.h>
 
-#include "Logger.h"
+#include <primitives/log.h>
 DECLARE_STATIC_LOGGER(logger, "storage_impl");
 
 #define PROGRESS_CALLBACK(p) if (callback) callback(p)

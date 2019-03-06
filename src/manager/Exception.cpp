@@ -18,7 +18,7 @@
 
 #include <Polygon4/DataManager/Exception.h>
 
-#include "Logger.h"
+#include <primitives/log.h>
 DECLARE_STATIC_LOGGER(logger, "exception");
 
 namespace polygon4

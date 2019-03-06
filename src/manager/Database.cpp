@@ -24,7 +24,7 @@
 
 #include <algorithm>
 
-#include "Logger.h"
+#include <primitives/log.h>
 DECLARE_STATIC_LOGGER(logger, "db");
 
 #define MAX_ERROR_SQL_LENGTH 200

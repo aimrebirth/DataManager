@@ -23,7 +23,7 @@
 #include <Polygon4/DataManager/StorageImpl.h>
 #include <Polygon4/DataManager/Types.h>
 
-#include "Logger.h"
+#include <primitives/log.h>
 DECLARE_STATIC_LOGGER(logger, "storage");
 
 namespace polygon4
