@@ -1490,7 +1490,7 @@ ModuleContext Class::printIo() const
         mc.cpp.addLine("auto db3 = db->getDb();");
         mc.cpp.addLine("sqlite3_stmt *stmt;");
         mc.cpp.beginBlock("if (sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0) != SQLITE_OK)");
-        mc.cpp.addLine("throw EXCEPTION(sqlite3_errmsg(db3));");
+        mc.cpp.addLine("throw SW_EXCEPTION(sqlite3_errmsg(db3));");
         mc.cpp.endBlock();
         mc.cpp.addLine("while (sqlite3_step(stmt) == SQLITE_ROW)");
         mc.cpp.beginBlock();
@@ -1619,7 +1619,7 @@ ModuleContext Class::printIo() const
             mc.cpp.addLine("auto db3 = db->getDb();");
             mc.cpp.addLine("sqlite3_stmt *stmt;");
             mc.cpp.beginBlock("if (sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0) != SQLITE_OK)");
-            mc.cpp.addLine("throw EXCEPTION(sqlite3_errmsg(db3));");
+            mc.cpp.addLine("throw SW_EXCEPTION(sqlite3_errmsg(db3));");
             mc.cpp.endBlock();
             mc.cpp.beginBlock("for (auto &" + getCppVariableName() + " : " + getCppArrayVariableName() + ")");
             mc.cpp.addLine("auto &v = " + getCppVariableName() + ".second;");

@@ -18,8 +18,9 @@
 
 #pragma once
 
-#include "Exception.h"
 #include "String.h"
+
+#include <primitives/exceptions.h>
 
 #include <memory>
 
@@ -112,7 +113,7 @@ struct IdPtr
     T &operator*() const
     {
         if (ptr == nullptr)
-            throw EXCEPTION("Value is not present");
+            throw SW_EXCEPTION("Value is not present");
         return (T &)*ptr;
     }
     T *get() const
