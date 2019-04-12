@@ -18,17 +18,17 @@
 
 #pragma once
 
-#include <primitives/context.h>
+#include <primitives/emitter.h>
 
-using Context = primitives::CppContext;
+using Emitter = primitives::CppEmitter;
 
-struct ModuleContext
+struct ModuleEmitter
 {
-    Context cpp;
-    Context hpp;
+    Emitter cpp;
+    Emitter hpp;
 
-    ModuleContext() {}
-    ModuleContext &operator+=(const ModuleContext &rhs)
+    ModuleEmitter() {}
+    ModuleEmitter &operator+=(const ModuleEmitter &rhs)
     {
         cpp += rhs.cpp;
         hpp += rhs.hpp;

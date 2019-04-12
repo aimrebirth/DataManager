@@ -101,14 +101,14 @@ sqlite3 *load_from_file(const path &fn)
     {
         std::string error = "Can't open database file: " + fn.u8string() + " error: " + sqlite3_errmsg(db);
         LOG_ERROR(logger, error);
-        throw SW_EXCEPTION(error);
+        throw SW_RUNTIME_ERROR(error);
     }
     auto ret = loadOrSaveDb(db, fn.u8string().c_str(), 0);
     if (ret != SQLITE_OK)
     {
         std::string error = "Can't load database: " + fn.u8string() + " error: " + sqlite3_errstr(ret);
         LOG_ERROR(logger, error);
-        throw SW_EXCEPTION(error);
+        throw SW_RUNTIME_ERROR(error);
     }
     return db;
 }
@@ -120,7 +120,7 @@ void save_to_file(const path &fn, sqlite3 *db)
     {
         std::string error = "Can't save database: " + fn.u8string() + " error: " + sqlite3_errstr(ret);
         LOG_ERROR(logger, error);
-        throw SW_EXCEPTION(error);
+        throw SW_RUNTIME_ERROR(error);
     }
 }
 
@@ -186,7 +186,7 @@ bool Database::execute(const std::string &sql, void *object, Sqlite3Callback cal
                 *err = error;
         }
         else
-            throw SW_EXCEPTION(error);
+            throw SW_RUNTIME_ERROR(error);
     }
     return error.empty();
 }
@@ -218,7 +218,7 @@ bool Database::execute(const std::string &sql, DatabaseCallback callback, bool n
                 *err = error;
         }
         else
-            throw SW_EXCEPTION(error);
+            throw SW_RUNTIME_ERROR(error);
     }
     return error.empty();
 }

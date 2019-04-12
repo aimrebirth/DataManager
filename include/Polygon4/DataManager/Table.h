@@ -127,13 +127,13 @@ public:
         auto key = v->getId(maxId);
         if (key < 1)
         {
-            throw SW_EXCEPTION("Bad id (" + std::to_string(key) + ") < 1 detected. Table: '" + name + "'" +
+            throw SW_RUNTIME_ERROR("Bad id (" + std::to_string(key) + ") < 1 detected. Table: '" + name + "'" +
                 ", value: '" + v->getName().toString() + "'");
         }
         auto old = base::find(key);
         if (old != base::end())
         {
-            throw SW_EXCEPTION("Duplicate key (" + std::to_string(key) + ") detected. Table '" + name + "'" +
+            throw SW_RUNTIME_ERROR("Duplicate key (" + std::to_string(key) + ") detected. Table '" + name + "'" +
                 ", old value: '" + old->second->getName().toString() + "'" +
                 ", new value: '" + old->second->getName().toString() + "'");
         }
@@ -161,7 +161,7 @@ public:
         auto v = base::find(i);
         if (v == base::end())
         {
-            throw SW_EXCEPTION("key (" + std::to_string(i) + ") not found in table '" + name + "'");
+            throw SW_RUNTIME_ERROR("key (" + std::to_string(i) + ") not found in table '" + name + "'");
         }
         return v->second;
     }
@@ -202,7 +202,7 @@ public:
         auto v = base::find(i);
         if (v == base::end())
         {
-            throw SW_EXCEPTION("key (" + std::to_string(i) + ") not found in table '" + name + "'");
+            throw SW_RUNTIME_ERROR("key (" + std::to_string(i) + ") not found in table '" + name + "'");
         }
         return id_ptr_type(v->second);
     }

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "Context.h"
+#include "Emitter.h"
 #include "Types.h"
 
 #include <assert.h>
@@ -191,7 +191,7 @@ public:
     bool isComplex() const { return !isSimple(); }
     bool isText() const { return getCppName() == "Text"; }
 
-    virtual void printVariables(ModuleContext &mc) const {}
+    virtual void printVariables(ModuleEmitter &mc) const {}
 
     bool operator<(const Type &rhs) const
     {
@@ -233,8 +233,8 @@ public:
     std::string print() const;
     std::string printSet() const;
     std::string printSetPtr() const;
-    void printLoadSqlite3(Context &context, const std::string &var) const;
-    void printSaveSqlite3(Context &context, const std::string &var) const;
+    void printLoadSqlite3(Emitter &context, const std::string &var) const;
+    void printSaveSqlite3(Emitter &context, const std::string &var) const;
 
 public:
     Name getName() const
@@ -389,12 +389,12 @@ public:
     virtual bool isSimple() const override { return false; }
 
     std::string printSql() const;
-    virtual void printVariables(ModuleContext &mc) const override;
+    virtual void printVariables(ModuleEmitter &mc) const override;
 
-    ModuleContext print(const Schema &schema) const;
-    ModuleContext printIo() const;
-    ModuleContext printAddDeleteRecordVirtual() const;
-    ModuleContext printAddDeleteRecord() const;
+    ModuleEmitter print(const Schema &schema) const;
+    ModuleEmitter printIo() const;
+    ModuleEmitter printAddDeleteRecordVirtual() const;
+    ModuleEmitter printAddDeleteRecord() const;
 
 private:
     Variables variables;
@@ -446,8 +446,8 @@ public:
     std::string getEnding() const { return ending; }
     EnumItems& getItems() { return items; }
 
-    ModuleContext print() const;
-    ModuleContext printTableRecord() const;
+    ModuleEmitter print() const;
+    ModuleEmitter printTableRecord() const;
 
 private:
     std::string ending;
@@ -494,13 +494,13 @@ public:
         return service_db;
     }
 
-    ModuleContext printForwardDeclarations() const;
-    ModuleContext printObjectInterfaces() const;
-    ModuleContext printTypes() const;
-    ModuleContext printType(const Class &c) const;
-    ModuleContext printStorage() const;
-    ModuleContext printStorageImplementation() const;
-    ModuleContext printEnums() const;
+    ModuleEmitter printForwardDeclarations() const;
+    ModuleEmitter printObjectInterfaces() const;
+    ModuleEmitter printTypes() const;
+    ModuleEmitter printType(const Class &c) const;
+    ModuleEmitter printStorage() const;
+    ModuleEmitter printStorageImplementation() const;
+    ModuleEmitter printEnums() const;
 
     Version getVersion() const { return version; }
 

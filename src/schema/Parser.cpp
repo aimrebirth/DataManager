@@ -20,7 +20,7 @@
 
 #include <schema_parser.h>
 
-#include <Polygon4/DataManager/Schema/Context.h>
+#include <Polygon4/DataManager/Schema/Emitter.h>
 
 #include <algorithm>
 #include <fstream>

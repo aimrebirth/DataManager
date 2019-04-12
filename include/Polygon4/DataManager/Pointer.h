@@ -113,7 +113,7 @@ struct IdPtr
     T &operator*() const
     {
         if (ptr == nullptr)
-            throw SW_EXCEPTION("Value is not present");
+            throw SW_RUNTIME_ERROR("Value is not present");
         return (T &)*ptr;
     }
     T *get() const

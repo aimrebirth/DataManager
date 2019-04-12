@@ -23,7 +23,7 @@
 
 #include <boost/variant.hpp>
 
-#include "Context.h"
+#include "Emitter.h"
 
 using BisonToken = int;
 
@@ -43,10 +43,10 @@ struct Token
     int type;
     Value value;
 
-    void print(ModuleContext &mc);
+    void print(ModuleEmitter &mc);
 };
 
 using Tokens = std::vector<Token>;
 
 SCHEMA_API
-ModuleContext print(Tokens &tokens);
+ModuleEmitter print(Tokens &tokens);
