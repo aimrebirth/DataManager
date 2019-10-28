@@ -1489,7 +1489,7 @@ ModuleEmitter Class::printIo() const
         mc.cpp.addText(" from " + getSqlName() + ";\"" + ";");
         mc.cpp.addLine("auto db3 = db->getDb();");
         mc.cpp.addLine("sqlite3_stmt *stmt;");
-        mc.cpp.beginBlock("if (sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0) != SQLITE_OK)");
+        mc.cpp.beginBlock("if (sqlite3_prepare_v2(db3, query.c_str(), (int)query.size() + 1, &stmt, 0) != SQLITE_OK)");
         mc.cpp.addLine("throw SW_RUNTIME_ERROR(sqlite3_errmsg(db3));");
         mc.cpp.endBlock();
         mc.cpp.addLine("while (sqlite3_step(stmt) == SQLITE_ROW)");
@@ -1618,7 +1618,7 @@ ModuleEmitter Class::printIo() const
             mc.cpp.addText(");\";");
             mc.cpp.addLine("auto db3 = db->getDb();");
             mc.cpp.addLine("sqlite3_stmt *stmt;");
-            mc.cpp.beginBlock("if (sqlite3_prepare_v2(db3, query.c_str(), query.size() + 1, &stmt, 0) != SQLITE_OK)");
+            mc.cpp.beginBlock("if (sqlite3_prepare_v2(db3, query.c_str(), (int)query.size() + 1, &stmt, 0) != SQLITE_OK)");
             mc.cpp.addLine("throw SW_RUNTIME_ERROR(sqlite3_errmsg(db3));");
             mc.cpp.endBlock();
             mc.cpp.beginBlock("for (auto &" + getCppVariableName() + " : " + getCppArrayVariableName() + ")");
@@ -2103,7 +2103,7 @@ void Variable::printSaveSqlite3(Emitter &ctx, const std::string &var) const
             break;
         case DataType::Blob:
             ctx.addLine("sqlite3_bind_blob(stmt, " + std::to_string(id + 1) + ", " +
-                var + "->" + getPrefixedName() + ".getRawData()" + ", " +
+                var + "->" + getPrefixedName() + ".getRawData()" + ", (int)" +
                 var + "->" + getPrefixedName() + ".getLength()" +
                 ", SQLITE_TRANSIENT);");
             break;
