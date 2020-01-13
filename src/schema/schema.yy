@@ -70,7 +70,7 @@ struct MY_PARSER_DRIVER : MY_PARSER
 
         by_type bt;
         bt.type = tok.type;
-        switch (bt.token())
+        switch (bt.type_get())
         {
         case token::INTEGER:
             t.type = Token::Integer;
