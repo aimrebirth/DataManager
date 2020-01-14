@@ -27,7 +27,7 @@
 #endif
 
 #ifdef __UNREAL__
-#include <Text.h>
+//#include <Text.h>
 #endif
 
 DATA_MANAGER_API std::wstring string2wstring(const std::string &s);
