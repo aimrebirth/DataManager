@@ -21,6 +21,8 @@
 #include <codecvt>
 #include <locale>
 
+#include <string.h>
+
 inline auto& get_string_converter()
 {
     static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;

@@ -170,13 +170,13 @@ class ScriptEngine;
 namespace detail
 {
 
-#include "interface/IConfiguration.h"
+#include "Interface/IConfiguration.h"
 #include "Interface/IConfigurationWeapon.h"
-#include "interface/IGlider.h"
-#include "interface/IMap.h"
-#include "interface/IMapObject.h"
-#include "interface/IMapBuilding.h"
-#include "interface/IModification.h"
+#include "Interface/IGlider.h"
+#include "Interface/IMap.h"
+#include "Interface/IMapObject.h"
+#include "Interface/IMapBuilding.h"
+#include "Interface/IModification.h"
 #include "Interface/IMechanoid.h"
 
 } // namespace detail
