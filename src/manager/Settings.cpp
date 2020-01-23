@@ -20,8 +20,8 @@
 
 #include <Polygon4/DataManager/Settings.h>
 
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
+#include <filesystem>
+namespace fs = std::filesystem;
 
 namespace polygon4
 {
@@ -31,10 +31,10 @@ void Settings::Directories::setGameDir(const String &p)
     game = p;
 
     mods = game + "/Mods";
-    fs::create_directories(mods);
+    fs::create_directories((std::string)mods);
 
     saves = game + "/Saves";
-    fs::create_directories(saves);
+    fs::create_directories((std::string)saves);
 }
 
 } // namespace polygon4

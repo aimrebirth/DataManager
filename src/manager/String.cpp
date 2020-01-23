@@ -23,7 +23,7 @@
 
 #include <string.h>
 
-inline auto& get_string_converter()
+static inline auto &get_string_converter_wstring()
 {
     static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     return converter;
@@ -31,13 +31,34 @@ inline auto& get_string_converter()
 
 std::wstring string2wstring(const std::string &s)
 {
-    auto &converter = get_string_converter();
+    auto &converter = get_string_converter_wstring();
     return converter.from_bytes(s.c_str());
 }
 
 std::string wstring2string(const std::wstring &s)
 {
-    auto &converter = get_string_converter();
+    auto &converter = get_string_converter_wstring();
+    return converter.to_bytes(s.c_str());
+}
+
+static inline auto &get_string_converter_u16string()
+{
+    // std::codecvt_utf8<char16_t> = UCS-2 (UE4 uses that)
+    // std::codecvt_utf8_utf16<char16_t> = UTF-16
+    // see this thread https://stackoverflow.com/questions/7232710/convert-between-string-u16string-u32string
+    static std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
+    return converter;
+}
+
+std::u16string string2u16string(const std::string &s)
+{
+    auto &converter = get_string_converter_u16string();
+    return converter.from_bytes(s.c_str());
+}
+
+std::string u16string2string(const std::u16string &s)
+{
+    auto &converter = get_string_converter_u16string();
     return converter.to_bytes(s.c_str());
 }
 

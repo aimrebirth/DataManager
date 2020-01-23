@@ -74,13 +74,13 @@ void TreeItem::update()
     {
         s = tr(defaultName);
         if (!name.empty())
-            s += L" - ";
+            s += u" - ";
     }
     s += tr(name);
     int cc = child_count();
     if (cc)
-        s += L" [" + std::to_wstring(cc) + L"]";
-    replace_all<::polygon4::String>(s, L"\n", L" ");
+        s += " [" + std::to_string(cc) + "]";
+    replace_all<::polygon4::String>(s, u"\n", u" ");
 
     static const size_t max_size = 50;
     if (s.size() > max_size)
