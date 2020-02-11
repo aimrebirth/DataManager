@@ -68,21 +68,20 @@ struct MY_PARSER_DRIVER : MY_PARSER
         Token t;
         t.token = tok.type;
 
-        by_type bt;
-        bt.type = tok.type;
-        switch (bt.type_get())
+        if (0);
+        else if (by_type(token::INTEGER).type_get() == tok.type)
         {
-        case token::INTEGER:
             t.type = Token::Integer;
             t.value = tok.value.as<int>();
-            break;
-        case token::STRING:
+        }
+        else if (by_type(token::STRING).type_get() == tok.type)
+        {
             t.type = Token::String;
             t.value = tok.value.as<std::string>();
-            break;
-        default:
+        }
+        else
+        {
             t.type = Token::None;
-            break;
         }
         return t;
     }
