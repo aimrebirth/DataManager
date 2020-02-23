@@ -255,7 +255,7 @@ private:
 
     int compare(const String &s) const
     {
-        return memcmp(c_str(), s.c_str(), std::min(size(), s.size()) * sizeof(base::value_type));
+        return base::compare(s);
     }
 };
 
