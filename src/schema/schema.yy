@@ -49,8 +49,7 @@ struct MY_PARSER_DRIVER : MY_PARSER
 
     symbol_type convert(const Token &t)
     {
-        symbol_type s;
-        s.type = t.token;
+        symbol_type s(t.token, location_type{});
         switch (t.type)
         {
         case Token::Integer:
@@ -66,22 +65,20 @@ struct MY_PARSER_DRIVER : MY_PARSER
     Token convert(const symbol_type &tok)
     {
         Token t;
-        t.token = tok.type;
-
-        if (0);
-        else if (by_type(token::INTEGER).type_get() == tok.type)
+        t.token = tok.kind();
+        switch (tok.kind())
         {
+        case symbol_kind::S_INTEGER:
             t.type = Token::Integer;
             t.value = tok.value.as<int>();
-        }
-        else if (by_type(token::STRING).type_get() == tok.type)
-        {
+            break;
+        case symbol_kind::S_STRING:
             t.type = Token::String;
             t.value = tok.value.as<std::string>();
-        }
-        else
-        {
+            break;
+        default:
             t.type = Token::None;
+            break;
         }
         return t;
     }
