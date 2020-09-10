@@ -99,14 +99,14 @@ sqlite3 *load_from_file(const path &fn)
     sqlite3 *db = nullptr;
     if (sqlite3_open(":memory:", &db))
     {
-        std::string error = "Can't open database file: " + fn.u8string() + " error: " + sqlite3_errmsg(db);
+        std::string error = "Can't open database file: " + to_printable_string(fn) + " error: " + sqlite3_errmsg(db);
         LOG_ERROR(logger, error);
         throw SW_RUNTIME_ERROR(error);
     }
-    auto ret = loadOrSaveDb(db, fn.u8string().c_str(), 0);
+    auto ret = loadOrSaveDb(db, (const char *)to_path_string(fn).c_str(), 0);
     if (ret != SQLITE_OK)
     {
-        std::string error = "Can't load database: " + fn.u8string() + " error: " + sqlite3_errstr(ret);
+        std::string error = "Can't load database: " + to_printable_string(fn) + " error: " + sqlite3_errstr(ret);
         LOG_ERROR(logger, error);
         throw SW_RUNTIME_ERROR(error);
     }
@@ -115,10 +115,10 @@ sqlite3 *load_from_file(const path &fn)
 
 void save_to_file(const path &fn, sqlite3 *db)
 {
-    auto ret = loadOrSaveDb(db, fn.u8string().c_str(), 1);
+    auto ret = loadOrSaveDb(db, (const char *)to_path_string(fn).c_str(), 1);
     if (ret != SQLITE_OK)
     {
-        std::string error = "Can't save database: " + fn.u8string() + " error: " + sqlite3_errstr(ret);
+        std::string error = "Can't save database: " + to_printable_string(fn) + " error: " + sqlite3_errstr(ret);
         LOG_ERROR(logger, error);
         throw SW_RUNTIME_ERROR(error);
     }
@@ -131,7 +131,7 @@ Database::Database(const path &dbname)
 {
     LOG_TRACE(logger, "Initializing database: " << dbname);
     loadDatabase(dbname);
-    name = dbname.filename().u8string();
+    name = to_printable_string(dbname.filename());
     fullName = dbname;
 }
 
