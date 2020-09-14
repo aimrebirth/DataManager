@@ -47,22 +47,7 @@ struct MY_PARSER_DRIVER : MY_PARSER
     const Tokens *tokensRead;
     Tokens::const_iterator readIterator;
 
-    symbol_type convert(const Token &t)
-    {
-        symbol_type s(t.token, location_type{});
-        switch (t.type)
-        {
-        case Token::Integer:
-            s.value.build<int>(boost::get<int>(t.value));
-            break;
-        case Token::String:
-            s.value.build<std::string>(boost::get<std::string>(t.value));
-            break;
-        }
-        return s;
-    }
-
-    Token convert(const symbol_type &tok)
+    Token convert_symbol(const symbol_type &tok)
     {
         Token t;
         t.token = tok.kind();
@@ -83,18 +68,40 @@ struct MY_PARSER_DRIVER : MY_PARSER
         return t;
     }
 
+    symbol_type convert_token(const Token &t)
+    {
+        // here we emulate symbol kind -> token kind conversion
+
+        // 255 is an offset
+        int offset = 255;
+
+        // 0 is a special case
+        if (t.token == 0)
+            return symbol_type(t.token, location_type{});
+
+        switch (t.type)
+        {
+        case Token::Integer:
+            return symbol_type(t.token + offset, boost::get<int>(t.value), location_type{});
+        case Token::String:
+            return symbol_type(t.token + offset, boost::get<std::string>(t.value), location_type{});
+        default:
+            return symbol_type(t.token + offset, location_type{});
+        }
+    }
+
     symbol_type lex()
     {
         if (parseMode == Mode::String)
         {
             auto ret = base::lex();
             if (tokensWrite)
-                tokensWrite->push_back(convert(ret));
+                tokensWrite->push_back(convert_symbol(ret));
             return ret;
         }
         else
         {
-            return convert(*readIterator++);
+            return convert_token(*readIterator++);
         }
     }
 
