@@ -173,8 +173,10 @@ public:
     operator FString() const { return toFString(); }
 
     String(const FText &s)
-        : String(s.ToString())
-    {}
+    {
+        if (!s.IsEmpty())
+            *this = String(s.ToString());
+    }
     String &operator=(const FText &s)
     {
         assign(s);
