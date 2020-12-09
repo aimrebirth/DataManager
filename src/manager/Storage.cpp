@@ -36,13 +36,7 @@ namespace detail
 
 } // namespace detail
 
-std::shared_ptr<Storage> initStorage(const path &filename)
-{
-    std::shared_ptr<Database> db = std::make_shared<Database>(filename);
-    return initStorage(db);
-}
-
-std::shared_ptr<Storage> initStorage(const std::shared_ptr<Database> &db)
+std::unique_ptr<Storage> initStorage()
 {
     if (!detail::schema)
     {
@@ -51,7 +45,7 @@ std::shared_ptr<Storage> initStorage(const std::shared_ptr<Database> &db)
     }
     initTranslator();
     LOG_DEBUG(logger, "Initializing storage");
-    return std::make_shared<detail::StorageImpl>(db);
+    return std::make_unique<detail::StorageImpl>();
 }
 
 } // namespace polygon4

@@ -33,6 +33,8 @@
 namespace polygon4
 {
 
+class Database;
+
 namespace detail
 {
 
@@ -47,11 +49,8 @@ using ProgressCallback = std::function<void(double)>;
 } // namespace detail
 
 using detail::Storage;
-class Database;
 
 DATA_MANAGER_API
-std::shared_ptr<Storage> initStorage(const path &filename);
-DATA_MANAGER_API
-std::shared_ptr<Storage> initStorage(const std::shared_ptr<Database> &db);
+std::unique_ptr<Storage> initStorage();
 
 } // namespace polygon4
