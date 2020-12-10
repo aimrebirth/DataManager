@@ -253,6 +253,7 @@ public:
     // other functions
 public:
     void setName(const std::string &name) { this->name = name; }
+    std::string getName() const { return name; }
     void setStorage(Storage &storage) { this->storage = &storage; }
 
 private:
