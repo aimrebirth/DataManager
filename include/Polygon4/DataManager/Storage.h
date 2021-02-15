@@ -18,9 +18,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
 #include "Enums.h"
 #include "Schema.h"
 #include "Settings.h"
@@ -29,6 +26,9 @@
 #include "detail/ForwardDeclarations.h"
 
 #include <primitives/filesystem.h>
+
+#include <memory>
+#include <string>
 
 namespace polygon4
 {
@@ -45,6 +45,18 @@ using CheckFunction = std::function<bool(IObjectBase*)>;
 using ProgressCallback = std::function<void(double)>;
 
 #include "detail/Storage.h"
+
+// create value
+template <class T>
+template <class... Args>
+typename StorageTable<T>::ptr_type StorageTable<T>::create(Args&&... args)
+{
+    auto ptr = T::template create<T>(std::forward<Args>(args)...);
+    auto raw = ptr.get();
+    storage->db_objects.emplace_back(std::move(ptr));
+    raw->setStorage(storage);
+    return raw;
+}
 
 } // namespace detail
 

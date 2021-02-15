@@ -142,6 +142,22 @@ private:
     template <typename T> friend struct IdPtr;
 };
 
+template <typename T>
+IdPtr<T>::IdPtr(base_type *p)
+    : ptr(p)
+{
+    if (ptr)
+        id = ptr->id;
+}
+template <typename T>
+IdPtr<T> &IdPtr<T>::operator=(const base_type *rhs)
+{
+    ptr = (base_type *)rhs;
+    if (ptr)
+        id = ptr->id;
+    return *this;
+}
+
 inline auto to_string(const ::polygon4::String &s)
 {
     return s;

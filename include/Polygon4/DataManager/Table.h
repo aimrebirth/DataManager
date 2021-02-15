@@ -103,14 +103,7 @@ public:
 public:
     // create value
     template <class... Args>
-    ptr_type create(Args&&... args)
-    {
-        auto ptr = T::template create<T>(std::forward<Args>(args)...);
-        auto raw = ptr.get();
-        storage->db_objects.emplace_back(std::move(ptr));
-        raw->setStorage(storage);
-        return raw;
-    }
+    ptr_type create(Args&&... args);
 
     // create value and append it to the end of container
     template <class... Args>
@@ -224,7 +217,7 @@ public:
 
     size_t erase(const ptr_type &v)
     {
-        return erase(v.get());
+        return erase(v);
     }
     size_t erase(const mapped_type *v)
     {

@@ -60,12 +60,7 @@ struct IdPtr
         : id(id)
     {
     }
-    IdPtr(base_type *p)
-        : ptr(p)
-    {
-        if (ptr)
-            id = ptr->id;
-    }
+    IdPtr(base_type *p);
     IdPtr(const Ptr<T> &p)
         : IdPtr(p.get())
     {
@@ -91,20 +86,7 @@ struct IdPtr
     {
         return *this = rhs.get();
     }
-    IdPtr &operator=(const base_type *rhs)
-    {
-        ptr = rhs;
-        if (ptr)
-            id = ptr->id;
-        return *this;
-    }
-    IdPtr &operator=(base_type *rhs)
-    {
-        ptr = rhs;
-        if (ptr)
-            id = ptr->id;
-        return *this;
-    }
+    IdPtr &operator=(const base_type *rhs);
 
     T *operator->() const
     {
