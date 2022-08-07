@@ -20,6 +20,7 @@ void build(Solution &s)
     {
         schema += cpp20;
         schema.ApiName = "SCHEMA_API";
+        schema += "data/schema.txt";
         schema += "include/.*"_rr;
         schema += "src/schema/.*\\.h"_rr;
         schema += "src/schema/.*\\.cpp"_rr;
